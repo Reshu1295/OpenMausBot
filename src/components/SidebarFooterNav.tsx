@@ -92,9 +92,39 @@ export function useAutomationsNeedYou(): boolean {
   return state.routineRuns.some((run) => isRoutineProblemRun(run) && !run.seenAt) || appTriggers.triggers.some((trigger) => trigger.enabled && trigger.problem);
 }
 
+/** The bar beside the profile. Advanced mode with the Bottom Tools layout puts Automations and Team map here as icons
+ * ahead of Apps; every other arrangement leaves the bar to Apps and the update button. */
 export function SidebarBottomButtons() {
+  const { state, dispatch } = useStore();
+  const advanced = useAdvancedMode();
+  const toolsLayout = useSidebarToolsLayout();
+  const toolsInBar = advanced && toolsLayout === "bottom";
+  const automationsNeedYou = useAutomationsNeedYou();
+  const tone = (active: boolean) => (active ? "text-accent" : "text-ink-secondary");
   return (
     <div data-sidebar-bottom-buttons="" className="flex shrink-0 items-center gap-0.5">
+      {toolsInBar && <>
+        <NavRow
+          id="automations"
+          label={t("sidebar.nav.automations")}
+          tourId="nav-automations"
+          iconsOnly
+          rail
+          active={state.activeView === "routines"}
+          attention={automationsNeedYou}
+          icon={(active) => <Zap size={18} className={tone(active)} />}
+          onClick={() => dispatch({ type: "showRoutines", view: "list" })}
+        />
+        <NavRow
+          id="team-map"
+          label={t("sidebar.nav.teamMap")}
+          iconsOnly
+          rail
+          active={state.activeView === "team-map"}
+          icon={(active) => <UsersRound size={18} className={tone(active)} />}
+          onClick={() => dispatch({ type: "showTeamMap" })}
+        />
+      </>}
       <SidebarAppsButton />
       <UpdateIndicator />
     </div>
@@ -140,6 +170,9 @@ export function SidebarFooterNav({
     icon={(active) => <FolderOpen size={iconSize} className={tone(active)} />}
     onClick={() => dispatch({ type: "showFiles" })}
   />;
+  // Bottom moves Automations and Team map to the bottom bar, so the body returns the headerless Files row while the
+  // cloud is ready and nothing at all when it is not - never a Tools section without visible rows.
+  if (advanced && toolsLayout === "bottom" && !iconsOnly) return filesRow ? <nav aria-label={t("sidebar.tools")} className="flex flex-col gap-0.5">{filesRow}</nav> : null;
   if (!advanced && !iconsOnly) return null;
   const appsRow = iconsOnly && <NavRow
     id="apps"
