@@ -58,7 +58,7 @@ export function AutomationPanel({ automation, sentence, onClose, onEdit, onDelet
       <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-5 py-4">
         <div className="flex flex-wrap items-center gap-2 text-[13px]" data-automation-status={status.state}>
           <StatusMark status={status} />
-          <span className={cn("font-medium", status.state === "needs-you" ? "text-warning" : "text-ink")}>{statusWord}</span>
+          <span className={cn("font-medium", status.state === "needs-you" ? "text-warning-text" : "text-ink")}>{statusWord}</span>
           {reason && <span className="min-w-0 text-ink-secondary">{reason}</span>}
           <FixButton automation={automation} status={status} actions={actions} onEdit={onEdit} />
         </div>
@@ -127,7 +127,7 @@ export function AutomationPanel({ automation, sentence, onClose, onEdit, onDelet
                   <button type="button" disabled={!run.threadId} onClick={() => actions.openRun(automation, run)} title={run.threadId ? t("automations.panel.open") : undefined}
                     className="flex w-full items-baseline gap-2 rounded-lg px-2 py-1.5 text-left text-[13px] hover:bg-raised disabled:hover:bg-transparent">
                     <span className="shrink-0 text-ink-secondary">{line.when}</span>
-                    <span className={cn("shrink-0 font-semibold", line.mark === "✓" ? "text-success" : line.mark === "✗" ? "text-danger-text" : "text-warning")}>{line.mark}</span>
+                    <span className={cn("shrink-0 font-semibold", line.mark === "✓" ? "text-success" : line.mark === "✗" ? "text-danger-text" : "text-warning-text")}>{line.mark}</span>
                     <span className="min-w-0 truncate text-ink">{line.text}</span>
                   </button>
                 </li>

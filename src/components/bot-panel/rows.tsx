@@ -163,7 +163,7 @@ export function ColRow({ children, ...rest }: { children: ReactNode; "data-panel
 export function NoteRow({ children, tone }: { children: ReactNode; tone?: "warn" }) {
   return (
     <div className={rowCls}>
-      <div className={cn("text-[13px] leading-[1.35]", tone === "warn" ? "text-warning" : "text-ink-secondary")}>{children}</div>
+      <div className={cn("text-[13px] leading-[1.35]", tone === "warn" ? "text-warning-text" : "text-ink-secondary")}>{children}</div>
     </div>
   );
 }

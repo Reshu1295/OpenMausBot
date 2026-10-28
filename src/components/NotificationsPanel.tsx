@@ -13,9 +13,9 @@ import { Select } from "./Select";
 const KIND_LOOK: Record<NotifyKind, { Icon: LucideIcon; className: string; status: LocaleKey }> = {
   done: { Icon: CheckCircle2, className: "text-success", status: "notifications.status.done" },
   "delegation-settled": { Icon: CheckCircle2, className: "text-success", status: "notifications.status.done" },
-  approval: { Icon: HandHelping, className: "text-warning", status: "notifications.status.approval" },
-  question: { Icon: CircleHelp, className: "text-warning", status: "notifications.status.question" },
-  "sign-in": { Icon: LogIn, className: "text-warning", status: "notifications.status.signIn" },
+  approval: { Icon: HandHelping, className: "text-warning-text", status: "notifications.status.approval" },
+  question: { Icon: CircleHelp, className: "text-warning-text", status: "notifications.status.question" },
+  "sign-in": { Icon: LogIn, className: "text-warning-text", status: "notifications.status.signIn" },
   mention: { Icon: AtSign, className: "text-accent-text", status: "notifications.status.mention" },
   incident: { Icon: AlertTriangle, className: "text-danger-text", status: "notifications.status.incident" },
   "turn-failed": { Icon: AlertTriangle, className: "text-danger-text", status: "notifications.status.failed" },

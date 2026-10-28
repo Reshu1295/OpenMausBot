@@ -46,6 +46,8 @@ export default {
     "danger-text": "#f86e68",
     "danger-ink": "#ffffff",
     warning: "#ff9800",
+    "warning-text": "#ff9800",
+    "warning-ink": "#2b1400",
     scrollbar: "#3d3d3d",
     "maus-line": "#f5f5f5",
   },
@@ -67,7 +69,7 @@ export default {
   },
   captionSymbol: "#b5b5b5",
   wideGamut: {
-    tokens: ["accent", "accent-border", "accent-text", "success", "danger", "danger-text", "warning"],
+    tokens: ["accent", "accent-border", "accent-text", "success", "danger", "danger-text", "warning", "warning-text"],
     pinned: {
       "accent-border": "color(display-p3 0.3457 0.6136 0.9909)",
       "accent-text": "color(display-p3 0.5417 0.7465 0.9948)",

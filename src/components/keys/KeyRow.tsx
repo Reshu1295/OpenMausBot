@@ -340,13 +340,13 @@ export function KeyRow({
               </p>
             )}
             {other && (
-              <p className="flex gap-1.5 text-warning">
+              <p className="flex gap-1.5 text-warning-text">
                 <TriangleAlert size={13} aria-hidden="true" className="mt-px shrink-0" />
                 <span>{t("keys.row.looksLike", { label: t(other.labelKey) })}</span>
               </p>
             )}
             {warning && (
-              <p className="flex gap-1.5 text-warning">
+              <p className="flex gap-1.5 text-warning-text">
                 <TriangleAlert size={13} aria-hidden="true" className="mt-px shrink-0" />
                 <span>{warning}</span>
               </p>

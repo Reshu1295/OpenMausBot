@@ -128,7 +128,7 @@ export function AnthropicEveryClaudeBot() {
         <Switch checked={on} disabled={saving} onClick={toggle} aria-label={t("keys.anthropic.everyBot")} />
       </div>
       {on && (
-        <p className="flex gap-1.5 text-[12px] leading-4 text-warning">
+        <p className="flex gap-1.5 text-[12px] leading-4 text-warning-text">
           <TriangleAlert size={13} className="mt-px shrink-0" aria-hidden="true" />
           <span>{t("keys.anthropic.warning")}</span>
         </p>

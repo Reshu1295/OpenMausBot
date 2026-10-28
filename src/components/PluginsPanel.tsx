@@ -618,7 +618,7 @@ export function PluginsPanel() {
 
         <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-7 sm:px-7">
           {stale && (
-            <div className="mb-3 flex items-start gap-2 rounded-xl bg-warning/10 px-3 py-2 text-[13px] text-warning">
+            <div className="mb-3 flex items-start gap-2 rounded-xl bg-warning/10 px-3 py-2 text-[13px] text-warning-text">
               <TriangleAlert size={14} className="mt-px shrink-0" />
               <span>
                 {t("connectors.stale")}
@@ -629,7 +629,7 @@ export function PluginsPanel() {
             <div
               className={cn(
                 "mb-3 rounded-xl px-4 py-3 text-[13px]",
-                setupNotice.tone === "warning" ? "bg-warning/10 text-warning" : "bg-control/50 text-ink-secondary",
+                setupNotice.tone === "warning" ? "bg-warning/10 text-warning-text" : "bg-control/50 text-ink-secondary",
               )}
             >
               {t(whopConnected ? "whop.otherAppsSetup" : setupNotice.key)}{" "}

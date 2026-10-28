@@ -28,7 +28,7 @@ export function ThreadContextWarningView({ name, percent, busy, pending, onCompa
   return (
     <span role="status" data-testid="context-warning" className={pill}
       title={t("contextWarning.threadHint", { name, percent })}>
-      <Gauge size={13} className="shrink-0 text-warning" aria-hidden="true" />
+      <Gauge size={13} className="shrink-0 text-warning-text" aria-hidden="true" />
       <span className="tabular-nums">{t("contextWarning.short", { percent })}</span>
       <button type="button" className={action} disabled={busy || pending} onClick={onCompact}
         title={busy ? t("contextWarning.busy") : undefined}>
@@ -66,7 +66,7 @@ export function RoomContextWarningsView({ warnings, pendingBotId, onCompact }: {
     <div className="flex flex-col gap-1" data-testid="room-context-warnings">
       {warnings.map(({ bot, percent, requested }) => (
         <p key={bot.id} role="status" className={cn(pill, "w-fit")}>
-          <Gauge size={13} className="shrink-0 text-warning" aria-hidden="true" />
+          <Gauge size={13} className="shrink-0 text-warning-text" aria-hidden="true" />
           <span>{t("contextWarning.room", { name: bot.name, percent })}</span>
           {requested
             ? <span className="text-ink-secondary">{t("contextWarning.roomRequested")}</span>

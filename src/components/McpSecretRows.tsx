@@ -58,7 +58,7 @@ export function McpSecretRows({ kind, rows, onChange, valuesOf, placeholder }: {
               </button>
             </div>
           )}
-          {row.gap && !row.value.trim() && <p className="mt-1 text-[11px] leading-relaxed text-warning">{gapHint(row.gap)}</p>}
+          {row.gap && !row.value.trim() && <p className="mt-1 text-[11px] leading-relaxed text-warning-text">{gapHint(row.gap)}</p>}
         </div>
       ))}
       {!valuesOf && (

@@ -17,7 +17,7 @@ export function routineRunLabel(run: RoutineRun): string {
 }
 
 export function routineRunTone(run: RoutineRun): string {
-  if (run.status === "waiting" || ["needs-input", "limit-reached", "paused"].includes(run.goalStatus ?? "")) return "text-warning";
+  if (run.status === "waiting" || ["needs-input", "limit-reached", "paused"].includes(run.goalStatus ?? "")) return "text-warning-text";
   if (["failed", "missed"].includes(run.status) || ["failed", "blocked"].includes(run.goalStatus ?? "")) return "text-danger-text";
   if (run.status === "running") return "text-accent-text";
   if (run.status === "completed" && (!run.goalStatus || run.goalStatus === "completed")) return "text-success";

@@ -181,12 +181,12 @@ export const PendingApprovalPanel = memo(function PendingApprovalPanel({
             </code>
           )}
           {heldNote && (outbound ? (
-            <span title={heldNote} className={cn(APPROVAL_CONTROL, "h-auto cursor-default items-baseline bg-warning/10 px-2.5 py-1 text-warning")}>
+            <span title={heldNote} className={cn(APPROVAL_CONTROL, "h-auto cursor-default items-baseline bg-warning/10 px-2.5 py-1 text-warning-text")}>
               <Send size={13} aria-hidden="true" className="self-center" />
               {t("approval.compact.maySend")}
             </span>
           ) : (
-            <span title={heldNote} className="inline-flex shrink-0 self-center text-warning">
+            <span title={heldNote} className="inline-flex shrink-0 self-center text-warning-text">
               <TriangleAlert size={14} aria-hidden="true" />
               <span className="sr-only">{heldNote}</span>
             </span>
@@ -231,7 +231,7 @@ export const PendingApprovalPanel = memo(function PendingApprovalPanel({
         {pending.message.card?.skillRequest && (
           <SkillRequestPreview request={pending.message.card.skillRequest} />
         )}
-        {heldNote && <div className="text-[12px] text-warning">{heldNote}</div>}
+        {heldNote && <div className="text-[12px] text-warning-text">{heldNote}</div>}
         {more}
       </div>
     </div>

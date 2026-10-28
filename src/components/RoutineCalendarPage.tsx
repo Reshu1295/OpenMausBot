@@ -843,7 +843,7 @@ export function EventEditor({
                     ? "References will be shared in the group when the event starts."
                     : "References stay with the event and are available when you join the group."}
               </div>
-              {attachmentNotice && <div className="text-[12px] text-warning">{attachmentNotice}</div>}
+              {attachmentNotice && <div className="text-[12px] text-warning-text">{attachmentNotice}</div>}
             </div>}
           </div>
   );
@@ -946,7 +946,7 @@ export function EventEditor({
                         <div className="mt-2 text-[12px] text-ink-secondary">{selectedRoom ? `The lead coordinates ${selectedRoom.name} and assigns work to its active members.` : t("routines.editor.goalOneOnOneHelp")}</div>
                       </>
                     ) : (
-                      <div className="rounded-xl border border-warning/30 bg-warning/10 px-3.5 py-3 text-[12px] text-warning">This group has no active members. Add or restore a bot before scheduling the goal.</div>
+                      <div className="rounded-xl border border-warning/30 bg-warning/10 px-3.5 py-3 text-[12px] text-warning-text">This group has no active members. Add or restore a bot before scheduling the goal.</div>
                     )}
                   </div>
                 </div>
@@ -1565,8 +1565,8 @@ export function EventDetails({
 
       <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4">
         {run && <div role="status" aria-live="polite" className="rounded-xl border border-hairline/40 bg-inset p-3"><div className="flex items-center gap-2 text-[12px] font-medium text-ink">{run.status === "running" && <Loader2 size={13} className="animate-spin text-accent-text" />}{routineRunLabel(run)}</div>{run.output && <div className="mt-2 max-h-48 overflow-y-auto whitespace-pre-wrap text-[12px] leading-relaxed text-ink-secondary">{run.output}</div>}{run.error && <div className="mt-2 text-[12px] text-danger-text">{run.error}</div>}</div>}
-        {run?.attention && <div className="flex items-start gap-2 rounded-xl border border-warning/30 bg-warning/10 px-3 py-2.5 text-warning"><CircleAlert size={15} className="mt-0.5 shrink-0" /><div className="min-w-0 whitespace-pre-wrap text-[12px] leading-relaxed">{run.attention}</div></div>}
-        {run?.status === "waiting" && !run.attention && <div className="rounded-xl border border-warning/30 bg-warning/10 px-3 py-2.5 text-[12px] text-warning">This run is waiting. Open its execution thread for more context.</div>}
+        {run?.attention && <div className="flex items-start gap-2 rounded-xl border border-warning/30 bg-warning/10 px-3 py-2.5 text-warning-text"><CircleAlert size={15} className="mt-0.5 shrink-0" /><div className="min-w-0 whitespace-pre-wrap text-[12px] leading-relaxed">{run.attention}</div></div>}
+        {run?.status === "waiting" && !run.attention && <div className="rounded-xl border border-warning/30 bg-warning/10 px-3 py-2.5 text-[12px] text-warning-text">This run is waiting. Open its execution thread for more context.</div>}
 
         <DrawerField label={isCall ? t("routines.drawer.guests") : isRoomGoal ? t("routines.drawer.lead") : t("routines.drawer.bot")}>
           <div className="flex flex-wrap gap-1.5">

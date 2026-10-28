@@ -229,7 +229,7 @@ export function SimpleModelMenu(props: SimpleModelMenuProps) {
               </Gutter>
               <span className="min-w-0 flex-1 truncate">{current.label}</span>
               {current.pending && <Loader2 size={14} className="shrink-0 animate-spin text-ink-tertiary" aria-hidden="true" />}
-              {current.meta && <span className={cn(MENU_META, current.warning && "text-warning")}>{current.meta}</span>}
+              {current.meta && <span className={cn(MENU_META, current.warning && "text-warning-text")}>{current.meta}</span>}
               <Check size={14} className="shrink-0 text-accent-text" aria-hidden="true" />
             </button>
           )}

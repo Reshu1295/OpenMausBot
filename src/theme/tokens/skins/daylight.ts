@@ -56,7 +56,10 @@ export default {
     // one shade under the fill, so an error also reads on a control (4.60:1); the phones use it too
     "danger-text": "#bd2a39",
     "danger-ink": "#ffffff",
-    warning: "#8a5a00",
+    // the needs-you fill, an amber that marks the page at 3:1 and carries the dark ink; was #8a5a00, now the words
+    warning: "#c47f00",
+    "warning-text": "#8a5a00",
+    "warning-ink": "#2b1400",
     scrollbar: "#c4c4c4",
     "maus-line": "#5f5f5f",
   },
@@ -100,6 +103,8 @@ export default {
     danger: "#ff7788",
     "danger-text": "#ff7788",
     "danger-ink": "#070707",
+    // needs-you words on the dark bubble; the amber fill and its dark ink read there as they are
+    "warning-text": "#ff9800",
     success: "#63b58a",
     "success-ink": "#070707",
   },

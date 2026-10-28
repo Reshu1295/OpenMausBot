@@ -36,7 +36,7 @@ export function TeamSettingsRows({ rows }: { rows: ReadonlyArray<TeamPlanRow | T
         const [label, tone] = row.status === "apply" ? [t("teamSettings.row.willChange"), "text-accent-text"]
           : row.status === "applied" ? [t("teamSettings.row.applied"), "text-success"]
             : row.status === "unchanged" ? [t("teamSettings.row.unchanged"), "text-ink-secondary"]
-              : [t("teamSettings.row.skipped", { reason: row.reason }), "text-warning"];
+              : [t("teamSettings.row.skipped", { reason: row.reason }), "text-warning-text"];
         return (
           <li key={row.bot.id} className="flex items-start justify-between gap-3 rounded-lg bg-inset px-3 py-1.5 text-[13px]">
             <span className="min-w-0 truncate text-ink">{row.bot.name}</span>

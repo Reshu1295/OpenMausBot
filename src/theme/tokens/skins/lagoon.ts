@@ -56,7 +56,10 @@ export default {
     danger: "#a8382f",
     "danger-text": "#a8382f",
     "danger-ink": "#ffffff",
-    warning: "#7a5a2a",
+    // the needs-you fill, an amber that marks the page at 3:1 and carries the dark ink; was #7a5a2a, now the words
+    warning: "#b97800",
+    "warning-text": "#7a5a2a",
+    "warning-ink": "#2b1400",
     scrollbar: "#a6b8b6",
     "maus-line": "#4d5c5b",
   },

@@ -128,7 +128,7 @@ function CustomPicker({ instance, cliDefault, onClose, onSaved }: {
         className="w-full rounded-lg border border-hairline/40 bg-inset px-3 py-2 font-mono text-[12px] text-ink placeholder:font-sans placeholder:text-ink-secondary focus:outline-none disabled:opacity-50"
       />
       {probe && !probe.ok && probe.message && (
-        <div role="alert" className="flex gap-1.5 rounded-lg border border-warning/25 bg-warning/10 px-2.5 py-2 text-[12px] leading-relaxed text-warning">
+        <div role="alert" className="flex gap-1.5 rounded-lg border border-warning/25 bg-warning/10 px-2.5 py-2 text-[12px] leading-relaxed text-warning-text">
           <TriangleAlert size={13} className="mt-0.5 shrink-0" />
           <span>{t("engines.testFailed", { message: probe.message })}</span>
         </div>

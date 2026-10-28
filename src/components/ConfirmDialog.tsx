@@ -115,7 +115,7 @@ export function ConfirmDialogCard({
       )}
     >
       <div className="flex items-start gap-3">
-        <span className={cn("mt-0.5 shrink-0", danger ? "text-danger-text" : "text-warning")}>
+        <span className={cn("mt-0.5 shrink-0", danger ? "text-danger-text" : "text-warning-text")}>
           {icon ?? <AlertTriangle size={18} />}
         </span>
         <div className="min-w-0">

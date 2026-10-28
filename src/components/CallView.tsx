@@ -806,7 +806,7 @@ function Call({ bot }: { bot: Bot }) {
       </div>
 
       {note && (
-        <div className="flex max-w-[460px] flex-col items-center gap-2 text-center text-[13px] text-warning">
+        <div className="flex max-w-[460px] flex-col items-center gap-2 text-center text-[13px] text-warning-text">
           <span>{note}</span>
           <button
             onClick={listen}

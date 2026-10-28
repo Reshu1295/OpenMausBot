@@ -530,7 +530,7 @@ export function McpServersPanel({ embedded = false, whopCard = false, hideWhop =
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="min-w-0 truncate text-[14px] font-medium text-ink">{whop ? "Whop" : server.name}</span>
                         <span className={cn("rounded-full px-2 py-0.5 text-[11px]", server.enabled ? "bg-success/10 text-success" : "bg-raised text-ink-secondary")}>{t(server.enabled ? "mcp.badge.on" : "mcp.badge.off")}</span>
-                        {auth && <span className={cn("rounded-full px-2 py-0.5 text-[11px]", auth === "signed-in" ? "bg-success/10 text-success" : "bg-warning/10 text-warning")}>{t(auth === "signed-in" ? "mcp.auth.signedIn" : "mcp.auth.needsSignIn")}</span>}
+                        {auth && <span className={cn("rounded-full px-2 py-0.5 text-[11px]", auth === "signed-in" ? "bg-success/10 text-success" : "bg-warning/10 text-warning-text")}>{t(auth === "signed-in" ? "mcp.auth.signedIn" : "mcp.auth.needsSignIn")}</span>}
                         {server.managedBy && <span className="rounded-full bg-raised px-2 py-0.5 text-[11px] text-ink-secondary">{t("policy.managedBy", { organization: server.managedBy })}</span>}
                       </div>
                       {server.managedBy && <div className="mt-1 text-[12px] text-ink-secondary">{t("policy.mcpBlocked", { organization: server.managedBy })}</div>}
@@ -585,7 +585,7 @@ export function McpServersPanel({ embedded = false, whopCard = false, hideWhop =
                   </div>}
                   <McpAppsSwitch<McpServerListing> server={server} disabled={busy !== null || signingIn !== null} onSaved={(next) => { loadGeneration.current += 1; listed(next); }} />{renderSignIn(server)}
                   {result && signingIn !== server.name && (
-                    <div role="status" className={cn("mt-3 flex flex-wrap items-center justify-between gap-2 rounded-lg px-3 py-2 text-[12px]", result.ok ? "bg-success/10 text-success" : result.auth === "required" ? "bg-warning/10 text-warning" : "bg-danger/10 text-danger-text")}>
+                    <div role="status" className={cn("mt-3 flex flex-wrap items-center justify-between gap-2 rounded-lg px-3 py-2 text-[12px]", result.ok ? "bg-success/10 text-success" : result.auth === "required" ? "bg-warning/10 text-warning-text" : "bg-danger/10 text-danger-text")}>
                       {result.auth === "required" ? t("mcp.auth.required") : result.ok ? (
                         <span className="flex items-start gap-2"><CheckCircle2 size={14} className="mt-px shrink-0" /> {connectedLabel(result)}</span>
                       ) : (

@@ -190,7 +190,7 @@ function SectionAttention({ attention, label, alert }: { attention?: SidebarSect
       {attention && attention.waiting > 0 && (
         <span
           aria-hidden="true"
-          className="min-w-4 rounded-full bg-warning/15 px-1 text-center text-[9px] font-semibold leading-4 text-warning"
+          className="min-w-4 rounded-full bg-warning/15 px-1 text-center text-[9px] font-semibold leading-4 text-warning-text"
         >
           {attention.waiting}
         </span>

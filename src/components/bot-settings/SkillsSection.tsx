@@ -229,7 +229,7 @@ export function SkillReviewDialog({
           Source: {skill.source}
         </div>
         {skill.warnings.length > 0 && (
-          <div className="mt-2 rounded-lg bg-warning/10 px-3 py-2 text-[12px] text-warning">
+          <div className="mt-2 rounded-lg bg-warning/10 px-3 py-2 text-[12px] text-warning-text">
             {skill.warnings.join(" · ")}
           </div>
         )}
@@ -496,14 +496,14 @@ export function SkillsSection({ bot }: { bot: Bot }) {
                 </div>
                 <div className="mt-1 truncate text-[11px] text-ink-secondary" title={skill.source}>Source: {skill.source}</div>
                 {skill.warnings.length > 0 && (
-                  <div className="mt-1 text-[11px] text-warning">{skill.warnings.join(" · ")}</div>
+                  <div className="mt-1 text-[11px] text-warning-text">{skill.warnings.join(" · ")}</div>
                 )}
               </div>
             ))}
           </div>
         )}
         {staged.length > 0 && (
-          <div className="mt-2 text-[12px] text-warning">
+          <div className="mt-2 text-[12px] text-warning-text">
             {staged.length} proposal{staged.length === 1 ? " is" : "s are"} waiting for a decision in chat.
           </div>
         )}

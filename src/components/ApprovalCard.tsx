@@ -282,9 +282,9 @@ function AppliedChangeLine({
         <div className="mt-1 text-[13px] text-ink-tertiary">{t("approval.applied.shareSkipped", { names: skippedNames.join(", ") })}</div>
       )}
       {!error && !shared && !undone && skill?.shareError && (
-        <div className="mt-1 text-[13px] text-warning">{t("approval.applied.shareFailed", { error: skill.shareError })}</div>
+        <div className="mt-1 text-[13px] text-warning-text">{t("approval.applied.shareFailed", { error: skill.shareError })}</div>
       )}
-      {error && <div role="alert" className="mt-1 text-[13px] text-warning">{error}</div>}
+      {error && <div role="alert" className="mt-1 text-[13px] text-warning-text">{error}</div>}
       {open && (
         <pre
           tabIndex={0}
@@ -502,7 +502,7 @@ export function ApprovalCard({
       {card.skillRequest && <SkillRequestPreview request={card.skillRequest} />}
 
       {heldNote && (
-        <div className="mt-2 rounded-lg border border-warning/30 bg-warning/10 px-3 py-2 text-[13px] text-warning">
+        <div className="mt-2 rounded-lg border border-warning/30 bg-warning/10 px-3 py-2 text-[13px] text-warning-text">
           {heldNote}
         </div>
       )}

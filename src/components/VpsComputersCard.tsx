@@ -76,7 +76,7 @@ export function VpsComputersCard({
       >
         {unavailableReason && instances.length > 0 && (
           <div className="flex items-center gap-2 border-b border-hairline/35 px-3 py-2.5 text-[12px] text-ink-secondary">
-            <AlertTriangle size={14} className="shrink-0 text-warning" /> {unavailableReason}
+            <AlertTriangle size={14} className="shrink-0 text-warning-text" /> {unavailableReason}
           </div>
         )}
         {loading && instances.length === 0 ? (
@@ -85,7 +85,7 @@ export function VpsComputersCard({
           </div>
         ) : unavailableReason && instances.length === 0 ? (
           <div className="flex items-center gap-2 px-3 py-4 text-[13px] text-ink-secondary">
-            <AlertTriangle size={14} className="shrink-0 text-warning" /> {unavailableReason}
+            <AlertTriangle size={14} className="shrink-0 text-warning-text" /> {unavailableReason}
           </div>
         ) : configured === false ? (
           <div className="flex items-center gap-2 px-3 py-4 text-[13px] text-ink-secondary">
@@ -118,7 +118,7 @@ export function VpsComputersCard({
                         ? "bg-success/15 text-success"
                         : kind === "stopped" || kind === "paused"
                           ? "bg-control text-ink-secondary"
-                          : "bg-warning/15 text-warning",
+                          : "bg-warning/15 text-warning-text",
                     )}
                   >
                     {state}

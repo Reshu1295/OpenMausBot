@@ -232,7 +232,7 @@ export function EngineUpdateNotice({
       className={cn("rounded-xl border border-warning/25 bg-warning/5 p-2.5", className)}
     >
       <div className="flex items-start gap-2">
-        <AlertTriangle size={14} className="mt-0.5 shrink-0 text-warning" aria-hidden="true" />
+        <AlertTriangle size={14} className="mt-0.5 shrink-0 text-warning-text" aria-hidden="true" />
         <div className="min-w-0">
           <div className="text-[13px] font-semibold text-ink">{update.title}</div>
           <p className="mt-0.5 text-[12px] leading-relaxed text-ink-secondary">{update.message}</p>
@@ -258,7 +258,7 @@ export function EngineWarningNotice({
       className={cn("rounded-xl border border-warning/25 bg-warning/5 p-2.5", className)}
     >
       <div className="flex items-start gap-2">
-        <AlertTriangle size={14} className="mt-0.5 shrink-0 text-warning" aria-hidden="true" />
+        <AlertTriangle size={14} className="mt-0.5 shrink-0 text-warning-text" aria-hidden="true" />
         <div className="min-w-0">
           <div className="text-[13px] font-semibold text-ink">{warning.title}</div>
           <p className="mt-0.5 text-[12px] leading-relaxed text-ink-secondary">{warning.message}</p>

@@ -17,10 +17,10 @@ const DETAIL_LIMIT = 280;
 const COPY = {
   working: { label: "Working", tone: "text-accent-text", border: "border-accent/30" },
   completed: { label: "Completed", tone: "text-success", border: "border-success/30" },
-  "needs-input": { label: "Needs your input", tone: "text-warning", border: "border-warning/35" },
-  blocked: { label: "Blocked", tone: "text-warning", border: "border-warning/35" },
-  "limit-reached": { label: "Turn limit reached", tone: "text-warning", border: "border-warning/35" },
-  paused: { label: "Paused", tone: "text-warning", border: "border-warning/35" },
+  "needs-input": { label: "Needs your input", tone: "text-warning-text", border: "border-warning/35" },
+  blocked: { label: "Blocked", tone: "text-warning-text", border: "border-warning/35" },
+  "limit-reached": { label: "Turn limit reached", tone: "text-warning-text", border: "border-warning/35" },
+  paused: { label: "Paused", tone: "text-warning-text", border: "border-warning/35" },
   stopped: { label: "Stopped", tone: "text-ink-secondary", border: "border-hairline/45" },
   failed: { label: "Failed", tone: "text-danger-text", border: "border-danger/35" },
 } satisfies Record<
@@ -41,11 +41,11 @@ function StatusIcon({ status }: { status: GroupGoalRunCardData["status"] }) {
     case "completed":
       return <CheckCircle2 aria-hidden="true" className={cn(className, "text-success")} />;
     case "needs-input":
-      return <Hand aria-hidden="true" className={cn(className, "text-warning")} />;
+      return <Hand aria-hidden="true" className={cn(className, "text-warning-text")} />;
     case "blocked":
     case "limit-reached":
     case "paused":
-      return <CircleAlert aria-hidden="true" className={cn(className, "text-warning")} />;
+      return <CircleAlert aria-hidden="true" className={cn(className, "text-warning-text")} />;
     case "stopped":
       return <Square aria-hidden="true" className={cn(className, "text-ink-secondary")} />;
     case "failed":

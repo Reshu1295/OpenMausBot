@@ -227,7 +227,7 @@ function Storage({ disk, busy, onMore }: { disk: CloudFilesDisk; busy: boolean; 
       <div className={cn("h-full rounded-full", disk.warn ? "bg-warning" : "bg-accent")} style={{ width: `${percent}%` }} />
     </div>
     {disk.warn && <div className="flex flex-wrap items-center gap-2">
-      <span className="text-[12px] text-warning">{t("files.almostFull")}</span>
+      <span className="text-[12px] text-warning-text">{t("files.almostFull")}</span>
       <button type="button" disabled={busy} className="ui-button ui-button-sm" onClick={onMore}>{t("files.moreSpace")}</button>
     </div>}
   </div>;

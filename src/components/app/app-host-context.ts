@@ -23,7 +23,7 @@ const VARIABLES: ReadonlyArray<readonly [string, string]> = [
   ["--color-text-info", "var(--color-accent-text)"],
   ["--color-text-danger", "var(--color-danger-text)"],
   ["--color-text-success", "var(--color-success)"],
-  ["--color-text-warning", "var(--color-warning)"],
+  ["--color-text-warning", "var(--color-warning-text)"],
   ["--color-text-disabled", "var(--color-ink-tertiary)"],
   ["--color-text-ghost", "var(--color-ink-tertiary)"],
   // Lines are a tint of the ink over the card, not the skin's hairline: the

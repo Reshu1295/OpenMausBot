@@ -111,7 +111,7 @@ export function ComposerAttachments({
       )}
 
       {notice && (
-        <div className="mb-2 flex items-start gap-2 rounded-lg border border-warning/30 bg-warning/10 px-3 py-2 text-[12px] text-warning">
+        <div className="mb-2 flex items-start gap-2 rounded-lg border border-warning/30 bg-warning/10 px-3 py-2 text-[12px] text-warning-text">
           <span className="min-w-0 flex-1">{notice}</span>
           <button
             onClick={() => onNotice(null)}

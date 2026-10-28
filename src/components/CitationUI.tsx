@@ -276,7 +276,7 @@ export function CitationBadge({
             <pre dir="auto" className="whitespace-pre-wrap break-words font-sans text-[12px] leading-relaxed">{citation.quote}</pre>
           </div>
           {citation.comment && <div className="mt-2 text-[12px]"><span className="font-semibold">Comment:</span> <span className="whitespace-pre-wrap">{citation.comment}</span></div>}
-          {unavailable && <p role="status" className="mt-2 text-[11px] text-warning">Source unavailable or changed. The saved quote is still available.</p>}
+          {unavailable && <p role="status" className="mt-2 text-[11px] text-warning-text">Source unavailable or changed. The saved quote is still available.</p>}
           <div className="mt-3 flex justify-end gap-2">
             {onNavigate && <button type="button" onClick={() => { void onNavigate().then((found) => { setUnavailable(!found); if (found) setOpen(false); }); }} className="rounded-lg border border-hairline/40 px-3 py-1.5 text-[12px] hover:bg-raised">Go to source</button>}
             {onChange && <button type="button" onClick={() => { setOpen(false); setEditing(true); }} className="rounded-lg border border-hairline/40 px-3 py-1.5 text-[12px] hover:bg-raised">Edit comment</button>}

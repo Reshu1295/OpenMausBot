@@ -418,7 +418,7 @@ export function CloudComputersCard({
           </div>
         ) : unavailableReason ? (
           <div className="flex items-center gap-2 px-3 py-4 text-[13px] text-ink-secondary">
-            <AlertTriangle size={14} className="shrink-0 text-warning" /> {unavailableReason}
+            <AlertTriangle size={14} className="shrink-0 text-warning-text" /> {unavailableReason}
           </div>
         ) : configured === false ? (
           <div className="flex items-center gap-2 px-3 py-4 text-[13px] text-ink-secondary">
@@ -452,7 +452,7 @@ export function CloudComputersCard({
                         ? "bg-success/15 text-success"
                         : kind === "sleeping" || kind === "going-to-sleep"
                           ? "bg-control text-ink-secondary"
-                          : "bg-warning/15 text-warning",
+                          : "bg-warning/15 text-warning-text",
                     )}
                   >
                     {state}
@@ -562,7 +562,7 @@ export function LocalVmInventoryCard({
           </div>
         ) : unavailableReason ? (
           <div className="flex items-center gap-2 px-3 py-4 text-[13px] text-ink-secondary">
-            <AlertTriangle size={14} className="shrink-0 text-warning" /> {unavailableReason}
+            <AlertTriangle size={14} className="shrink-0 text-warning-text" /> {unavailableReason}
           </div>
         ) : instances.length === 0 ? (
           <div className="px-3 py-4 text-[13px] text-ink-secondary">{t("vm.perBot.none")}</div>
@@ -585,12 +585,12 @@ export function LocalVmInventoryCard({
                     className={cn(
                       "rounded-full px-2 py-0.5 text-[11px]",
                       !managed
-                        ? "bg-warning/15 text-warning"
+                        ? "bg-warning/15 text-warning-text"
                         : instance.inUse || instance.ready
                           ? "bg-success/15 text-success"
                           : instance.container === "stopped"
                             ? "bg-control text-ink-secondary"
-                            : "bg-warning/15 text-warning",
+                            : "bg-warning/15 text-warning-text",
                     )}
                   >
                     {state}
@@ -600,12 +600,12 @@ export function LocalVmInventoryCard({
                   {t("vm.perBot.destination", { destination: t(destinationLabelKeys[instance.destination]) })}
                 </div>
                 {!managed && (
-                  <div className="mt-1 text-[12px] text-warning">
+                  <div className="mt-1 text-[12px] text-warning-text">
                     {t("vm.perBot.unmanaged")}
                   </div>
                 )}
                 {managed && instance.problem && !instance.inUse && (
-                  <div className="mt-1 text-[12px] text-warning">{instance.problem}</div>
+                  <div className="mt-1 text-[12px] text-warning-text">{instance.problem}</div>
                 )}
                 {managed && instance.inUse && (
                   <div className="mt-1 text-[12px] text-ink-secondary">{t("vm.perBot.stopFirst")}</div>
@@ -1388,7 +1388,7 @@ export function LocalComputerSection() {
               </div>
             ) : needsRecreate ? (
               <>
-                <div className="flex gap-2 text-[13px] text-warning">
+                <div className="flex gap-2 text-[13px] text-warning-text">
                   <AlertTriangle size={15} className="mt-0.5 shrink-0" />
                   <span>{status?.problem}</span>
                 </div>
@@ -1434,7 +1434,7 @@ export function LocalComputerSection() {
       {unavailable && (
         <Card>
           <div className="flex gap-2 text-[13px] text-ink-secondary">
-            <AlertTriangle size={15} className="mt-0.5 shrink-0 text-warning" />
+            <AlertTriangle size={15} className="mt-0.5 shrink-0 text-warning-text" />
             <span>{t("vm.inspectFailed")}</span>
           </div>
         </Card>

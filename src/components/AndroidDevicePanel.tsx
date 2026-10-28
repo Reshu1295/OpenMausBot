@@ -247,7 +247,7 @@ export function AndroidDevicePanel({ status }: { status: AndroidDeviceStatus }) 
       </div>
 
       {!ready ? (
-        <div className="rounded-xl border border-warning/25 bg-warning/10 p-4 text-[12px] leading-relaxed text-warning">
+        <div className="rounded-xl border border-warning/25 bg-warning/10 p-4 text-[12px] leading-relaxed text-warning-text">
           {selected.state === "unauthorized"
             ? t("computer.android.unauthorized")
             : t("computer.android.badState", { state: selected.state })}

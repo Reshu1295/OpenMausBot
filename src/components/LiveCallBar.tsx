@@ -179,7 +179,7 @@ export function LiveCallBar({ bot }: { bot: Bot }) {
       >
         <bdi dir="ltr">{spoken}</bdi>
       </span>
-      {view.hint && <span role="status" className="order-last w-full min-w-0 truncate text-[12px] text-warning" title={view.hint}>{view.hint}</span>}
+      {view.hint && <span role="status" className="order-last w-full min-w-0 truncate text-[12px] text-warning-text" title={view.hint}>{view.hint}</span>}
       <span className="ml-auto flex shrink-0 items-center gap-1">
         <button
           ref={gearRef}

@@ -119,19 +119,23 @@ const PAIRS = [
   ["--color-accent-ink", "--color-accent", 4.5],
   ["--color-danger-ink", "--color-danger", 4.5],
   ["--color-success-ink", "--color-success", 4.5],
-  // Accent and danger as words (text-accent-text, text-danger-text): links,
-  // selected labels, errors, delete actions. They sit on the ground, the
-  // sidebar, a card and a menu.
+  // The needs-you amber is a fill that always carries the dark ink.
+  ["--color-warning-ink", "--color-warning", 4.5],
+  // Accent, danger and needs-you as words (text-accent-text,
+  // text-danger-text, text-warning-text): links, selected labels, errors,
+  // notices. They sit on the ground, the sidebar, a card and a menu.
   ...WORD_SURFACES.flatMap((s) => [
     ["--color-accent-text", s, 4.5],
     ["--color-danger-text", s, 4.5],
+    ["--color-warning-text", s, 4.5],
   ]),
   ["--color-success", "--color-card", 4.5],
-  ["--color-warning", "--color-card", 4.5],
   // borders, dots and fills are UI components, not text — AA asks 3:1 of them
   ["--color-hairline", "--color-app", 1.5],
   ["--color-accent", "--color-app", 3],
   ["--color-danger", "--color-app", 3],
+  ["--color-warning", "--color-app", 3],
+  ["--color-warning", "--color-panel", 3],
   ["--color-scrollbar", "--color-app", 1.5],
   // The focus ring sits outside the control (outline-offset: 2px), on whatever
   // surface is behind it. WCAG 1.4.11 asks 3:1 of a non-text indicator.
@@ -257,6 +261,8 @@ for (const skinId of ["daylight", "pop"]) {
     ["--color-accent", "--color-inset"],
     ["--color-accent-text", "--color-bubble-user"],
     ["--color-danger-text", "--color-bubble-user"],
+    ["--color-warning-text", "--color-bubble-user"],
+    ["--color-warning-ink", "--color-warning"],
     ["--color-ink", "--color-control"],
     ["--color-accent-ink", "--color-accent"],
     ["--color-danger-ink", "--color-danger"],

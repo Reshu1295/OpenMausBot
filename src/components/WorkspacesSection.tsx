@@ -54,7 +54,7 @@ export function WorkspacesTable({ fleet, onAct, busy }: { fleet: FleetView; onAc
               <a href={`https://${workspace.host}`} target="_blank" rel="noreferrer" className="block truncate text-[12px] text-accent-text hover:underline">{workspace.host}</a>
               {!operational && <span className="block text-[12px] text-ink-secondary">{t("workspaces.recoveryHint")}</span>}
             </span>
-            <span className={cn("text-right", suspended || workspace.status === "provisioning" ? "text-warning" : workspace.status === "running" && workspace.live === "active" ? "text-success" : "text-danger-text")}>{state}</span>
+            <span className={cn("text-right", suspended || workspace.status === "provisioning" ? "text-warning-text" : workspace.status === "running" && workspace.live === "active" ? "text-success" : "text-danger-text")}>{state}</span>
             <span className="text-right tabular-nums text-ink" title={workspace.usage.turns === null ? undefined : t("workspaces.turns", { turns: String(workspace.usage.turns) })}>
               {hasFiniteCost(workspace.usage.costUsd) ? formatUsd(workspace.usage.costUsd) : "—"}
               {hasFiniteCost(workspace.usage.billableUsd) && <span className="text-ink-secondary"> · {formatUsd(workspace.usage.billableUsd)}</span>}

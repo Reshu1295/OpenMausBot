@@ -37,7 +37,7 @@ export function WelcomeEngine({ name, headingRef, onFinish }: { name: string; he
       <span>{credit.left !== null ? t("cloudWelcome.engine.credit", { amount: usd(credit.left) }) : t("cloudWelcome.engine.creditPlain")}</span>
     </p>}
     {credit && credit.state !== "active" && <p role="status" data-welcome-credit={credit.state} className="mt-5 flex items-start gap-2.5 rounded-xl bg-warning/10 px-3.5 py-3 text-[13px] leading-relaxed text-ink">
-      <CircleAlert size={16} aria-hidden="true" className="mt-px shrink-0 text-warning" />
+      <CircleAlert size={16} aria-hidden="true" className="mt-px shrink-0 text-warning-text" />
       <span>{t(credit.state === "used_up" ? "cloudSignIn.creditUsedUp" : "cloudSignIn.creditEnded")}</span>
     </p>}
     {claude && <div data-welcome-recommended={claude.instanceId} className="mt-6 rounded-2xl border border-hairline/50 bg-card px-4 py-4">

@@ -285,7 +285,7 @@ export function SkillsSection() {
                     />
                   </div>
                   {skill.warnings.length > 0 && (
-                    <div className="mt-1 text-[11px] text-warning">{skill.warnings.join(" · ")}</div>
+                    <div className="mt-1 text-[11px] text-warning-text">{skill.warnings.join(" · ")}</div>
                   )}
                   <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[11px] text-ink-secondary">
                     {skill.assignedBots.length === 0 ? (
@@ -405,7 +405,7 @@ function SkillSourceDialog({ viewing, error, working, onClose, onEnable }: {
               </button>
             </div>
             {viewing.review && <LibrarySkillMeta skill={viewing.skill} />}
-            {viewing.skill.warnings.length > 0 && <div className="mt-2 text-[12px] text-warning">{viewing.skill.warnings.join(" · ")}</div>}
+            {viewing.skill.warnings.length > 0 && <div className="mt-2 text-[12px] text-warning-text">{viewing.skill.warnings.join(" · ")}</div>}
             <pre
               tabIndex={0}
               aria-label={`${t("skills.library.view", { skill: viewing.skill.name })}`}

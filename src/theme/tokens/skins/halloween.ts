@@ -35,6 +35,8 @@ export default {
     "danger-text": "#f0727c",
     "danger-ink": "#240a0e",
     warning: "#f2b45a",
+    "warning-text": "#f2b45a",
+    "warning-ink": "#2b1400",
     scrollbar: "#3b3048",
     "maus-line": "#c2b3cc",
   },

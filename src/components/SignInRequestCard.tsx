@@ -196,7 +196,7 @@ export function SignInBanner({
   };
   return (
     <div className="mt-3 rounded-xl border border-warning/25 bg-warning/10 p-4 text-start" data-testid="sign-in-banner">
-      <div className="text-[13px] leading-relaxed text-warning">
+      <div className="text-[13px] leading-relaxed text-warning-text">
         <b>{askerName}</b> {t("signIn.banner", { site: help.site })}
       </div>
       {help.place === "local" && (

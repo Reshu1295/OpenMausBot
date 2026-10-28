@@ -106,7 +106,7 @@ export function McpServerEditor({ server, fixKeys = false, taken, team, busy, on
                 <label className="block">
                   <span className={LABEL}>{t("mcp.field.url")}</span>
                   <input value={each.url} spellCheck={false} onChange={(event) => setDrafts((current) => current.map((other, at) => at === index ? { ...other, url: event.target.value } : other))} className={FIELD} />
-                  <span className="mt-1 block text-[11px] text-warning">{t("mcp.paste.urlMissing")}</span>
+                  <span className="mt-1 block text-[11px] text-warning-text">{t("mcp.paste.urlMissing")}</span>
                 </label>
               )}
               <McpSecretRows kind="header" valuesOf="gaps" rows={each.headers} onChange={(headers) => setDrafts((current) => current.map((other, at) => at === index ? { ...other, headers } : other))} />
@@ -145,7 +145,7 @@ export function McpServerEditor({ server, fixKeys = false, taken, team, busy, on
                   <span className={LABEL}>{t("mcp.field.url")}</span>
                   <input autoFocus={!adding} value={draft.url} spellCheck={false} placeholder="https://mcp.example.com/mcp" className={FIELD}
                     onChange={(event) => setDraft((current) => ({ ...current, url: event.target.value }))} />
-                  {draft.urlGap && <span className="mt-1 block text-[11px] text-warning">{t("mcp.paste.urlMissing")}</span>}
+                  {draft.urlGap && <span className="mt-1 block text-[11px] text-warning-text">{t("mcp.paste.urlMissing")}</span>}
                 </label>
                 <label className="block">
                   <span className={LABEL}>{t("mcp.field.type")}</span>

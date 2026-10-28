@@ -69,7 +69,7 @@ export function BudgetCard({ budget }: { budget: BudgetState | null }) {
       {budget ? (
         <div className="mb-4">
           <div className="mb-1 flex items-baseline justify-between text-[13px]">
-            <span className={cn(tone === "danger" ? "text-danger-text" : tone === "warning" ? "text-warning" : "text-ink")}>
+            <span className={cn(tone === "danger" ? "text-danger-text" : tone === "warning" ? "text-warning-text" : "text-ink")}>
               {budget.exceeded ? t("usage.budget.reached") : budget.warn ? t("usage.budget.nearing") : t("usage.budget.within")}
             </span>
             <span className="tabular-nums text-ink-secondary">{t("usage.budget.spent", { spent: formatUsd(budget.spentUsd), cap: formatUsd(budget.monthlyUsd), percent: String(budget.percent) })}</span>

@@ -69,7 +69,7 @@ export function LinuxLocalControl() {
               : waylandSafetyBlocked
                 ? "bg-danger/10 text-danger-text"
                 : local.enabled
-                  ? "bg-warning/10 text-warning"
+                  ? "bg-warning/10 text-warning-text"
                   : "bg-raised text-ink-secondary",
           )}
         >
@@ -97,7 +97,7 @@ export function LinuxLocalControl() {
       ) : !local.enabled ? (
         <div className="mt-3 rounded-lg border border-warning/20 bg-warning/5 p-3">
           <div className="flex gap-2 text-[12px] leading-relaxed text-ink-secondary">
-            <AlertTriangle size={15} className="mt-0.5 shrink-0 text-warning" />
+            <AlertTriangle size={15} className="mt-0.5 shrink-0 text-warning-text" />
             <span>
               {t("computer.linux.enableBefore")}{" "}
               <strong className="font-medium text-ink">{t("vm.dest.local")}</strong>{" "}
@@ -114,7 +114,7 @@ export function LinuxLocalControl() {
             ) : busy ? (
               <Loader2 size={15} className="mt-0.5 shrink-0 animate-spin" />
             ) : (
-              <AlertTriangle size={15} className="mt-0.5 shrink-0 text-warning" />
+              <AlertTriangle size={15} className="mt-0.5 shrink-0 text-warning-text" />
             )}
             <span aria-live="polite">
               {ready

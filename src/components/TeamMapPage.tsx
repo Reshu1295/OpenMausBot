@@ -56,7 +56,7 @@ export function EdgeRow({ edge, bots }: { edge: TeamMapEdge; bots: Bot[] }) {
           edge.state === "running"
             ? "bg-success/15 text-success"
             : edge.state === "queued"
-              ? "bg-warning/15 text-warning"
+              ? "bg-warning/15 text-warning-text"
               : "bg-control text-ink-secondary",
         )}
       >

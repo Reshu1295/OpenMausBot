@@ -499,7 +499,7 @@ function LocalVmPane({
             </div>
           ) : (
             <div className="flex max-w-[300px] flex-col items-center gap-3 text-ink-secondary">
-              <AlertTriangle size={21} className="text-warning" />
+              <AlertTriangle size={21} className="text-warning-text" />
               <div className="text-[12px] leading-relaxed">
                 {error ??
                   (status?.container === "missing"

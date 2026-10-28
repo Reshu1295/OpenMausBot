@@ -61,7 +61,7 @@ export function MacLocalControl() {
   return (
     <section className="mt-4 rounded-xl border border-warning/25 bg-warning/10 p-4">
       <div className="flex items-start gap-3">
-        <Shield size={16} className="mt-0.5 shrink-0 text-warning" />
+        <Shield size={16} className="mt-0.5 shrink-0 text-warning-text" />
         <div className="min-w-0 flex-1">
           <div className="text-[14px] font-medium text-ink">Allow control of this computer</div>
           <p className="mt-1 text-[13px] leading-relaxed text-ink-secondary">

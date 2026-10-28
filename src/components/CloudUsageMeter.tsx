@@ -43,7 +43,7 @@ export function MeterBar({ meter, label, compact = false }: { meter: CloudUsageM
   );
 }
 const BAR: Record<MeterBand, string> = { ok: "bg-accent", near: "bg-warning", full: "bg-danger" };
-const AMOUNT: Record<MeterBand, string> = { ok: "text-ink-secondary", near: "text-warning", full: "text-danger-text" };
+const AMOUNT: Record<MeterBand, string> = { ok: "text-ink-secondary", near: "text-warning-text", full: "text-danger-text" };
 
 export function MeterRow({ meter, compact = false }: { meter: CloudUsageMeter; compact?: boolean }) {
   const label = meterLabel(meter.kind), band = meterBand(meterPercent(meter));

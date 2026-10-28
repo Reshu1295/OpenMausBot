@@ -45,7 +45,10 @@ export default {
     // the coral as words is a step darker, to read on the sidebar (4.64:1); the fill keeps the brand coral
     "danger-text": "#ca291c",
     "danger-ink": "#ffffff",
-    warning: "#8a5a00",
+    // the needs-you fill, an amber that marks the page at 3:1 and carries the dark ink; was #8a5a00, now the words
+    warning: "#bc7a00",
+    "warning-text": "#8a5a00",
+    "warning-ink": "#2b1400",
     scrollbar: "#d0bfa6",
     "maus-line": "#6b625b",
   },
@@ -74,7 +77,7 @@ export default {
       focus: "color(display-p3 0.4751 0.2990 0.9505)",
       success: "color(display-p3 0.2127 0.4772 0.3073)",
       danger: "color(display-p3 0.8102 0.2412 0.1727)",
-      warning: "color(display-p3 0.5248 0.3557 0.0473)",
+      "warning-text": "color(display-p3 0.5248 0.3557 0.0473)",
     },
   },
   invertedBubble: {
@@ -94,6 +97,8 @@ export default {
     danger: "#ff7a66",
     "danger-text": "#ff7a66",
     "danger-ink": "#1b1613",
+    // needs-you words on the dark bubble; the amber fill and its dark ink read there as they are
+    "warning-text": "#ffae33",
     success: "#8ee3b0",
     "success-ink": "#1b1613",
   },

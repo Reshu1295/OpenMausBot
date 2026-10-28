@@ -78,7 +78,7 @@ function OrgPackageCard({
           {entry.release && <span>{entry.release.version}</span>}
         </p>
         <p className="mt-0.5 truncate text-[12px] text-ink-tertiary">{orgContentsLine(entry.contents)}</p>
-        {notes.map((note) => <p key={note} className="mt-0.5 text-[12px] text-warning">{note}</p>)}
+        {notes.map((note) => <p key={note} className="mt-0.5 text-[12px] text-warning-text">{note}</p>)}
       </div>
       <div className="flex shrink-0 flex-col items-end gap-1.5">
         {action === "add" && (

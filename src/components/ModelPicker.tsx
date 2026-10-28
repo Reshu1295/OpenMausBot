@@ -850,7 +850,7 @@ export function ModelPicker({
                     <span
                       className={cn(
                         "flex h-5 shrink-0 items-center rounded-full px-2 text-[11px] font-medium leading-4",
-                        blocked ? "bg-warning/10 text-warning" : "bg-success/10 text-success",
+                        blocked ? "bg-warning/10 text-warning-text" : "bg-success/10 text-success",
                       )}
                     >
                       {pane === "custom" && !blocked && railInstance.access !== "api" ? t("model.localModels") : engineStatus(railInstance)}

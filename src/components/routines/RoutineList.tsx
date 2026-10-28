@@ -46,7 +46,7 @@ export function RoutineList({ routines, runs, bots, loading, error, onOpen, onLo
         {latest && (latest.attention || latest.error || latest.output) && <p className={cn("mt-2 line-clamp-2 whitespace-pre-wrap text-[12px] leading-relaxed", latest.error ? "text-danger-text" : "text-ink-secondary")}>{latest.attention || latest.error || latest.output}</p>}
         {!!routine.failureStreak && <p className="mt-2 text-[12px] text-danger-text">{t("routines.failureStreak", { count: routine.failureStreak })}</p>}
         {routine.weekRuns && <p className="mt-2 text-[12px] text-ink-secondary">{t("routines.weekRuns", routine.weekRuns)}</p>}
-        {routine.warning && <p className="mt-2 text-[12px] leading-relaxed text-warning">{routine.warning}</p>}
+        {routine.warning && <p className="mt-2 text-[12px] leading-relaxed text-warning-text">{routine.warning}</p>}
         {!!routine.skippedRuns && <p className="mt-2 text-[12px] text-ink-secondary">
           {t("routines.skippedRuns", { count: routine.skippedRuns })}
           {routine.lastSkippedAt != null && <> · {t("routines.lastSkipped", { date: routineDateTime(routine.lastSkippedAt) })}</>}

@@ -46,7 +46,7 @@ export function CustomDomainDnsRecord({ domain, serverIpv4 }: { domain: string; 
             <dt className="text-[12px] text-ink-secondary">{label}</dt>
             <dd className="min-w-0">{value
               ? <CommandLine key={value} command={value} copyLabel={t("settings.domain.copyField", { field: label })} />
-              : <p className="text-[12px] text-warning">{t("settings.domain.missingIp")}</p>}
+              : <p className="text-[12px] text-warning-text">{t("settings.domain.missingIp")}</p>}
             </dd>
           </div>
         ))}
@@ -83,7 +83,7 @@ export function CustomDomainGuide({ status }: { status: CustomDomainStatus }) {
         </li>
         <li>{t("settings.domain.verifyHint")}</li>
       </ol>
-      <p className="mt-3 text-warning">{t("settings.domain.loopbackWarning")}</p>
+      <p className="mt-3 text-warning-text">{t("settings.domain.loopbackWarning")}</p>
       {!status.serverIpv4 && <p className="mt-3">{t("settings.domain.ipAdminHint")}</p>}
       <p className="mt-3">{t("settings.domain.scope")}</p>
       <a className="mt-3 inline-flex items-center gap-1.5 text-accent-text hover:underline" href="https://github.com/milind-soni/OpenMausBot/blob/main/docs/self-hosting.md#connect-a-custom-domain-in-settings" target="_blank" rel="noopener noreferrer">

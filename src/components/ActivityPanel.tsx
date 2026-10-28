@@ -19,7 +19,7 @@ const TONE_CLASS: Record<ChipTone, string> = {
   ok: "bg-accent/12 text-accent-text",
   danger: "bg-danger/15 text-danger-text",
   accent: "bg-accent/12 text-accent-text",
-  warn: "bg-warning/15 text-warning",
+  warn: "bg-warning/15 text-warning-text",
 };
 
 export function ActivityPanel({ bot }: { bot: Bot }) {

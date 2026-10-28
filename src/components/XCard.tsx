@@ -180,7 +180,7 @@ export function XCard({ refreshKey = 0, onConnection }: {
           </p>
         )}
         {using === "included" && usage && (
-          <p data-x-usage className={usage.usedUp ? "mt-1 text-[12px] leading-relaxed text-warning" : "mt-1 text-[12px] leading-relaxed text-ink-secondary"}>{usage.line}</p>
+          <p data-x-usage className={usage.usedUp ? "mt-1 text-[12px] leading-relaxed text-warning-text" : "mt-1 text-[12px] leading-relaxed text-ink-secondary"}>{usage.line}</p>
         )}
         {using === "own" && (
           <button type="button" disabled={busy !== null} onClick={() => void remove()} className="mt-1.5 inline-flex items-center gap-1.5 text-[12px] text-danger-text underline underline-offset-2 disabled:opacity-50">

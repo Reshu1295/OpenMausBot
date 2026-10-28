@@ -11,6 +11,8 @@
  * - `accent-text`, `danger-text`: accent and danger as words (links, selected labels, errors), tuned to read on the
  *   skin's surfaces; `accent` and `danger` are the fills, tuned for the label they carry.
  * - `accent-ink`, `danger-ink`, `success-ink`: the label a filled accent, danger or success surface carries.
+ * - `warning`: the needs-you amber, one fill bright enough to read as a mark on the page, always carrying the dark
+ *   `warning-ink`; `warning-text` is the same amber as words.
  * - `bubble-user-ink`: the ink inside the user's own bubble, a hex rather than the ink token so it can be measured.
  * - `maus-line`: the mascot's second speed line, set against the ground.
  */
@@ -22,7 +24,7 @@ export const COLOR_TOKENS = [
   "bubble-user", "bubble-user-ink",
   "success", "success-ink",
   "danger", "danger-text", "danger-ink",
-  "warning",
+  "warning", "warning-text", "warning-ink",
   "scrollbar", "maus-line",
 ] as const;
 export type ColorToken = (typeof COLOR_TOKENS)[number];
@@ -33,12 +35,13 @@ export const THEME_TOKENS = [
   "app", "panel", "raised", "raised-hover", "composer", "composer-ring", "menu", "menu-hover", "menu-active", "card",
   "inset", "control", "hairline", "ink", "ink-secondary", "ink-tertiary", "accent", "accent-border", "focus",
   "accent-text", "accent-ink", "bubble-user", "success", "success-ink", "danger", "danger-text", "danger-ink", "warning",
+  "warning-text", "warning-ink",
 ] as const satisfies readonly ColorToken[];
 export const ROOT_TOKENS = COLOR_TOKENS.filter((token) => !(THEME_TOKENS as readonly string[]).includes(token));
 
 /** The tokens that get a more chromatic Display P3 twin on a wide-gamut screen, unless a skin lists its own. */
 export const WIDE_GAMUT_TOKENS = [
-  "accent", "accent-border", "accent-text", "focus", "success", "danger", "danger-text", "warning",
+  "accent", "accent-border", "accent-text", "focus", "success", "danger", "danger-text", "warning", "warning-text",
 ] as const satisfies readonly ColorToken[];
 /** How much more chroma the P3 twin carries, lightness and hue held. */
 export const WIDE_GAMUT_LIFT = 1.12;

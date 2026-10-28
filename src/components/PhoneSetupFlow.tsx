@@ -1116,7 +1116,7 @@ export function PhoneSetupFlowView({ controller }: { controller: PhoneSetupContr
         <p className="mt-3 text-[12px] text-ink-secondary">{t("phone.code.expiresIn", { seconds: c.secondsLeft })}</p>
       )}
       {!c.pairingExpired && c.localFallback && c.state?.publicNetwork && (
-        <p role="note" className="mt-3 w-full max-w-[390px] rounded-lg border border-warning/30 bg-warning/10 px-3 py-2 text-left text-[12px] leading-relaxed text-warning">
+        <p role="note" className="mt-3 w-full max-w-[390px] rounded-lg border border-warning/30 bg-warning/10 px-3 py-2 text-left text-[12px] leading-relaxed text-warning-text">
           {t("phone.code.publicNetwork", { network: c.state.publicNetwork })}
         </p>
       )}
