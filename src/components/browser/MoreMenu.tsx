@@ -55,7 +55,7 @@ export function MoreMenu({ stream, ready, typing, setting, zoom, pip, onViewport
   return (
     <details ref={menu} className="relative shrink-0">
       <summary className="list-none cursor-pointer rounded-md p-1.5 text-ink-secondary hover:bg-inset hover:text-ink [&::-webkit-details-marker]:hidden" aria-label="Browser menu" title="Browser menu"><EllipsisVertical size={16} /></summary>
-      <div className="absolute right-0 top-full z-40 mt-2 flex w-56 flex-col rounded-xl border border-hairline bg-card p-1 text-[12px] text-ink shadow-xl" role="menu">
+      <div className="popover-surface absolute right-0 top-full z-40 mt-2 flex w-56 flex-col rounded-xl border border-hairline bg-menu p-1 text-[12px] text-ink shadow-xl" role="menu">
         {stream ? section(<>
           <div className="px-3 pb-1 pt-1.5 text-[11px] text-ink-tertiary">Page size</div>
           {VIEWPORTS.map((viewport) => (

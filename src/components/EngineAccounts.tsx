@@ -125,7 +125,7 @@ function AccountMenu({ group, instance, onRename }: { group: AccountGroup; insta
           {canRemove && usedBy > 0 && <p className="px-3 pb-1 pt-0.5 text-[11px] leading-snug text-ink-secondary">{t("accounts.inUse", { count: String(usedBy) })}</p>}
         </div>
       )}
-      {error && <p role="alert" className="absolute right-0 top-full z-30 mt-1 w-[260px] rounded-lg bg-card p-2 text-[12px] text-danger-text shadow-lg">{error}</p>}
+      {error && <p role="alert" className="popover-surface absolute right-0 top-full z-30 mt-1 w-[260px] rounded-lg bg-menu p-2 text-[12px] text-danger-text shadow-lg">{error}</p>}
       <ConfirmDialog
         open={confirm === "signOut"}
         title={t("accounts.signOutTitle", { name: instance.displayName })}

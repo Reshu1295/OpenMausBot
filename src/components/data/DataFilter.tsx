@@ -45,7 +45,7 @@ export function DataFilter({ columns, value, onChange }: { columns: DataColumn[]
       {active && <span className="max-w-40 truncate text-[11px]">· {selected}</span>}
     </button>
     {open && <div id={id} role="dialog" aria-label={t("data.grid.filter")} data-testid="data-filter-popover" onKeyDown={onKeyDown}
-      className="absolute left-0 top-full z-40 mt-1 flex max-h-[min(20rem,calc(100cqh-5.5rem))] w-64 max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-xl border border-hairline bg-menu text-ink shadow-xl">
+      className="popover-surface absolute left-0 top-full z-40 mt-1 flex max-h-[min(20rem,calc(100cqh-5.5rem))] w-64 max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-xl border border-hairline bg-menu text-ink shadow-xl">
       {choosing ? <>
         <label className="flex shrink-0 items-center gap-2 border-b border-hairline px-3 py-2 text-ink-secondary">
           <Search size={14} aria-hidden="true" />

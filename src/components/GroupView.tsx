@@ -741,7 +741,7 @@ function RoomSetup({ group, members }: { group: Group; members: Bot[] }) {
                 <div
                   role="listbox"
                   aria-label={t("room.behavior.chooseLead")}
-                  className={cn("absolute left-0 top-full z-30 mt-2 w-72 max-w-[calc(100vw-3rem)] overflow-hidden rounded-2xl border border-hairline bg-panel shadow-2xl shadow-shadow/20", leadMotion.className)} {...leadMotion.exitProps}
+                  className={cn("popover-surface absolute left-0 top-full z-30 mt-2 w-72 max-w-[calc(100vw-3rem)] overflow-hidden rounded-2xl border border-hairline bg-menu shadow-2xl shadow-shadow/20", leadMotion.className)} {...leadMotion.exitProps}
                 >
                   <div className="border-b border-hairline px-3 py-2.5">
                     <div className="text-[13px] font-semibold text-ink">{t("room.behavior.chooseLead")}</div>

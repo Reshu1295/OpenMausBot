@@ -847,7 +847,8 @@
 }
 /* @generated tokens:skins end */
 
-/* Every popover and menu in the menu tone, flat in Midnight and on a soft lift in Daylight. A popover's rim is its
+/* The float surface: every popover, menu, dropdown, autocomplete list, hover card and floating notice carries
+   popover-surface and paints the menu tone, flat in Midnight and on a soft lift in Daylight. A popover's rim is its
    border, never a ring, so clearing box-shadow leaves the rim. */
 .popover-surface {
   background-color: var(--color-menu);

@@ -693,7 +693,7 @@ export function StreamSurface(props: {
           />
         ) : null}
         {fileChooser && you ? (
-          <div className="absolute inset-x-3 top-3 z-20 mx-auto flex max-w-sm flex-col gap-2 rounded-xl border border-hairline bg-card p-3 text-ink shadow-xl" role="dialog" aria-label="Choose files for the page">
+          <div className="popover-surface absolute inset-x-3 top-3 z-20 mx-auto flex max-w-sm flex-col gap-2 rounded-xl border border-hairline bg-menu p-3 text-ink shadow-xl" role="dialog" aria-label="Choose files for the page">
             <p className="flex items-center gap-2 text-[13px]"><FileUp size={14} aria-hidden="true" />The page asks for {fileChooser.multiple ? "files" : "a file"}.</p>
             <input
               ref={fileInputRef}
@@ -714,7 +714,7 @@ export function StreamSurface(props: {
           </div>
         ) : null}
         {control?.dialog && control.controller !== "another-viewer" ? (
-          <div className="absolute inset-x-3 top-3 z-20 mx-auto flex max-w-sm flex-col gap-2 rounded-xl border border-hairline bg-card p-3 text-ink shadow-xl" role="dialog" aria-label="Browser dialog">
+          <div className="popover-surface absolute inset-x-3 top-3 z-20 mx-auto flex max-w-sm flex-col gap-2 rounded-xl border border-hairline bg-menu p-3 text-ink shadow-xl" role="dialog" aria-label="Browser dialog">
             <p className="break-words text-[13px]">{control.dialog.message}</p>
             {you ? (
               <>

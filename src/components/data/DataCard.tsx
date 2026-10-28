@@ -72,7 +72,7 @@ export function ExportMenu({ formats, busy, onExport, onCopyMarkdown }: { format
       <summary role="button" className={cn(action, "list-none cursor-pointer [&::-webkit-details-marker]:hidden")} aria-label={t("data.card.export")} title={t("data.card.export")}>
         {busy ? <Loader2 size={13} className="animate-spin" aria-hidden="true" /> : <Download size={13} aria-hidden="true" />}<span className="hidden @min-[460px]/data:inline">{t("data.card.export")}</span><ChevronDown size={11} aria-hidden="true" />
       </summary>
-      <div className="absolute right-0 bottom-full z-20 mb-1 flex max-h-[min(20rem,calc(100cqh-3rem))] w-52 flex-col overflow-y-auto rounded-xl border border-hairline bg-menu p-1.5 shadow-xl">
+      <div className="popover-surface absolute right-0 bottom-full z-20 mb-1 flex max-h-[min(20rem,calc(100cqh-3rem))] w-52 flex-col overflow-y-auto rounded-xl border border-hairline bg-menu p-1.5 shadow-xl">
         {formats.map((format) => (
           <button key={format} type="button" className={menuItem} disabled={busy} onClick={(event) => { close(event); onExport(format); }}>{labels[format]}</button>
         ))}
