@@ -387,7 +387,7 @@
   --color-composer: #262019;
   --color-composer-ring: transparent;
   --color-card: #1e1a14;
-  --color-menu: #1e1a14;
+  --color-menu: #211d16;
   --color-menu-hover: color-mix(in srgb, var(--color-raised) 70%, transparent);
   --color-menu-active: var(--color-raised);
   --color-inset: #0b0a08;
@@ -470,7 +470,7 @@
   --color-success: #2f6b4f;
   --color-success-ink: #ffffff;
   --color-danger: #a8382f;
-  --color-danger-text: #a8382f;
+  --color-danger-text: #a6362e;
   --color-danger-ink: #ffffff;
   --color-warning: #b97800;
   --color-warning-text: #7a5a2a;
@@ -513,7 +513,7 @@
   --color-composer: #2a2d32;
   --color-composer-ring: transparent;
   --color-card: #22252a;
-  --color-menu: #22252a;
+  --color-menu: #25282d;
   --color-menu-hover: color-mix(in srgb, var(--color-raised) 70%, transparent);
   --color-menu-active: var(--color-raised);
   --color-inset: #0d0e10;
@@ -533,7 +533,7 @@
   --color-success: #63b58a;
   --color-success-ink: #101a14;
   --color-danger: #dd6b73;
-  --color-danger-text: #dd6b73;
+  --color-danger-text: #e47179;
   --color-danger-ink: #1e0b0e;
   --color-warning: #d3a150;
   --color-warning-text: #d3a150;
@@ -596,7 +596,7 @@
   --color-success: #2f704f;
   --color-success-ink: #ffffff;
   --color-danger: #a83d48;
-  --color-danger-text: #a83d48;
+  --color-danger-text: #a43944;
   --color-danger-ink: #ffffff;
   --color-warning: #be7b00;
   --color-warning-text: #765b2b;
@@ -639,7 +639,7 @@
   --color-composer: #2b2630;
   --color-composer-ring: transparent;
   --color-card: #231f27;
-  --color-menu: #231f27;
+  --color-menu: #26222b;
   --color-menu-hover: color-mix(in srgb, var(--color-raised) 70%, transparent);
   --color-menu-active: var(--color-raised);
   --color-inset: #0d0b0f;
@@ -649,7 +649,7 @@
   --color-ink: #f4eff6;
   --color-ink-secondary: #b9afbd;
   --color-ink-tertiary: #a199a5;
-  --color-accent: #765683;
+  --color-accent: #795986;
   --color-accent-border: #9670a3;
   --color-accent-text: #c49bd2;
   --color-focus: #c49bd2;
@@ -786,7 +786,7 @@
   --color-success: #007671;
   --color-success-ink: #ffffff;
   --color-danger: #c02b3a;
-  --color-danger-text: #c02b3a;
+  --color-danger-text: #bd2838;
   --color-danger-ink: #ffffff;
   --color-warning: #c68100;
   --color-warning-text: #8a5a00;
@@ -828,7 +828,7 @@
   --color-raised-hover: #e4d4bc;
   --color-composer: #ffffff;
   --color-composer-ring: #1b1613;
-  --color-card: #ffffff;
+  --color-card: #fffbf7;
   --color-menu: #ffffff;
   --color-menu-hover: color-mix(in srgb, var(--color-raised) 70%, transparent);
   --color-menu-active: var(--color-raised);
@@ -849,7 +849,7 @@
   --color-success: #1f7a4d;
   --color-success-ink: #ffffff;
   --color-danger: #d93a2b;
-  --color-danger-text: #ca291c;
+  --color-danger-text: #c32015;
   --color-danger-ink: #ffffff;
   --color-warning: #bc7a00;
   --color-warning-text: #8a5a00;
@@ -2721,7 +2721,7 @@ button:disabled.bg-danger {
     --color-focus: color(display-p3 0.1370 0.3714 0.3551);
     --color-success: color(display-p3 0.2280 0.4194 0.3117);
     --color-danger: color(display-p3 0.6315 0.2229 0.1802);
-    --color-danger-text: color(display-p3 0.6315 0.2229 0.1802);
+    --color-danger-text: color(display-p3 0.6239 0.2151 0.1762);
     --color-warning: color(display-p3 0.7064 0.4727 0.0501);
     --color-warning-text: color(display-p3 0.4684 0.3544 0.1678);
   }
@@ -2732,7 +2732,7 @@ button:disabled.bg-danger {
     --color-focus: color(display-p3 0.5770 0.7021 0.8792);
     --color-success: color(display-p3 0.4428 0.7097 0.5438);
     --color-danger: color(display-p3 0.8343 0.4228 0.4455);
-    --color-danger-text: color(display-p3 0.8343 0.4228 0.4455);
+    --color-danger-text: color(display-p3 0.8611 0.4463 0.4690);
     --color-warning: color(display-p3 0.8118 0.6338 0.3191);
     --color-warning-text: color(display-p3 0.8118 0.6338 0.3191);
   }
@@ -2743,12 +2743,12 @@ button:disabled.bg-danger {
     --color-focus: color(display-p3 0.1963 0.3325 0.5077);
     --color-success: color(display-p3 0.2332 0.4391 0.3120);
     --color-danger: color(display-p3 0.6315 0.2423 0.2772);
-    --color-danger-text: color(display-p3 0.6315 0.2423 0.2772);
+    --color-danger-text: color(display-p3 0.6162 0.2267 0.2615);
     --color-warning: color(display-p3 0.7254 0.4846 0.0525);
     --color-warning-text: color(display-p3 0.4543 0.3583 0.1717);
   }
   :is([data-skin="dusk"]) {
-    --color-accent: color(display-p3 0.4495 0.3350 0.5154);
+    --color-accent: color(display-p3 0.4612 0.3468 0.5272);
     --color-accent-border: color(display-p3 0.5725 0.4369 0.6409);
     --color-accent-text: color(display-p3 0.7511 0.6056 0.8251);
     --color-focus: color(display-p3 0.7511 0.6056 0.8251);
@@ -2776,7 +2776,7 @@ button:disabled.bg-danger {
     --color-focus: color(display-p3 0.1985 0.4783 0.2864);
     --color-success: color(display-p3 0.1555 0.4613 0.4459);
     --color-danger: color(display-p3 0.7202 0.1738 0.2207);
-    --color-danger-text: color(display-p3 0.7202 0.1738 0.2207);
+    --color-danger-text: color(display-p3 0.7088 0.1621 0.2129);
     --color-warning: color(display-p3 0.7562 0.5082 0.0572);
     --color-warning-text: color(display-p3 0.5270 0.3546 0.0278);
   }
@@ -2787,7 +2787,7 @@ button:disabled.bg-danger {
     --color-focus: color(display-p3 0.4751 0.2990 0.9505);
     --color-success: color(display-p3 0.2127 0.4772 0.3073);
     --color-danger: color(display-p3 0.8102 0.2412 0.1727);
-    --color-danger-text: color(display-p3 0.7581 0.1660 0.1055);
+    --color-danger-text: color(display-p3 0.7315 0.1313 0.0780);
     --color-warning: color(display-p3 0.7178 0.4806 0.0517);
     --color-warning-text: color(display-p3 0.5248 0.3557 0.0473);
   }
@@ -2860,7 +2860,7 @@ button:disabled.bg-danger {
     --color-app: #f6f8f6;
     --color-panel: #fcfdfc;
     --color-composer-ring: #cfd8d1;
-    --color-card: #ffffff;
+    --color-card: #fbfdfb;
     --color-inset: #e9eeea;
     --color-hairline: #c1ccc473;
     --color-edge: #c1ccc4;

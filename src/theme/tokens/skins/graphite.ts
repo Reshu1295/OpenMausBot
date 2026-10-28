@@ -17,7 +17,8 @@ export default {
     composer: "#2a2d32",
     "composer-ring": "transparent",
     card: "#22252a",
-    menu: "#22252a",
+    // the float, a step above the card it floats over and under raised, which stays the row hover; it was #22252a, the card
+    menu: "#25282d",
     "menu-hover": "color-mix(in srgb, var(--color-raised) 70%, transparent)",
     "menu-active": "var(--color-raised)",
     inset: "#0d0e10",
@@ -37,7 +38,8 @@ export default {
     success: "#63b58a",
     "success-ink": "#101a14",
     danger: "#dd6b73",
-    "danger-text": "#dd6b73",
+    // a shade further from the ground than #dd6b73, so an error also reads on a control (4.5:1)
+    "danger-text": "#e47179",
     "danger-ink": "#1e0b0e",
     warning: "#d3a150",
     "warning-text": "#d3a150",

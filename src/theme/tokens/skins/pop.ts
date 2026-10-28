@@ -21,7 +21,8 @@ export default {
     "raised-hover": "#e4d4bc",
     composer: "#ffffff",
     "composer-ring": "#1b1613",
-    card: "#ffffff",
+    // the sticker card, a step under the white menu that floats over it; it was white too
+    card: "#fffbf7",
     menu: "#ffffff",
     "menu-hover": "color-mix(in srgb, var(--color-raised) 70%, transparent)",
     "menu-active": "var(--color-raised)",
@@ -43,8 +44,8 @@ export default {
     success: "#1f7a4d",
     "success-ink": "#ffffff",
     danger: "#d93a2b",
-    // the coral as words is a step darker, to read on the sidebar (4.64:1); the fill keeps the brand coral
-    "danger-text": "#ca291c",
+    // the coral as words, darker than the fill so it reads on the sidebar and on a control (4.55:1)
+    "danger-text": "#c32015",
     "danger-ink": "#ffffff",
     // the needs-you fill, an amber that marks the page at 3:1 and carries the dark ink; was #8a5a00, now the words
     warning: "#bc7a00",

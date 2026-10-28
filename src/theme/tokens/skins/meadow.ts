@@ -46,7 +46,8 @@ export default {
     success: "#007671",
     "success-ink": "#ffffff",
     danger: "#c02b3a",
-    "danger-text": "#c02b3a",
+    // a shade further from the ground than #c02b3a, the fill, so an error also reads on a control (4.5:1)
+    "danger-text": "#bd2838",
     "danger-ink": "#ffffff",
     // the needs-you fill, an amber that marks the page at 3:1 and carries the dark ink; was #8a5a00, now the words
     warning: "#c68100",
@@ -80,7 +81,8 @@ export default {
     colors: {
       app: "#f6f8f6",
       panel: "#fcfdfc",
-      card: "#ffffff",
+      // bot messages a step under the white menus that float over them (1.02:1); they were white too
+      card: "#fbfdfb",
       inset: "#e9eeea",
       "composer-ring": "#cfd8d1",
       hairline: "#c1ccc473",

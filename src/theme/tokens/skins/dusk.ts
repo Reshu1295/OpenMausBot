@@ -17,7 +17,8 @@ export default {
     composer: "#2b2630",
     "composer-ring": "transparent",
     card: "#231f27",
-    menu: "#231f27",
+    // the float, a step above the card it floats over and under raised, which stays the row hover; it was #231f27, the card
+    menu: "#26222b",
     "menu-hover": "color-mix(in srgb, var(--color-raised) 70%, transparent)",
     "menu-active": "var(--color-raised)",
     inset: "#0d0b0f",
@@ -27,7 +28,8 @@ export default {
     ink: "#f4eff6",
     "ink-secondary": "#b9afbd",
     "ink-tertiary": "#a199a5",
-    accent: "#765683",
+    // a touch lighter than #765683, so an unread dot reads on the sidebar (3.06:1); white on it 5.86:1
+    accent: "#795986",
     "accent-border": "#9670a3",
     "accent-text": "#c49bd2",
     focus: "#c49bd2",

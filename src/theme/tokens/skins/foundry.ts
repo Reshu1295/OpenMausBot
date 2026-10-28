@@ -26,7 +26,8 @@ export default {
     composer: "#262019",
     "composer-ring": "transparent",
     card: "#1e1a14",
-    menu: "#1e1a14",
+    // the float, a step above the card it floats over and under raised, which stays the row hover; it was #1e1a14, the card
+    menu: "#211d16",
     "menu-hover": "color-mix(in srgb, var(--color-raised) 70%, transparent)",
     "menu-active": "var(--color-raised)",
     // inset sinks below the ground

@@ -130,6 +130,8 @@ const PAIRS = [
     ["--color-warning-text", s, 4.5],
   ]),
   ["--color-success", "--color-card", 4.5],
+  // An error can sit on a control (a chip, a field's row) as well as on the page.
+  ["--color-danger-text", "--color-control", 4.5],
   // borders, dots and fills are UI components, not text — AA asks 3:1 of them.
   // A divider (hairline, translucent) only has to be seen; the edge around a
   // control has to be found.
@@ -139,6 +141,8 @@ const PAIRS = [
   ["--color-edge", "--color-card", 1.3],
   ["--color-edge", "--color-menu", 1.3],
   ["--color-accent", "--color-app", 3],
+  // The unread dot sits on the sidebar.
+  ["--color-accent", "--color-panel", 3],
   ["--color-danger", "--color-app", 3],
   ["--color-warning", "--color-app", 3],
   ["--color-warning", "--color-panel", 3],
@@ -169,10 +173,13 @@ const PAIRS = [
   ["--color-raised", "--color-app", 1.04],
   ["--color-raised", "--color-panel", 1.04],
   ["--color-raised", "--color-card", 1.04],
+  // The float (menus, popovers) is its own surface, a step off the card it
+  // floats over, besides its border and shadow.
+  ["--color-menu", "--color-card", 1.02],
 ];
 // Steps a skin keeps flat on purpose. Midnight's card, composer, menu and raised
-// fill are Simple mode's one raised surface (#3657), a step apart at most.
-const FLAT_BY_DESIGN = new Set(["midnight|--color-raised|--color-card"]);
+// fill are Simple mode's one raised surface (#3657), one 8-bit step apart.
+const FLAT_BY_DESIGN = new Set(["midnight|--color-raised|--color-card", "midnight|--color-menu|--color-card"]);
 
 /** OKLab coordinates of an opaque hex, for telling two colours apart beyond their luminance. */
 function oklab(value) {
@@ -318,6 +325,7 @@ for (const skinId of ["daylight", "pop"]) {
     ["--color-warning-text", "--color-bubble-user"],
     ["--color-warning-ink", "--color-warning"],
     ["--color-ink", "--color-control"],
+    ["--color-danger-text", "--color-control"],
     ["--color-accent-ink", "--color-accent"],
     ["--color-danger-ink", "--color-danger"],
     ["--color-success-ink", "--color-success"],

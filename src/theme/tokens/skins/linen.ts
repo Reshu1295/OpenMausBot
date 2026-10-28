@@ -39,7 +39,8 @@ export default {
     success: "#2f704f",
     "success-ink": "#ffffff",
     danger: "#a83d48",
-    "danger-text": "#a83d48",
+    // a shade further from the ground than #a83d48, so an error also reads on a control (4.5:1)
+    "danger-text": "#a43944",
     "danger-ink": "#ffffff",
     // the needs-you fill, an amber that marks the page at 3:1 and carries the dark ink; was #765b2b, now the words
     warning: "#be7b00",
