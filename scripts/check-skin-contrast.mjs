@@ -159,7 +159,14 @@ const PAIRS = [
   ["--color-inset", "--color-card", 1.04],
   ["--color-card", "--color-app", 1.04],
   ["--color-panel", "--color-app", 1.03],
+  // The hover, chip and selected-row fill shows on every surface it lands on.
+  ["--color-raised", "--color-app", 1.04],
+  ["--color-raised", "--color-panel", 1.04],
+  ["--color-raised", "--color-card", 1.04],
 ];
+// Steps a skin keeps flat on purpose. Midnight's card, composer, menu and raised
+// fill are Simple mode's one raised surface (#3657), a step apart at most.
+const FLAT_BY_DESIGN = new Set(["midnight|--color-raised|--color-card"]);
 
 /** OKLab coordinates of an opaque hex, for telling two colours apart beyond their luminance. */
 function oklab(value) {
@@ -201,7 +208,11 @@ for (const [id, tokens] of skins) {
       continue;
     }
     measured++;
-    if (ratio < min) problems.push({ fg, bg, ratio, min });
+    if (ratio < min && !FLAT_BY_DESIGN.has(`${id.replace(/ \(phone\)$/, "")}|${fg}|${bg}`)) problems.push({ fg, bg, ratio, min });
+  }
+  // The float (menus, popovers) sits over cards, so it is never darker than one.
+  if (!missing.length && !unmeasurable.length && oklab(tokens["--color-menu"])[0] < oklab(tokens["--color-card"])[0] - 0.002) {
+    problems.push({ fg: "--color-menu", bg: "--color-card", ratio: oklab(tokens["--color-menu"])[0] - oklab(tokens["--color-card"])[0], min: 0, kind: "OKLCH lightness (the float sits below the card)" });
   }
   // Success is a state of its own: a working dot next to an unread one must not read as the same colour.
   const apart = missing.length || unmeasurable.length ? Infinity : distance(tokens["--color-success"], tokens["--color-accent"]);

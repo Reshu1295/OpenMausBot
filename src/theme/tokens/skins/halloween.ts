@@ -13,7 +13,8 @@ export default {
     composer: "#1d1725",
     "composer-ring": "#352a40",
     card: "#201a29",
-    menu: "#1e1827",
+    // a step above the card it floats over; it was #1e1827, below the card
+    menu: "#241d2d",
     "menu-hover": "color-mix(in srgb, var(--color-raised) 70%, transparent)",
     "menu-active": "var(--color-raised)",
     inset: "#1b1622",

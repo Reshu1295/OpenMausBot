@@ -154,7 +154,7 @@
   --color-raised-hover: #2c2c2c;
   --color-composer: #1f1f1f;
   --color-composer-ring: #2a2a2a;
-  --color-menu: #1f1f1f;
+  --color-menu: #202020;
   --color-menu-hover: #f5f5f50f;
   --color-menu-active: #f5f5f514;
   --color-card: #1f1f1f;
@@ -241,7 +241,7 @@
   --color-composer: #1f1f1f;
   --color-composer-ring: #2a2a2a;
   --color-card: #1f1f1f;
-  --color-menu: #1f1f1f;
+  --color-menu: #202020;
   --color-menu-hover: #f5f5f50f;
   --color-menu-active: #f5f5f514;
   --color-inset: #1b1b1b;
@@ -293,7 +293,7 @@
   --color-raised-hover: #f2e9dc;
   --color-composer: #ffffff;
   --color-composer-ring: transparent;
-  --color-card: #ffffff;
+  --color-card: #fdf9f3;
   --color-menu: #ffffff;
   --color-menu-hover: color-mix(in srgb, var(--color-raised) 70%, transparent);
   --color-menu-active: var(--color-raised);
@@ -399,7 +399,7 @@
   --color-raised-hover: #cfe4e1;
   --color-composer: #ffffff;
   --color-composer-ring: transparent;
-  --color-card: #ffffff;
+  --color-card: #f3fbfa;
   --color-menu: #ffffff;
   --color-menu-hover: color-mix(in srgb, var(--color-raised) 70%, transparent);
   --color-menu-active: var(--color-raised);
@@ -505,7 +505,7 @@
   --color-raised-hover: #e1e6ed;
   --color-composer: #ffffff;
   --color-composer-ring: transparent;
-  --color-card: #ffffff;
+  --color-card: #f8fafc;
   --color-menu: #ffffff;
   --color-menu-hover: color-mix(in srgb, var(--color-raised) 70%, transparent);
   --color-menu-active: var(--color-raised);
@@ -772,7 +772,7 @@
   --color-composer: #1d1725;
   --color-composer-ring: #352a40;
   --color-card: #201a29;
-  --color-menu: #1e1827;
+  --color-menu: #241d2d;
   --color-menu-hover: color-mix(in srgb, var(--color-raised) 70%, transparent);
   --color-menu-active: var(--color-raised);
   --color-inset: #1b1622;

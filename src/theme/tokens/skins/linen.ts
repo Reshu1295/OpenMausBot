@@ -16,7 +16,9 @@ export default {
     "raised-hover": "#e1e6ed",
     composer: "#ffffff",
     "composer-ring": "transparent",
-    card: "#ffffff",
+    // a step under white (1.05:1), so a white hover, chip or selected row shows on a card; it was white,
+    // the same as raised and menu
+    card: "#f8fafc",
     menu: "#ffffff",
     "menu-hover": "color-mix(in srgb, var(--color-raised) 70%, transparent)",
     "menu-active": "var(--color-raised)",

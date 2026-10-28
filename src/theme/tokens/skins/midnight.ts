@@ -20,7 +20,9 @@ export default {
     composer: "#1f1f1f",
     "composer-ring": "#2a2a2a",
     card: "#1f1f1f",
-    menu: "#1f1f1f",
+    // the float, one step off the card: card, composer and menu stay one raised surface (#3657); the phones
+    // use the same value
+    menu: "#202020",
     "menu-hover": "#f5f5f50f",
     "menu-active": "#f5f5f514",
     inset: "#1b1b1b",
