@@ -50,7 +50,7 @@ export function skinsCss(skins: readonly SkinSource[], fallback: SkinSource): st
   const out = [":root {", `  --code-color-scheme: ${fallback.mode};`, ...declare("  ", colorEntries(fallback.colors, ROOT_TOKENS))];
   out.push(`  --shadow-float: 0 0 #0000;`, "}");
   for (const skin of skins) {
-    out.push("", `[data-skin="${skin.id}"] {`, `  --code-color-scheme: ${skin.mode};`);
+    out.push("", `[data-skin="${skin.id}"] {`, `  color-scheme: ${skin.mode};`, `  --code-color-scheme: ${skin.mode};`);
     out.push(...declare("  ", colorEntries(skin.colors)));
     out.push(`  --font-sans: ${skin.font};`);
     out.push(...declare("  ", scaleEntries(skin.radius)));

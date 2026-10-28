@@ -12,7 +12,7 @@ const css = readFileSync(join(root, "src/styles.css"), "utf8");
 
 function declarations(body) {
   const tokens = {};
-  for (const [, name, value] of body.matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)) {
+  for (const [, name, value] of body.matchAll(/(--[\w-]+|(?<![\w-])color-scheme)\s*:\s*([^;]+);/g)) {
     tokens[name] = value.trim();
   }
   return tokens;
@@ -228,6 +228,8 @@ for (const [id, tokens] of skins) {
   // Success is a state of its own: a working dot next to an unread one must not read as the same colour.
   const apart = missing.length || unmeasurable.length ? Infinity : distance(tokens["--color-success"], tokens["--color-accent"]);
   if (apart < MIN_SUCCESS_DISTANCE) problems.push({ text: `--color-success is ${apart.toFixed(3)} from --color-accent in OKLab (needs ${MIN_SUCCESS_DISTANCE}): success must read as its own colour` });
+  // Native controls (date and time pickers, scrollbars, selects) follow the skin's own scheme.
+  if (tokens["color-scheme"] !== tokens["--code-color-scheme"]) problems.push({ text: `color-scheme is ${tokens["color-scheme"] ?? "unset"} under --code-color-scheme ${tokens["--code-color-scheme"]}` });
   // Corners: every step of the scale rounder than the one before, and Tailwind's bare `rounded` at the sm step.
   const corners = RADII.map((name) => cornerPx(tokens[name]));
   if (corners.some((size) => size === null)) problems.push({ text: `radius scale incomplete: ${RADII.filter((_, i) => corners[i] === null).join(", ")}` });

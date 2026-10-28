@@ -252,6 +252,7 @@
 }
 
 [data-skin="midnight"] {
+  color-scheme: dark;
   --code-color-scheme: dark;
   --color-app: #121212;
   --color-panel: #0e0e0e;
@@ -314,6 +315,7 @@
 }
 
 [data-skin="atelier"] {
+  color-scheme: light;
   --code-color-scheme: light;
   --color-app: #f5f1eb;
   --color-panel: #fbf8f2;
@@ -376,6 +378,7 @@
 }
 
 [data-skin="foundry"] {
+  color-scheme: dark;
   --code-color-scheme: dark;
   --color-app: #100e0b;
   --color-panel: #171410;
@@ -438,6 +441,7 @@
 }
 
 [data-skin="lagoon"] {
+  color-scheme: light;
   --code-color-scheme: light;
   --color-app: #dfeceb;
   --color-panel: #ecf4f3;
@@ -500,6 +504,7 @@
 }
 
 [data-skin="graphite"] {
+  color-scheme: dark;
   --code-color-scheme: dark;
   --color-app: #111214;
   --color-panel: #181a1d;
@@ -562,6 +567,7 @@
 }
 
 [data-skin="linen"] {
+  color-scheme: light;
   --code-color-scheme: light;
   --color-app: #eceff3;
   --color-panel: #f5f6f8;
@@ -624,6 +630,7 @@
 }
 
 [data-skin="dusk"] {
+  color-scheme: dark;
   --code-color-scheme: dark;
   --color-app: #121014;
   --color-panel: #19161c;
@@ -686,6 +693,7 @@
 }
 
 [data-skin="daylight"] {
+  color-scheme: light;
   --code-color-scheme: light;
   --color-app: #fcfcfc;
   --color-panel: #f5f5f5;
@@ -749,6 +757,7 @@
 }
 
 [data-skin="meadow"] {
+  color-scheme: light;
   --code-color-scheme: light;
   --color-app: #ffffff;
   --color-panel: #f6f8f6;
@@ -811,6 +820,7 @@
 }
 
 [data-skin="pop"] {
+  color-scheme: light;
   --code-color-scheme: light;
   --color-app: #fdf5ea;
   --color-panel: #f6ebdb;
@@ -873,6 +883,7 @@
 }
 
 [data-skin="halloween"] {
+  color-scheme: dark;
   --code-color-scheme: dark;
   --color-app: #110d16;
   --color-panel: #17121e;
@@ -967,6 +978,14 @@
 }
 :root[data-skin="daylight"] .ui-button-primary:disabled {
   background: color-mix(in srgb, var(--color-ink) 15%, transparent);
+}
+
+/* Each skin sets color-scheme, so native date and time pickers, selects and
+   scrollbars follow it. A frame keeps the browser's default: under a dark
+   skin, a framed page that declares no scheme would otherwise be painted on
+   an opaque white canvas instead of showing through as it always has. */
+iframe {
+  color-scheme: normal;
 }
 
 /* Shiki emits both palettes so cached blocks follow the nearest skin without

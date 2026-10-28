@@ -9,7 +9,7 @@ import type { LocaleKey } from "@/locales";
 import { Select } from "./Select";
 import { Card } from "./SettingsPrimitives";
 
-const inputClass = "rounded-lg border border-hairline bg-inset px-3 py-2 text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none [color-scheme:dark]";
+const inputClass = "rounded-lg border border-hairline bg-inset px-3 py-2 text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none";
 
 export function ActivityRow({ entry }: { entry: ActivityEntry }) {
   const [open, setOpen] = useState(false);
