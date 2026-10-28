@@ -62,7 +62,7 @@ export function McpSecretRows({ kind, rows, onChange, valuesOf, placeholder }: {
         </div>
       ))}
       {!valuesOf && (
-        <button type="button" onClick={() => onChange([...rows, secretRow()])} className="inline-flex items-center gap-1 rounded-lg px-1 py-1 text-[12px] font-medium text-accent hover:underline">
+        <button type="button" onClick={() => onChange([...rows, secretRow()])} className="inline-flex items-center gap-1 rounded-lg px-1 py-1 text-[12px] font-medium text-accent-text hover:underline">
           <Plus size={13} /> {t("mcp.row.add")}
         </button>
       )}

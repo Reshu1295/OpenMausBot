@@ -277,7 +277,7 @@ export function CodeBlock({ code, lang, initialWrap = false }: CodeBlockProps) {
             onClick={() => setWrapLines((w) => !w)}
             className={`inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] transition-colors ${
               wrapLines
-                ? "bg-accent/15 text-accent font-medium"
+                ? "bg-accent/15 text-accent-text font-medium"
                 : "text-ink-secondary hover:bg-raised hover:text-ink"
             }`}
             title={wrapLines ? t("code.unwrapLong") : t("code.wrapLong")}

@@ -113,7 +113,7 @@ export function OwnerPicker({ target, onClose }: { target: OwnerPickerTarget | n
               <span className="block truncate">{person.you ? t("owner.you", { name: person.name }) : person.name}</span>
               <span className="block truncate text-[11px] text-ink-secondary">{person.email}</span>
             </span>
-            {person.email === shown.current && <Check size={14} className="shrink-0 text-accent" />}
+            {person.email === shown.current && <Check size={14} className="shrink-0 text-accent-text" />}
           </button>
         ))}
       </div>

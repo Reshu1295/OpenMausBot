@@ -229,7 +229,7 @@ function Row({ row, open, onToggle }: { row: InspectorRow; open: boolean; onTogg
         <span
           className={cn(
             "shrink-0 rounded px-1 text-[11px]",
-            row.kind === "native" ? "bg-accent/15 text-accent" : row.tone === "error" ? "bg-danger/20 text-danger" : "bg-inset text-ink-secondary",
+            row.kind === "native" ? "bg-accent/15 text-accent-text" : row.tone === "error" ? "bg-danger/20 text-danger" : "bg-inset text-ink-secondary",
           )}
         >
           {row.tag}

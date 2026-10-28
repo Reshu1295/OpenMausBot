@@ -309,7 +309,7 @@ export function RemoteDesktopPanel({ bot }: { bot: Bot }) {
         <div className="w-full rounded-xl bg-card p-4 text-left">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 text-[15px] font-medium text-ink">
-              <CalendarClock size={16} className="text-accent" />
+              <CalendarClock size={16} className="text-accent-text" />
               Scheduled tasks
             </div>
             {botRoutines.length > 0 && (
@@ -322,7 +322,7 @@ export function RemoteDesktopPanel({ bot }: { bot: Bot }) {
             <button
               type="button"
               onClick={() => dispatch({ type: "showRoutines" })}
-              className="mt-3 flex w-full items-center gap-2 rounded-lg border border-accent/25 bg-accent/10 px-3 py-2 text-left text-[12px] text-accent hover:bg-accent/15"
+              className="mt-3 flex w-full items-center gap-2 rounded-lg border border-accent/25 bg-accent/10 px-3 py-2 text-left text-[12px] text-accent-text hover:bg-accent/15"
             >
               <Loader2 size={13} className={activeRoutineRun.status === "queued" ? "" : "animate-spin"} />
               <span className="min-w-0 flex-1 truncate">

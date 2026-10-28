@@ -106,7 +106,7 @@ export function LiveCallSettings({ onClose }: { onClose: () => void }) {
       <div className="flex items-center justify-between gap-2 border-t border-hairline/60 pt-2">
         <span className="text-ink-secondary">{t("call.live.key")}</span>
         <span className="flex gap-2">
-          <button type="button" className="text-accent hover:underline" onClick={() => setChangingKey((open) => !open)}>
+          <button type="button" className="text-accent-text hover:underline" onClick={() => setChangingKey((open) => !open)}>
             {t("call.live.keyChange")}
           </button>
           {live.keySource === "live" && (

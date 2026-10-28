@@ -889,7 +889,7 @@ function ValuePoints() {
     <div className="mt-5 grid w-full gap-2 sm:grid-cols-3">
       {points.map(({ Icon, title, detail }) => (
         <div key={title} className="rounded-xl bg-inset px-3 py-3 text-left">
-          <Icon size={16} className="text-accent" />
+          <Icon size={16} className="text-accent-text" />
           <div className="mt-2 text-[13px] font-medium text-ink">{title}</div>
           <div className="mt-0.5 text-[12px] leading-relaxed text-ink-secondary">{detail}</div>
         </div>
@@ -907,7 +907,7 @@ export function PhoneSetupFlowView({ controller }: { controller: PhoneSetupContr
   if (c.phase === "intro") {
     return (
       <div className="flex flex-col items-center text-center">
-        <div className="flex size-14 items-center justify-center rounded-2xl bg-accent/12 text-accent">
+        <div className="flex size-14 items-center justify-center rounded-2xl bg-accent/12 text-accent-text">
           <Smartphone size={26} />
         </div>
         <h2 className="mt-4 text-[19px] font-semibold text-ink">{t("phone.intro.title", { app: brand().name })}</h2>
@@ -936,7 +936,7 @@ export function PhoneSetupFlowView({ controller }: { controller: PhoneSetupContr
         <button onClick={c.cancel} className="mb-4 flex w-fit items-center gap-1.5 text-[12px] text-ink-secondary hover:text-ink">
           <ArrowLeft size={13} /> {t("phone.back")}
         </button>
-        <div className="flex size-11 items-center justify-center rounded-xl bg-accent/12 text-accent">
+        <div className="flex size-11 items-center justify-center rounded-xl bg-accent/12 text-accent-text">
           <Mail size={20} />
         </div>
         <h2 className="mt-3 text-[18px] font-semibold text-ink">
@@ -1043,7 +1043,7 @@ export function PhoneSetupFlowView({ controller }: { controller: PhoneSetupContr
   if (c.phase === "verifying") {
     return (
       <div className="flex flex-col items-center py-8 text-center">
-        <div className="flex size-14 items-center justify-center rounded-2xl bg-accent/12 text-accent">
+        <div className="flex size-14 items-center justify-center rounded-2xl bg-accent/12 text-accent-text">
           <Loader2 size={25} className="animate-spin" />
         </div>
         <h2 className="mt-4 text-[18px] font-semibold text-ink">

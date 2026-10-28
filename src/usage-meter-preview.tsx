@@ -79,7 +79,7 @@ function ConfirmMock({ usage }: { usage: CloudUsage }) {
   return <div className="relative h-full">
     <SidebarMock usage={usage} />
     <div className="absolute inset-0 flex items-center justify-center bg-black/55 p-6">
-      <ConfirmDialogCard open tone="neutral" icon={<Gauge size={18} className="text-accent" />} title={t("usageMeter.confirm.title", { plan: cloudPlanLabel(plan) })}
+      <ConfirmDialogCard open tone="neutral" icon={<Gauge size={18} className="text-accent-text" />} title={t("usageMeter.confirm.title", { plan: cloudPlanLabel(plan) })}
         body={upgradeConfirmBody(preview)} confirmLabel={t("usageMeter.confirm.action", { plan: cloudPlanLabel(plan) })} cancelLabel={t("usageMeter.confirm.cancel")}
         onCancel={noop} onConfirm={noop} />
     </div>

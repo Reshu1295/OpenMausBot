@@ -58,7 +58,7 @@ function CursorLine({ cursor, card, onSignIn, onSignOut }: {
         <span className="flex items-center gap-1.5">
           <Check size={13} className="text-success" />
           {t("grokImport.cursorSignedIn")} ·{" "}
-          <button onClick={onSignOut} className="text-accent hover:underline">{t("grokImport.cursorSignOut")}</button>
+          <button onClick={onSignOut} className="text-accent-text hover:underline">{t("grokImport.cursorSignOut")}</button>
         </span>
       ) : cursor.waiting ? (
         <span className="flex items-center gap-1.5"><Loader2 size={13} className="animate-spin" />{t("grokImport.cursorWaiting")}</span>

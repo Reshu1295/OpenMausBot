@@ -56,7 +56,7 @@ function ScreenUnavailable() {
       <button
         type="button"
         onClick={() => window.location.reload()}
-        className="shrink-0 rounded-md px-1.5 py-0.5 font-medium text-accent hover:bg-raised"
+        className="shrink-0 rounded-md px-1.5 py-0.5 font-medium text-accent-text hover:bg-raised"
       >
         {t("screenLoad.reload")}
       </button>

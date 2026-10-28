@@ -225,7 +225,7 @@ export function AvatarImageGenerator({
   return (
     <div className="mt-5 border-t border-hairline/40 pt-4">
       <div className="flex items-center gap-2 text-[13px] font-medium text-ink">
-        <Sparkles size={14} className="text-accent" /> {t("botIdentity.ai.generateWith")}
+        <Sparkles size={14} className="text-accent-text" /> {t("botIdentity.ai.generateWith")}
       </div>
       <label className="mt-3 block text-[12px] text-ink-secondary">
         {t("botIdentity.ai.provider")}

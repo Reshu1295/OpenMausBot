@@ -626,7 +626,7 @@ export function EngineSetup({
           href={install.docsUrl}
           target="_blank"
           rel="noreferrer"
-          className="mt-2.5 inline-flex items-center gap-1.5 text-[12px] font-medium text-accent hover:underline"
+          className="mt-2.5 inline-flex items-center gap-1.5 text-[12px] font-medium text-accent-text hover:underline"
         >
           <ExternalLink size={12} /> {t("engineSetup.viewGuide")}
         </a>

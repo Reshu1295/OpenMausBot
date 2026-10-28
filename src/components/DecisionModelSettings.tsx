@@ -282,7 +282,7 @@ export function DecisionModelSettings() {
                   type="button"
                   data-testid="decider-manage-keys"
                   onClick={() => dispatch(openKeySettings("openrouter"))}
-                  className="cursor-pointer text-accent hover:underline"
+                  className="cursor-pointer text-accent-text hover:underline"
                 >
                   {t("decider.openrouter.key.manageLink")}
                 </button>
@@ -333,7 +333,7 @@ export function DecisionModelSettings() {
             href={KEY_URL[provider]}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-2 inline-flex cursor-pointer items-center gap-1 text-[12px] text-accent hover:underline"
+            className="mt-2 inline-flex cursor-pointer items-center gap-1 text-[12px] text-accent-text hover:underline"
           >
             {t(openrouter ? "decider.openrouter.key.getKey" : "decider.key.getKey")}
             <ExternalLink size={11} aria-hidden="true" />

@@ -199,7 +199,7 @@ export function CloudSetup({ viewer, welcomeShown = false }: { viewer: WelcomeVi
     return <div key={id} data-cloud-setup-step={id} data-status="todo" className="animate-rise mt-4">
       <h3 className="text-[14px] font-semibold leading-snug text-ink [text-wrap:balance]">{titleOf(id)}</h3>
       {here
-        ? <p className="mt-1.5 flex items-center gap-1.5 text-[12px] font-medium text-accent"><span aria-hidden="true" className="size-1.5 rounded-full bg-accent" />{t("cloudSetup.onScreen")}</p>
+        ? <p className="mt-1.5 flex items-center gap-1.5 text-[12px] font-medium text-accent-text"><span aria-hidden="true" className="size-1.5 rounded-full bg-accent" />{t("cloudSetup.onScreen")}</p>
         : body}
       {act && <div className="mt-3.5 flex">{act}</div>}
     </div>;

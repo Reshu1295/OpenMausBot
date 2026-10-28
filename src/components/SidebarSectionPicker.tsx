@@ -81,7 +81,7 @@ export function SectionPicker({
               )}
             >
               <span className="truncate">{section}</span>
-              {section === sectionCurrent && <Check size={14} className="shrink-0 text-accent" />}
+              {section === sectionCurrent && <Check size={14} className="shrink-0 text-accent-text" />}
             </button>
           ))}
         </div>

@@ -51,7 +51,7 @@ export function WorkspacesTable({ fleet, onAct, busy }: { fleet: FleetView; onAc
           <div key={workspace.slug} className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-x-5 border-b border-hairline/20 py-2 text-[13px]">
             <span className="min-w-0">
               <span className="block truncate text-ink">{workspace.slug}</span>
-              <a href={`https://${workspace.host}`} target="_blank" rel="noreferrer" className="block truncate text-[12px] text-accent hover:underline">{workspace.host}</a>
+              <a href={`https://${workspace.host}`} target="_blank" rel="noreferrer" className="block truncate text-[12px] text-accent-text hover:underline">{workspace.host}</a>
               {!operational && <span className="block text-[12px] text-ink-secondary">{t("workspaces.recoveryHint")}</span>}
             </span>
             <span className={cn("text-right", suspended || workspace.status === "provisioning" ? "text-warning" : workspace.status === "running" && workspace.live === "active" ? "text-success" : "text-danger")}>{state}</span>

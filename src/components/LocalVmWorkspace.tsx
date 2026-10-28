@@ -762,7 +762,7 @@ export function LocalVmWorkspace({
   return (
     <main className="flex h-full min-w-0 flex-1 flex-col bg-app">
       <header {...dragProps} className="flex min-h-[60px] items-center gap-3 border-b border-hairline/40 px-5 py-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent/15 text-accent">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent/15 text-accent-text">
           <Monitor size={18} />
         </div>
         <div className="min-w-0 flex-1">

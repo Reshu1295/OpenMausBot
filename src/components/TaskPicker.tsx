@@ -298,7 +298,7 @@ function ConversationTaskPicker({
                 <div
                   className={cn("group flex items-center gap-2 rounded-md px-2 py-1.5", active ? "bg-menu-active" : "hover:bg-menu-hover")}
                 >
-                  <Check size={14} className={cn("shrink-0", active ? "text-accent" : "opacity-0")} />
+                  <Check size={14} className={cn("shrink-0", active ? "text-accent-text" : "opacity-0")} />
                   {renaming === task.threadId ? (
                     <input
                       autoFocus

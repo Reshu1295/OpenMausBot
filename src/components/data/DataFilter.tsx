@@ -40,7 +40,7 @@ export function DataFilter({ columns, value, onChange }: { columns: DataColumn[]
     <button ref={trigger} type="button" aria-label={t("data.filter.button")} aria-haspopup="dialog" aria-expanded={open} aria-controls={open ? id : undefined}
       title={active ? `${selected}: ${value.text}` : t("data.filter.button")} data-active={active}
       onClick={() => { setChoosing(!active); setSearch(""); setOpen(!open); }}
-      className={`flex max-w-full items-center gap-1.5 rounded-md border px-2 py-1 text-xs ${active ? "border-accent/40 bg-accent/10 text-accent" : "border-hairline/50 text-ink-secondary hover:bg-inset hover:text-ink"}`}>
+      className={`flex max-w-full items-center gap-1.5 rounded-md border px-2 py-1 text-xs ${active ? "border-accent/40 bg-accent/10 text-accent-text" : "border-hairline/50 text-ink-secondary hover:bg-inset hover:text-ink"}`}>
       <ListFilter size={14} aria-hidden="true" /><span>{t("data.filter.button")}</span>
       {active && <span className="max-w-40 truncate text-[11px]">· {selected}</span>}
     </button>

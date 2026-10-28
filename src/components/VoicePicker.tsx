@@ -243,7 +243,7 @@ export function VoicePicker({
                 </span>
               )}
             </span>
-            {current && <Check size={14} aria-hidden className="shrink-0 text-accent" />}
+            {current && <Check size={14} aria-hidden className="shrink-0 text-accent-text" />}
           </div>
         </div>
       );

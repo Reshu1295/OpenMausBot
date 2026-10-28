@@ -208,7 +208,7 @@ export function CloudEngineSignIn() {
               )}
             </figcaption>
             <p className="mt-1 text-[14px] leading-relaxed text-ink">
-              <span className="mr-1.5 inline-flex h-[21px] items-center rounded-md bg-accent/15 px-1.5 align-[1px] text-[13px] font-semibold text-accent">/setup</span>
+              <span className="mr-1.5 inline-flex h-[21px] items-center rounded-md bg-accent/15 px-1.5 align-[1px] text-[13px] font-semibold text-accent-text">/setup</span>
               {pending}
             </p>
             {handing && (

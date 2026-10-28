@@ -70,7 +70,7 @@ export function KeyboardShortcutsModal({ open, onClose }: KeyboardShortcutsModal
       >
         <div className="flex items-center justify-between border-b border-hairline/40 px-5 py-4">
           <div className="flex items-center gap-2.5">
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-accent/15 text-accent">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-accent/15 text-accent-text">
               <Keyboard size={18} />
             </span>
             <div>

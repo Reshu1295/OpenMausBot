@@ -91,7 +91,7 @@ export function TeamDialog({ section, rename = false, onClose, onRenamed }: {
             {managing ? t("team.manageIntro") : moving ? t("team.moveIntro") : t("team.createIntro")} {t("team.moveWarning")}
           </p>
           {managing && <button disabled={saving || state.botCreationPending} onClick={createBot}
-            className="mb-3 flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px] text-accent hover:bg-raised disabled:opacity-40">
+            className="mb-3 flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px] text-accent-text hover:bg-raised disabled:opacity-40">
             <Plus size={14} />{t("sidebar.newBot")}
           </button>}
           <fieldset disabled={saving}>

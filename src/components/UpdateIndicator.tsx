@@ -209,7 +209,7 @@ export function UpdateCard({
         <button
           type="button"
           onClick={() => void openExternalLink(RELEASES_URL)}
-          className={cn(highlights.length > 0 ? "mt-3" : "mt-5", "block text-[13px] font-medium leading-5 text-accent hover:underline")}
+          className={cn(highlights.length > 0 ? "mt-3" : "mt-5", "block text-[13px] font-medium leading-5 text-accent-text hover:underline")}
         >
           {t("update.card.allNotes")}
         </button>

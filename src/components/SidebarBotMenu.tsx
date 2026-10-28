@@ -204,7 +204,7 @@ export function BotContextMenu({
     const moreItems = remoteClient ? [editProfile, owner, ...deleteAll] : [
       editProfile,
       item(
-        <Crown size={16} className={bot.chiefOfStaff ? "text-accent" : "text-ink-secondary"} />,
+        <Crown size={16} className={bot.chiefOfStaff ? "text-accent-text" : "text-ink-secondary"} />,
         bot.chiefOfStaff ? t("sidebar.bot.removeChief") : t("sidebar.bot.makeChief"),
         () => dispatch({ type: "updateBot", botId: bot.id, patch: { chiefOfStaff: !bot.chiefOfStaff } }),
         { disabled: !bot.chiefOfStaff && !canCoordinate, hint: !bot.chiefOfStaff && !canCoordinate ? t("sidebar.bot.chiefNeedsEngine") : undefined },
@@ -351,7 +351,7 @@ export function BotContextMenu({
           () => dispatch({ type: "updateBot", botId: bot.id, patch: { pinned: !bot.pinned } }),
         ),
         item(
-          <Crown size={16} className={bot.chiefOfStaff ? "text-accent" : "text-ink-secondary"} />,
+          <Crown size={16} className={bot.chiefOfStaff ? "text-accent-text" : "text-ink-secondary"} />,
           bot.chiefOfStaff ? t("sidebar.bot.removeChief") : t("sidebar.bot.makeChief"),
           () => dispatch({ type: "updateBot", botId: bot.id, patch: { chiefOfStaff: !bot.chiefOfStaff } }),
           {

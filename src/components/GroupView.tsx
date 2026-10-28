@@ -197,7 +197,7 @@ function RoomTextMessage({
       {canReact && m.from && <ReactAction threadId={group.threadId} message={m} />}
       {botText && <CopyButton text={botText} className={messageActionClass} />}
       {botText && viewRaw && <RawToggleAction active onToggle={() => setViewRaw(false)} className={messageActionClass} />}
-      {botText && speaking && <SpeakButton text={botText} botId={speakerBot?.id} messageId={m.id} voiceId={speakerBot?.voice} tts={state.config?.tts} localVoice={localSystemVoiceActive()} className={cn(messageActionClass, "text-accent")} />}
+      {botText && speaking && <SpeakButton text={botText} botId={speakerBot?.id} messageId={m.id} voiceId={speakerBot?.voice} tts={state.config?.tts} localVoice={localSystemVoiceActive()} className={cn(messageActionClass, "text-accent-text")} />}
     </MessageActions>
   );
   return (
@@ -775,7 +775,7 @@ function RoomSetup({ group, members }: { group: Group; members: Bot[] }) {
                             <span className="block truncate text-[13px] font-medium text-ink">{member.name}</span>
                             <span className="block truncate text-[11px] text-ink-secondary">{member.title}</span>
                           </span>
-                          {selected && <Check size={15} className="shrink-0 text-accent" />}
+                          {selected && <Check size={15} className="shrink-0 text-accent-text" />}
                         </button>
                       );
                     })}
@@ -1037,7 +1037,7 @@ export function GroupView({ group }: { group: Group }) {
             <button
               type="button"
               onClick={() => dispatch({ type: "toggleAppSettings", open: true, section: "decisionModel" })}
-              className="cursor-pointer text-accent hover:underline"
+              className="cursor-pointer text-accent-text hover:underline"
             >
               {t("room.responder.jevOffOpen")}
             </button>
@@ -1065,13 +1065,13 @@ export function GroupView({ group }: { group: Group }) {
         return (
           <div className="w-full px-5">
             <div className="mb-2 flex items-center gap-2 rounded-lg border border-accent/25 bg-accent/[0.07] px-3 py-1.5">
-              <Pin size={12} className="shrink-0 text-accent" />
+              <Pin size={12} className="shrink-0 text-accent-text" />
               <button
                 onClick={() => dispatch({ type: "focusMessage", threadId: group.threadId, messageId: pinned.id })}
                 className="flex min-w-0 flex-1 items-baseline gap-2 text-left"
                 title={t("chat.pinnedJump")}
               >
-                <span className="shrink-0 text-[12px] font-medium text-accent">{sender}</span>
+                <span className="shrink-0 text-[12px] font-medium text-accent-text">{sender}</span>
                 <span dir="auto" className="truncate text-[13px] text-ink-secondary">{text}</span>
               </button>
               <button

@@ -206,7 +206,7 @@ export function CompanionSection({ profileEmail = "", focusRequest = 0 }: { prof
               )}
               {pairedCount > 0 && c.hostedReady && (
                 <div className="flex items-center gap-1.5 text-[12px] text-ink-secondary">
-                  <ShieldCheck size={13} className="text-accent" /> {t("remote.worksAway")}
+                  <ShieldCheck size={13} className="text-accent-text" /> {t("remote.worksAway")}
                 </div>
               )}
             </div>
@@ -361,7 +361,7 @@ export function CompanionSection({ profileEmail = "", focusRequest = 0 }: { prof
           <div className="border-t border-hairline/30 pt-4">
             <div className="flex items-start justify-between gap-3">
               <div className="flex min-w-0 items-start gap-2.5">
-                <Cloud size={15} className="mt-0.5 shrink-0 text-accent" />
+                <Cloud size={15} className="mt-0.5 shrink-0 text-accent-text" />
                 <div className="min-w-0">
                   <div className="text-[13px] text-ink">{t("remote.account.title")}</div>
                   <div className="mt-0.5 text-[12px] leading-relaxed text-ink-secondary">

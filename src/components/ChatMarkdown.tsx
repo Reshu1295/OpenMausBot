@@ -252,7 +252,7 @@ export function MermaidDiagram({ code }: MermaidDiagramProps) {
             onClick={() => setShowSource((visible) => !visible)}
             className={`inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] transition-colors ${
               showSource
-                ? "bg-accent/15 text-accent font-medium"
+                ? "bg-accent/15 text-accent-text font-medium"
                 : "text-ink-secondary hover:bg-raised hover:text-ink"
             }`}
             title={showSource ? "Hide diagram source" : "Show diagram source"}
@@ -316,7 +316,7 @@ function LocalFileLink({ filePath, name, children, message }: { filePath: string
         onClick={() => void save.save()}
         disabled={save.state === "saving"}
         title="Save a copy"
-        className="inline-flex items-center gap-1 break-words text-start text-accent underline decoration-accent/40 hover:decoration-accent disabled:cursor-wait"
+        className="inline-flex items-center gap-1 break-words text-start text-accent-text underline decoration-accent/40 hover:decoration-accent disabled:cursor-wait"
       >
         {children}
         {save.state === "saving" ? (

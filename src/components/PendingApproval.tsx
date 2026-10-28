@@ -169,7 +169,7 @@ export const PendingApprovalPanel = memo(function PendingApprovalPanel({
       className="px-3 py-2"
     >
       <div className="flex flex-wrap items-baseline gap-x-2 gap-y-2">
-        <ShieldCheck size={16} className="shrink-0 self-center text-accent" aria-hidden="true" />
+        <ShieldCheck size={16} className="shrink-0 self-center text-accent-text" aria-hidden="true" />
         <div className="flex min-w-0 flex-1 basis-52 items-baseline gap-2" aria-live="polite">
           <span className="min-w-0 max-w-[60%] shrink-0 truncate text-[13px] font-medium leading-5 text-ink" title={line}>{line}</span>
           {outbound?.summary && (

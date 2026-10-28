@@ -16,13 +16,13 @@ const KIND_LOOK: Record<NotifyKind, { Icon: LucideIcon; className: string; statu
   approval: { Icon: HandHelping, className: "text-warning", status: "notifications.status.approval" },
   question: { Icon: CircleHelp, className: "text-warning", status: "notifications.status.question" },
   "sign-in": { Icon: LogIn, className: "text-warning", status: "notifications.status.signIn" },
-  mention: { Icon: AtSign, className: "text-accent", status: "notifications.status.mention" },
+  mention: { Icon: AtSign, className: "text-accent-text", status: "notifications.status.mention" },
   incident: { Icon: AlertTriangle, className: "text-danger", status: "notifications.status.incident" },
   "turn-failed": { Icon: AlertTriangle, className: "text-danger", status: "notifications.status.failed" },
   "routine-failed": { Icon: AlertTriangle, className: "text-danger", status: "notifications.status.failed" },
-  "routine-deferred": { Icon: RotateCcw, className: "text-accent", status: "notifications.status.deferred" },
-  spend: { Icon: Wallet, className: "text-accent", status: "notifications.status.spend" },
-  brief: { Icon: Newspaper, className: "text-accent", status: "notifications.status.brief" },
+  "routine-deferred": { Icon: RotateCcw, className: "text-accent-text", status: "notifications.status.deferred" },
+  spend: { Icon: Wallet, className: "text-accent-text", status: "notifications.status.spend" },
+  brief: { Icon: Newspaper, className: "text-accent-text", status: "notifications.status.brief" },
 };
 
 interface TitledThread { threadId: string; title: string }
@@ -137,9 +137,9 @@ export function NotificationsPanel() {
       <div className="flex items-center gap-1.5 border-b border-hairline/40 px-3.5 py-2.5">
         <span className="flex-1 text-[13px] font-medium text-ink">
           {t("notifications.title")}
-          {unreadCount > 0 && <span className="ml-1.5 text-[12px] font-normal text-accent">· {t("notifications.unread", { count: unreadCount })}</span>}
+          {unreadCount > 0 && <span className="ml-1.5 text-[12px] font-normal text-accent-text">· {t("notifications.unread", { count: unreadCount })}</span>}
         </span>
-        <button type="button" onClick={markAllRead} className="shrink-0 whitespace-nowrap text-[12px] text-accent hover:underline">
+        <button type="button" onClick={markAllRead} className="shrink-0 whitespace-nowrap text-[12px] text-accent-text hover:underline">
           {t("notifications.markAllRead")}
         </button>
         <button
@@ -150,7 +150,7 @@ export function NotificationsPanel() {
           title={state.notificationsPinned ? t("notifications.unpin") : t("notifications.pin")}
           className={cn(
             "flex size-[26px] shrink-0 items-center justify-center rounded-md text-ink-secondary hover:bg-raised hover:text-ink",
-            state.notificationsPinned && "text-accent",
+            state.notificationsPinned && "text-accent-text",
           )}
         >
           <Pin size={14} />

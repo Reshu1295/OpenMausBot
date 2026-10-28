@@ -309,10 +309,10 @@ function AudioAttachment({ file, message }: { file: GalleryFile; message: Messag
   return (
     <div className="inline-flex w-72 max-w-full flex-col gap-1.5 rounded-2xl border border-hairline/30 bg-inset/60 px-3 py-2.5 text-left">
       <div className="flex items-center gap-2">
-        {src ? <Music size={14} className="shrink-0 text-accent" aria-hidden="true" />
+        {src ? <Music size={14} className="shrink-0 text-accent-text" aria-hidden="true" />
           : (
             <button type="button" disabled={loading} onClick={() => void load()} aria-label={t("attach.previewAudio", { name: file.name })}
-              className="flex size-7 shrink-0 items-center justify-center rounded-full bg-accent/15 text-accent transition-colors hover:bg-accent/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 disabled:cursor-wait">
+              className="flex size-7 shrink-0 items-center justify-center rounded-full bg-accent/15 text-accent-text transition-colors hover:bg-accent/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 disabled:cursor-wait">
               {loading ? <LoaderCircle size={14} className="animate-spin" /> : <Play size={13} fill="currentColor" />}
             </button>
           )}

@@ -150,7 +150,7 @@ export function TeamMemoryDialog({ section, label, onClose }: { section: string;
         <header className="flex items-start justify-between gap-4 border-b border-hairline/40 px-6 pb-4 pt-6 sm:px-8 sm:pt-7">
           <div>
             <div className="flex items-center gap-2">
-              <Brain size={19} className="text-accent" />
+              <Brain size={19} className="text-accent-text" />
               <h2 id="team-memory-title" className="text-[20px] font-semibold tracking-[-0.01em] text-ink">
                 {t("teamMemory.title", { name: label })}
               </h2>
@@ -180,7 +180,7 @@ export function TeamMemoryDialog({ section, label, onClose }: { section: string;
 
           {proposed.length > 0 && (
             <section className="mb-5 rounded-xl border border-accent/30 bg-accent/5 p-3">
-              <h3 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-accent">{t("teamMemory.waiting")}</h3>
+              <h3 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-accent-text">{t("teamMemory.waiting")}</h3>
               <ul className="mt-2 space-y-2">
                 {proposed.map((entry) => (
                   <li key={entry.id} className="flex items-start gap-3 text-[13px]">
@@ -247,7 +247,7 @@ export function TeamMemoryDialog({ section, label, onClose }: { section: string;
                         </span>
                         {!!entry.history?.length && <details className="mt-1 text-[11px] text-ink-secondary"><summary>{t("teamMemory.history")}</summary>{entry.history.map((version, index) => <div key={index} className="mt-1">{new Date(version.at).toLocaleDateString()}: {version.name} — {version.detail} <button disabled={busyId !== null} onClick={() => editDetail(entry, version.detail, version.name)} className="underline">{t("teamMemory.restore")}</button></div>)}</details>}
                       </span>
-                      <button aria-label={t(entry.pinned ? "teamMemory.unpin" : "teamMemory.pin", { name: entry.name })} aria-pressed={entry.pinned ?? false} disabled={busyId !== null} className="p-1 text-ink-secondary hover:text-accent" onClick={() => void run(entry.id, () => api(`/api/team-memory/${entry.id}?${query}`, { method: "PATCH", body: JSON.stringify({ pinned: !entry.pinned, expectedRevision: entry.revision }) }))}><Pin size={13} /></button>
+                      <button aria-label={t(entry.pinned ? "teamMemory.unpin" : "teamMemory.pin", { name: entry.name })} aria-pressed={entry.pinned ?? false} disabled={busyId !== null} className="p-1 text-ink-secondary hover:text-accent-text" onClick={() => void run(entry.id, () => api(`/api/team-memory/${entry.id}?${query}`, { method: "PATCH", body: JSON.stringify({ pinned: !entry.pinned, expectedRevision: entry.revision }) }))}><Pin size={13} /></button>
                       <button
                         onClick={() => void remove(entry)}
                         disabled={busyId !== null}

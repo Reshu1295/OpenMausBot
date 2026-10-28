@@ -149,12 +149,12 @@ export function PermissionsSection({
         </div>
         {!draft && approvalMode === "full" && <button
           type="button"
-          className="mt-3 text-[13px] text-accent hover:underline disabled:opacity-40"
+          className="mt-3 text-[13px] text-accent-text hover:underline disabled:opacity-40"
           onClick={applyFullEverywhere}
         >{t("permissions.approval.applyFull")}</button>}
         {!draft && ownerOrAdmin === true && <button
           type="button"
-          className="mt-3 block text-[13px] text-accent hover:underline"
+          className="mt-3 block text-[13px] text-accent-text hover:underline"
           onClick={() => setCommandAllowlistTarget({ botId: bot.id, botName: bot.name })}
         >{t("commandAllowlist.manage")}</button>}
       </div>}
@@ -184,7 +184,7 @@ function PeersListNote({ peers, bots, onOpen }: { peers: readonly string[]; bots
   return (
     <div className="mt-3 flex flex-wrap items-baseline gap-x-2 gap-y-1 border-t border-hairline/40 pt-3 text-[13px] text-ink-secondary">
       <span>{names.length ? t("permissions.peers.limited", { names: names.join(", ") }) : t("permissions.peers.none")}</span>
-      <button type="button" className="text-accent hover:underline" onClick={onOpen}>{t("permissions.peers.everyone")}</button>
+      <button type="button" className="text-accent-text hover:underline" onClick={onOpen}>{t("permissions.peers.everyone")}</button>
     </div>
   );
 }

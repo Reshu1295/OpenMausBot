@@ -56,7 +56,7 @@ export function PhoneAppDialog({ open, onClose, connect = [] }: { open: boolean;
               <div className="rounded-md bg-white p-2">
                 <QRCodeSVG value={app.url} size={132} level="M" bgColor="#ffffff" fgColor="#111111" title={t(app.actionKey)} />
               </div>
-              <button type="button" onClick={() => void openExternalLink(app.url)} className="text-[13px] text-accent hover:underline">
+              <button type="button" onClick={() => void openExternalLink(app.url)} className="text-[13px] text-accent-text hover:underline">
                 {t(app.actionKey)}
               </button>
             </li>

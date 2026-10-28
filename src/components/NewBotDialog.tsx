@@ -217,7 +217,7 @@ function SharedInTeam({ team }: { team: string }) {
   return <div data-new-bot-shared className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-hairline/40 bg-raised/30 px-5 py-2.5 text-[13px] text-ink-secondary">
     <span>{t("newBot.sharedWith", { team })}</span>
     {bridge
-      ? <button type="button" onClick={() => void openServerMenu(bridge).catch(() => {})} className="font-medium text-accent hover:underline">{t("newBot.justForYou")}</button>
+      ? <button type="button" onClick={() => void openServerMenu(bridge).catch(() => {})} className="font-medium text-accent-text hover:underline">{t("newBot.justForYou")}</button>
       : <span>{t("newBot.justForYou").replace(/\s*→$/, "")}</span>}
   </div>;
 }

@@ -52,7 +52,7 @@ export function ToolIcon({ icon, app, catalog, error = false }: { icon: TraceToo
   const Icon = icon === "app" ? Blocks : ICONS[icon];
   return (
     <span className={BOX} aria-hidden>
-      <Icon size={13} className={error ? "text-danger" : icon === "browser" || icon === "web" ? "text-accent" : "trace-tool-ink"} />
+      <Icon size={13} className={error ? "text-danger" : icon === "browser" || icon === "web" ? "text-accent-text" : "trace-tool-ink"} />
     </span>
   );
 }

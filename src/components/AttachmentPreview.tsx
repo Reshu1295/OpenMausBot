@@ -372,7 +372,7 @@ function MessageFolderFile({ folderPath, name, bytes, message }: {
         onClick={() => void save.save()}
         disabled={save.state === "saving"}
         aria-label={t("attach.saveAria", { name })}
-        className="inline-flex min-h-8 min-w-0 items-center gap-1 break-all text-start text-accent underline decoration-accent/40 hover:decoration-accent disabled:cursor-wait"
+        className="inline-flex min-h-8 min-w-0 items-center gap-1 break-all text-start text-accent-text underline decoration-accent/40 hover:decoration-accent disabled:cursor-wait"
       >
         {save.state === "saving" ? (
           <LoaderCircle size={12} className="shrink-0 animate-spin" aria-hidden="true" />
@@ -442,7 +442,7 @@ export function OutsideWorkspaceFile({ filePath }: { filePath: string }) {
         type="button"
         onClick={() => void show()}
         title={filePath}
-        className="inline-flex items-center gap-1 text-accent underline decoration-accent/40 hover:decoration-accent"
+        className="inline-flex items-center gap-1 text-accent-text underline decoration-accent/40 hover:decoration-accent"
       >
         <FolderOpen size={12} className="shrink-0" aria-hidden="true" />
         {t("attach.showInFolder")}
@@ -885,7 +885,7 @@ export function MarkdownImagePreview({
           </span>
         )}
         {openUrl && (
-          <a href={openUrl} target="_blank" rel="noreferrer" className="mt-1 inline-flex text-[11px] text-accent hover:underline">
+          <a href={openUrl} target="_blank" rel="noreferrer" className="mt-1 inline-flex text-[11px] text-accent-text hover:underline">
             Open original
           </a>
         )}

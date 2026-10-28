@@ -261,10 +261,10 @@ export function CanvasComputers({ open, createRequest, drop, sections, onClose, 
               // provider URLs are never iframes.
               if (typeof value.joinUrl === "string" && value.joinUrl.startsWith("https://")) setViewer({ id: computer.id, url: value.joinUrl });
             })}>{t("canvasComputers.openDesktop")} <ExternalLink size={11} /></button>}
-            {heldHereNow && <button className={`${control} text-accent`} disabled={busy !== null} onClick={() => void mutate(computer.id, () => post(computer.id, "control", { action: "release", controlLeaseId: controlLeaseId.current }), () => { setHeldHere(null); setViewer(null); })}>{t("canvasComputers.returnToBots")}</button>}
+            {heldHereNow && <button className={`${control} text-accent-text`} disabled={busy !== null} onClick={() => void mutate(computer.id, () => post(computer.id, "control", { action: "release", controlLeaseId: controlLeaseId.current }), () => { setHeldHere(null); setViewer(null); })}>{t("canvasComputers.returnToBots")}</button>}
             {computer.held && !heldHereNow && <button className={control} disabled title={t("canvasComputers.inUseTitle")}>{t("canvasComputers.inUse")}</button>}
           </div>
-          {viewer?.id === computer.id && <a href={viewer.url} target="_blank" rel="noopener noreferrer" className="mt-2 block rounded-lg px-3 py-2 text-[12px] text-accent hover:bg-control">{t("canvasComputers.openSecure")} <ArrowUpRight size={14} aria-hidden="true" className="inline align-[-2px]" /></a>}
+          {viewer?.id === computer.id && <a href={viewer.url} target="_blank" rel="noopener noreferrer" className="mt-2 block rounded-lg px-3 py-2 text-[12px] text-accent-text hover:bg-control">{t("canvasComputers.openSecure")} <ArrowUpRight size={14} aria-hidden="true" className="inline align-[-2px]" /></a>}
         </article>; })}
       </div>
       <footer className="border-t border-hairline/40 p-3"><button className={`${control} w-full text-left`} onClick={settings}>{t("canvasComputers.moreSettings")}</button></footer>

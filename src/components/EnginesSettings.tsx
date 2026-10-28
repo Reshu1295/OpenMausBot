@@ -273,7 +273,7 @@ function EngineAdvanced({ instance }: { instance: InstanceInfo }) {
             aria-expanded={open}
             className={cn(
               "shrink-0 rounded-lg border border-hairline/40 px-3 py-1 text-[12px]",
-              open ? "bg-accent/15 text-accent" : "text-ink-secondary hover:bg-raised/50 hover:text-ink",
+              open ? "bg-accent/15 text-accent-text" : "text-ink-secondary hover:bg-raised/50 hover:text-ink",
               "disabled:opacity-50",
             )}
           >

@@ -28,7 +28,7 @@ export function DigestChip({ message }: { message: Message }) {
       >
         <ClipboardList size={12} />
         <span className="truncate">{label}</span>
-        <button type="button" onClick={() => setTracing(true)} className="shrink-0 text-accent hover:underline" data-testid="view-trace">
+        <button type="button" onClick={() => setTracing(true)} className="shrink-0 text-accent-text hover:underline" data-testid="view-trace">
           {t("trace.view")}
         </button>
       </span>

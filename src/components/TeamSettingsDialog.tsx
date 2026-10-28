@@ -33,7 +33,7 @@ export function TeamSettingsRows({ rows }: { rows: ReadonlyArray<TeamPlanRow | T
   return (
     <ul className="flex flex-col gap-1" data-testid="team-settings-rows">
       {rows.map((row) => {
-        const [label, tone] = row.status === "apply" ? [t("teamSettings.row.willChange"), "text-accent"]
+        const [label, tone] = row.status === "apply" ? [t("teamSettings.row.willChange"), "text-accent-text"]
           : row.status === "applied" ? [t("teamSettings.row.applied"), "text-success"]
             : row.status === "unchanged" ? [t("teamSettings.row.unchanged"), "text-ink-secondary"]
               : [t("teamSettings.row.skipped", { reason: row.reason }), "text-warning"];

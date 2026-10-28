@@ -372,7 +372,7 @@ export function VoiceSettings({
             href={cloudProvider.keyUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-1.5 inline-block text-[12px] font-medium text-accent hover:underline"
+            className="mt-1.5 inline-block text-[12px] font-medium text-accent-text hover:underline"
           >
             {t("voice.getKey", { provider: cloudProvider.name })}
           </a>
@@ -450,7 +450,7 @@ export function VoiceSettings({
             href="https://github.com/resemble-ai/chatterbox"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-medium text-accent hover:underline"
+            className="font-medium text-accent-text hover:underline"
           >
             {t("voice.chatterboxHowTo")}
           </a>

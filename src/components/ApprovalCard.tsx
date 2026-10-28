@@ -254,7 +254,7 @@ function AppliedChangeLine({
             type="button"
             onClick={undo}
             disabled={undoing}
-            className={cn(TEXT_ACTION, "text-accent disabled:opacity-60")}
+            className={cn(TEXT_ACTION, "text-accent-text disabled:opacity-60")}
           >
             {undoing ? t("approval.applied.undoing") : t("approval.applied.undo")}
           </button>
@@ -264,7 +264,7 @@ function AppliedChangeLine({
             type="button"
             onClick={share}
             disabled={sharing}
-            className="rounded-md px-1.5 py-0.5 font-medium text-accent hover:bg-inset disabled:opacity-60"
+            className="rounded-md px-1.5 py-0.5 font-medium text-accent-text hover:bg-inset disabled:opacity-60"
           >
             {sharing ? t("approval.applied.sharingSkill") : t("approval.applied.shareSkill")}
           </button>
@@ -347,7 +347,7 @@ function CompactApprovalRow({
     >
       <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1 leading-5">
         {waiting
-          ? <ShieldCheck size={14} className="shrink-0 self-center text-accent" aria-hidden="true" />
+          ? <ShieldCheck size={14} className="shrink-0 self-center text-accent-text" aria-hidden="true" />
           : allowed
             ? <Check size={14} className="shrink-0 self-center text-success" aria-hidden="true" />
             : <X size={14} className="shrink-0 self-center" aria-hidden="true" />}
@@ -515,7 +515,7 @@ export function ApprovalCard({
           </>
         ) : (
           <>
-            <ShieldCheck size={14} className="text-accent" />
+            <ShieldCheck size={14} className="text-accent-text" />
             {isRoutineRequest || isSkillRequest || isProfileRequest || isTeamSetup
               ? t("approval.status.waitingConfirmation")
               : t("approval.status.waitingAnswer")}

@@ -22,7 +22,7 @@ export function PhoneHero({ bot, selected, onOpen, onMenu }: { bot: Bot; selecte
         <span className="relative flex">
           <BotAvatar bot={bot} state={stateForBot({ ...bot, messages: visible })} size={88} motion="none" motionKey={0} animated={Boolean(bot.busy)} />
           <span className="absolute -bottom-0.5 -right-0.5 flex rounded-full border-2 border-app bg-raised p-1">
-            <Crown size={13} strokeWidth={2.25} className="text-accent" aria-hidden="true" />
+            <Crown size={13} strokeWidth={2.25} className="text-accent-text" aria-hidden="true" />
           </span>
         </span>
         <span className="text-[17px] font-semibold leading-6 text-ink">{bot.name}</span>

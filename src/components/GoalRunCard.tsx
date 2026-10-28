@@ -15,7 +15,7 @@ import type { GroupGoalRunCardData } from "../../shared/group-goal-run";
 const DETAIL_LIMIT = 280;
 
 const COPY = {
-  working: { label: "Working", tone: "text-accent", border: "border-accent/30" },
+  working: { label: "Working", tone: "text-accent-text", border: "border-accent/30" },
   completed: { label: "Completed", tone: "text-success", border: "border-success/30" },
   "needs-input": { label: "Needs your input", tone: "text-warning", border: "border-warning/35" },
   blocked: { label: "Blocked", tone: "text-warning", border: "border-warning/35" },
@@ -37,7 +37,7 @@ function StatusIcon({ status }: { status: GroupGoalRunCardData["status"] }) {
   const className = "size-4 shrink-0";
   switch (status) {
     case "working":
-      return <Loader2 aria-hidden="true" className={cn(className, "animate-spin text-accent")} />;
+      return <Loader2 aria-hidden="true" className={cn(className, "animate-spin text-accent-text")} />;
     case "completed":
       return <CheckCircle2 aria-hidden="true" className={cn(className, "text-success")} />;
     case "needs-input":

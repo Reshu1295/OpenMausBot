@@ -46,7 +46,7 @@ export function EdgeRow({ edge, bots }: { edge: TeamMapEdge; bots: Bot[] }) {
     >
       <div className="flex min-w-0 flex-1 items-center gap-2">
         <span className="truncate text-[13px] font-medium text-ink">{source.name}</span>
-        <ArrowRight size={13} className={cn("shrink-0", live ? "text-accent" : "text-ink-secondary")} />
+        <ArrowRight size={13} className={cn("shrink-0", live ? "text-accent-text" : "text-ink-secondary")} />
         <span className="truncate text-[13px] font-medium text-ink">{target.name}</span>
       </div>
       {edge.reason && <span className="max-w-[220px] truncate text-[12px] text-ink-secondary">{edge.reason}</span>}
@@ -196,7 +196,7 @@ function SectionContextDialog({ section, label, onClose }: { section: string; la
         <header className="flex items-start justify-between gap-4 border-b border-hairline/40 px-6 pb-4 pt-6 sm:px-8 sm:pt-7">
           <div>
             <div className="flex items-center gap-2">
-              <BookOpen size={19} className="text-accent" />
+              <BookOpen size={19} className="text-accent-text" />
               <h2 id="section-context-title" className="text-[20px] font-semibold tracking-[-0.01em] text-ink">
                 {t("team.instructionsTitle", { name: label })}
               </h2>

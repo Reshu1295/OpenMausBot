@@ -760,7 +760,7 @@ export function TeamLibraryPanel({
                         dragging ? "border-accent bg-accent/5" : "border-hairline/60 bg-raised/20 hover:bg-raised/35",
                       )}
                     >
-                      <UploadCloud size={27} className="text-accent" />
+                      <UploadCloud size={27} className="text-accent-text" />
                       <span className="mt-3 text-[14px] font-medium text-ink">{t("templates.chooseFile")}</span>
                       <span className="mt-1 text-[13px] text-ink-secondary">{t("templates.dropFile")}</span>
                     </button>

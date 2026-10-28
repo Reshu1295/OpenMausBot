@@ -120,7 +120,7 @@ export function useUpgrade(bridge: CloudPlanBridge | undefined, usage: CloudUsag
     <ConfirmDialog
       open={preview !== null}
       tone="neutral"
-      icon={<Gauge size={18} className="text-accent" />}
+      icon={<Gauge size={18} className="text-accent-text" />}
       title={preview ? t("usageMeter.confirm.title", { plan: cloudPlanLabel(preview.plan) }) : ""}
       body={preview ? upgradeConfirmBody(preview) : ""}
       confirmLabel={preview ? t("usageMeter.confirm.action", { plan: cloudPlanLabel(preview.plan) }) : ""}

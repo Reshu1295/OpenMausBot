@@ -28,13 +28,13 @@ export function RoutineList({ routines, runs, bots, loading, error, onOpen, onLo
       const switched = onToggle !== undefined && !routineFinished(routine);
       return <article key={routine.id} className="rounded-xl border border-hairline/40 bg-card p-3.5" aria-label={routine.name}>
         <div className="flex items-start gap-2">
-          <button type="button" onClick={() => onOpen(routine)} className="min-w-0 flex-1 text-left hover:text-accent">
+          <button type="button" onClick={() => onOpen(routine)} className="min-w-0 flex-1 text-left hover:text-accent-text">
             <span className="block truncate text-[13px] font-semibold text-ink">{routine.name}</span>
             <span className="mt-1 block text-[12px] leading-relaxed text-ink-secondary">{bot && `${bot.name} · `}{scheduleLabel(routine.schedule)}</span>
           </button>
           {switched
             ? <Switch checked={routine.enabled} aria-label={t("routines.toggle", { name: routine.name })} onClick={() => onToggle(routine)} />
-            : <span className={cn("shrink-0 rounded-full bg-inset px-2 py-0.5 text-[10px]", routine.enabled && routine.nextRunAt != null ? "text-accent" : "text-ink-secondary")}>{routineScheduleState(routine)}</span>}
+            : <span className={cn("shrink-0 rounded-full bg-inset px-2 py-0.5 text-[10px]", routine.enabled && routine.nextRunAt != null ? "text-accent-text" : "text-ink-secondary")}>{routineScheduleState(routine)}</span>}
         </div>
         {(switched || routineNextLabel(routine) !== routineScheduleState(routine)) && <div className="mt-2 text-[12px] text-ink-secondary">{routineNextLabel(routine)}</div>}
         <div className="mt-1 flex items-start justify-between gap-2">

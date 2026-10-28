@@ -140,7 +140,7 @@ export function WorkersAiKeyCard({ failureText }: { failureText: (result: { reas
       </div>
       {error && <p role="alert" className="mt-1 text-[12px] text-danger">{error}</p>}
       {verdict && <p role="status" className={cn("mt-1 text-[12px]", verdict.ok ? "text-success" : "text-danger")}>{verdict.text}</p>}
-      <a href={TOKEN_URL} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex cursor-pointer items-center gap-1 text-[12px] text-accent hover:underline">
+      <a href={TOKEN_URL} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex cursor-pointer items-center gap-1 text-[12px] text-accent-text hover:underline">
         {t("decider.workersAi.getKey")}
         <ExternalLink size={11} aria-hidden="true" />
       </a>

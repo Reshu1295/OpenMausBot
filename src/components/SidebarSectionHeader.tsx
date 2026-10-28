@@ -198,7 +198,7 @@ function SectionAttention({ attention, label, alert }: { attention?: SidebarSect
       {attention && attention.unread > 0 && (
         <span
           aria-hidden="true"
-          className="min-w-4 rounded-full bg-accent/15 px-1 text-center text-[9px] font-semibold leading-4 text-accent"
+          className="min-w-4 rounded-full bg-accent/15 px-1 text-center text-[9px] font-semibold leading-4 text-accent-text"
         >
           {attention.unread}
         </span>

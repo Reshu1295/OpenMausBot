@@ -9,7 +9,7 @@ function StatusIcon({ status }: { status: RunStep["status"] }) {
   const className = "size-4 shrink-0";
   switch (status) {
     case "running":
-      return <Loader2 aria-hidden="true" className={cn(className, "animate-spin text-accent")} />;
+      return <Loader2 aria-hidden="true" className={cn(className, "animate-spin text-accent-text")} />;
     case "passed":
       return <CheckCircle2 aria-hidden="true" className={cn(className, "text-success")} />;
     case "failed":
@@ -45,7 +45,7 @@ export function VerifyCard({
       className="pointer-events-auto w-[22rem] max-w-full rounded-2xl border border-hairline/40 bg-raised/95 text-ink shadow-lg backdrop-blur-sm"
     >
       <div className="flex items-center gap-2 px-3 py-2">
-        <ListChecks size={14} className="shrink-0 text-accent" aria-hidden="true" />
+        <ListChecks size={14} className="shrink-0 text-accent-text" aria-hidden="true" />
         <div className="flex min-w-0 flex-1 flex-col">
           <span className="text-[13px] font-medium">{t("chat.verify.title")}</span>
           <span role="status" aria-live="polite" aria-atomic="true" className="text-[12px] text-ink-secondary">

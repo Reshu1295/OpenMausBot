@@ -396,7 +396,7 @@ export function McpServersPanel({ embedded = false, whopCard = false, hideWhop =
           <Loader2 size={13} className="animate-spin" /> {t(signInFlow?.phase !== "succeeded" ? "mcp.auth.waiting" : isRemoteMcpListing(server) && isWhopServer(server) ? "whop.loadingTools" : "mcp.auth.loadingTools")}
         </div>
         {signInFlow?.authorizationUrl && mcpSignInLink(signInFlow.authorizationUrl) && (
-          <button type="button" onClick={() => void openExternalLink(signInFlow.authorizationUrl!).catch(() => setCallbackError(t("mcp.auth.openFailed")))} className="text-accent hover:underline">
+          <button type="button" onClick={() => void openExternalLink(signInFlow.authorizationUrl!).catch(() => setCallbackError(t("mcp.auth.openFailed")))} className="text-accent-text hover:underline">
             {t("mcp.auth.openAgain")}
           </button>
         )}

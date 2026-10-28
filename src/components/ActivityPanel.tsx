@@ -16,9 +16,9 @@ import { t } from "@/lib/i18n";
 const LIMIT = 300;
 
 const TONE_CLASS: Record<ChipTone, string> = {
-  ok: "bg-accent/12 text-accent",
+  ok: "bg-accent/12 text-accent-text",
   danger: "bg-danger/15 text-danger",
-  accent: "bg-accent/12 text-accent",
+  accent: "bg-accent/12 text-accent-text",
   warn: "bg-warning/15 text-warning",
 };
 

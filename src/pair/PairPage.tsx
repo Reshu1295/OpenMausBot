@@ -128,7 +128,7 @@ export function PairPage({ initialCode, initialEmail = null, reason }: { initial
         {opening ? null : connected ? (
           <p className="mt-4 text-[14px]">
             This browser is already connected.{" "}
-            <a href="/" className="text-accent underline">
+            <a href="/" className="text-accent-text underline">
               Open the app
             </a>
           </p>

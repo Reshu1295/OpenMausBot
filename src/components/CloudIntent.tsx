@@ -160,7 +160,7 @@ export function CloudIntent() {
             className="relative rounded-2xl bg-composer py-3.5 pl-4 pr-14 shadow-[0_22px_50px_-30px_rgba(0,0,0,0.65)] ring-1 ring-composer-ring transition-[box-shadow] duration-200 ease-out focus-within:ring-accent/30"
             style={{ viewTransitionName: "cloud-intent" }}
           >
-            <span ref={token} aria-hidden="true" className="absolute left-4 top-[15px] inline-flex h-[22px] items-center rounded-md bg-accent/[0.14] px-1.5 text-[13px] font-semibold text-accent">
+            <span ref={token} aria-hidden="true" className="absolute left-4 top-[15px] inline-flex h-[22px] items-center rounded-md bg-accent/[0.14] px-1.5 text-[13px] font-semibold text-accent-text">
               /setup
             </span>
             <textarea
@@ -213,7 +213,7 @@ export function CloudIntent() {
                 )}
                 style={staggerIndex(4 + index)}
               >
-                <Icon size={13} aria-hidden="true" className={chosen ? "text-accent" : undefined} />
+                <Icon size={13} aria-hidden="true" className={chosen ? "text-accent-text" : undefined} />
                 {t(candidate.label)}
               </button>
             );

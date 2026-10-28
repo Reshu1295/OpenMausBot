@@ -127,7 +127,7 @@ function WhereItWent({ range, version, onBudget }: { range: { from: string; to: 
                 aria-selected={other === option}
                 onClick={() => setOther(option)}
                 className={cn("rounded-md px-2 py-0.5 text-[11px] font-medium uppercase tracking-[0.06em]",
-                  other === option ? "bg-accent/12 text-accent" : "text-ink-secondary hover:bg-raised/60 hover:text-ink")}
+                  other === option ? "bg-accent/12 text-accent-text" : "text-ink-secondary hover:bg-raised/60 hover:text-ink")}
               >{t(GROUP_LABEL_KEYS[option])}</button>
             ))}
           </div>
@@ -246,7 +246,7 @@ export function UsageSection() {
               {list?.roots.map((root) => <RunRow key={root.id} root={root} onOpen={() => setOpen({ id: root.id, at: root.startedAt })} />)}
             </ul>
             {list?.next !== undefined && (
-              <button type="button" onClick={more} className="m-2 rounded-lg px-3 py-1.5 text-[13px] text-accent hover:bg-raised/50">{t("usage.page.more")}</button>
+              <button type="button" onClick={more} className="m-2 rounded-lg px-3 py-1.5 text-[13px] text-accent-text hover:bg-raised/50">{t("usage.page.more")}</button>
             )}
             {untimed && <p className="px-3 pb-3 pt-1 text-[12px] text-ink-tertiary">{t("usage.page.untimedNote")}</p>}
           </section>

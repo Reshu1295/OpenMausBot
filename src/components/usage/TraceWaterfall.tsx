@@ -20,7 +20,7 @@ export function modelName(model: string, instances: readonly InstanceInfo[]): st
 
 export function LiveBadge() {
   return (
-    <span className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-accent/12 px-2.5 py-1 text-[13px] font-medium text-accent" data-testid="trace-live">
+    <span className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-accent/12 px-2.5 py-1 text-[13px] font-medium text-accent-text" data-testid="trace-live">
       <span className="size-1.5 animate-pulse rounded-full bg-accent" />{t("trace.live")}
     </span>
   );
@@ -130,7 +130,7 @@ function Badge({ kind }: { kind: "slowest" | "costliest" }) {
   return (
     <span className={cn(
       "ml-2 rounded-md px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.06em]",
-      kind === "slowest" ? "bg-warning/15 text-warning" : "bg-accent/12 text-accent",
+      kind === "slowest" ? "bg-warning/15 text-warning" : "bg-accent/12 text-accent-text",
     )}>{t(kind === "slowest" ? "trace.slowest" : "trace.costliest")}</span>
   );
 }
@@ -211,7 +211,7 @@ export function TraceWaterfall({ detail, now, actions }: { detail: TraceDetail; 
   return (
     <section className="overflow-hidden rounded-2xl border border-hairline/50 bg-card" data-testid="trace-waterfall" aria-label={t("trace.title")}>
       <header className="flex items-center gap-3 border-b border-hairline/40 px-5 py-4">
-        <Sparkles size={16} className="shrink-0 text-accent" aria-hidden />
+        <Sparkles size={16} className="shrink-0 text-accent-text" aria-hidden />
         <span className="shrink-0 text-[15px] font-semibold text-ink">{t("trace.title")}</span>
         <span className="min-w-0 flex-1 truncate text-[15px] text-ink-secondary" title={title}>{title}</span>
         {live && <LiveBadge />}

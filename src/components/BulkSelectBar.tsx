@@ -83,7 +83,7 @@ export function BulkSelectFilters({ rows, selected, now, onChange, onDone }: {
     <button type="button" className={chip} onClick={() => add(olderThanIds(rows, OLDER_DAYS, now))}>{t("task.bulk.older", { days: OLDER_DAYS })}</button>
     <button type="button" className={chip} onClick={() => add(archivedIds(rows))}>{t("task.bulk.archived")}</button>
     <button type="button" className={chip} disabled={selected.size === 0} onClick={() => onChange(clearSelection())}>{t("task.bulk.clear")}</button>
-    <button type="button" onClick={onDone} className="ml-auto rounded px-1.5 py-0.5 text-[11px] font-medium text-accent hover:underline">{t("task.bulk.done")}</button>
+    <button type="button" onClick={onDone} className="ml-auto rounded px-1.5 py-0.5 text-[11px] font-medium text-accent-text hover:underline">{t("task.bulk.done")}</button>
   </div>;
 }
 

@@ -1706,7 +1706,7 @@ export function ComputerPanel({
                 )}
               >
                 <span className="flex items-center gap-2 text-[12px] font-medium leading-4">
-                  {selected ? <Check size={14} className="shrink-0 text-accent" /> : <Icon size={14} className="shrink-0 text-ink-secondary" />}
+                  {selected ? <Check size={14} className="shrink-0 text-accent-text" /> : <Icon size={14} className="shrink-0 text-ink-secondary" />}
                   <span>{t(labelKey)}</span>
                 </span>
                 <span className="mt-1.5 block text-[11px] leading-4 text-ink-secondary">
@@ -1722,7 +1722,7 @@ export function ComputerPanel({
           )}
           <div className="mt-3 border-t border-hairline/40 pt-3 text-[12px] leading-5 text-ink-secondary" aria-live="polite" data-testid="place-line">
             {worksOnView.line}
-            {placeActionButton(worksOnView, "mt-1 block font-medium text-accent hover:underline")}
+            {placeActionButton(worksOnView, "mt-1 block font-medium text-accent-text hover:underline")}
           </div>
           {profileBot.computer === "cloud" && (
             <CloudBackendPicker
@@ -1734,7 +1734,7 @@ export function ComputerPanel({
         </div>
 
         <button type="button" onClick={() => selectPanelView("routines")} className="mt-4 flex w-full items-start gap-3 rounded-xl bg-card p-4 text-left hover:bg-raised">
-          <CalendarClock size={17} className="mt-0.5 shrink-0 text-accent" />
+          <CalendarClock size={17} className="mt-0.5 shrink-0 text-accent-text" />
           <span className="min-w-0 flex-1">
             <span className="block text-[14px] font-medium text-ink">{t("computer.tab.routines")} <span className="ml-1 text-[11px] text-ink-secondary">{botRoutines.length}</span></span>
             <span className={cn("mt-1 block truncate text-[12px]", activeRoutineRun ? routineRunTone(activeRoutineRun) : "text-ink-secondary")}>{activeRoutineRun ? `${activeRoutineRun.routineName} · ${routineRunLabel(activeRoutineRun)}` : t("computer.routines.openTitle")}</span>
@@ -1761,7 +1761,7 @@ export function ComputerPanel({
                     disabled ? "cursor-not-allowed opacity-50" : "hover:border-accent/40 hover:bg-control/60",
                   )}
                 >
-                  <Icon size={16} className={cn("shrink-0", selected ? "text-accent" : "text-ink-secondary")} aria-hidden="true" />
+                  <Icon size={16} className={cn("shrink-0", selected ? "text-accent-text" : "text-ink-secondary")} aria-hidden="true" />
                   <span className="w-full truncate text-[12px] font-medium leading-4">{simpleLabel}</span>
                   {issue && <span className="w-full truncate text-[11px] leading-3 text-ink-secondary">{view.short}</span>}
                 </button>
@@ -1769,7 +1769,7 @@ export function ComputerPanel({
             </div>
             <div className="mt-3 text-[12px] leading-5 text-ink-secondary" data-testid="place-line">
               {worksOnView.line}
-              {placeActionButton(worksOnView, "mt-1 block font-medium text-accent hover:underline")}
+              {placeActionButton(worksOnView, "mt-1 block font-medium text-accent-text hover:underline")}
             </div>
             {heldPin && (
               <div className="mt-2 flex items-center gap-2">

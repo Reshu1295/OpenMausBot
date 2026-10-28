@@ -344,7 +344,7 @@ export function AndroidDevicePanel({ status }: { status: AndroidDeviceStatus }) 
 
       <div className="rounded-xl bg-card p-4">
         <div className="flex items-center gap-2 text-[13px] font-medium text-ink">
-          <Usb size={15} className="text-accent" /> {t("computer.android.setupTitle")}
+          <Usb size={15} className="text-accent-text" /> {t("computer.android.setupTitle")}
         </div>
         <ol className="mt-2 list-decimal space-y-1.5 pl-4 text-[12px] leading-relaxed text-ink-secondary">
           <li>{t("computer.android.step1")}</li>

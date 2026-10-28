@@ -91,7 +91,7 @@ function AboutLink({ href, label }: { href: string; label: string }) {
     <button
       type="button"
       onClick={() => void openExternalLink(href)}
-      className="text-accent hover:underline"
+      className="text-accent-text hover:underline"
     >
       {label}
     </button>

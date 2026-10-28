@@ -445,7 +445,7 @@ export function CallModeMenu({ id, mode, onChoose, onClose, placement = "header"
                 {unavailable ? `${unavailable.label}. ${unavailable.reason}` : callModeHint(entry.id, { cloudHome })}
               </span>
             </span>
-            {mode === entry.id && <Check size={14} className="mt-0.5 shrink-0 text-accent" aria-hidden="true" />}
+            {mode === entry.id && <Check size={14} className="mt-0.5 shrink-0 text-accent-text" aria-hidden="true" />}
           </button>
         );
       })}

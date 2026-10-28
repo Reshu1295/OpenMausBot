@@ -1340,7 +1340,7 @@ export function LocalComputerSection() {
             {c?.install ? (
               <CommandLine command={c.install} />
             ) : (
-              <a href="https://podman.io/docs/installation" target="_blank" rel="noreferrer" className="text-[13px] text-accent hover:underline">
+              <a href="https://podman.io/docs/installation" target="_blank" rel="noreferrer" className="text-[13px] text-accent-text hover:underline">
                 {t("vm.setup.podmanGuide")}
               </a>
             )}
