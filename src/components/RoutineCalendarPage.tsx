@@ -46,11 +46,7 @@ import { useModalDialog } from "@/hooks/use-modal-dialog";
 import type { CalendarCall, CalendarCallAttachment, CalendarCallInput } from "@/lib/calendar-calls";
 import { isDone } from "@/lib/automations";
 import { cn } from "@/lib/cn";
-import {
-  imageAttachmentFromFile,
-  intakeFiles,
-  type Attachment,
-} from "@/lib/composer-attachments";
+import { imageAttachmentFromFile, intakeFiles, type Attachment } from "@/lib/composer-attachments";
 import {
   addDays,
   atLocalTime,
@@ -92,6 +88,7 @@ const WEEKDAYS = [1, 2, 3, 4, 5];
 const INTERVAL_PRESETS = [5, 10, 15, 30, 60];
 const EVENT_DURATION_OPTIONS = Array.from({ length: 240 / CALENDAR_SLOT_MINUTES }, (_, index) => (index + 1) * CALENDAR_SLOT_MINUTES);
 import { BOT_DRAG_TYPE, EVENT_DRAG_TYPE, LimitResetMarker, type ResetDrop } from "./routines/LimitResetMarkers";
+import { Button } from "./ui/Button";
 
 export type EventKind = "routine" | "call";
 export type RoutinesLayout = "day" | "week" | "list";
@@ -1004,8 +1001,8 @@ export function EventEditor({
 
 
         <div className="sticky bottom-0 flex items-center justify-end gap-2 border-t border-hairline bg-panel/95 px-5 py-3.5 backdrop-blur">
-          <button onClick={onClose} className="rounded-lg px-4 py-2 text-[13px] text-ink-secondary hover:bg-raised hover:text-ink">Cancel</button>
-          <button onClick={save} disabled={saving || attachmentPending || !valid} className="flex items-center gap-2 rounded-lg bg-accent px-5 py-2 text-[13px] font-semibold text-white hover:brightness-110 disabled:opacity-40">{(saving || attachmentPending) && <Loader2 size={14} className="animate-spin" />}{attachmentPending ? "Attaching…" : existingRoutine || existingCall || (kind === "routine" && !isRoomGoal) ? t("automations.editor.app.save") : kind === "call" ? "Schedule call" : "Schedule team goal"}</button>
+          <Button variant="ghost" size="lg" onClick={onClose} className="font-normal">Cancel</Button>
+          <Button variant="primary" size="lg" onClick={save} disabled={saving || attachmentPending || !valid} className="flex gap-2 px-5">{(saving || attachmentPending) && <Loader2 size={14} className="animate-spin" />}{attachmentPending ? "Attaching…" : existingRoutine || existingCall || (kind === "routine" && !isRoomGoal) ? t("automations.editor.app.save") : kind === "call" ? "Schedule call" : "Schedule team goal"}</Button>
         </div>
       </div>
     </div>
@@ -1154,7 +1151,7 @@ export function QuickComposer({
       </div>
       <div className="flex items-center justify-end gap-2 border-t border-hairline px-4 py-3">
         <button onClick={() => onMore({ ...seed, kind, botIds, name, description, durationMinutes, resultsThreadId })} title="Choose repeating schedules and other options" className="rounded-lg px-3 py-2 text-[12px] font-medium text-accent-text hover:bg-accent/10">More options</button>
-        <button onClick={save} disabled={!valid || working} className="flex items-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-[12px] font-semibold text-white hover:brightness-110 disabled:opacity-40">{working && <Loader2 size={13} className="animate-spin" />}Save</button>
+        <Button variant="primary" size="lg" onClick={save} disabled={!valid || working} className="flex gap-1.5 text-[12px]">{working && <Loader2 size={13} className="animate-spin" />}Save</Button>
       </div>
     </div>
   );

@@ -10,6 +10,7 @@ import { t } from "@/lib/i18n";
 import { AddCloudFlow } from "./cloud-buy/AddCloudFlow";
 import { NewOrganization } from "./cloud-buy/NewOrganization";
 import { BackLink, Heading } from "./cloud-buy/parts";
+import { Button } from "./ui/Button";
 
 /** A server's pairing link, pasted here: main checks it and asks "Connect to <host>?" itself, then opens it. The sheet
  * stays open when the person cancels, and says so when the link isn't one. `connect`: a server of theirs that signed in
@@ -42,9 +43,9 @@ export function OwnServerLink({ onBack, onConnected, connect = null }: { onBack:
         className="w-full rounded-lg border border-hairline bg-inset px-3 py-2 text-[14px] font-normal text-ink outline-none focus:border-accent/50" />
     </label>
     {failed && <p role="alert" className="text-[13px] text-danger-text">{t("rail.linkFailed")}</p>}
-    <div><button type="submit" disabled={busy || !link.trim()} className="ui-button ui-button-primary inline-flex items-center gap-2">
+    <div><Button variant="primary" type="submit" disabled={busy || !link.trim()} className="inline-flex items-center gap-2">
       {busy && <Loader2 size={14} className="animate-spin" aria-hidden="true" />}{t("rail.connect")}
-    </button></div>
+    </Button></div>
   </form>;
 }
 

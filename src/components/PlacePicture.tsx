@@ -3,6 +3,7 @@ import { t } from "@/lib/i18n";
 import type { LocaleKey } from "@/locales";
 import { BANNER_ACCEPT, bannerSrc, prepareBanner, removeBanner, uploadBanner, type BannerProblem, type BannerSummary } from "@/lib/place-banner";
 import { SettingRow } from "./SettingsPrimitives";
+import { Button } from "./ui/Button";
 
 const PROBLEM: Readonly<Record<BannerProblem | "animated" | "failed", LocaleKey>> = {
   format: "placeLook.imageFormat", read: "placeLook.imageRead", size: "placeLook.imageSize", animated: "placeLook.imageMoving", failed: "placeLook.imageFailed",
@@ -35,10 +36,10 @@ export function PlacePicture({ banner, canChange, subtitle }: { banner: BannerSu
     <SettingRow title={t("placeLook.sidebarPicture")} subtitle={subtitle} message={message}>
       <div className="flex flex-wrap items-center justify-end gap-2">
         {src && <img src={src} alt={t("placeLook.currentImage")} className="h-8 w-14 rounded-md border border-ink/10 object-cover" />}
-        <button type="button" className="ui-button" disabled={!canChange || busy} onClick={() => input.current?.click()}>
+        <Button disabled={!canChange || busy} onClick={() => input.current?.click()}>
           {busy ? t("placeLook.imageSaving") : t(src ? "placeLook.changeImage" : "placeLook.useImage")}
-        </button>
-        {src && <button type="button" className="ui-button" disabled={!canChange || busy} onClick={() => void run(removeBanner)}>{t("placeLook.removeImage")}</button>}
+        </Button>
+        {src && <Button disabled={!canChange || busy} onClick={() => void run(removeBanner)}>{t("placeLook.removeImage")}</Button>}
         <input ref={input} type="file" accept={BANNER_ACCEPT} hidden data-place-picture-input onChange={(event) => chosen(event.target.files?.[0])} />
       </div>
     </SettingRow>

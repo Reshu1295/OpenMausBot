@@ -7,6 +7,7 @@ import type { CloudRenewal } from "../../electron/cloud-list.mjs";
 import { cn } from "@/lib/cn";
 import { activeLocale, t } from "@/lib/i18n";
 import type { LocaleKey } from "@/locales";
+import { Button } from "./ui/Button";
 
 export const CLOUD_CALL_URL = "https://cal.com/milind-soni-002qed/30min";
 const ANSWERS: readonly CloudCancelAnswer[] = ["feature", "price", "setup", "broken", "later", "other"];
@@ -61,12 +62,12 @@ export function CloudCancelPlan({ renewal, actions, onChanged }: { renewal: Clou
     {renewal.cancelled
       ? <div data-cloud-cancel="cancelled" className="flex flex-col items-start gap-2 self-start">
         <p role="status" className="text-[13px] text-ink">{endedLine(renewal)}</p>
-        <button type="button" className="ui-button" disabled={keeping} onClick={keep}>{t(keeping ? "cloudCancel.keeping" : "cloudCancel.keep")}</button>
+        <Button disabled={keeping} onClick={keep}>{t(keeping ? "cloudCancel.keeping" : "cloudCancel.keep")}</Button>
         {note && <p role={note === "failed" ? "alert" : "status"} className={cn("text-[13px]", note === "failed" ? "text-danger-text" : "text-ink-secondary")}>
           {t(note === "failed" ? "cloudCancel.failed" : "cloudCancel.browser")}</p>}
       </div>
-      : <button type="button" data-cloud-cancel="renewing" className="ui-button self-start" onClick={() => { setNote(null); setOpened(renewal); }}>
-        {t(renewal.trial ? "cloudCancel.cancelTrial" : "cloudCancel.cancelPlan")}</button>}
+      : <Button data-cloud-cancel="renewing" className="self-start" onClick={() => { setNote(null); setOpened(renewal); }}>
+        {t(renewal.trial ? "cloudCancel.cancelTrial" : "cloudCancel.cancelPlan")}</Button>}
     {opened && <CloudCancelSheet renewal={opened} actions={actions} onClose={changed => { setOpened(null); if (changed) onChanged?.(); }} />}
   </>;
 }
@@ -143,9 +144,9 @@ export function CloudCancelSheet({ renewal, actions, onClose }: { renewal: Cloud
               <a href={CLOUD_CALL_URL} target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-ink">{t("cloudCancel.book")}</a></p>
             {alert}
             <div className="mt-5 flex flex-wrap justify-end gap-2">
-              <button type="button" className="ui-button" disabled={busy} onClick={close}>{t("cloudCancel.keep")}</button>
-              <button type="button" data-cloud-cancel-confirm className="ui-button border-transparent bg-danger text-white hover:brightness-110" disabled={busy} onClick={cancel}>
-                {t(busy ? "cloudCancel.cancelling" : renewal.trial ? "cloudCancel.confirmTrial" : "cloudCancel.confirmPlan")}</button>
+              <Button disabled={busy} onClick={close}>{t("cloudCancel.keep")}</Button>
+              <Button data-cloud-cancel-confirm className="border-transparent bg-danger text-white hover:brightness-110" disabled={busy} onClick={cancel}>
+                {t(busy ? "cloudCancel.cancelling" : renewal.trial ? "cloudCancel.confirmTrial" : "cloudCancel.confirmPlan")}</Button>
             </div>
           </>}
           {state.step === "done" && <>
@@ -155,13 +156,13 @@ export function CloudCancelSheet({ renewal, actions, onClose }: { renewal: Cloud
             {alert}
             <div className="mt-5 flex flex-wrap items-center gap-2">
               <span className="text-[13px] text-ink-secondary">{t("cloudCancel.changedMind")}</span>
-              <button type="button" className="ui-button" disabled={busy} onClick={keep}>{t(busy ? "cloudCancel.keeping" : "cloudCancel.keep")}</button>
-              <button type="button" className="ui-button ui-button-primary ms-auto" disabled={busy} onClick={close}>{t("cloudCancel.done")}</button>
+              <Button disabled={busy} onClick={keep}>{t(busy ? "cloudCancel.keeping" : "cloudCancel.keep")}</Button>
+              <Button variant="primary" className="ms-auto" disabled={busy} onClick={close}>{t("cloudCancel.done")}</Button>
             </div>
           </>}
           {state.step === "browser" && <>
             <p role="status" className="text-[13px] leading-relaxed text-ink">{t("cloudCancel.browser")}</p>
-            <div className="mt-5 flex justify-end"><button type="button" className="ui-button ui-button-primary" onClick={close}>{t("cloudCancel.done")}</button></div>
+            <div className="mt-5 flex justify-end"><Button variant="primary" onClick={close}>{t("cloudCancel.done")}</Button></div>
           </>}
         </div>
       </div>
