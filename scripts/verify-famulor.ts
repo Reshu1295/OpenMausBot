@@ -71,8 +71,13 @@ try {
   await page.reload();
   const connect = () => page.getByRole("button", { name: "Connect Famulor", exact: true }).click();
   const row = page.locator('[data-app-tile="famulor"]');
+  const connectedMark = () => row.locator('[aria-label="Connected"]');
+  const output = process.env.OMB_UI_EVIDENCE_DIR || "/tmp/omb-famulor-evidence";
+  mkdirSync(output, { recursive: true });
   assert.equal(await page.locator('[data-apps-grid] [data-app-tile="famulor"]').count(), 1);
   assert.equal(await page.getByText("Set up Famulor", { exact: true }).count(), 0);
+  await page.locator('[data-app-tile="gmail"]').waitFor();
+  await page.screenshot({ path: join(output, "disconnected.png"), fullPage: true });
   const status = async () => (await api("GET", "/api/mcp/servers")).servers;
   // This browser is not on the server's machine and the fixture has no https
   // address to come back to, so the paste-back box is shown up front.
@@ -100,7 +105,7 @@ try {
   oauth.options.deny = false;
   await connect();
   await complete();
-  await row.getByText("Connected", { exact: true }).waitFor();
+  await connectedMark().waitFor();
   const connected = (await status()).find((server: any) => server.name === "famulor-2");
   assert.equal(connected.auth, "signed-in");
   assert.equal(connected.enabled, true);
@@ -109,18 +114,19 @@ try {
   assert.equal(JSON.stringify(connected).includes(bearer), false, "The browser listing never includes the token");
   assert.equal(mcp.calls.length, 0, "Connecting never executes business tools");
   assert.equal((await status()).find((server: any) => server.name === "famulor").command, "node");
-  const output = process.env.OMB_UI_EVIDENCE_DIR || "/tmp/omb-famulor-evidence";
-  mkdirSync(output, { recursive: true });
   await page.screenshot({ path: join(output, "connected.png"), fullPage: true });
+  await page.evaluate(() => { document.documentElement.dataset.skin = "midnight"; });
+  await page.screenshot({ path: join(output, "connected-dark.png"), fullPage: true });
+  await page.evaluate(() => { document.documentElement.dataset.skin = "daylight"; });
   await page.locator('[data-apps-filter="connected"]').click();
-  await row.getByText("Connected", { exact: true }).waitFor();
-  assert.equal(await page.locator('[data-apps-filter="connected"]').innerText(), "Connected 1");
+  await connectedMark().waitFor();
+  assert.match(await page.locator('[data-apps-filter="connected"]').innerText(), /1 connected/);
   assert.equal(await page.locator('[data-app-tile="gmail"]').count(), 0);
   await row.getByRole("button", { name: "Disconnect Famulor", exact: true }).click();
   await row.waitFor({ state: "hidden" });
   await page.locator('[data-apps-filter="all"]').click();
   await connect(); await complete();
-  await row.getByText("Connected", { exact: true }).waitFor();
+  await connectedMark().waitFor();
   await page.reload();
   await row.getByRole("button", { name: "Disconnect Famulor", exact: true }).waitFor();
   assert.equal(await page.locator("[data-famulor-setup]").count(), 0);
@@ -136,7 +142,7 @@ try {
   await page.getByText("Signed in, but Famulor’s tools could not be loaded: Synthetic discovery failure. Please connect again to retry.", { exact: true }).waitFor();
   assert.equal((await status()).find((server: any) => server.name === "famulor-2").enabled, false);
   await connect(); await complete();
-  await row.getByText("Connected", { exact: true }).waitFor();
+  await connectedMark().waitFor();
   const search = page.getByRole("textbox", { name: "Search apps", exact: true });
   await search.fill("famulor");
   assert.equal(await row.isVisible(), true);
