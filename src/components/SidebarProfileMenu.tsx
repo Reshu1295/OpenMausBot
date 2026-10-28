@@ -359,10 +359,10 @@ export type AccountDot = "danger" | "accent";
 const DOT_COLOR: Record<AccountDot, string> = { danger: "bg-danger", accent: "bg-accent" };
 
 /** The avatar's dot: red while automations, a failed update or the failing move to My Cloud need the person, the accent
- * for news (an update, what the move brought); none while the move only goes. */
+ * for an update; none for the move on its way or done (what it brought waits in the menu). */
 export function accountDot({ automationsNeedYou, update, move }: { automationsNeedYou: boolean; update: "failed" | "news" | null; move: AccountMoveKind | null }): AccountDot | null {
   if (automationsNeedYou || update === "failed" || move === "failed") return "danger";
-  return update || move === "done" ? "accent" : null;
+  return update ? "accent" : null;
 }
 
 export function placeMenuItems(place: Pick<WorkspacePlace, "bridge" | "current" | "cloudHome" | "onLine" | "openMenu" | "switchable">, { owner, onCloudSettings }: {

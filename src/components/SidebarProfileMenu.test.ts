@@ -502,12 +502,13 @@ describe("Simple mode's account menu", () => {
     expect(accountLabel("Omkar", { automationsNeedYou: false, update: null, move: null })).toBe("Omkar");
   });
 
-  it("raises the avatar's dot red for a failing move like automations, the accent for what it brought, and none on its way", () => {
+  it("raises the avatar's dot red for a failing move like automations, and none on its way or once done", () => {
     expect(accountDot({ automationsNeedYou: false, update: null, move: "failed" })).toBe("danger");
     expect(accountDot({ automationsNeedYou: true, update: null, move: "failed" })).toBe("danger");
     expect(accountDot({ automationsNeedYou: false, update: "news", move: "failed" })).toBe("danger");
     expect(accountDot({ automationsNeedYou: false, update: null, move: "sending" })).toBeNull();
-    expect(accountDot({ automationsNeedYou: false, update: null, move: "done" })).toBe("accent");
+    expect(accountDot({ automationsNeedYou: false, update: null, move: "done" })).toBeNull();
+    expect(accountDot({ automationsNeedYou: false, update: "news", move: "done" })).toBe("accent");
     expect(accountDot({ automationsNeedYou: false, update: null, move: null })).toBeNull();
     expect(accountDot({ automationsNeedYou: true, update: null, move: null })).toBe("danger");
     expect(accountDot({ automationsNeedYou: false, update: "failed", move: null })).toBe("danger");
