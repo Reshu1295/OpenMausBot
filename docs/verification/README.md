@@ -124,6 +124,10 @@ The [Whop fixture](whop.md) checks its one-click setup, cancellation, denied
 consent, discovery failures, reconnect and disconnect using that same registry
 and a synthetic provider, without accessing a real Whop account.
 
+The [Famulor fixture](famulor.md) checks the same path for Famulor's hosted MCP:
+one-click setup, cancellation, denied consent, discovery failures, reconnect
+and disconnect, against a synthetic provider and without a real Famulor account.
+
 The [X card fixture](x-connector.md) checks the Apps page's X card: a plan's
 included calls with the month's use, the person's own treg key (saved, tested,
 removed, used first) and a used-up month, against loopback stand-ins for treg
