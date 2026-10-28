@@ -4,14 +4,8 @@ import { BookOpen, CalendarClock, Check, Crown, MessageSquare, NotebookPen, Plug
 
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
+import { TEAM_GLYPHS } from "@/lib/team-glyphs";
 import type { PendingTeamImport } from "@/lib/team-import";
-
-export const TEAM_GLYPHS = [
-  "bg-purple-500/15 text-purple-300",
-  "bg-cyan-500/15 text-cyan-300",
-  "bg-orange-500/15 text-orange-300",
-  "bg-emerald-500/15 text-emerald-300",
-] as const;
 
 export function TeamImportDetails({ pending, importedNames, org = false }: {
   pending: PendingTeamImport;

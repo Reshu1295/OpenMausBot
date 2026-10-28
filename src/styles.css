@@ -2723,6 +2723,19 @@ button:disabled.bg-danger {
 .bot-identity[data-bot-color="silver"] { color: var(--identity-silver); }
 .bot-identity[data-bot-color="chrome"] { color: var(--identity-chrome); }
 
+/* Team, member and organization tiles (src/lib/team-glyphs.ts): a 15% wash of
+   one identity hue, the glyph in that hue pulled 40% toward the ink, so it
+   clears 4.5:1 on light and dark skins alike. check:contrast reads these
+   amounts and hues from this rule and measures every skin. */
+:is(.team-glyph-purple, .team-glyph-cyan, .team-glyph-orange, .team-glyph-green) {
+  color: color-mix(in srgb, var(--team-glyph), var(--color-ink) 40%);
+  background-color: color-mix(in srgb, var(--team-glyph) 15%, transparent);
+}
+.team-glyph-purple { --team-glyph: var(--identity-purple); }
+.team-glyph-cyan { --team-glyph: var(--identity-cyan); }
+.team-glyph-orange { --team-glyph: var(--identity-orange); }
+.team-glyph-green { --team-glyph: var(--identity-green); }
+
 .user-bubble-colored {
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.16);
 }

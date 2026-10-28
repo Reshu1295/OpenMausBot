@@ -197,6 +197,42 @@ for (const [id, tokens] of skins) {
   }
 }
 
+// Team, member and organization tiles: the glyph is the identity hue mixed
+// toward the ink, on a wash of the same hue over whatever surface the tile
+// sits on. The mix amounts and hues are read from the rule in styles.css.
+const glyphInk = Number(/color-mix\(in srgb, var\(--team-glyph\), var\(--color-ink\) (\d+)%\)/.exec(css)?.[1]);
+const glyphWash = Number(/color-mix\(in srgb, var\(--team-glyph\) (\d+)%, transparent\)/.exec(css)?.[1]);
+const glyphHues = [...css.matchAll(/\.team-glyph-[a-z]+ \{ --team-glyph: var\((--identity-[a-z]+)\); \}/g)].map(([, hue]) => hue);
+const mixHex = (a, b, weightOfB) => {
+  const [x, y] = [parseHex(a), parseHex(b)];
+  if (!x || !y || x.a !== 1 || y.a !== 1) return null;
+  const channel = (k) => Math.round(x[k] * (1 - weightOfB) + y[k] * weightOfB).toString(16).padStart(2, "0");
+  return `#${channel("r")}${channel("g")}${channel("b")}`;
+};
+if (!glyphInk || !glyphWash || glyphHues.length === 0) {
+  failed = true;
+  console.log("✗ team tiles — could not read the .team-glyph-* rule from styles.css");
+} else {
+  const low = [];
+  let measured = 0;
+  for (const [id, tokens] of skins) {
+    for (const hue of glyphHues) {
+      for (const surface of ["--color-app", "--color-panel", "--color-card", "--color-raised", "--color-inset", "--color-menu"]) {
+        const ink = tokens["--color-ink"] ?? "";
+        const text = mixHex(tokens[hue] ?? "", parseHex(ink)?.a === 1 ? ink : "", glyphInk / 100);
+        const wash = mixHex(tokens[surface] ?? "", tokens[hue] ?? "", glyphWash / 100);
+        const ratio = text && wash ? contrast(text, wash) : null;
+        measured++;
+        if (ratio === null || ratio < 4.5) low.push(`${id}: ${hue} tile on ${surface}: ${ratio?.toFixed(2) ?? "unmeasurable"}:1 (needs 4.5:1)`);
+      }
+    }
+  }
+  if (low.length) {
+    failed = true;
+    for (const line of low) console.log(`✗ team tiles — ${line}`);
+  } else console.log(`✓ team tiles — ${measured} hue/surface pairs in every skin above 4.5:1`);
+}
+
 // The inverted bubbles (Daylight's ink-black, Pop's ink) have
 // their own inherited context: the editor, labels, quotes and file chips
 // explicitly use these tokens, not parent color.

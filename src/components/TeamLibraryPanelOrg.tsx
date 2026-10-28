@@ -11,13 +11,7 @@ import {
   type OrgLibraryListing,
   type OrgLibraryPackage,
 } from "@/lib/org-library";
-
-const GLYPHS = [
-  "bg-cyan-500/15 text-cyan-300",
-  "bg-purple-500/15 text-purple-300",
-  "bg-emerald-500/15 text-emerald-300",
-  "bg-orange-500/15 text-orange-300",
-] as const;
+import { ORG_GLYPHS } from "@/lib/team-glyphs";
 
 export function OrgLibraryTab({
   listing,
@@ -72,7 +66,7 @@ function OrgPackageCard({
   const adding = busy === entry.packageId;
   return (
     <article className="flex min-h-[104px] items-center gap-3 border-b border-hairline/35 px-1 py-4">
-      <div className={cn("flex size-11 shrink-0 items-center justify-center rounded-xl", GLYPHS[index % GLYPHS.length])}>
+      <div className={cn("flex size-11 shrink-0 items-center justify-center rounded-xl", ORG_GLYPHS[index % ORG_GLYPHS.length])}>
         <Building2 size={20} />
       </div>
       <div className="min-w-0 flex-1">

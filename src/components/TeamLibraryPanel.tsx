@@ -11,9 +11,10 @@ import { ArrowLeft, Check, Compass, ExternalLink, FolderOpen, Github, Loader2, S
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { catalogCopy, catalogMatches, type TeamCatalog, type TeamCatalogEntry } from "@/lib/team-catalog";
+import { TEAM_GLYPHS } from "@/lib/team-glyphs";
 
 import { GrokFinishSetup, grokSetupLeft } from "./GrokFinishSetup";
-import { TEAM_GLYPHS, TeamImportDetails } from "./TeamImportDetails";
+import { TeamImportDetails } from "./TeamImportDetails";
 import { GrokImportFlow } from "./GrokImportFlow";
 import { ReadyBotGallery } from "./ReadyBotGallery";
 import { ShareTeamDialog } from "./ShareTeamDialog";
