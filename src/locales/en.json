@@ -4579,6 +4579,7 @@
   "routines.editor.edit": "Edit routine",
   "routines.editor.titlePlaceholder": "What should happen?",
   "routines.editor.titleLabel": "Title",
+  "routines.editor.roomGoalTogether": "{app} keeps the group and its member hand-offs together for the full goal.",
   "routines.editor.descriptionLabel": "Description",
   "routines.editor.who": "Who does it",
   "routines.editor.when": "When",
