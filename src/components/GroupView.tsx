@@ -124,7 +124,7 @@ export function RoomToolChip({ message, roomId, live = false }: { message: Messa
       <div
         className={cn(
           "ui-pill",
-          tool.ok === false && "text-danger",
+          tool.ok === false && "text-danger-text",
         )}
       >
         {comm && <BotAvatar bot={state.bots.find(b => b.id === comm.withBotId) ?? { name: comm.withName, color: comm.withColor }} state="happy" size={16} animated={false} />}
@@ -858,7 +858,7 @@ function RoomSetup({ group, members }: { group: Group; members: Bot[] }) {
           />
         </label>
 
-        {error && <div role="alert" className="rounded-xl border border-danger/30 bg-danger/10 px-3 py-2 text-[13px] text-danger">{error}</div>}
+        {error && <div role="alert" className="rounded-xl border border-danger/30 bg-danger/10 px-3 py-2 text-[13px] text-danger-text">{error}</div>}
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between">
           <button
             type="button"

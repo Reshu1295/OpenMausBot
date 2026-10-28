@@ -110,7 +110,7 @@ export function LiveCallSettings({ onClose }: { onClose: () => void }) {
             {t("call.live.keyChange")}
           </button>
           {live.keySource === "live" && (
-            <button type="button" className="text-danger hover:underline" disabled={saving} onClick={() => void removeKey()}>
+            <button type="button" className="text-danger-text hover:underline" disabled={saving} onClick={() => void removeKey()}>
               {t("call.live.keyRemove")}
             </button>
           )}
@@ -121,7 +121,7 @@ export function LiveCallSettings({ onClose }: { onClose: () => void }) {
       )}
       {changingKey && <LiveKeySetup compact onSaved={() => setChangingKey(false)} />}
       <div className="text-[12px] text-ink-tertiary">{liveDisclosure({ cloudHome: state.config?.cloudHome === true })} {t("call.live.cost")}</div>
-      {error && <div className="text-[12px] text-danger">{error}</div>}
+      {error && <div className="text-[12px] text-danger-text">{error}</div>}
     </div>
   );
 }

@@ -252,7 +252,7 @@ export function AvatarEditorCard({ bot, activeState, onPatch, onClose }: {
                   disabled={busy}
                   aria-label="Remove custom avatar image"
                   title={t("botPanel.avatar.remove")}
-                  className="flex size-8 shrink-0 items-center justify-center rounded-lg text-ink-secondary hover:bg-control hover:text-danger disabled:opacity-50"
+                  className="flex size-8 shrink-0 items-center justify-center rounded-lg text-ink-secondary hover:bg-control hover:text-danger-text disabled:opacity-50"
                 >
                   <Trash2 size={14} />
                 </button>
@@ -262,7 +262,7 @@ export function AvatarEditorCard({ bot, activeState, onPatch, onClose }: {
           </>
         )}
 
-        {error && <div role="alert" className="mt-3 text-[12px] text-danger">{error}</div>}
+        {error && <div role="alert" className="mt-3 text-[12px] text-danger-text">{error}</div>}
       </div>
     </div>
   );

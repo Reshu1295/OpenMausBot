@@ -300,7 +300,7 @@ export function SkillsSection() {
                             title={t("skills.library.removeAssignment", { bot: bot.name })}
                             disabled={Boolean(working || importing)}
                             onClick={() => void unassign(skill, bot.id)}
-                            className="flex size-4 items-center justify-center rounded-full text-ink-secondary hover:bg-danger/10 hover:text-danger disabled:opacity-40"
+                            className="flex size-4 items-center justify-center rounded-full text-ink-secondary hover:bg-danger/10 hover:text-danger-text disabled:opacity-40"
                           >
                             <X size={11} />
                           </button>
@@ -337,7 +337,7 @@ export function SkillsSection() {
               ))}
             </div>
           )}
-          {error && <div role="alert" className="mt-2 text-[12px] text-danger">{error}</div>}
+          {error && <div role="alert" className="mt-2 text-[12px] text-danger-text">{error}</div>}
         </div>
       </Card>
 
@@ -413,7 +413,7 @@ function SkillSourceDialog({ viewing, error, working, onClose, onEnable }: {
             >
               {viewing.text}
             </pre>
-            {error && <div role="alert" className="mt-2 text-[12px] text-danger">{error}</div>}
+            {error && <div role="alert" className="mt-2 text-[12px] text-danger-text">{error}</div>}
             {viewing.review && <button type="button" disabled={working} onClick={onEnable} className="mt-4 self-end rounded-lg bg-accent px-4 py-2 text-[13px] font-semibold text-white disabled:opacity-40">Enable reviewed skill</button>}
           </div>
         </div>

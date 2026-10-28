@@ -205,7 +205,7 @@ export function AvatarImageGenerator({
       )}
       <div className="flex items-center justify-end gap-2">
         {keyConfigured && (
-          <button type="button" onClick={() => void removeKey()} disabled={busy} className="mr-auto rounded-md py-1.5 text-[12px] text-ink-secondary hover:text-danger disabled:opacity-50">
+          <button type="button" onClick={() => void removeKey()} disabled={busy} className="mr-auto rounded-md py-1.5 text-[12px] text-ink-secondary hover:text-danger-text disabled:opacity-50">
             {t("botIdentity.ai.removeKey")}
           </button>
         )}
@@ -274,7 +274,7 @@ export function AvatarImageGenerator({
         </button>
       </div>
       {unsaved && <p role="status" className="mt-2 text-[11px] text-ink-secondary">{t("botIdentity.ai.saveBeforeGenerate")}</p>}
-      {error && <div role="alert" className="mt-3 text-[12px] text-danger">{error}</div>}
+      {error && <div role="alert" className="mt-3 text-[12px] text-danger-text">{error}</div>}
     </div>
   );
 }

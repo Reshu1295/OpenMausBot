@@ -234,13 +234,13 @@ function SectionContextDialog({ section, label, onClose }: { section: string; la
                 <span>
                   {t("team.instructionsFactHint")} {updatedAt ? ` ${t("team.instructionsLastSaved", { time: new Date(updatedAt).toLocaleString() })}` : ""}
                 </span>
-                <span className={cn("shrink-0 tabular-nums", bytes > maxBytes && "text-danger")}>
+                <span className={cn("shrink-0 tabular-nums", bytes > maxBytes && "text-danger-text")}>
                   {bytes.toLocaleString()} / {maxBytes.toLocaleString()} bytes
                 </span>
               </div>
             </>
           )}
-          {error && <div className="mt-3 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-[12px] text-danger">{error}</div>}
+          {error && <div className="mt-3 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-[12px] text-danger-text">{error}</div>}
         </div>
 
         <footer className="flex items-center justify-end gap-2 border-t border-hairline/40 px-6 py-4 sm:px-8">
@@ -384,7 +384,7 @@ export function TeamMapPage() {
           </details>
         </div>}
       </header>
-      {(error || refreshError) && <div role="alert" className="flex shrink-0 items-center justify-between gap-3 border-b border-danger/20 bg-danger/10 px-6 py-2 text-[12px] text-danger">
+      {(error || refreshError) && <div role="alert" className="flex shrink-0 items-center justify-between gap-3 border-b border-danger/20 bg-danger/10 px-6 py-2 text-[12px] text-danger-text">
         {error || refreshError}
         <button aria-label={t("common.close")} className="rounded p-1 hover:bg-danger/10" onClick={() => { setError(null); setRefreshError(null); }}><X size={14} /></button>
       </div>}

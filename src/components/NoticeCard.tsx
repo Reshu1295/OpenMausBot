@@ -35,7 +35,7 @@ export function LinkButton({ url, label, onOpened }: { url: string; label: strin
     }}>
       {label}<ArrowUpRight size={14} aria-hidden="true" />
     </button>
-    {failed && <p role="alert" className="mt-2 text-[12px] text-danger">{t("notice.openFailed")}</p>}
+    {failed && <p role="alert" className="mt-2 text-[12px] text-danger-text">{t("notice.openFailed")}</p>}
   </div>;
 }
 

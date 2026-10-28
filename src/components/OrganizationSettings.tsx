@@ -132,7 +132,7 @@ export function OrganizationSettings() {
           <p className="text-[13px] text-ink">{t("organization.disconnectWarning")}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <button type="button" autoFocus disabled={busy} className="ui-button" onClick={() => setConfirmDisconnect(false)}>{t("organization.keepConnection")}</button>
-            <button type="button" disabled={busy} className="ui-button text-danger" onClick={() => void perform(() => bridge.disconnect())}>{t("organization.disconnectConfirm")}</button>
+            <button type="button" disabled={busy} className="ui-button text-danger-text" onClick={() => void perform(() => bridge.disconnect())}>{t("organization.disconnectConfirm")}</button>
           </div>
         </div> : <div className="flex flex-wrap gap-2">
           {connection.status !== "reauth-required" && <button type="button" disabled={busy} className="ui-button" onClick={() => void perform(() => bridge.refresh())}>{t("organization.refresh")}</button>}
@@ -141,7 +141,7 @@ export function OrganizationSettings() {
       </div>}
       {connection?.status === "unavailable" && <p role="status" className="text-[13px] text-ink-secondary">{t("organization.unavailable")}</p>}
       {dateLabel && <p className="mt-3 text-[12px] text-ink-secondary">{t("organization.expires", { date: dateLabel })}</p>}
-      {error && connection && <p role="alert" className="mt-3 text-[13px] text-danger">{error}</p>}
+      {error && connection && <p role="alert" className="mt-3 text-[13px] text-danger-text">{error}</p>}
       {!connection && <button type="button" disabled={busy} className="ui-button mt-3" onClick={() => void perform(() => bridge.refresh())}>{t("organization.refresh")}</button>}
     </Card>
   </>;

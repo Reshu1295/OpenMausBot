@@ -513,7 +513,7 @@ export function VoiceSettings({
               {preparingSample ? <Loader2 size={14} className="animate-spin" /> : <Volume2 size={14} />} {t("voice.try")}
             </button>
           </div>
-          {addError && <div role="alert" className="mt-1.5 text-[12px] text-danger">{addError}</div>}
+          {addError && <div role="alert" className="mt-1.5 text-[12px] text-danger-text">{addError}</div>}
           {!searchable && selectedDescription && (
             <div className="mt-1.5 text-[12px] leading-relaxed text-ink-secondary">{selectedDescription}</div>
           )}
@@ -548,7 +548,7 @@ export function VoiceSettings({
         />
       </div>
 
-      {error && <div role="alert" className="mt-2 text-[12px] text-danger">{error}</div>}
+      {error && <div role="alert" className="mt-2 text-[12px] text-danger-text">{error}</div>}
     </div>
   );
 }

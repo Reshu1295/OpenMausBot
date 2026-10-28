@@ -119,7 +119,7 @@ export function TriggersPage({ onBack, onOpenRoom }: { onBack: () => void; onOpe
                           {status.state === "needs-you"
                             ? <div className="mt-1.5 flex flex-wrap items-center gap-2 text-[13px] text-warning">{t("automations.needsYou", { reason: status.reason ?? "" })}<FixButton automation={automation} status={status} actions={actions} onEdit={() => setEditing({ kind: automation.kind, id: automation.id })} /></div>
                             : <div className="mt-0.5 text-[13px] text-ink-secondary">{statusLine(automation)}</div>}
-                          {actions.error && actions.errorFor?.endsWith(`:${automation.id}`) && <p role="alert" className="mt-1 text-[12px] text-danger">{actions.error}</p>}
+                          {actions.error && actions.errorFor?.endsWith(`:${automation.id}`) && <p role="alert" className="mt-1 text-[12px] text-danger-text">{actions.error}</p>}
                         </div>
                         {status.state !== "done" && <Switch checked={automation.enabled} disabled={actions.busy === `toggle:${automation.id}`} aria-label={t("automations.toggle", { name: automation.name })} onClick={() => void actions.toggle(automation)} className="mt-0.5 shrink-0" />}
                       </li>
@@ -127,7 +127,7 @@ export function TriggersPage({ onBack, onOpenRoom }: { onBack: () => void; onOpe
                   })}
                 </ul>
               )}
-              {actions.error && !listed.some((automation) => actions.errorFor?.endsWith(`:${automation.id}`)) && <p role="alert" className="mt-3 text-[12px] text-danger">{actions.error}</p>}
+              {actions.error && !listed.some((automation) => actions.errorFor?.endsWith(`:${automation.id}`)) && <p role="alert" className="mt-3 text-[12px] text-danger-text">{actions.error}</p>}
               <RoutineWakeBar />
             </div>
           </div>

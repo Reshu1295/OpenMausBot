@@ -110,7 +110,7 @@ export function DataCard({ bot, card, theme, controls, running, onCancel }: Data
         formats={card.kind === "chart" ? ["png", "svg", "csv"] : ["csv", "parquet", "xlsx"]}
         onCopyMarkdown={card.kind === "table" || view === "table" ? () => void exporter.copyMarkdown() : undefined} />
     )}
-    {exporter.notice && <span role={exporter.notice.kind} className={cn("absolute inset-x-0 bottom-full z-10 truncate border-t border-hairline/40 bg-card px-3 py-1 text-[11px]", exporter.notice.kind === "alert" ? "text-danger" : "text-ink-secondary")} title={exporter.notice.text}>{exporter.notice.text}</span>}
+    {exporter.notice && <span role={exporter.notice.kind} className={cn("absolute inset-x-0 bottom-full z-10 truncate border-t border-hairline/40 bg-card px-3 py-1 text-[11px]", exporter.notice.kind === "alert" ? "text-danger-text" : "text-ink-secondary")} title={exporter.notice.text}>{exporter.notice.text}</span>}
     {controls}
   </>;
 
@@ -118,7 +118,7 @@ export function DataCard({ bot, card, theme, controls, running, onCancel }: Data
   const body = card.status === "running"
     ? <div className="flex min-h-0 flex-1 items-center justify-center text-[12px] text-ink-secondary"><Loader2 size={18} className="animate-spin" aria-hidden="true" /></div>
     : card.status === "failed"
-      ? <div role="alert" className="min-h-0 flex-1 overflow-auto px-3 py-2 text-[12px] text-danger" data-testid="card-error">
+      ? <div role="alert" className="min-h-0 flex-1 overflow-auto px-3 py-2 text-[12px] text-danger-text" data-testid="card-error">
           <div className="font-medium">{t("data.card.failed")}{card.error?.line ? ` · ${t("data.card.line", { line: card.error.line })}` : ""}</div>
           <pre className="mt-1 whitespace-pre-wrap break-words font-mono text-[12px]">{card.error?.message}</pre>
           {card.error?.hint && <p className="mt-1 text-ink-secondary">{card.error.hint}</p>}

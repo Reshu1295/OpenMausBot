@@ -86,7 +86,7 @@ export function McpCallTimeoutSettings() {
         {t("settings.mcpCalls.help")}
       </p>
       {error ? (
-        <p id="mcp-call-timeout-error" role="alert" className="text-[12px] text-danger">
+        <p id="mcp-call-timeout-error" role="alert" className="text-[12px] text-danger-text">
           {error}
         </p>
       ) : null}

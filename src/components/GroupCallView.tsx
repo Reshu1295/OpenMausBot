@@ -547,7 +547,7 @@ function GroupCall({ group, members }: { group: Group; members: Bot[] }) {
           </button>
         </div>
       )}
-      {speech.error && <div className="max-w-[460px] text-center text-[13px] text-danger">{speech.error}</div>}
+      {speech.error && <div className="max-w-[460px] text-center text-[13px] text-danger-text">{speech.error}</div>}
 
       <div className="flex items-center gap-3">
         {speaker.isSpeaking() && (

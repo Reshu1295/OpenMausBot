@@ -111,7 +111,7 @@ export function ManageMembersPanel({
         <BotPickerList bots={bots} picked={picked} onToggle={toggle} emptyHint="Create a bot first — groups are made of bots." />
         {!memberIds.length && <div className="mt-2 text-[12px] text-ink-secondary">A group needs at least one bot.</div>}
         {saveError && (
-          <div role="alert" className="mt-2 text-[12px] text-danger">
+          <div role="alert" className="mt-2 text-[12px] text-danger-text">
             {saveError}
           </div>
         )}

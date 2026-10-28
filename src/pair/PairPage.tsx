@@ -172,7 +172,7 @@ export function PairPage({ initialCode, initialEmail = null, reason }: { initial
                 <input id="signin-label" value={label} onChange={(e) => setLabel(e.target.value)} maxLength={80} className={input} />
               </>
             ) : null}
-            {error ? <p className="mt-3 text-[13px] text-danger">{error}</p> : null}
+            {error ? <p className="mt-3 text-[13px] text-danger-text">{error}</p> : null}
             <button type="submit" disabled={busy || !email.includes("@") || (sent && otp.replace(/\D/g, "").length < 8)} className={button}>
               {busy ? (sent ? "Signing in…" : "Sending…") : sent ? "Sign in" : "Send code"}
             </button>
@@ -207,7 +207,7 @@ export function PairPage({ initialCode, initialEmail = null, reason }: { initial
               This device
             </label>
             <input id="pair-label" value={label} onChange={(e) => setLabel(e.target.value)} maxLength={80} className={input} />
-            {error ? <p className="mt-3 text-[13px] text-danger">{error}</p> : null}
+            {error ? <p className="mt-3 text-[13px] text-danger-text">{error}</p> : null}
             <button type="submit" disabled={busy || code.replace(/[^a-z0-9]/gi, "").length < 12} className={button}>
               {busy ? "Connecting…" : "Connect"}
             </button>

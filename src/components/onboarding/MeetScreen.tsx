@@ -116,7 +116,7 @@ export function MeetScreen({ hosted, onNext }: { hosted: boolean; onNext: () => 
             <button type="button" data-welcome-later="" onClick={onNext} className="rounded transition-colors hover:text-ink">{t("onboarding.meet.setupLater")}</button>
           </p>
         )}
-        {signingIn && failure && <p role="alert" className="mt-2 text-[13px] leading-[18px] text-danger">{failure}</p>}
+        {signingIn && failure && <p role="alert" className="mt-2 text-[13px] leading-[18px] text-danger-text">{failure}</p>}
       </div>
       {dialog && <ConnectAiDialog hosted={hosted} tested={tested} onClose={() => setDialog(false)} />}
     </div>

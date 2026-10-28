@@ -220,7 +220,7 @@ export function MermaidDiagram({ code }: MermaidDiagramProps) {
 
   const diagram = <>
     {error && (
-      <p role="alert" className="px-3 pt-2 text-[12px] text-danger">
+      <p role="alert" className="px-3 pt-2 text-[12px] text-danger-text">
         Diagram could not be rendered: {error}
       </p>
     )}
@@ -271,8 +271,8 @@ export function MermaidDiagram({ code }: MermaidDiagramProps) {
           >
             {copied === "failed" ? (
               <>
-                <X size={12} className="text-danger" aria-hidden="true" />
-                <span className="text-danger font-medium hidden sm:inline">{t("common.copyFailed")}</span>
+                <X size={12} className="text-danger-text" aria-hidden="true" />
+                <span className="text-danger-text font-medium hidden sm:inline">{t("common.copyFailed")}</span>
               </>
             ) : copied === "copied" ? (
               <>
@@ -333,7 +333,7 @@ function LocalFileLink({ filePath, name, children, message }: { filePath: string
         <span
           role={save.state === "failed" ? "alert" : "status"}
           title={save.state === "saved" ? save.savedTo : undefined}
-          className={`text-[12px] ${save.state === "saved" ? "text-success" : save.state === "failed" ? "text-danger" : "text-ink-secondary"}`}
+          className={`text-[12px] ${save.state === "saved" ? "text-success" : save.state === "failed" ? "text-danger-text" : "text-ink-secondary"}`}
         >
           {save.state === "failed" ? saveFailureText(save) : label}
         </span>
@@ -567,7 +567,7 @@ function MarkdownImage(props: ComponentProps<"img"> & ExtraProps) {
   const { message, imageOffsets } = useContext(MessageScopeContext);
   const { src, alt } = props;
   if (!src) {
-    return <span className="text-[12px] text-danger" role="alert">{t("attach.imageUnavailable")}</span>;
+    return <span className="text-[12px] text-danger-text" role="alert">{t("attach.imageUnavailable")}</span>;
   }
   const filePath = localFilePath(src) ?? undefined;
   const sourceOffset = props.node?.position?.start.offset;

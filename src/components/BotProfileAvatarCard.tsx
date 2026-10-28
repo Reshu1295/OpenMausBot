@@ -85,7 +85,7 @@ export function BotProfileAvatarCard({
               disabled={busy}
               aria-label={t("botIdentity.removeAvatar")}
               title={t("botIdentity.removeImage")}
-              className="flex size-10 items-center justify-center rounded-lg text-ink-secondary hover:bg-control hover:text-danger disabled:opacity-50"
+              className="flex size-10 items-center justify-center rounded-lg text-ink-secondary hover:bg-control hover:text-danger-text disabled:opacity-50"
             >
               <Trash2 size={14} />
             </button>
@@ -189,7 +189,7 @@ export function BotProfileAvatarCard({
           onSavingChange={setSavingConnection}
         />
 
-        {error && <div role="alert" className="mt-3 text-[12px] text-danger">{error}</div>}
+        {error && <div role="alert" className="mt-3 text-[12px] text-danger-text">{error}</div>}
       </div>
     </div>
   );

@@ -30,7 +30,7 @@ export function WorkspaceBackupRestartNotice({ onRetry }: { onRetry?: () => void
     <p>{t(relaunch ? "backup.restartDesktop" : "backup.restart")}</p>
     {relaunch && <button type="button" className={`${buttonClass} self-start`} disabled={restarting} onClick={() => void restart()}>{restarting ? t("settings.updates.restartingShort") : t("backup.restartAction")}</button>}
     {!relaunch && onRetry && <button type="button" className={`${buttonClass} self-start`} onClick={onRetry}>{t("connectors.action.retry")}</button>}
-    {error && <p role="alert" className="text-[13px] text-danger">{t("backup.restartFailed")}</p>}
+    {error && <p role="alert" className="text-[13px] text-danger-text">{t("backup.restartFailed")}</p>}
   </div>;
 }
 
@@ -155,7 +155,7 @@ export function WorkspaceBackupSettings() {
         <p className="text-[13px] leading-relaxed text-ink-secondary">{t("backup.privacy")}</p>
     </section>
         <div className="flex flex-col gap-4">
-            {error && <p role="alert" className="break-words px-4 text-[13px] text-danger">{error}</p>}
+            {error && <p role="alert" className="break-words px-4 text-[13px] text-danger-text">{error}</p>}
             {status?.pendingRestore ? <div className="rounded-xl border border-warning/40 bg-warning/10 p-4 text-ink"><WorkspaceBackupRestartNotice /></div> : <>
             {(!status || status.busy) && <div role="status" className="flex items-center gap-3 px-4 text-[13px] text-ink-secondary"><span>{status?.busy ? t("backup.serverBusy") : t("backup.checkStatus")}</span><button type="button" onClick={() => void refresh()} className="cursor-pointer underline">{t("connectors.action.retry")}</button></div>}
             <Card title={t("backup.export")} subtitle={t("backup.passwordHint")}>
@@ -173,8 +173,8 @@ export function WorkspaceBackupSettings() {
                 </form>
                 {preview && <div className="mt-4 flex flex-col gap-3">
                 <WorkspaceBackupSummaryView summary={preview.summary} />
-                <p className="text-[13px] leading-relaxed text-danger">{t("backup.replaceWarning")}</p>
-                <p className="text-[13px] leading-relaxed text-danger">{t("backup.trustWarning")}</p>
+                <p className="text-[13px] leading-relaxed text-danger-text">{t("backup.replaceWarning")}</p>
+                <p className="text-[13px] leading-relaxed text-danger-text">{t("backup.trustWarning")}</p>
                 <label className="text-[13px] text-ink">{t("backup.confirmReplace")}<input value={confirmation} autoComplete="off" spellCheck={false} disabled={disabled} onChange={(event) => setConfirmation(event.target.value)} className={`${inputClass} mt-1`} /></label>
                 <button type="button" disabled={disabled || confirmation !== "REPLACE"} onClick={() => void restoreBackup()} className="cursor-pointer rounded-lg bg-danger px-3 py-2 text-[13px] font-medium text-danger-ink disabled:opacity-40">{busy === "restore" ? t("backup.restoring") : t("backup.replace")}</button>
                 </div>}
@@ -227,7 +227,7 @@ export function WorkspaceBackupRecovery({ children }: { children: ReactNode }) {
   };
   return <main className="flex h-dvh flex-col items-center justify-center gap-4 bg-app p-6 text-ink">
     {restartRequired ? <WorkspaceBackupRestartNotice onRetry={() => { setRestartRequired(false); setAttempt((value) => value + 1); }} /> : <p className="max-w-lg text-[14px]">{t("backup.recovering")}</p>}
-    {error && <p role="alert" className="max-w-lg break-words text-[13px] text-danger">{error}</p>}
+    {error && <p role="alert" className="max-w-lg break-words text-[13px] text-danger-text">{error}</p>}
     {error && <button type="button" className={buttonClass} onClick={() => { setRestartRequired(false); setAttempt((value) => value + 1); }}>{t("connectors.action.retry")}</button>}
     {error && <>
       <p className="max-w-lg text-[13px] text-ink-secondary">{t("backup.skipDraftsHint")}</p>

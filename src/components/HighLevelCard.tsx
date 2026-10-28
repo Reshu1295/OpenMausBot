@@ -259,7 +259,7 @@ export function HighLevelCard({ refreshKey = 0, onConnection }: {
             )}
           </p>
         )}
-        {error && <p role="alert" className="mt-1.5 text-[12px] text-danger">{error}</p>}
+        {error && <p role="alert" className="mt-1.5 text-[12px] text-danger-text">{error}</p>}
         {!connecting && status !== null && !connected && !needsSignIn && (
           tokenMode ? (
             <form

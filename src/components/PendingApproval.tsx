@@ -296,7 +296,7 @@ export function PendingApprovalActions({
       type="button"
       onClick={() => decide("deny")}
       autoFocus={isTeamSetup}
-      className={cn(APPROVAL_CONTROL, "bg-ink/[0.07] text-danger hover:bg-danger/15")}
+      className={cn(APPROVAL_CONTROL, "bg-ink/[0.07] text-danger-text hover:bg-danger/15")}
     >
       {isRoutineRequest || isProfileRequest || isTeamSetup ? t("approval.action.cancel") : t("approval.action.deny")}
     </button>,

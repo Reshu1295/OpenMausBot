@@ -183,7 +183,7 @@ export function XCard({ refreshKey = 0, onConnection }: {
           <p data-x-usage className={usage.usedUp ? "mt-1 text-[12px] leading-relaxed text-warning" : "mt-1 text-[12px] leading-relaxed text-ink-secondary"}>{usage.line}</p>
         )}
         {using === "own" && (
-          <button type="button" disabled={busy !== null} onClick={() => void remove()} className="mt-1.5 inline-flex items-center gap-1.5 text-[12px] text-danger underline underline-offset-2 disabled:opacity-50">
+          <button type="button" disabled={busy !== null} onClick={() => void remove()} className="mt-1.5 inline-flex items-center gap-1.5 text-[12px] text-danger-text underline underline-offset-2 disabled:opacity-50">
             {busy === "remove" && <Loader2 size={12} className="animate-spin" aria-hidden="true" />}
             {t("apps.x.remove")}
           </button>
@@ -220,7 +220,7 @@ export function XCard({ refreshKey = 0, onConnection }: {
           </form>
         )}
         {verdict && <p role="status" className="mt-1.5 text-[12px] text-ink-secondary">{verdict}</p>}
-        {error && <p role="alert" className="mt-1.5 text-[12px] text-danger">{error}</p>}
+        {error && <p role="alert" className="mt-1.5 text-[12px] text-danger-text">{error}</p>}
       </div>
     </div>
   );

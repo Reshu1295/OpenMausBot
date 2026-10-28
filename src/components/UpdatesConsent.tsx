@@ -68,7 +68,7 @@ export function UpdatesConsentDialog({ signedIn, onYes, onNo }: {
           className="w-full rounded-lg border border-hairline/40 bg-inset px-3 py-2 text-[14px] font-normal text-ink placeholder:text-ink-secondary focus:outline-none" />
         <span className="text-[12px] font-normal text-ink-secondary">{t("updatesConsent.emailHint")}</span>
       </label>}
-      {error && <p role="alert" className="mt-3 text-[13px] text-danger">{error}</p>}
+      {error && <p role="alert" className="mt-3 text-[13px] text-danger-text">{error}</p>}
       <div className="mt-5 flex flex-wrap items-center justify-end gap-2">
         <button type="button" className={SECONDARY} disabled={busy} onClick={onNo}>{t("updatesConsent.no")}</button>
         <button type="button" className={PRIMARY} disabled={busy} onClick={yes}>{t("updatesConsent.yes")}</button>
@@ -95,7 +95,7 @@ export function UpdatesConsentRow() {
     {on && state.email && <>{" "}{t("settings.updatesConsent.to", { email: state.email })}</>}
   </>;
   return <SettingRow title={t("settings.updatesConsent.title")} subtitle={subtitle}
-    message={failed ? <span role="alert" className="text-danger">{t("updatesConsent.failed")}</span> : undefined}>
+    message={failed ? <span role="alert" className="text-danger-text">{t("updatesConsent.failed")}</span> : undefined}>
     <Switch checked={on} disabled={busy} aria-label={t("settings.updatesConsent.aria")}
       onClick={() => {
         if (on) void set("withdrawn").catch(() => {});

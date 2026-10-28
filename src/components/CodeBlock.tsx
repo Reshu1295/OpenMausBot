@@ -183,7 +183,7 @@ export function CodePlate({ copied, onCopy, copyLabel, items }: {
       <button type="button" onClick={onCopy} className={PLATE_BUTTON}
         title={copied === "copied" ? t("code.copiedTitle") : copied === "failed" ? t("common.copyFailed") : copyLabel}
         aria-label={copied === "copied" ? t("code.copiedTitle") : copied === "failed" ? t("common.copyFailed") : copyLabel}>
-        {copied === "failed" ? <X size={14} className="text-danger" aria-hidden="true" />
+        {copied === "failed" ? <X size={14} className="text-danger-text" aria-hidden="true" />
           : copied === "copied" ? <Check size={14} className="text-success" aria-hidden="true" />
             : <Copy size={14} aria-hidden="true" />}
       </button>
@@ -304,11 +304,11 @@ export function CodeBlock({ code, lang, initialWrap = false }: CodeBlockProps) {
             title={copied === "copied" ? t("code.copiedTitle") : copied === "failed" ? t("common.copyFailed") : t("code.copyTitle")}
             aria-label={copied === "copied" ? t("code.copiedAria") : copied === "failed" ? t("common.copyFailed") : t("code.copyAria")}
           >
-            {copied === "failed" ? <X size={12} className="text-danger" aria-hidden="true" />
+            {copied === "failed" ? <X size={12} className="text-danger-text" aria-hidden="true" />
               : copied === "copied" ? <Check size={12} className="text-success" aria-hidden="true" />
                 : <Copy size={12} aria-hidden="true" />}
             <span aria-hidden="true" className="hidden max-sm:inline touch:inline">{t("code.copy")}</span>
-            <span role="status" className={`max-sm:sr-only touch:sr-only ${copied === "failed" ? "text-danger font-medium" : copied === "copied" ? "text-success font-medium" : ""}`}>
+            <span role="status" className={`max-sm:sr-only touch:sr-only ${copied === "failed" ? "text-danger-text font-medium" : copied === "copied" ? "text-success font-medium" : ""}`}>
               {copied === "failed" ? t("common.copyFailed") : copied === "copied" ? t("code.copied") : t("code.copy")}
             </span>
           </button>

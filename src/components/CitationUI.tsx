@@ -91,7 +91,7 @@ function CitationEditor({
         }}
         className="w-full resize-none rounded-lg border border-hairline/40 bg-inset px-3 py-2 text-[13px] outline-none focus:border-accent"
       />
-      {tooLong && <p role="status" className="mt-1 text-[11px] text-danger">Comments can contain up to {CITATION_MAX_COMMENT_LENGTH.toLocaleString()} characters.</p>}
+      {tooLong && <p role="status" className="mt-1 text-[11px] text-danger-text">Comments can contain up to {CITATION_MAX_COMMENT_LENGTH.toLocaleString()} characters.</p>}
       <div className="mt-2 flex justify-end gap-2">
         <button type="button" onClick={onCancel} className="rounded-lg px-3 py-1.5 text-[12px] text-ink-secondary hover:bg-raised">Cancel</button>
         <button type="button" disabled={tooLong} onClick={() => onSave(withCitationComment(citation, comment))} className="rounded-lg bg-accent px-3 py-1.5 text-[12px] font-medium text-white disabled:opacity-40">Save</button>
@@ -190,7 +190,7 @@ export function CitationSelectionToolbar({
       onKeyDown={(event) => {
         if (event.key === "Escape") { event.preventDefault(); setCaptured(null); }
       }}
-      className="fixed z-50 flex items-center gap-1.5 rounded-full border border-hairline/50 bg-panel px-3 py-1.5 text-[12px] font-medium text-ink shadow-lg disabled:text-danger"
+      className="fixed z-50 flex items-center gap-1.5 rounded-full border border-hairline/50 bg-panel px-3 py-1.5 text-[12px] font-medium text-ink shadow-lg disabled:text-danger-text"
       style={captured.point}
     >
       <Quote size={13} aria-hidden="true" /> {tooLong ? "Shorten selection" : "Cite"}

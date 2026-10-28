@@ -155,7 +155,7 @@ export function ConnectorCard({ botId, threadId, message }: { botId: string; thr
             {t("connectors.card.continueTask")}
           </button>
         )}
-        detail={error && <p role="alert" className="ms-[19px] mt-1 text-[12px] text-danger">{typeof error === "string" ? error : t(error.key)}</p>}
+        detail={error && <p role="alert" className="ms-[19px] mt-1 text-[12px] text-danger-text">{typeof error === "string" ? error : t(error.key)}</p>}
       >
         <span className="text-ink-secondary" title={connector.resumed ? t("connectors.card.resumed") : t("connectors.card.paused")}>
           {connector.label}
@@ -206,7 +206,7 @@ export function ConnectorCard({ botId, threadId, message }: { botId: string; thr
             if (label.trim()) void connect(label.trim());
           }}
         >
-          <p role="alert" className="text-[12px] text-danger">
+          <p role="alert" className="text-[12px] text-danger-text">
             {t(requiresAccountAlias(errorText) ? "connectors.aliasNeeded" : "connectors.aliasTaken")}
           </p>
           <input
@@ -218,7 +218,7 @@ export function ConnectorCard({ botId, threadId, message }: { botId: string; thr
             className="mt-1.5 h-8 w-full rounded-full bg-inset px-3 text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none focus:ring-1 focus:ring-accent"
           />
         </form>
-      ) : error && <p role="alert" className="mt-1.5 text-[12px] text-danger">{typeof error === "string" ? error : t(error.key)}</p>}
+      ) : error && <p role="alert" className="mt-1.5 text-[12px] text-danger-text">{typeof error === "string" ? error : t(error.key)}</p>}
       {authorizationUrl && (
         <a href={authorizationUrl} target="_blank" rel="noopener noreferrer" onClick={(event) => {
           if (!reusableConnectionUrl(pendingAuthorization)) {

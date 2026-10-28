@@ -85,7 +85,7 @@ function CloudReady({ routine, onDone }: { routine?: Routine; onDone: () => void
             {next ? <> {t("cloudSetup.ready.runs", { when: next })}</> : null}
           </p>
         : <p className="mt-1 text-[13px] leading-relaxed text-ink-secondary">{t("cloudSetup.ready.body")}</p>}
-      {run === "failed" && <p role="alert" className="mt-1.5 text-[12px] text-danger">{t("cloudSetup.ready.runFailed")}</p>}
+      {run === "failed" && <p role="alert" className="mt-1.5 text-[12px] text-danger-text">{t("cloudSetup.ready.runFailed")}</p>}
     </div>
     {routine
       ? <div className="relative mt-4 flex w-full flex-col gap-2">

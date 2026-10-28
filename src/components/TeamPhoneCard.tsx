@@ -132,7 +132,7 @@ export function TeamPhoneCard({ team }: { team: string }) {
           )}
         </div>
       ) : null}
-      {error ? <p className="mt-3 text-[13px] text-danger">{error}</p> : null}
+      {error ? <p className="mt-3 text-[13px] text-danger-text">{error}</p> : null}
     </Card>
   );
 }

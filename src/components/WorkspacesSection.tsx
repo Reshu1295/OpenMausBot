@@ -54,7 +54,7 @@ export function WorkspacesTable({ fleet, onAct, busy }: { fleet: FleetView; onAc
               <a href={`https://${workspace.host}`} target="_blank" rel="noreferrer" className="block truncate text-[12px] text-accent-text hover:underline">{workspace.host}</a>
               {!operational && <span className="block text-[12px] text-ink-secondary">{t("workspaces.recoveryHint")}</span>}
             </span>
-            <span className={cn("text-right", suspended || workspace.status === "provisioning" ? "text-warning" : workspace.status === "running" && workspace.live === "active" ? "text-success" : "text-danger")}>{state}</span>
+            <span className={cn("text-right", suspended || workspace.status === "provisioning" ? "text-warning" : workspace.status === "running" && workspace.live === "active" ? "text-success" : "text-danger-text")}>{state}</span>
             <span className="text-right tabular-nums text-ink" title={workspace.usage.turns === null ? undefined : t("workspaces.turns", { turns: String(workspace.usage.turns) })}>
               {hasFiniteCost(workspace.usage.costUsd) ? formatUsd(workspace.usage.costUsd) : "—"}
               {hasFiniteCost(workspace.usage.billableUsd) && <span className="text-ink-secondary"> · {formatUsd(workspace.usage.billableUsd)}</span>}
@@ -62,7 +62,7 @@ export function WorkspacesTable({ fleet, onAct, busy }: { fleet: FleetView; onAc
             <span className="flex items-center justify-end gap-2 text-[12px]">
               {operational && <><button type="button" disabled={busy !== null} onClick={() => onAct(workspace.slug, "users")} className="text-ink-secondary hover:text-ink disabled:opacity-50">{t("workspaces.users")}</button>
               <button type="button" disabled={busy !== null} onClick={() => onAct(workspace.slug, suspended ? "resume" : "suspend")} className="text-ink-secondary hover:text-ink disabled:opacity-50">{suspended ? t("workspaces.resume") : t("workspaces.suspend")}</button>
-              <button type="button" disabled={busy !== null} onClick={() => onAct(workspace.slug, "delete")} className="text-danger hover:underline disabled:opacity-50">{t("workspaces.delete")}</button></>}
+              <button type="button" disabled={busy !== null} onClick={() => onAct(workspace.slug, "delete")} className="text-danger-text hover:underline disabled:opacity-50">{t("workspaces.delete")}</button></>}
             </span>
           </div>
         );
@@ -131,7 +131,7 @@ function NewWorkspaceForm({ domain, onCreated, disabled }: { domain: string; onC
         </label>
       </div>
       <p className="text-[12px] leading-relaxed text-ink-secondary">{t("workspaces.createHint")}</p>
-      {error && <p role="alert" className="text-[12px] text-danger">{error}</p>}
+      {error && <p role="alert" className="text-[12px] text-danger-text">{error}</p>}
       <div className="flex justify-end">
         <button type="submit" disabled={disabled || saving} className="ui-button ui-button-primary">
           {saving ? <Loader2 size={13} className="animate-spin" /> : <Plus size={13} />}{saving ? t("workspaces.creating") : t("workspaces.create")}
@@ -167,9 +167,9 @@ function UsersForm({ slug, onDone }: { slug: string; onDone: (log: string[]) => 
         <input value={email} onChange={(e) => setEmail(e.target.value)} type="text" placeholder="person@example.com or @example.com" aria-label={t("workspaces.email")} disabled={busy !== null} className="min-w-[16rem] flex-1 rounded-lg border border-hairline/40 bg-inset px-3 py-2 text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none disabled:opacity-50" />
         <label className="flex items-center gap-1.5 text-[12px] text-ink-secondary"><input type="checkbox" checked={chatOnly} onChange={(e) => setChatOnly(e.target.checked)} disabled={busy !== null} />{t("workspaces.chatOnly")}</label>
         <button type="button" disabled={busy !== null || !email.trim()} onClick={() => void run("add")} className="rounded-lg bg-raised px-3 py-1.5 text-[12px] text-ink hover:bg-raised-hover disabled:opacity-50">{busy === "add" ? t("workspaces.working") : t("workspaces.addUser")}</button>
-        <button type="button" disabled={busy !== null || !email.trim()} onClick={() => void run("remove")} className="rounded-lg px-3 py-1.5 text-[12px] text-danger hover:underline disabled:opacity-50">{busy === "remove" ? t("workspaces.working") : t("workspaces.removeUser")}</button>
+        <button type="button" disabled={busy !== null || !email.trim()} onClick={() => void run("remove")} className="rounded-lg px-3 py-1.5 text-[12px] text-danger-text hover:underline disabled:opacity-50">{busy === "remove" ? t("workspaces.working") : t("workspaces.removeUser")}</button>
       </div>
-      {error && <p role="alert" className="mt-2 text-[12px] text-danger">{error}</p>}
+      {error && <p role="alert" className="mt-2 text-[12px] text-danger-text">{error}</p>}
     </div>
   );
 }
@@ -253,7 +253,7 @@ export function WorkspacesSection({ load = fetchFleet }: { load?: () => Promise<
         </div>
         {creating && fleet && <div className="mb-4 rounded-xl border border-hairline/40 p-3"><NewWorkspaceForm domain={fleet.domain} disabled={busy !== null} onCreated={(lines, created) => { setCreating(false); setLog(lines); setInviteLink(`https://${created.slug}.${fleet.domain}/pair?email=${encodeURIComponent(created.admin)}`); void refresh(); }} /></div>}
         {inviteLink && <div className="mb-4"><CopyLink link={inviteLink} /></div>}
-        {error && <p role="alert" className="mb-2 text-[12px] text-danger">{error}</p>}
+        {error && <p role="alert" className="mb-2 text-[12px] text-danger-text">{error}</p>}
         {fleet ? <WorkspacesTable fleet={fleet} onAct={(slug, action) => void act(slug, action)} busy={busy} /> : loading ? <div className="flex items-center gap-2 text-[13px] text-ink-secondary"><Loader2 size={14} className="animate-spin" />{t("common.checking")}</div> : null}
         {usersFor && <UsersForm slug={usersFor} onDone={(lines) => { setLog(lines); void refresh(); }} />}
         {log.length > 0 && (

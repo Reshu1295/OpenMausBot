@@ -658,7 +658,7 @@ export function SidebarProfileMenu({ iconOnly = false, rail = false, circle = fa
                 aria-label={update.label}
                 className={cn(
                   "flex size-6 shrink-0 items-center justify-center rounded-full",
-                  update.phase === "error" ? "bg-danger/15 text-danger" : "bg-accent/15 text-accent-text",
+                  update.phase === "error" ? "bg-danger/15 text-danger-text" : "bg-accent/15 text-accent-text",
                 )}
               >
                 <UpdateIcon phase={update.phase} pending={update.pending} size={14} />

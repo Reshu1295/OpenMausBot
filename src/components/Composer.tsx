@@ -719,7 +719,7 @@ export function Composer({
         {failedSends.map((failed) => (
           <div
             key={failed.id}
-            className="mb-2 flex items-center gap-2 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-[13px] text-danger"
+            className="mb-2 flex items-center gap-2 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-[13px] text-danger-text"
           >
             <span className="min-w-0 flex-1 truncate">
               {t("composer.failed.notSent", {
@@ -980,7 +980,7 @@ export function Composer({
               "flex shrink-0 items-center justify-center rounded-full",
               simpleDock ? "size-7" : "size-8",
               recording
-                ? "animate-pulse bg-danger/20 text-danger"
+                ? "animate-pulse bg-danger/20 text-danger-text"
                 : advanced || singleRow ? "text-ink-secondary hover:bg-raised hover:text-ink" : SIMPLE_CONTROL,
             )}
             title={recording ? t("composer.dictation.stopHint") : t("composer.dictation.hint")}

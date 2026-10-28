@@ -85,7 +85,7 @@ export function RoomTurnTimeoutSettings() {
         {t("settings.roomTurns.help")}
       </p>
       {error ? (
-        <p id="room-turn-timeout-error" role="alert" className="text-[12px] text-danger">
+        <p id="room-turn-timeout-error" role="alert" className="text-[12px] text-danger-text">
           {error}
         </p>
       ) : null}

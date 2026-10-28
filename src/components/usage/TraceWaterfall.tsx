@@ -36,7 +36,7 @@ export function StatStrip({ items }: { items: Array<{ label: string; value: stri
           title={item.hint}
         >
           <dt className="truncate text-[11px] font-medium uppercase tracking-[0.08em] text-ink-secondary">{item.label}</dt>
-          <dd className={cn("mt-1 truncate text-[20px] font-medium tabular-nums sm:text-[22px]", item.tone === "danger" ? "text-danger" : "text-ink")}>{item.value}</dd>
+          <dd className={cn("mt-1 truncate text-[20px] font-medium tabular-nums sm:text-[22px]", item.tone === "danger" ? "text-danger-text" : "text-ink")}>{item.value}</dd>
         </div>
       ))}
     </dl>
@@ -110,8 +110,8 @@ function RowName({ row, models }: { row: TraceRow; models: readonly InstanceInfo
   return (
     <>
       {icon}
-      <span className={cn("shrink-0 truncate text-[14px]", node.kind === "turn" ? "font-medium text-ink" : "text-ink", failed && "text-danger")}>{name}</span>
-      {detail && <span className={cn("min-w-0 truncate text-[13px]", failed ? "text-danger/80" : "text-ink-tertiary")}>{detail}</span>}
+      <span className={cn("shrink-0 truncate text-[14px]", node.kind === "turn" ? "font-medium text-ink" : "text-ink", failed && "text-danger-text")}>{name}</span>
+      {detail && <span className={cn("min-w-0 truncate text-[13px]", failed ? "text-danger-text/80" : "text-ink-tertiary")}>{detail}</span>}
       {node.kind === "turn" && !node.timed && <span className="shrink-0 rounded bg-raised px-1.5 text-[11px] text-ink-secondary">{t("trace.notTimed")}</span>}
     </>
   );
@@ -257,7 +257,7 @@ export function TraceWaterfall({ detail, now, actions }: { detail: TraceDetail; 
                     </button>
                   ) : <span className="w-5 shrink-0" />}
                   <RowName row={row} models={state.instances} />
-                  {rowFailed(row.node) && row.node.kind === "turn" && <X size={13} className="shrink-0 text-danger" aria-label={t("trace.failed")} />}
+                  {rowFailed(row.node) && row.node.kind === "turn" && <X size={13} className="shrink-0 text-danger-text" aria-label={t("trace.failed")} />}
                 </div>
                 <div className="relative mx-4 h-7 sm:ml-0 sm:mr-6 sm:h-9 sm:border-l sm:border-hairline/40" style={grid}>
                   <RowBar row={row} origin={origin} axisMax={axis.max} badges={badges} now={now} trackPx={trackPx} />

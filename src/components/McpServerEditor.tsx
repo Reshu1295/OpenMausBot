@@ -91,7 +91,7 @@ export function McpServerEditor({ server, fixKeys = false, taken, team, busy, on
             className="mt-2 w-full resize-y rounded-lg border border-hairline/60 bg-raised px-3 py-2.5 font-mono text-[12px] leading-relaxed text-ink outline-none focus:border-accent" />
         </label>
       )}
-      {pasteError && <p role="alert" className="mt-2 text-[12px] leading-relaxed text-danger">{t(pasteError)}</p>}
+      {pasteError && <p role="alert" className="mt-2 text-[12px] leading-relaxed text-danger-text">{t(pasteError)}</p>}
       {adding && text.trim() && drafts.length > 0 && !pasteError && (
         <p role="status" className="mt-2 text-[12px] text-ink-secondary">
           {draft ? t("mcp.paste.foundOne", { name: draft.name, where: where(draft) }) : t("mcp.paste.foundMany", { count: drafts.length, names: drafts.map((each) => each.name).join(", ") })}
@@ -221,7 +221,7 @@ export function McpServerEditor({ server, fixKeys = false, taken, team, busy, on
           )}
         </div>
       )}
-      {error && <p role="alert" className="mt-3 text-[12px] text-danger">{t(error.key, error.params)}</p>}
+      {error && <p role="alert" className="mt-3 text-[12px] text-danger-text">{t(error.key, error.params)}</p>}
       <div className="mt-4 flex justify-end gap-2">
         <button type="button" onClick={onCancel} className="rounded-lg px-3 py-2 text-[13px] text-ink-secondary hover:bg-raised">{t("mcp.cancel")}</button>
         <button type="button" disabled={busy || !drafts.length} onClick={submit}

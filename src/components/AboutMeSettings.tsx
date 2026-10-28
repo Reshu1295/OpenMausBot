@@ -52,7 +52,7 @@ export function AboutMeSettings() {
       <div className="min-h-4 text-[12px]" role="status">
         {status === "saving" && <span className="text-ink-secondary">{t("settings.profile.saving")}</span>}
         {status === "saved" && <span className="text-success">{t("settings.profile.saved")}</span>}
-        {status === "error" && <span className="text-danger">{t("settings.profile.saveError")} {" "}
+        {status === "error" && <span className="text-danger-text">{t("settings.profile.saveError")} {" "}
           <button type="button" onClick={() => void flush()} className="underline">{t("settings.profile.retry")}</button>
         </span>}
       </div>
@@ -113,7 +113,7 @@ function LearnedFacts({ onChanged }: { onChanged: (aboutMe: string) => void }) {
           </li>
         ))}
       </ul>
-      {error && <div className="mt-2 text-[12px] text-danger">{t("settings.profile.learned.error")}</div>}
+      {error && <div className="mt-2 text-[12px] text-danger-text">{t("settings.profile.learned.error")}</div>}
     </div>
   );
 }

@@ -140,7 +140,7 @@ export function SignInAccessCard() {
         </ul>
       )}
       <p className="mt-3 text-[12px] leading-relaxed text-ink-secondary">{t("remote.signInAccess.note")}</p>
-      {error ? <p className="mt-2 text-[13px] text-danger">{error}</p> : null}
+      {error ? <p className="mt-2 text-[13px] text-danger-text">{error}</p> : null}
     </Card>
   );
 }

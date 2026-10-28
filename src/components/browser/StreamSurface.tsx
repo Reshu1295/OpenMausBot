@@ -753,7 +753,7 @@ export function StreamSurface(props: {
                     <span className="min-w-0 truncate">The page copied text</span>
                     <button type="button" className="shrink-0 rounded-md bg-accent px-2 py-0.5 text-accent-ink" onClick={() => { void copyText(notice.text); dismiss(notice.id); }}>Copy</button>
                   </>
-                ) : <span role="alert" className="min-w-0 text-danger">{notice.message}</span>}
+                ) : <span role="alert" className="min-w-0 text-danger-text">{notice.message}</span>}
                 <button type="button" aria-label="Dismiss" className="shrink-0 rounded-md p-0.5 text-ink-secondary hover:bg-inset" onClick={() => dismiss(notice.id)}><X size={12} /></button>
               </div>
             ))}

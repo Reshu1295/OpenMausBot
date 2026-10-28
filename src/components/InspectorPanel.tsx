@@ -199,7 +199,7 @@ export function InspectorPanel({ bot }: { bot: Bot }) {
 
       <div role="tabpanel" id={`inspector-panel-${lens}`} aria-labelledby={`inspector-tab-${lens}`} tabIndex={0} className="flex min-h-0 flex-1 flex-col outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/60">
       {lens === "run" ? <RunLog key={threadId} events={activity} /> : <div ref={listRef} onScroll={onScroll} className="min-h-0 flex-1 overflow-y-auto font-mono text-[12px]">
-        {error && <div className="px-4 py-3 text-danger">couldn't load: {error}</div>}
+        {error && <div className="px-4 py-3 text-danger-text">couldn't load: {error}</div>}
         {page && rows.length === 0 && !error && (
           <div className="px-4 py-6 text-ink-secondary">
             {lens === "raw" ? "No native protocol messages recorded for this thread yet." : "No runtime events for this thread yet."}
@@ -229,13 +229,13 @@ function Row({ row, open, onToggle }: { row: InspectorRow; open: boolean; onTogg
         <span
           className={cn(
             "shrink-0 rounded px-1 text-[11px]",
-            row.kind === "native" ? "bg-accent/15 text-accent-text" : row.tone === "error" ? "bg-danger/20 text-danger" : "bg-inset text-ink-secondary",
+            row.kind === "native" ? "bg-accent/15 text-accent-text" : row.tone === "error" ? "bg-danger/20 text-danger-text" : "bg-inset text-ink-secondary",
           )}
         >
           {row.tag}
           {row.count > 1 ? ` ×${row.count}` : ""}
         </span>
-        <span className={cn("min-w-0 flex-1 truncate", row.tone === "error" ? "text-danger" : "text-ink")}>{row.summary}</span>
+        <span className={cn("min-w-0 flex-1 truncate", row.tone === "error" ? "text-danger-text" : "text-ink")}>{row.summary}</span>
       </button>
       {open && (
         <pre className="max-h-[50vh] overflow-auto whitespace-pre-wrap break-all border-t border-hairline/20 bg-app px-3 py-2 text-[11px] leading-relaxed text-ink">

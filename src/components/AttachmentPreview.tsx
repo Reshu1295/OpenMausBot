@@ -384,7 +384,7 @@ function MessageFolderFile({ folderPath, name, bytes, message }: {
         {name}
       </button>
       <span className="text-ink-secondary">{folderFileSize(bytes)}</span>
-      {save.state === "failed" && <span role="alert" className="text-danger">{save.reason}</span>}
+      {save.state === "failed" && <span role="alert" className="text-danger-text">{save.reason}</span>}
     </li>
   );
 }
@@ -447,7 +447,7 @@ export function OutsideWorkspaceFile({ filePath }: { filePath: string }) {
         <FolderOpen size={12} className="shrink-0" aria-hidden="true" />
         {t("attach.showInFolder")}
       </button>
-      {problem && <span role="alert" className="text-danger">{problem}</span>}
+      {problem && <span role="alert" className="text-danger-text">{problem}</span>}
     </>
   );
 }
@@ -939,7 +939,7 @@ export function AttachedFileChip({ file, message, linked = false, compact = fals
           ) : save.state === "saved" ? (
             <Check size={13} className="shrink-0 text-success" />
           ) : failed ? (
-            retryable && <RotateCcw size={13} className="shrink-0 text-danger" />
+            retryable && <RotateCcw size={13} className="shrink-0 text-danger-text" />
           ) : (
             <Download size={13} className="shrink-0" />
           )}
@@ -951,7 +951,7 @@ export function AttachedFileChip({ file, message, linked = false, compact = fals
           role={failed ? "alert" : "status"}
           className={cn(
             "border-t border-hairline/30 px-2.5 py-1.5 text-[11px]",
-            failed ? "text-danger" : save.state === "saved" ? "text-success" : "text-ink-secondary",
+            failed ? "text-danger-text" : save.state === "saved" ? "text-success" : "text-ink-secondary",
           )}
         >
           {save.state === "saving"
@@ -1011,7 +1011,7 @@ function CompactFileChip({ file, message, linked, save, className }: {
           ) : save.state === "saved" ? (
             <Check size={13} className="shrink-0 text-success" aria-hidden="true" />
           ) : failed ? (
-            retryable && <RotateCcw size={13} className="shrink-0 text-danger" aria-hidden="true" />
+            retryable && <RotateCcw size={13} className="shrink-0 text-danger-text" aria-hidden="true" />
           ) : (
             <Download size={13} strokeWidth={1.75} className="shrink-0" aria-hidden="true" />
           )}
@@ -1019,7 +1019,7 @@ function CompactFileChip({ file, message, linked, save, className }: {
         <FilePreviewButton path={file.path} name={file.name} message={message} />
       </span>
       {save.state !== "idle" && save.state !== "saved" && (
-        <span role={failed ? "alert" : "status"} className={cn("px-2.5 text-[12px]", failed ? "text-danger" : "text-ink-secondary")}>
+        <span role={failed ? "alert" : "status"} className={cn("px-2.5 text-[12px]", failed ? "text-danger-text" : "text-ink-secondary")}>
           {save.state === "saving" ? t("attach.downloading") : saveFailureText(save)}
           {failed && save.outsideWorkspace && (
             <span className="ms-1.5 inline-flex flex-wrap items-center gap-x-1.5"><OutsideWorkspaceFile filePath={file.path} /></span>

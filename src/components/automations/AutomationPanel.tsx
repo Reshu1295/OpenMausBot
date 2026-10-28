@@ -88,7 +88,7 @@ export function AutomationPanel({ automation, sentence, onClose, onEdit, onDelet
                       <li key={call.id} data-call={call.ok ? "ok" : "refused"}>
                         <button type="button" aria-expanded={openCall === call.id} onClick={() => setOpenCall((current) => (current === call.id ? null : call.id))} className="flex w-full items-baseline gap-2 rounded-md px-1.5 py-1 text-left hover:bg-raised">
                           <span className="shrink-0">{capital(lastWhen(call.at))}</span>
-                          <span className={cn("shrink-0 font-semibold", call.ok ? "text-success" : "text-danger")}>{call.ok ? "✓" : "✗"}</span>
+                          <span className={cn("shrink-0 font-semibold", call.ok ? "text-success" : "text-danger-text")}>{call.ok ? "✓" : "✗"}</span>
                           <span className="min-w-0 truncate text-ink">{call.reason}</span>
                         </button>
                         {openCall === call.id && <pre className="mx-1.5 mb-1 whitespace-pre-wrap break-all rounded-md bg-inset px-2 py-1.5 font-mono text-[11px] text-ink">{call.preview || t("automations.calls.empty")}</pre>}
@@ -127,21 +127,21 @@ export function AutomationPanel({ automation, sentence, onClose, onEdit, onDelet
                   <button type="button" disabled={!run.threadId} onClick={() => actions.openRun(automation, run)} title={run.threadId ? t("automations.panel.open") : undefined}
                     className="flex w-full items-baseline gap-2 rounded-lg px-2 py-1.5 text-left text-[13px] hover:bg-raised disabled:hover:bg-transparent">
                     <span className="shrink-0 text-ink-secondary">{line.when}</span>
-                    <span className={cn("shrink-0 font-semibold", line.mark === "✓" ? "text-success" : line.mark === "✗" ? "text-danger" : "text-warning")}>{line.mark}</span>
+                    <span className={cn("shrink-0 font-semibold", line.mark === "✓" ? "text-success" : line.mark === "✗" ? "text-danger-text" : "text-warning")}>{line.mark}</span>
                     <span className="min-w-0 truncate text-ink">{line.text}</span>
                   </button>
                 </li>
               );
             })}</ul>}
         </section>
-        {actions.error && <p role="alert" className="rounded-lg bg-danger/10 px-3 py-2 text-[12px] text-danger">{actions.error}</p>}
+        {actions.error && <p role="alert" className="rounded-lg bg-danger/10 px-3 py-2 text-[12px] text-danger-text">{actions.error}</p>}
       </div>
 
       <div className="grid grid-cols-2 gap-2 border-t border-hairline/40 px-5 py-3.5">
         <button type="button" disabled={Boolean(actions.busy)} onClick={() => void actions.runNow(automation)} className={cn(BUTTON, "bg-accent text-accent-ink hover:brightness-110")}><Play size={14} />{actions.busy === `run:${automation.id}` ? t("automations.starting") : t("automations.runNow")}</button>
         {status.state !== "done" && <button type="button" disabled={Boolean(actions.busy)} onClick={() => void actions.toggle(automation)} className={cn(BUTTON, "border border-hairline/50 bg-control text-ink hover:bg-raised-hover")}>{automation.enabled ? <Pause size={14} /> : <Play size={14} />}{automation.enabled ? t("automations.pause") : t("automations.resume")}</button>}
         <button type="button" onClick={onEdit} className={cn(BUTTON, "text-ink hover:bg-raised")}><Pencil size={14} />{t("automations.edit")}</button>
-        <button type="button" disabled={Boolean(actions.busy)} onClick={() => void actions.remove(automation, t("automations.deleteConfirm", { sentence })).then((gone) => { if (gone) onDeleted(); })} className={cn(BUTTON, "text-danger hover:bg-danger/10")}><Trash2 size={14} />{t("automations.delete")}</button>
+        <button type="button" disabled={Boolean(actions.busy)} onClick={() => void actions.remove(automation, t("automations.deleteConfirm", { sentence })).then((gone) => { if (gone) onDeleted(); })} className={cn(BUTTON, "text-danger-text hover:bg-danger/10")}><Trash2 size={14} />{t("automations.delete")}</button>
       </div>
     </aside>
   );

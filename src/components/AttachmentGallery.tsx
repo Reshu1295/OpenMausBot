@@ -237,7 +237,7 @@ function VideoAttachment({ file, message }: { file: GalleryFile; message: Messag
         )}
         {!preview && !loading && <Film size={13} className="pointer-events-none absolute left-2 top-2 text-ink-secondary/50" />}
       </div>
-      {error && <p role="alert" className="px-3 py-2 text-[11px] text-danger">{error}</p>}
+      {error && <p role="alert" className="px-3 py-2 text-[11px] text-danger-text">{error}</p>}
       <AttachedFileChip file={file} linked={file.linked} message={message} className="max-w-none rounded-none border-0 border-t border-hairline/30 bg-transparent" />
     </div>
   );
@@ -321,7 +321,7 @@ function AudioAttachment({ file, message }: { file: GalleryFile; message: Messag
           className="shrink-0 rounded-lg p-1 text-ink-secondary hover:bg-raised hover:text-ink"><Download size={14} /></a>}
       </div>
       {src && !error && <audio src={src} controls autoPlay preload="metadata" aria-label={t("attach.previewAudio", { name: file.name })} onError={() => { setSrc(null); setError(t("attach.audioUnavailable")); }} className="h-9 w-full" />}
-      {error && <p role="alert" className="text-[11px] text-danger">{error}</p>}
+      {error && <p role="alert" className="text-[11px] text-danger-text">{error}</p>}
     </div>
   );
 }

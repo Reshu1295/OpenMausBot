@@ -148,7 +148,7 @@ export function CommandAllowlistDialog({ botId, botName, threadId, onClose }: {
           {loading && <p role="status" className="mt-5 flex items-center gap-2 text-[13px] text-ink-secondary">
             <Loader2 size={15} className="animate-spin" aria-hidden="true" />{t("commandAllowlist.loading")}
           </p>}
-          {error && <div role="alert" className="mt-4 rounded-lg bg-danger/10 px-3 py-2 text-[12px] text-danger">
+          {error && <div role="alert" className="mt-4 rounded-lg bg-danger/10 px-3 py-2 text-[12px] text-danger-text">
             <p>{error}</p>
             {!data && !loading && <button type="button" onClick={() => setRevision((value) => value + 1)}
               className="mt-2 underline underline-offset-2">{t("commandAllowlist.retry")}</button>}
@@ -164,7 +164,7 @@ export function CommandAllowlistDialog({ botId, botName, threadId, onClose }: {
                 <button type="button" disabled={Boolean(saving)} onClick={() => void save(rule)}
                   aria-label={t("commandAllowlist.removeAria", { command: rule.command })}
                   title={t(saving === rule.id ? "commandAllowlist.removing" : "commandAllowlist.remove")}
-                  className="shrink-0 rounded-md p-1.5 text-ink-secondary hover:bg-danger/10 hover:text-danger disabled:opacity-40">
+                  className="shrink-0 rounded-md p-1.5 text-ink-secondary hover:bg-danger/10 hover:text-danger-text disabled:opacity-40">
                   {saving === rule.id ? <Loader2 size={15} className="animate-spin" /> : <Trash2 size={15} />}
                 </button>
               </li>)}

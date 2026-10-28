@@ -147,7 +147,7 @@ describe("remembering exact command approvals", () => {
       expect(name).toContain("text-[13px] font-medium");
       expect(name).toMatch(/(^|\s)bg-/);
     }
-    expect(classes[0]).toContain("text-danger");
+    expect(classes[0]).toContain("text-danger-text");
   });
 
   it("lines the row up on the text baseline with the command in a 28px mono pill", () => {

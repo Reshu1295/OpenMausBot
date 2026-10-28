@@ -71,7 +71,7 @@ export function ConnectedWorkspacesSettings() {
   return <>
     <p className="text-[13px] leading-relaxed text-ink-secondary">One desktop app, wherever your bots live. Switching servers does not move or replace your bots, conversations, or provider accounts.</p>
     {saved?.packaged && <Card title="Environments on this computer" subtitle="Separate setups on this computer, each with its own bots, conversations and data folder.">
-      {envError && <p role="alert" className="text-[12px] text-danger">{envError}</p>}
+      {envError && <p role="alert" className="text-[12px] text-danger-text">{envError}</p>}
       {locals.length > 0 && <ul className="divide-y divide-hairline/40">
         {locals.map((entry) => {
           const active = entry.id === saved.activeId;
@@ -91,7 +91,7 @@ export function ConnectedWorkspacesSettings() {
                 className="rounded-md px-2 py-1.5 text-[12px] text-ink hover:bg-control disabled:opacity-50">Switch</button>}
             {!active && <button type="button" disabled={busy} aria-label={`Forget ${entry.name}`} title={`Forget ${entry.name}`}
               onClick={() => { setEnvForget(entry.id); setEnvPurge(false); }}
-              className="rounded-md p-1.5 text-ink-secondary hover:bg-control hover:text-danger disabled:opacity-50"><Trash2 size={14} /></button>}
+              className="rounded-md p-1.5 text-ink-secondary hover:bg-control hover:text-danger-text disabled:opacity-50"><Trash2 size={14} /></button>}
           </li>;
         })}
       </ul>}
@@ -105,7 +105,7 @@ export function ConnectedWorkspacesSettings() {
             const result = envPurge ? await bridge.forget(forgetEntry.id, true) : await bridge.forget(forgetEntry.id);
             if (result && result.ok === false) throw new Error("Couldn't forget the environment.");
             setEnvForget(null);
-          }, setEnvError)} className="rounded-lg px-3 py-1.5 text-[12px] font-medium text-danger hover:bg-control disabled:opacity-50">Forget</button>
+          }, setEnvError)} className="rounded-lg px-3 py-1.5 text-[12px] font-medium text-danger-text hover:bg-control disabled:opacity-50">Forget</button>
           <button type="button" onClick={() => setEnvForget(null)} className="rounded-lg px-3 py-1.5 text-[12px] text-ink hover:bg-control">Cancel</button>
         </div>
       </div>}
@@ -155,7 +155,7 @@ export function ConnectedWorkspacesSettings() {
               {entry.id !== "local" && "home" in entry && entry.home && window.ogb?.cloudLending && <button type="button" disabled={busy} data-cloud-lending-link onClick={() => void window.ogb?.cloudLending?.open().catch(() => {})} className="rounded-md px-2 py-1.5 text-[12px] text-ink hover:bg-control">{lendingTitle()}</button>}
               {entry.id !== "local" && !("home" in entry && entry.home) && sharingOffered && <button type="button" disabled={busy} aria-label={`Computer access for ${entry.name}`} onClick={() => setComputerId(entry.id)} className="rounded-md px-2 py-1.5 text-[12px] text-ink hover:bg-control">Computer access</button>}
               {entry.id !== "local" && <button type="button" disabled={busy} aria-label={`Forget ${entry.name}`} title={`Forget ${entry.name}`}
-                onClick={() => void perform(() => bridge.forget(entry.id))} className="rounded-md p-1.5 text-ink-secondary hover:bg-control hover:text-danger disabled:opacity-50"><Trash2 size={14} /></button>}
+                onClick={() => void perform(() => bridge.forget(entry.id))} className="rounded-md p-1.5 text-ink-secondary hover:bg-control hover:text-danger-text disabled:opacity-50"><Trash2 size={14} /></button>}
             </li>;
           })}
         </ul>}
@@ -180,7 +180,7 @@ export function ConnectedWorkspacesSettings() {
           <p className="mt-2">Run this on the server and copy the link it prints:</p>
           <code className="mt-1 block select-all break-words rounded-md bg-inset px-2 py-2 text-ink">npx openmausbot pair --label "My desktop"</code>
         </details>
-        {error && <p role="alert" className="text-[12px] text-danger">{error}</p>}
+        {error && <p role="alert" className="text-[12px] text-danger-text">{error}</p>}
         <button type="submit" disabled={busy || !address.trim()} className="flex w-fit items-center gap-2 rounded-lg bg-accent px-3 py-2 text-[13px] font-medium text-accent-ink disabled:opacity-50">
           {busy && <Loader2 size={14} className="animate-spin" />}Connect
         </button>

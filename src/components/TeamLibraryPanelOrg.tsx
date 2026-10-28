@@ -48,7 +48,7 @@ export function OrgLibraryTab({
         </div>
       )}
       {notice && <div role="status" className="mt-4 rounded-lg bg-raised/60 px-3 py-2 text-[13px] text-ink-secondary">{notice}</div>}
-      {error && <div role="alert" className="mt-4 rounded-lg bg-danger/10 px-3 py-2 text-[13px] text-danger">{error}</div>}
+      {error && <div role="alert" className="mt-4 rounded-lg bg-danger/10 px-3 py-2 text-[13px] text-danger-text">{error}</div>}
     </div>
   );
 }

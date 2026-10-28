@@ -256,7 +256,7 @@ function BotDataPanel({ bot, requestedCard }: { bot: Bot; requestedCard?: { id: 
             <Loader2 size={14} className="animate-spin" aria-hidden="true" />{t("data.loading")}
           </p>
         )}
-        {loadError && <p role="alert" className="rounded-xl border border-danger/30 bg-danger/10 px-3 py-2 text-[12px] text-danger">{t("data.loadFailed", { reason: loadError })}</p>}
+        {loadError && <p role="alert" className="rounded-xl border border-danger/30 bg-danger/10 px-3 py-2 text-[12px] text-danger-text">{t("data.loadFailed", { reason: loadError })}</p>}
         {unavailable && <p role="status" className="px-3 py-8 text-center text-[13px] text-ink-secondary">{t("data.resultUnavailable")}</p>}
         {empty && (
           <div className="flex flex-col items-center gap-3 py-12 text-center" data-testid="data-empty">
@@ -277,7 +277,7 @@ function BotDataPanel({ bot, requestedCard }: { bot: Bot; requestedCard?: { id: 
       <div ref={query} id={queryId} style={{ height: queryHeight ?? undefined }} className="flex min-h-0 shrink-0 flex-col overflow-hidden px-3 py-2" data-testid="data-query">
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
           <SqlEditor sql={shown.sql} externalRevision={String(shown.revision)} onChange={edit} />
-          <p role={queryError ? "alert" : undefined} title={queryError ?? undefined} className="mt-1 h-4 shrink-0 truncate text-[12px] text-danger" data-testid="data-query-error">{queryError}</p>
+          <p role={queryError ? "alert" : undefined} title={queryError ?? undefined} className="mt-1 h-4 shrink-0 truncate text-[12px] text-danger-text" data-testid="data-query-error">{queryError}</p>
         </div>
         <div className="shrink-0"><SourcesStrip sources={tables} /></div>
       </div>

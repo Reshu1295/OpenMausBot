@@ -17,7 +17,7 @@ const LIMIT = 300;
 
 const TONE_CLASS: Record<ChipTone, string> = {
   ok: "bg-accent/12 text-accent-text",
-  danger: "bg-danger/15 text-danger",
+  danger: "bg-danger/15 text-danger-text",
   accent: "bg-accent/12 text-accent-text",
   warn: "bg-warning/15 text-warning",
 };
@@ -124,7 +124,7 @@ export function ActivityPanel({ bot }: { bot: Bot }) {
       </p>
 
       <div className="min-h-0 flex-1 overflow-y-auto">
-        {error && <div className="px-4 py-3 text-[13px] text-danger">{t("activity.panel.error", { message: error })}</div>}
+        {error && <div className="px-4 py-3 text-[13px] text-danger-text">{t("activity.panel.error", { message: error })}</div>}
         {rows && rows.length === 0 && !error && (
           <div className="px-4 py-6 text-[13px] text-ink-secondary">
             {t("activity.panel.empty", { name: bot.name })}

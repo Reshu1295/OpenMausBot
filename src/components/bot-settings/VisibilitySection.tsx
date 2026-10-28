@@ -160,7 +160,7 @@ export function VisibilitySection({ bot }: { bot: Bot }) {
           <span role="status" className="flex items-center gap-1 text-[12px] text-success"><Check size={13} />{t("botSettings.visibility.saved")}</span>
         )}
       </div>
-      {error && <p role="alert" className="text-[12px] text-danger">{error}</p>}
+      {error && <p role="alert" className="text-[12px] text-danger-text">{error}</p>}
     </div>
   );
 }

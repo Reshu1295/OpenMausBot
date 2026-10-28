@@ -53,7 +53,7 @@ export function LimitWarnings({ botFilter = "all" }: { botFilter?: string }) {
           </div>
         );
       })}
-      {error && <p role="alert" className="text-[12px] text-danger">{error}</p>}
+      {error && <p role="alert" className="text-[12px] text-danger-text">{error}</p>}
     </section>
   );
 }

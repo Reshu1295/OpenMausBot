@@ -240,7 +240,7 @@ export function SkillReviewDialog({
         >
           {text}
         </pre>
-        {error && <div role="alert" className="mt-2 text-[12px] text-danger">{error}</div>}
+        {error && <div role="alert" className="mt-2 text-[12px] text-danger-text">{error}</div>}
         <div className="mt-4 flex justify-end gap-2">
           <button
             type="button"
@@ -488,7 +488,7 @@ export function SkillsSection({ bot }: { bot: Bot }) {
                       title="Remove skill"
                       disabled={Boolean(working)}
                       onClick={() => void remove(skill)}
-                      className="flex size-8 shrink-0 items-center justify-center rounded-md text-ink-secondary hover:bg-danger/10 hover:text-danger disabled:opacity-40"
+                      className="flex size-8 shrink-0 items-center justify-center rounded-md text-ink-secondary hover:bg-danger/10 hover:text-danger-text disabled:opacity-40"
                     >
                       <Trash2 size={15} />
                     </button>
@@ -507,7 +507,7 @@ export function SkillsSection({ bot }: { bot: Bot }) {
             {staged.length} proposal{staged.length === 1 ? " is" : "s are"} waiting for a decision in chat.
           </div>
         )}
-        {error && <div role="alert" className="mt-2 text-[12px] text-danger">{error}</div>}
+        {error && <div role="alert" className="mt-2 text-[12px] text-danger-text">{error}</div>}
       </div>
 
       <WriteCommandCard bot={bot} taken={skills.map((skill) => skill.name)} onSaved={() => void refresh()} />

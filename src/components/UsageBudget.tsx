@@ -69,7 +69,7 @@ export function BudgetCard({ budget }: { budget: BudgetState | null }) {
       {budget ? (
         <div className="mb-4">
           <div className="mb-1 flex items-baseline justify-between text-[13px]">
-            <span className={cn(tone === "danger" ? "text-danger" : tone === "warning" ? "text-warning" : "text-ink")}>
+            <span className={cn(tone === "danger" ? "text-danger-text" : tone === "warning" ? "text-warning" : "text-ink")}>
               {budget.exceeded ? t("usage.budget.reached") : budget.warn ? t("usage.budget.nearing") : t("usage.budget.within")}
             </span>
             <span className="tabular-nums text-ink-secondary">{t("usage.budget.spent", { spent: formatUsd(budget.spentUsd), cap: formatUsd(budget.monthlyUsd), percent: String(budget.percent) })}</span>
@@ -95,7 +95,7 @@ export function BudgetCard({ budget }: { budget: BudgetState | null }) {
         </button>
       </form>
       <p className="mt-2 text-[12px] leading-relaxed text-ink-secondary">{t("usage.budget.hint")}</p>
-      {error && <p role="alert" className="mt-2 text-[12px] text-danger">{error}</p>}
+      {error && <p role="alert" className="mt-2 text-[12px] text-danger-text">{error}</p>}
     </Card>
   );
 }
@@ -176,7 +176,7 @@ export function PricesCard() {
             <input value={row.input} onChange={(e) => update(index, { input: e.target.value })} inputMode="decimal" aria-label={t("usage.prices.colInput")} disabled={saving} className={cell} />
             <input value={row.output} onChange={(e) => update(index, { output: e.target.value })} inputMode="decimal" aria-label={t("usage.prices.colOutput")} disabled={saving} className={cell} />
             <input value={row.cached} onChange={(e) => update(index, { cached: e.target.value })} inputMode="decimal" placeholder="—" aria-label={t("usage.prices.colCached")} disabled={saving} className={cell} />
-            <button type="button" onClick={() => setRows((current) => current.filter((_, i) => i !== index))} aria-label={t("usage.prices.remove")} disabled={saving} className="rounded-md p-1.5 text-ink-secondary hover:bg-control hover:text-danger disabled:opacity-50"><Trash2 size={13} /></button>
+            <button type="button" onClick={() => setRows((current) => current.filter((_, i) => i !== index))} aria-label={t("usage.prices.remove")} disabled={saving} className="rounded-md p-1.5 text-ink-secondary hover:bg-control hover:text-danger-text disabled:opacity-50"><Trash2 size={13} /></button>
           </div>
         ))}
       </div>
@@ -187,7 +187,7 @@ export function PricesCard() {
         </button>
       </div>
       <p className="mt-2 text-[12px] leading-relaxed text-ink-secondary">{t("usage.prices.hint")}</p>
-      {error && <p role="alert" className="mt-2 text-[12px] text-danger">{error}</p>}
+      {error && <p role="alert" className="mt-2 text-[12px] text-danger-text">{error}</p>}
     </Card>
   );
 }

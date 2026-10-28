@@ -461,7 +461,7 @@ export function MemorySection({ bot, active = true, onToggle }: { bot: Bot; acti
       </div>
 
       {notice && <div className="text-[13px] text-ink-secondary">{notice}</div>}
-      {error && <div className="text-[13px] text-danger">{error}</div>}
+      {error && <div className="text-[13px] text-danger-text">{error}</div>}
     </div>
   );
 }
@@ -504,7 +504,7 @@ export function MemoryUpkeepCard({
             {status && !status.modelSteps && (
               <p className="mt-1 text-[13px] leading-relaxed text-ink-secondary">{t("memory.learnFromRooms.noModelSteps")}</p>
             )}
-            {rooms.error && <p role="alert" className="mt-1 text-[13px] text-danger">{rooms.error}</p>}
+            {rooms.error && <p role="alert" className="mt-1 text-[13px] text-danger-text">{rooms.error}</p>}
           </div>
           <Switch
             checked={rooms.enabled}
@@ -540,13 +540,13 @@ export function MemoryGauge({ index }: { index: MemoryCapacity }) {
     <div className={cn("rounded-xl p-4", status.level === "over" ? "border border-danger/30 bg-danger/10" : "bg-card")}>
       <div className="flex items-center justify-between gap-3 text-[13px]">
         <span className="font-medium text-ink">{t("memory.capacity.title")}</span>
-        <span className={cn("text-[12px]", status.level === "over" ? "text-danger" : "text-ink-secondary")}>
+        <span className={cn("text-[12px]", status.level === "over" ? "text-danger-text" : "text-ink-secondary")}>
           {index.lines} / {index.maxLines} lines · {formatBytes(index.bytes)} / {formatBytes(index.maxBytes)}
         </span>
       </div>
       <GaugeBar label={t("memory.capacity.lines")} share={status.lineShare} fill={fill} />
       <GaugeBar label={t("memory.capacity.size")} share={status.byteShare} fill={fill} />
-      <p className={cn("mt-2 text-[13px] leading-relaxed", status.level === "over" ? "text-danger" : "text-ink-secondary")}>
+      <p className={cn("mt-2 text-[13px] leading-relaxed", status.level === "over" ? "text-danger-text" : "text-ink-secondary")}>
           {status.warning ?? t("memory.capacity.sentence", { lines: index.lines, maxLines: index.maxLines, bytes: formatBytes(index.bytes), maxBytes: formatBytes(index.maxBytes), maxLoaded: index.maxLines })}
       </p>
       {status.warning && <p className="mt-1 text-[12px] text-ink-secondary">{t("memory.capacity.sentence", { lines: index.lines, maxLines: index.maxLines, bytes: formatBytes(index.bytes), maxBytes: formatBytes(index.maxBytes), maxLoaded: index.maxLines })}</p>}
@@ -645,7 +645,7 @@ export function MemoryFileRows({
                 onClick={() => onDelete(file)}
                 aria-label={t("memory.deleteFile", { name: file.name })}
                 title={t("memory.delete")}
-                className="shrink-0 rounded-md p-1 text-ink-secondary hover:bg-control hover:text-danger"
+                className="shrink-0 rounded-md p-1 text-ink-secondary hover:bg-control hover:text-danger-text"
               >
                 <Trash2 size={14} />
               </button>

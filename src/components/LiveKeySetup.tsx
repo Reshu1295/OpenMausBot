@@ -59,7 +59,7 @@ export function LiveKeySetup({ onSaved, compact = false }: { onSaved: () => void
         aria-label={t("call.live.keyField")}
         className="rounded-lg border border-hairline bg-inset px-3 py-2 text-[13px] text-ink outline-none focus:border-accent/60"
       />
-      {error && <div className="text-[12px] text-danger">{error}</div>}
+      {error && <div className="text-[12px] text-danger-text">{error}</div>}
       <button
         type="submit"
         disabled={!key.trim() || saving}

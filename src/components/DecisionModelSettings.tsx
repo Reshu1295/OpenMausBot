@@ -311,7 +311,7 @@ export function DecisionModelSettings() {
             title={clearing ? t("keys.removeKey") : t("common.save")}
             className={cn(
               "flex w-[72px] shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-control py-2 text-[13px] hover:bg-raised-hover disabled:cursor-not-allowed disabled:opacity-50",
-              clearing ? "text-danger" : "text-ink",
+              clearing ? "text-danger-text" : "text-ink",
             )}
           >
             {saving ? <Loader2 size={13} className="animate-spin" /> : clearing ? t("keys.clear") : <><Check size={13} />{t("common.save")}</>}
@@ -326,8 +326,8 @@ export function DecisionModelSettings() {
             {testing ? t("keys.testing") : t("keys.test")}
           </button>
         </div>
-        {error && <p role="alert" className="mt-1 text-[12px] text-danger">{error}</p>}
-        {verdict && <p role="status" className={cn("mt-1 text-[12px]", verdict.ok ? "text-success" : "text-danger")}>{verdict.text}</p>}
+        {error && <p role="alert" className="mt-1 text-[12px] text-danger-text">{error}</p>}
+        {verdict && <p role="status" className={cn("mt-1 text-[12px]", verdict.ok ? "text-success" : "text-danger-text")}>{verdict.text}</p>}
         {!usingShared && (
           <a
             href={KEY_URL[provider]}

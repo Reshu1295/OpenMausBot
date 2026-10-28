@@ -86,7 +86,7 @@ export function RoomWorkingFolder({ group, heading = true }: { group: Group; hea
           </button>
         </form>
       )}
-      {error && <div className="mt-2 text-[12px] text-danger">{error}</div>}
+      {error && <div className="mt-2 text-[12px] text-danger-text">{error}</div>}
     </div>
   );
 }

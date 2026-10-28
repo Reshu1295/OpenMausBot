@@ -116,7 +116,7 @@ export function SectionPicker({
           <div role="separator" className={MENU_ITEM_SEPARATOR} />
           <button
             onClick={() => assign("")}
-            className={cn(MENU_ITEM, "text-danger hover:bg-menu-hover")}
+            className={cn(MENU_ITEM, "text-danger-text hover:bg-menu-hover")}
           >
             <FolderMinus size={16} />
             {t("sidebar.section.removeFromContext")}

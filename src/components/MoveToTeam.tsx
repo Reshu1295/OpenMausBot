@@ -64,7 +64,7 @@ export function useMoveToTeam({ blocked }: { blocked: (bot: Bot) => string | und
         <span>{t("teamMove.goes", names)}</span>
         <span>{t("teamMove.private", names)}</span>
         <span>{t("teamMove.stays", names)}</span>
-        {error && <span role="alert" className="text-danger">{error}</span>}
+        {error && <span role="alert" className="text-danger-text">{error}</span>}
       </span>}
       confirmLabel={t("teamMove.confirm", names)}
       pending={sending}

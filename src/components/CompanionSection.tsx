@@ -255,7 +255,7 @@ export function CompanionSection({ profileEmail = "", focusRequest = 0 }: { prof
                           disabled={c.busy}
                           onClick={() => void c.act((companion) => companion.revoke(device.id))}
                           aria-label={t("remote.devices.remove", { name: device.name })}
-                          className="shrink-0 rounded p-1.5 text-ink-secondary hover:bg-control hover:text-danger disabled:opacity-40"
+                          className="shrink-0 rounded p-1.5 text-ink-secondary hover:bg-control hover:text-danger-text disabled:opacity-40"
                         >
                           <Trash2 size={14} />
                         </button>
@@ -396,7 +396,7 @@ export function CompanionSection({ profileEmail = "", focusRequest = 0 }: { prof
                 {c.accountBusy ? t("remote.account.retrying") : t("remote.account.retry")}
               </button>
             )}
-            {accountActionError && <div className="mt-2 text-[12px] text-danger">{accountActionError}</div>}
+            {accountActionError && <div className="mt-2 text-[12px] text-danger-text">{accountActionError}</div>}
           </div>
 
           <div className="border-t border-hairline/30 pt-4">
@@ -437,7 +437,7 @@ export function CompanionSection({ profileEmail = "", focusRequest = 0 }: { prof
               {t("remote.localOnly")}
             </div>
           )}
-          {(c.error || state.error) && <div className="text-[12px] text-danger">{c.error ?? state.error}</div>}
+          {(c.error || state.error) && <div className="text-[12px] text-danger-text">{c.error ?? state.error}</div>}
         </div>
       </details>
     </div>

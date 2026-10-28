@@ -71,7 +71,7 @@ export function CommandRow({
     if (result !== "empty") settle(result);
   };
   const copyIcon = (size: number) => status === "copied" ? <Check size={size} className="text-success" />
-    : status === "failed" ? <X size={size} className="text-danger" /> : <Copy size={size} />;
+    : status === "failed" ? <X size={size} className="text-danger-text" /> : <Copy size={size} />;
 
   const openTerminal = async () => {
     const opened = await window.ogb!.openInstallTerminal!(command);
@@ -203,7 +203,7 @@ function ServerEngineInstall({ instance, mode, command, quiet = false }: { insta
           : t(mode === "update" ? "engineSetup.serverUpdate" : "engineSetup.serverInstall", { name: instance.displayName })}
       </button>
       {done && !busy && <p role="status" className="text-center text-[11px] text-success">{t("engineSetup.installVerified")}</p>}
-      {error && <p role="alert" className="whitespace-pre-wrap text-[12px] leading-relaxed text-danger">{error}</p>}
+      {error && <p role="alert" className="whitespace-pre-wrap text-[12px] leading-relaxed text-danger-text">{error}</p>}
       {command && (
         <details className="rounded-lg border border-hairline/50 bg-app px-2.5 py-2 text-[12px] text-ink-secondary">
           <summary className="cursor-pointer select-none">{t("engineSetup.preferTerminal")}</summary>
@@ -342,7 +342,7 @@ function ManagedEngineSetup({ instance, signInOnly }: { instance: InstanceInfo; 
         <p className="mt-1.5 text-center text-[11px] text-ink-tertiary">
           {t("engineSetup.downloadNote", { mb: Math.ceil(managed.downloadBytes / 1024 / 1024) })}
         </p>
-        {error && <p className="mt-2 text-[12px] text-danger">{error}</p>}
+        {error && <p className="mt-2 text-[12px] text-danger-text">{error}</p>}
       </div>
     );
   }
@@ -388,7 +388,7 @@ function ManagedEngineSetup({ instance, signInOnly }: { instance: InstanceInfo; 
           </details>
         </>
       )}
-      {error && <p className="text-[12px] text-danger">{error}</p>}
+      {error && <p className="text-[12px] text-danger-text">{error}</p>}
     </div>
   );
 }
@@ -463,7 +463,7 @@ function ApiKeyEngineSetup({ instance, className, unframed, configured = false }
       {/* An API-only engine is available only with a saved key, so unauthenticated means rejected.
           A key engine with its own CLI (DeepSeek Harness) is unauthenticated simply when no key is saved yet. */}
       {!inline && isApiKeyEngine(instance) && needsSignIn(instance) && (
-        <p role="alert" className="mt-2 text-[12px] leading-relaxed text-danger">{t("engineSetup.apiKey.rejected")}</p>
+        <p role="alert" className="mt-2 text-[12px] leading-relaxed text-danger-text">{t("engineSetup.apiKey.rejected")}</p>
       )}
       {inline ? <KeyRow id={inline} bare via="model_picker" rejected={isApiKeyEngine(instance) && needsSignIn(instance)} className="mt-2 px-0 pb-0" /> : !remote && (
         <button
@@ -570,7 +570,7 @@ export function EngineSetup({
           <p className="mt-1 whitespace-pre-wrap">{instance.snapshot.reason}</p>
         </details>
       ) : (
-        <p role="alert" className="mt-2 text-[12px] leading-relaxed text-danger">
+        <p role="alert" className="mt-2 text-[12px] leading-relaxed text-danger-text">
           {instance.snapshot.reason}
         </p>
       ))}

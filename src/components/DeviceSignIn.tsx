@@ -86,7 +86,7 @@ export function DeviceSignInProgress({ auth, browserPkce = false, provider = "co
   }
 
   if (!link || (!browserPkce && !isDeviceSignInCode(provider, auth.userCode))) {
-    return <p role="alert" className="text-[12px] text-danger">{t(browserPkce ? "engineSetup.chatgpt.invalidChallenge" : copy.invalidChallenge)}</p>;
+    return <p role="alert" className="text-[12px] text-danger-text">{t(browserPkce ? "engineSetup.chatgpt.invalidChallenge" : copy.invalidChallenge)}</p>;
   }
 
   return (
@@ -101,7 +101,7 @@ export function DeviceSignInProgress({ auth, browserPkce = false, provider = "co
           onClick={copyCode}
           className="rounded-md p-2 text-ink-secondary hover:bg-control hover:text-ink"
         >
-          {codeCopy === "copied" ? <Check size={15} className="text-success" /> : codeCopy === "failed" ? <X size={15} className="text-danger" /> : <Copy size={15} />}
+          {codeCopy === "copied" ? <Check size={15} className="text-success" /> : codeCopy === "failed" ? <X size={15} className="text-danger-text" /> : <Copy size={15} />}
         </button>
       </div></>}
       <a href={link} target="_blank" rel="noopener noreferrer" onClick={(event) => {
@@ -232,7 +232,7 @@ export function DeviceSignIn({ instanceId, browserPkce = false, provider = "code
           {startLabel}
         </button>
       )}
-      {error && <p role="alert" className="text-[12px] text-danger">{error}</p>}
+      {error && <p role="alert" className="text-[12px] text-danger-text">{error}</p>}
       {!browserPkce && provider === "codex" && <p className="text-[11px] leading-relaxed text-ink-secondary">{t("engineSetup.device.enableHint")}</p>}
     </div>
   );

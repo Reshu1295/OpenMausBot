@@ -76,7 +76,7 @@ export function SavedCompanyBackupSchedule({ bridge }: { bridge: BackupBridge })
         <Switch aria-label={t("companyBackup.daily")} checked disabled={busy} onClick={() => void turnOff()} />
       </div>
       <p role="status" className="mt-2 text-[12px] text-ink-secondary">{t(`companyBackup.scheduleStatus.${schedule.status}`)}</p>
-      {error && <p role="alert" className="mt-1 text-[12px] text-danger">{error}</p>}
+      {error && <p role="alert" className="mt-1 text-[12px] text-danger-text">{error}</p>}
     </div>
   </Card>;
 }
@@ -264,11 +264,11 @@ export function ConnectedCompanyBackupSettings({ connection, bridge }: { connect
         {listing && ready.length === 0 && <p className="text-[13px] text-ink-secondary">{t("companyBackup.empty")}</p>}
         <ul className="divide-y divide-hairline/40">{ready.map((entry) => <li key={entry.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
           <div className="min-w-0 text-[13px]"><div className="text-ink">{dateLabel(entry)}</div><div className="text-[12px] text-ink-secondary">{bytes(entry.sizeBytes)}{entry.appVersion ? ` · ${entry.appVersion}` : ""}</div><code className="break-all text-[11px] text-ink-secondary">{entry.id}</code></div>
-          <div className="flex flex-wrap gap-2"><button type="button" className="ui-button" disabled={disabled} onClick={() => openDialog({ kind: "restore", entry })}>{t("companyBackup.restore")}</button><button type="button" className="ui-button text-danger" disabled={disabled} onClick={() => openDialog({ kind: "delete", entry })}>{t("companyBackup.delete")}</button></div>
+          <div className="flex flex-wrap gap-2"><button type="button" className="ui-button" disabled={disabled} onClick={() => openDialog({ kind: "restore", entry })}>{t("companyBackup.restore")}</button><button type="button" className="ui-button text-danger-text" disabled={disabled} onClick={() => openDialog({ kind: "delete", entry })}>{t("companyBackup.delete")}</button></div>
         </li>)}</ul>
       </>}
       {!dialog && busyView}
-      {!dialog && statusMessage && <p role="alert" className="break-words text-[13px] text-danger">{statusMessage}</p>}
+      {!dialog && statusMessage && <p role="alert" className="break-words text-[13px] text-danger-text">{statusMessage}</p>}
     </div>
     {dialog && <dialog ref={nativeDialog} aria-labelledby="company-backup-dialog-title" onKeyDown={(event) => {
       // The enclosing Settings dialog has its own window-level keyboard trap.
@@ -291,17 +291,17 @@ export function ConnectedCompanyBackupSettings({ connection, bridge }: { connect
           <button type="submit" className="ui-button" disabled={disabled || (dialog.entry.passwordRequired !== false && (password.length < 12 || password.length > 1024))}>{t("backup.validate")}</button>
         </form> : <>
           <WorkspaceBackupSummaryView summary={preview.summary} />
-          <p className="text-[13px] text-danger">{t("backup.replaceWarning")}</p><p className="text-[13px] text-danger">{t("backup.trustWarning")}</p>
+          <p className="text-[13px] text-danger-text">{t("backup.replaceWarning")}</p><p className="text-[13px] text-danger-text">{t("backup.trustWarning")}</p>
           <label className="text-[13px]">{t("backup.confirmReplace")}<input autoComplete="off" spellCheck={false} maxLength={7} disabled={disabled} value={confirmation} onChange={(event) => setConfirmation(event.target.value)} className={inputClass} /></label>
-          <button type="button" className="ui-button text-danger" disabled={disabled || confirmation !== "REPLACE"} onClick={restore}>{t("backup.replace")}</button>
+          <button type="button" className="ui-button text-danger-text" disabled={disabled || confirmation !== "REPLACE"} onClick={restore}>{t("backup.replace")}</button>
         </>)}
         {dialog.kind === "delete" && <>
-          <p className="text-[13px] text-danger">{t("companyBackup.deleteWarning")}</p>
+          <p className="text-[13px] text-danger-text">{t("companyBackup.deleteWarning")}</p>
           <label className="text-[13px]">{t("companyBackup.confirmDelete")}<input autoComplete="off" spellCheck={false} maxLength={6} disabled={disabled} value={confirmation} onChange={(event) => setConfirmation(event.target.value)} className={inputClass} /></label>
-          <button type="button" className="ui-button text-danger" disabled={disabled || confirmation !== "DELETE"} onClick={deleteBackup}>{t("companyBackup.delete")}</button>
+          <button type="button" className="ui-button text-danger-text" disabled={disabled || confirmation !== "DELETE"} onClick={deleteBackup}>{t("companyBackup.delete")}</button>
         </>}
         {busyView}
-        {statusMessage && <p role="alert" className="break-words text-[13px] text-danger">{statusMessage}</p>}
+        {statusMessage && <p role="alert" className="break-words text-[13px] text-danger-text">{statusMessage}</p>}
         <button type="button" autoFocus className="ui-button w-fit" disabled={action !== null} onClick={closeDialog}>{t("companyBackup.cancel")}</button>
       </div>
     </dialog>}

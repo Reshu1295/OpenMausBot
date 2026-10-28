@@ -199,7 +199,7 @@ export function NewBotDialog({ defaultsMode = false, onClose, onCreated, readyBo
           </fieldset>}
         </div>
       </div>
-      {error && <p role="alert" className="max-h-24 overflow-y-auto border-t border-hairline/40 px-5 py-3 text-[13px] text-danger">{error}</p>}
+      {error && <p role="alert" className="max-h-24 overflow-y-auto border-t border-hairline/40 px-5 py-3 text-[13px] text-danger-text">{error}</p>}
       <div className="flex shrink-0 justify-end gap-2 border-t border-hairline/40 px-5 py-3">
         <button type="button" onClick={() => closeRef.current()} className="rounded-lg px-4 py-2 text-[13px] text-ink-secondary hover:bg-control">{t("common.cancel")}</button>
         <button type="button" disabled={!ready || saving || (!defaultsMode && !bot.name.trim())} onClick={() => void save()}
@@ -320,7 +320,7 @@ function StartingRole({ draft, defaultsMode }: { draft: BotCreationDraft; defaul
       {chosen.source === "file" && <button type="button" onClick={() => void remove(chosen)}
         className="mt-1 rounded-md px-2 py-1 text-[12px] text-ink-secondary hover:bg-control hover:text-ink">{t("newBot.presetRemove")}</button>}
     </div>}
-    {error && <p role="alert" className="mt-2 text-[13px] text-danger">{error}</p>}
+    {error && <p role="alert" className="mt-2 text-[13px] text-danger-text">{error}</p>}
   </div>;
 }
 

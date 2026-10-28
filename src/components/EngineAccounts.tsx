@@ -110,7 +110,7 @@ function AccountMenu({ group, instance, onRename }: { group: AccountGroup; insta
     <div ref={menuRef} className="relative flex items-center gap-1">
       {canRemove && <button type="button" disabled={busy || usedBy > 0} onClick={() => setConfirm("remove")}
         title={usedBy > 0 ? t("accounts.inUse", { count: String(usedBy) }) : undefined}
-        className="rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-danger hover:bg-danger/10 disabled:cursor-not-allowed disabled:opacity-50">
+        className="rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-danger-text hover:bg-danger/10 disabled:cursor-not-allowed disabled:opacity-50">
         {t("accounts.remove")}
       </button>}
       <button type="button" onClick={() => setOpen((value) => !value)} disabled={busy} aria-haspopup="menu" aria-expanded={open}
@@ -125,7 +125,7 @@ function AccountMenu({ group, instance, onRename }: { group: AccountGroup; insta
           {canRemove && usedBy > 0 && <p className="px-3 pb-1 pt-0.5 text-[11px] leading-snug text-ink-secondary">{t("accounts.inUse", { count: String(usedBy) })}</p>}
         </div>
       )}
-      {error && <p role="alert" className="absolute right-0 top-full z-30 mt-1 w-[260px] rounded-lg bg-card p-2 text-[12px] text-danger shadow-lg">{error}</p>}
+      {error && <p role="alert" className="absolute right-0 top-full z-30 mt-1 w-[260px] rounded-lg bg-card p-2 text-[12px] text-danger-text shadow-lg">{error}</p>}
       <ConfirmDialog
         open={confirm === "signOut"}
         title={t("accounts.signOutTitle", { name: instance.displayName })}
@@ -179,7 +179,7 @@ function RenameForm({ instance, onDone }: { instance: InstanceInfo; onDone: () =
         </button>
         <button type="button" onClick={onDone} disabled={saving} className="rounded-lg px-2.5 py-1.5 text-[12px] text-ink-secondary hover:bg-control">{t("common.cancel")}</button>
       </div>
-      {error && <p role="alert" className="text-[12px] text-danger">{error}</p>}
+      {error && <p role="alert" className="text-[12px] text-danger-text">{error}</p>}
     </form>
   );
 }
@@ -304,7 +304,7 @@ export function AddAccount({ label, endpoint, extra, folder: offerFolder = false
           <p className="mt-1 leading-relaxed">{t("accounts.folderHint")}</p>
         </details>
       )}
-      {error && <p role="alert" className="text-[12px] text-danger">{error}</p>}
+      {error && <p role="alert" className="text-[12px] text-danger-text">{error}</p>}
       <div className="flex justify-end gap-2">
         <button type="button" onClick={() => { setOpen(false); setError(null); }} disabled={saving} className="rounded-lg px-3 py-1.5 text-[12px] text-ink-secondary hover:bg-control disabled:opacity-50">{t("common.cancel")}</button>
         <button type="submit" disabled={saving || !name.trim()} className="flex items-center gap-1.5 rounded-lg bg-accent px-3 py-1.5 text-[12px] font-semibold text-white hover:brightness-110 disabled:opacity-50">

@@ -22,7 +22,7 @@ const COPY = {
   "limit-reached": { label: "Turn limit reached", tone: "text-warning", border: "border-warning/35" },
   paused: { label: "Paused", tone: "text-warning", border: "border-warning/35" },
   stopped: { label: "Stopped", tone: "text-ink-secondary", border: "border-hairline/45" },
-  failed: { label: "Failed", tone: "text-danger", border: "border-danger/35" },
+  failed: { label: "Failed", tone: "text-danger-text", border: "border-danger/35" },
 } satisfies Record<
   GroupGoalRunCardData["status"],
   { label: string; tone: string; border: string }
@@ -49,7 +49,7 @@ function StatusIcon({ status }: { status: GroupGoalRunCardData["status"] }) {
     case "stopped":
       return <Square aria-hidden="true" className={cn(className, "text-ink-secondary")} />;
     case "failed":
-      return <XCircle aria-hidden="true" className={cn(className, "text-danger")} />;
+      return <XCircle aria-hidden="true" className={cn(className, "text-danger-text")} />;
   }
 }
 

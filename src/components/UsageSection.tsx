@@ -162,7 +162,7 @@ export function RunRow({ root, onOpen }: { root: TraceRootSummary; onOpen: () =>
         </span>
         <span className="flex items-center gap-3 text-[13px] tabular-nums text-ink-secondary">
           {root.running && <LiveBadge />}
-          {root.errors > 0 && <span className="rounded-md bg-danger/12 px-1.5 py-0.5 text-[12px] font-medium text-danger">{t("trace.groupErrors", { count: String(root.errors) })}</span>}
+          {root.errors > 0 && <span className="rounded-md bg-danger/12 px-1.5 py-0.5 text-[12px] font-medium text-danger-text">{t("trace.groupErrors", { count: String(root.errors) })}</span>}
           {root.timed ? <span className="hidden min-w-[3.5rem] text-right sm:inline">{formatDuration(root.durationMs)}</span>
             : <span className="hidden rounded bg-raised px-1.5 text-[11px] sm:inline">{t("trace.notTimed")}</span>}
           <span className="min-w-[3.5rem] text-right text-ink">{formatCost(root.costUsd)}</span>
@@ -222,7 +222,7 @@ export function UsageSection() {
           </a>
         </div>
       </div>
-      {error && <p role="alert" className="text-[12px] text-danger">{error}</p>}
+      {error && <p role="alert" className="text-[12px] text-danger-text">{error}</p>}
       {open ? (
         <TraceView id={open.id} at={open.at} actions={(
           <button type="button" onClick={() => setOpen(null)} className="flex shrink-0 items-center gap-1 rounded-lg px-2 py-1 text-[13px] text-ink-secondary hover:bg-raised hover:text-ink">

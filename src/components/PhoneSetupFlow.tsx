@@ -923,7 +923,7 @@ export function PhoneSetupFlowView({ controller }: { controller: PhoneSetupContr
         >
           {c.state?.devices.length ? t("phone.intro.pairAnother") : t("phone.intro.pair")}
         </button>
-        {c.error && <p role="alert" className="mt-3 max-w-[390px] text-[13px] text-danger">{c.error}</p>}
+        {c.error && <p role="alert" className="mt-3 max-w-[390px] text-[13px] text-danger-text">{c.error}</p>}
       </div>
     );
   }
@@ -1022,7 +1022,7 @@ export function PhoneSetupFlowView({ controller }: { controller: PhoneSetupContr
             {c.accountBusy ? t("remote.account.retrying") : t("phone.signIn.retry")}
           </button>
         )}
-        {actionError && <p role="alert" className="mt-3 text-[13px] text-danger">{actionError}</p>}
+        {actionError && <p role="alert" className="mt-3 text-[13px] text-danger-text">{actionError}</p>}
         <div className="my-4 flex items-center gap-3 text-[11px] text-ink-secondary">
           <span className="h-px flex-1 bg-hairline/40" /> {t("phone.signIn.or")} <span className="h-px flex-1 bg-hairline/40" />
         </div>
@@ -1061,7 +1061,7 @@ export function PhoneSetupFlowView({ controller }: { controller: PhoneSetupContr
             : t("phone.verifying.secureDetail")}
         </p>
         {(c.error || c.accountError) && (
-          <p role="alert" className="mt-3 max-w-[380px] text-[13px] text-danger">{c.error ?? c.accountError}</p>
+          <p role="alert" className="mt-3 max-w-[380px] text-[13px] text-danger-text">{c.error ?? c.accountError}</p>
         )}
         <button onClick={c.cancel} className="mt-5 text-[12px] text-ink-secondary hover:text-ink">{t("common.cancel")}</button>
       </div>

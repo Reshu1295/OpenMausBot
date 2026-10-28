@@ -161,7 +161,7 @@ export function OrganisationRow({
         {connection.message && (
           <p role="status" className="text-[12px] text-ink-secondary">{connection.message}</p>
         )}
-        {failed && <p role="alert" className="text-[12px] text-danger">{t("organization.actionFailed")}</p>}
+        {failed && <p role="alert" className="text-[12px] text-danger-text">{t("organization.actionFailed")}</p>}
       </div>
       {action}
     </div>

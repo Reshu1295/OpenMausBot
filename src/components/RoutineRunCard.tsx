@@ -15,9 +15,9 @@ const COPY = {
   running: { label: "Running", tone: "text-accent-text" },
   waiting: { label: "Waiting", tone: "text-warning" },
   completed: { label: "Completed", tone: "text-ink-secondary" },
-  failed: { label: "Failed", tone: "text-danger" },
+  failed: { label: "Failed", tone: "text-danger-text" },
   cancelled: { label: "Cancelled", tone: "text-ink-secondary" },
-  missed: { label: "Missed", tone: "text-danger" },
+  missed: { label: "Missed", tone: "text-danger-text" },
 } satisfies Record<
   RoutineRunCardData["status"],
   { label: string; tone: string }
@@ -26,7 +26,7 @@ const COPY = {
 const GOAL_COPY = {
   completed: COPY.completed,
   "needs-input": { label: "Needs your input", tone: "text-warning" },
-  blocked: { label: "Blocked", tone: "text-danger" },
+  blocked: { label: "Blocked", tone: "text-danger-text" },
   "limit-reached": { label: "Turn limit reached", tone: "text-warning" },
   paused: { label: "Paused", tone: "text-warning" },
   stopped: { label: "Stopped", tone: "text-ink-secondary" },
@@ -147,7 +147,7 @@ export function AutomationCaption({ message, line, botId }: { message: Message; 
   const canOpen = state.bots.some((bot) => bot.threadId === line.executionThreadId || hasRoutineExecutionTask(bot.tasks, line.executionThreadId));
   const asking = line.needsYou === true && (message.card ? liveCardKind(message.card) !== null : line.copyOf !== undefined ||
     !state.bots.find((bot) => bot.id === botId)?.messages.some((later) => later.role === "user" && later.at > message.at));
-  const tone = line.failed ? "text-danger" : asking ? "text-warning" : "text-accent-text";
+  const tone = line.failed ? "text-danger-text" : asking ? "text-warning" : "text-accent-text";
   return (
     <div data-automation-caption={line.runId} className="-mb-2 flex min-w-0 items-center gap-1.5 pl-0.5 text-[11px] text-ink-tertiary">
       <Zap aria-hidden="true" size={12} className={cn("shrink-0", tone)} />

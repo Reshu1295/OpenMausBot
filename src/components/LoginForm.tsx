@@ -89,7 +89,7 @@ export function LoginForm({
       <p className="flex items-start gap-1 text-[12px] leading-snug text-ink-tertiary">
         <LockKeyhole size={11} aria-hidden="true" className="mt-[3px] shrink-0" /> {t("logins.private")}
       </p>
-      {error && <p role="alert" className="text-[12px] text-danger">{error}</p>}
+      {error && <p role="alert" className="text-[12px] text-danger-text">{error}</p>}
       <div className="flex flex-wrap justify-end gap-2">
         {onCancel && (
           <button type="button" onClick={onCancel} disabled={pending} className="ui-button ui-button-md">{t("logins.cancel")}</button>

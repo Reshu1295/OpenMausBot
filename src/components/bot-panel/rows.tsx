@@ -129,7 +129,7 @@ export function NavRow({ title, hint, value, icon, onClick, drill = true, danger
     >
       {icon && <RowIcon icon={icon} />}
       <div className="min-w-0 flex-1">
-        <div className={cn(titleCls, danger && "text-danger")}>{title}</div>
+        <div className={cn(titleCls, danger && "text-danger-text")}>{title}</div>
         {hint && <div className={hintCls}>{hint}</div>}
       </div>
       {value !== undefined && value !== null && value !== "" && (

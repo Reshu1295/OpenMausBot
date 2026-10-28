@@ -309,7 +309,7 @@ export function ShareTeamDialog({ team, onClose }: { team: string; onClose: () =
           </div>
         )}
 
-        {error && <p role="alert" className="mx-6 mb-2 rounded-lg bg-danger/10 px-3 py-2 text-[13px] text-danger">{error}</p>}
+        {error && <p role="alert" className="mx-6 mb-2 rounded-lg bg-danger/10 px-3 py-2 text-[13px] text-danger-text">{error}</p>}
         <footer className="flex justify-end gap-2 border-t border-hairline/35 px-6 py-3">
           {saved ? (
             <button onClick={onClose} className="rounded-lg bg-accent px-4 py-2 text-[13px] font-medium text-white">{t("teamShare.done")}</button>

@@ -92,7 +92,7 @@ export function SignInRequestCard({
         ariaLabel={t("signIn.title")}
         icon={outcome === "cancelled" ? <X size={13} className="text-ink-tertiary" /> : card.resumed || stopped ? undefined : error ? <LogIn size={13} /> : <Loader2 size={13} className="animate-spin" />}
         action={retry}
-        detail={error && <p role="alert" className="ms-[19px] mt-1 text-[12px] text-danger">{error}</p>}
+        detail={error && <p role="alert" className="ms-[19px] mt-1 text-[12px] text-danger-text">{error}</p>}
       >
         <span className="text-ink-secondary">{card.savedLogin
           ? t("signIn.settled.saved", { site: card.savedLogin })
@@ -169,7 +169,7 @@ export function SignInRequestCard({
           <LockKeyhole size={11} aria-hidden="true" /> {t("signIn.private")}
         </p>
       )}
-      {error && <p role="alert" className="mt-2 text-[12px] text-danger">{error}</p>}
+      {error && <p role="alert" className="mt-2 text-[12px] text-danger-text">{error}</p>}
     </AskCard>
   );
 }

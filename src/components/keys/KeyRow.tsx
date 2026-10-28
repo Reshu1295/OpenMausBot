@@ -29,8 +29,8 @@ export function KeyStatusChip({ status }: { status: KeyStatus }) {
     <span aria-live="polite" className="flex min-h-5 shrink-0 items-center gap-1 text-[12px] leading-5 text-ink-secondary">
       {status?.tone === "busy" && <Loader2 size={12} aria-hidden="true" className="animate-spin" />}
       {status?.tone === "ok" && <Check size={13} aria-hidden="true" className="text-success" />}
-      {status?.tone === "bad" && <CircleAlert size={13} aria-hidden="true" className="text-danger" />}
-      {status && <span className={cn(status.tone === "bad" && "text-danger")}>{status.text}</span>}
+      {status?.tone === "bad" && <CircleAlert size={13} aria-hidden="true" className="text-danger-text" />}
+      {status && <span className={cn(status.tone === "bad" && "text-danger-text")}>{status.text}</span>}
     </span>
   );
 }
@@ -332,9 +332,9 @@ export function KeyRow({
         )}
         {(notice || failure || other || warning || note || verdict || (fieldShown && target.href) || (!fieldShown && saved.configured && target.test)) && (
           <div className="flex flex-col gap-1.5 text-[12px] leading-4">
-            {notice && <p role="alert" className="text-danger">{notice}</p>}
+            {notice && <p role="alert" className="text-danger-text">{notice}</p>}
             {failure && (
-              <p role="alert" className="flex gap-1.5 text-danger">
+              <p role="alert" className="flex gap-1.5 text-danger-text">
                 <CircleAlert size={13} aria-hidden="true" className="mt-px shrink-0" />
                 <span>{t("keys.row.failed", { reason: failure })}</span>
               </p>

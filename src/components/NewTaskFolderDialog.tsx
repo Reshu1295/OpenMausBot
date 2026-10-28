@@ -47,7 +47,7 @@ export function NewTaskFolderDialog({ bot, onClose, onReturnFocus }: { bot: Bot;
             onChange={(event) => { setCwd(event.target.value); setError(null); }} placeholder={t("task.folder.placeholder")}
             className="mt-1 w-full rounded-lg border border-hairline/50 bg-inset px-3 py-2 font-mono text-[13px] text-ink focus:border-focus focus:outline-none" />
         </label>
-        {error && <p role="alert" className="mt-2 text-[12px] text-danger">{error}</p>}
+        {error && <p role="alert" className="mt-2 text-[12px] text-danger-text">{error}</p>}
         <div className="mt-5 flex justify-end gap-2">
           <button type="button" disabled={saving} onClick={close} className="rounded-lg px-3 py-2 text-[13px] text-ink-secondary hover:bg-raised disabled:opacity-40">{t("common.cancel")}</button>
           <button type="submit" disabled={saving || !cwd.trim()} className="rounded-lg bg-accent px-3 py-2 text-[13px] font-medium text-white disabled:opacity-40">{t(saving ? "task.folder.creating" : "task.newShort")}</button>

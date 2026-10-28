@@ -465,7 +465,7 @@ function RoomContextMenu({
           onClose();
           onDelete(group.id);
         }}
-        className={cn(MENU_ITEM, "text-danger hover:bg-menu-hover")}
+        className={cn(MENU_ITEM, "text-danger-text hover:bg-menu-hover")}
       >
         <Trash2 size={16} />
         {isBotChat ? t("sidebar.room.deleteChat") : t("sidebar.room.deleteChannel")}
@@ -651,9 +651,9 @@ export function BotThreadList({ bot, selected, density, query, pendingQueued, re
           </div>}
         </div>;
       })}
-      {reorderError && <p role="alert" className="px-2.5 py-1 text-[12px] text-danger">{reorderError}</p>}
+      {reorderError && <p role="alert" className="px-2.5 py-1 text-[12px] text-danger-text">{reorderError}</p>}
       <span role="status" className="sr-only">{reorderStatus}</span>
-      {readError && <p role="alert" className="px-2.5 py-1 text-[12px] text-danger">{readError}</p>}
+      {readError && <p role="alert" className="px-2.5 py-1 text-[12px] text-danger-text">{readError}</p>}
       <span role="status" className="sr-only">{readStatus}</span>
       {projects.length > 0 && ungrouped.length > 0 && <div className="pl-6 pr-3 pb-1 pt-2 text-[11px] text-ink-tertiary">{t("task.list")}</div>}
       {ungrouped.map(renderThread)}
@@ -1914,7 +1914,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
             className={cn(
               "fixed bottom-4 left-4 z-[60] max-w-[300px] rounded-xl border px-3.5 py-2.5 text-[13px] shadow-xl",
               teamFeedback.error
-                ? "border-danger/30 bg-card text-danger"
+                ? "border-danger/30 bg-card text-danger-text"
                 : "border-hairline/50 bg-card text-ink",
             )}
           >

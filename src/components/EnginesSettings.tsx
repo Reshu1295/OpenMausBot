@@ -136,7 +136,7 @@ function CustomPicker({ instance, cliDefault, onClose, onSaved }: {
       {probe?.ok && probe.version && (
         <div className="text-[12px] text-success">{t("engines.testPassed", { version: probe.version })}</div>
       )}
-      {error && <div role="alert" className="text-[12px] text-danger">{error}</div>}
+      {error && <div role="alert" className="text-[12px] text-danger-text">{error}</div>}
       <div className="flex justify-end gap-2">
         <button
           onClick={onClose}
@@ -157,7 +157,7 @@ function CustomPicker({ instance, cliDefault, onClose, onSaved }: {
             <button
               onClick={() => persist()}
               disabled={busy}
-              className="flex items-center gap-1.5 rounded-lg bg-raised px-3 py-1.5 text-[13px] text-danger hover:bg-raised-hover disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-lg bg-raised px-3 py-1.5 text-[13px] text-danger-text hover:bg-raised-hover disabled:opacity-50"
             >
               {saving ? <Loader2 size={13} className="animate-spin" /> : t("engines.saveAnyway")}
             </button>
@@ -283,7 +283,7 @@ function EngineAdvanced({ instance }: { instance: InstanceInfo }) {
         {updatedVersion && (
           <div role="status" className="mt-1 text-[12px] text-success">{t("engines.claudeUpdated", { version: updatedVersion })}</div>
         )}
-        {error && <div role="alert" className="mt-1 text-[12px] text-danger">{error}</div>}
+        {error && <div role="alert" className="mt-1 text-[12px] text-danger-text">{error}</div>}
         {cliMotion.shown && (
           <div className={cliMotion.className} {...cliMotion.exitProps}>
             <CustomPicker
@@ -320,12 +320,12 @@ function RemoveAntigravityAccount({ instance }: { instance: InstanceInfo }) {
   };
   return <>
     <div className="flex flex-wrap items-center gap-2">
-      <button type="button" disabled={removing || usedBy > 0} onClick={() => setConfirming(true)} className="rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-danger hover:bg-danger/10 disabled:cursor-not-allowed disabled:opacity-50">
+      <button type="button" disabled={removing || usedBy > 0} onClick={() => setConfirming(true)} className="rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-danger-text hover:bg-danger/10 disabled:cursor-not-allowed disabled:opacity-50">
         {removing ? <Loader2 size={13} className="animate-spin" /> : t("accounts.remove")}
       </button>
       {usedBy > 0 && <p className="text-[11px] text-ink-secondary">{t("accounts.inUse", { count: String(usedBy) })}</p>}
     </div>
-    {error && <p role="alert" className="text-[12px] text-danger">{error}</p>}
+    {error && <p role="alert" className="text-[12px] text-danger-text">{error}</p>}
     <ConfirmDialog open={confirming} title={t("accounts.removeTitle", { name: instance.displayName })} body={t("accounts.removeBodyAntigravity")}
       confirmLabel={t("accounts.remove")} tone="neutral" pending={removing} onCancel={() => { if (!removing) setConfirming(false); }} onConfirm={() => void remove()} />
   </>;

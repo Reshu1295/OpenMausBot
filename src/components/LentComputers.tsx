@@ -98,7 +98,7 @@ function LendThisComputer({ bridge }: { bridge: PageLendingBridge }) {
       <span className="text-[13px] text-ink">{t("lending.terminal")}<span className="mt-0.5 block text-[12px] text-ink-secondary">
         {t("lending.terminalHelp")}</span></span>
     </label>}
-    {failed && <p role="alert" data-lending-failed={failed} className="text-[13px] text-danger">{t(failed)}</p>}
+    {failed && <p role="alert" data-lending-failed={failed} className="text-[13px] text-danger-text">{t(failed)}</p>}
   </div>;
 }
 
@@ -122,7 +122,7 @@ export function LentComputersCard() {
   return <Card title={t("lending.cloudSide.title")}>
     <div data-lent-computers={known === null ? "loading" : known.length} className="flex flex-col gap-3">
       {here && <LendThisComputer bridge={here} />}
-      {failed && <p role="alert" className="text-[13px] text-danger">{t("lending.cloudSide.error")}</p>}
+      {failed && <p role="alert" className="text-[13px] text-danger-text">{t("lending.cloudSide.error")}</p>}
       {known?.length === 0 && <p className="text-[13px] text-ink-secondary">{t("lending.cloudSide.empty")}</p>}
       {!!known?.length && <ul className="divide-y divide-hairline/40">
         {known.map((computer) => <li key={computer.id} data-lent-computer={computer.online ? "online" : computer.lent ? "offline" : "stopped"} className="flex items-start gap-2 py-2.5">

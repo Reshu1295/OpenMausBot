@@ -103,7 +103,7 @@ export function TeamDialog({ section, rename = false, onClose, onRenamed }: {
             })} />
           </fieldset>
         </>}
-        {error && <p role="alert" className="mt-3 text-[13px] text-danger">{error}</p>}
+        {error && <p role="alert" className="mt-3 text-[13px] text-danger-text">{error}</p>}
         <div className="mt-4 flex justify-end gap-2">
           <button disabled={saving} onClick={onClose} className="rounded-lg px-3 py-2 text-[13px] text-ink-secondary hover:bg-raised">{t("common.cancel")}</button>
           <button disabled={saving || (!moving && !name.trim()) || unchanged} onClick={() => void save()}

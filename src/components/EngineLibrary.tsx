@@ -114,7 +114,7 @@ export function RefreshEngines() {
       <RefreshCw size={13} aria-hidden="true" className={cn(busy && "animate-spin")} />
       {busy ? t("common.checking") : t("engines.library.refresh")}
     </button>
-    {error && <p role="alert" className="mt-1 text-[12px] text-danger">{t("engineSetup.checkFailed", { reason: error })}</p>}
+    {error && <p role="alert" className="mt-1 text-[12px] text-danger-text">{t("engineSetup.checkFailed", { reason: error })}</p>}
     {checked && <p role="status" className="mt-1 text-[11px] text-ink-secondary">{t("engineSetup.checked")}</p>}
   </div>;
 }

@@ -394,7 +394,7 @@ export function CloudComputersCard({
         </button>
       </div>
 
-      {error && <div role="alert" className="mt-3 rounded-lg bg-danger/10 px-3 py-2 text-[12px] text-danger">{error}</div>}
+      {error && <div role="alert" className="mt-3 rounded-lg bg-danger/10 px-3 py-2 text-[12px] text-danger-text">{error}</div>}
 
       <p role="status" aria-live="polite" aria-atomic="true" className="sr-only">
         {loading
@@ -483,7 +483,7 @@ export function CloudComputersCard({
                   disabled={loading || instance.inUse || pending !== null || isRemoving}
                   aria-busy={isPending && pending?.action === "delete" ? true : undefined}
                   title={t("vm.cloud.deleteTitle")}
-                  className="flex items-center gap-1.5 rounded-lg bg-danger/10 px-2.5 py-1.5 text-[12px] font-medium text-danger hover:bg-danger/15 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="flex items-center gap-1.5 rounded-lg bg-danger/10 px-2.5 py-1.5 text-[12px] font-medium text-danger-text hover:bg-danger/15 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   {isPending && pending?.action === "delete" ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
                   {t("common.delete")}
@@ -540,7 +540,7 @@ export function LocalVmInventoryCard({
         </button>
       </div>
 
-      {error && <div role="alert" className="mt-3 rounded-lg bg-danger/10 px-3 py-2 text-[12px] text-danger">{error}</div>}
+      {error && <div role="alert" className="mt-3 rounded-lg bg-danger/10 px-3 py-2 text-[12px] text-danger-text">{error}</div>}
 
       <p role="status" aria-live="polite" aria-atomic="true" className="sr-only">
         {loading
@@ -621,7 +621,7 @@ export function LocalVmInventoryCard({
                     ? t("vm.perBot.deleteBlocked")
                     : t("vm.perBot.deleteTitle", { name: instance.name })
                 }
-                className="flex shrink-0 items-center gap-1.5 rounded-lg bg-danger/10 px-2.5 py-1.5 text-[12px] font-medium text-danger hover:bg-danger/15 disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex shrink-0 items-center gap-1.5 rounded-lg bg-danger/10 px-2.5 py-1.5 text-[12px] font-medium text-danger-text hover:bg-danger/15 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {deleting ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
                 {t("common.delete")}
@@ -673,7 +673,7 @@ function ActionButton({
       disabled={pending !== null}
       className={cn(
         "flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[13px] font-medium disabled:opacity-50",
-        danger ? "bg-danger/15 text-danger hover:bg-danger/20" : "bg-accent text-white hover:brightness-110",
+        danger ? "bg-danger/15 text-danger-text hover:bg-danger/20" : "bg-accent text-white hover:brightness-110",
       )}
     >
       {pending === action && <Loader2 size={13} className="animate-spin" />}
@@ -771,7 +771,7 @@ export function LocalVmIdleTimeoutSetting({
         </div>
       </div>
       {error ? (
-        <p id="local-vm-idle-timeout-error" role="alert" className="mt-1.5 text-[12px] text-danger">
+        <p id="local-vm-idle-timeout-error" role="alert" className="mt-1.5 text-[12px] text-danger-text">
           {error}
         </p>
       ) : null}
@@ -1283,7 +1283,7 @@ export function LocalComputerSection() {
             </a>
           )}
         </div>
-        {error && <div role="alert" className="mt-3 rounded-lg bg-danger/10 px-3 py-2 text-[12px] text-danger">{error}</div>}
+        {error && <div role="alert" className="mt-3 rounded-lg bg-danger/10 px-3 py-2 text-[12px] text-danger-text">{error}</div>}
       </Card>
 
       <Card

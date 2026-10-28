@@ -54,6 +54,6 @@ function KeepHereSwitch({ bridge, read, write }: { bridge: CloudSendPageBridge; 
         <button type="button" className="ui-button ui-button-primary" onClick={() => set(true)}>{t("cloudAccount.keepHere.bringBack")}</button>
       </div>
     </div>}
-    {failed && <p role="alert" className="mt-3 text-[13px] text-danger">{failed}</p>}
+    {failed && <p role="alert" className="mt-3 text-[13px] text-danger-text">{failed}</p>}
   </div>;
 }

@@ -107,7 +107,7 @@ export function RemoteAgentSettingsPanel({ bot, overlay = false }: {
                 <button type="button" disabled={uploading || saving} onClick={() => avatarInput.current?.click()} className="flex items-center gap-1.5 rounded-lg bg-control px-3 py-2 text-[13px] text-ink hover:bg-raised-hover disabled:opacity-50">
                   {uploading ? <Loader2 size={14} className="animate-spin" /> : <ImagePlus size={14} />} Avatar
                 </button>
-                {bot.avatarUrl && <button type="button" disabled={saving} onClick={() => void patch({ avatarUrl: null, avatarCrop: "mascot" })} aria-label="Remove custom avatar" className="flex size-9 items-center justify-center rounded-lg text-ink-secondary hover:bg-control hover:text-danger"><Trash2 size={14} /></button>}
+                {bot.avatarUrl && <button type="button" disabled={saving} onClick={() => void patch({ avatarUrl: null, avatarCrop: "mascot" })} aria-label="Remove custom avatar" className="flex size-9 items-center justify-center rounded-lg text-ink-secondary hover:bg-control hover:text-danger-text"><Trash2 size={14} /></button>}
               </div>
             </div>
             <label className="block text-[12px] font-medium text-ink-secondary">Name
@@ -145,7 +145,7 @@ export function RemoteAgentSettingsPanel({ bot, overlay = false }: {
             />
           </div>
 
-          {error ? <div role="alert" className="text-[12px] text-danger">{error}</div> : null}
+          {error ? <div role="alert" className="text-[12px] text-danger-text">{error}</div> : null}
         </div>
       </div>
     </aside>

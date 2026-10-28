@@ -213,7 +213,7 @@ export function ServerPairingCard({ initialSession = null, initialPairingCodes =
             </div>
           ))}
         </div>
-        {error ? <p className="pl-4 text-[12px] leading-4 text-danger">{error}</p> : null}
+        {error ? <p className="pl-4 text-[12px] leading-4 text-danger-text">{error}</p> : null}
       </div>
     );
   }
@@ -265,7 +265,7 @@ export function ServerPairingCard({ initialSession = null, initialPairingCodes =
           ))}
         </ul>
       )}
-      {error ? <p className="mt-3 text-[13px] text-danger">{error}</p> : null}
+      {error ? <p className="mt-3 text-[13px] text-danger-text">{error}</p> : null}
     </Card>
     </div>
   );

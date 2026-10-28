@@ -108,7 +108,7 @@ export function WorkingFolder({ bot }: { bot: Bot }) {
           </button>
         </form>
       )}
-      {error && <div className="mt-2 text-[12px] text-danger">{error}</div>}
+      {error && <div className="mt-2 text-[12px] text-danger-text">{error}</div>}
       {pinnedElsewhere && (
         <div className="mt-2 text-[12px] text-ink-secondary">
           {t("botAccess.folder.pinned", { path: pinned ? shortPath(pinned, home) : t("botAccess.folder.home") })}
@@ -151,7 +151,7 @@ export function McpServersCard({ bot, patch }: { bot: Bot; patch: (patch: { mcpS
         </div>
       </div>
       {error && (
-        <div role="alert" className="mt-3 text-[12px] text-danger">
+        <div role="alert" className="mt-3 text-[12px] text-danger-text">
           {t("botAccess.mcpRefreshError")} <button type="button" onClick={() => void refresh()} className="underline">{t("connectors.action.retry")}</button>
         </div>
       )}
@@ -583,7 +583,7 @@ export function VpsAliasField({ bot }: { bot: Bot }) {
           {t("botAccess.cloud.serverSave")}
         </button>
       </form>
-      {error && <div className="mt-2 text-[12px] text-danger">{error}</div>}
+      {error && <div className="mt-2 text-[12px] text-danger-text">{error}</div>}
       {notice && <div role="status" className="mt-2 break-words text-[12px] text-ink-secondary">{notice}</div>}
     </div>
   );
@@ -837,7 +837,7 @@ export function AccessSection({
                   type="button"
                   aria-label={t("botAccess.always.remove", { entry })}
                   onClick={() => patch({ alwaysAllow: alwaysAllow.filter((key) => key !== entry) })}
-                  className="shrink-0 rounded-md px-2 py-1 text-[12px] text-ink-secondary hover:bg-danger/10 hover:text-danger"
+                  className="shrink-0 rounded-md px-2 py-1 text-[12px] text-ink-secondary hover:bg-danger/10 hover:text-danger-text"
                 >
                   {t("botAccess.always.removeButton")}
                 </button>

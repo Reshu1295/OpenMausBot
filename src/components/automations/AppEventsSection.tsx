@@ -23,7 +23,7 @@ export function AppEventsSection({ trigger }: { trigger: AppTrigger }) {
           return (
             <li key={attempt.id} className="flex items-baseline gap-2 px-2 py-1 text-[13px]">
               <span className="shrink-0 text-ink-secondary">{when.charAt(0).toLocaleUpperCase() + when.slice(1)}</span>
-              <span className={cn("shrink-0 font-semibold", line.mark === "✓" ? "text-success" : line.mark === "✗" ? "text-danger" : "text-ink-tertiary")}>{line.mark}</span>
+              <span className={cn("shrink-0 font-semibold", line.mark === "✓" ? "text-success" : line.mark === "✗" ? "text-danger-text" : "text-ink-tertiary")}>{line.mark}</span>
               <span className="min-w-0 truncate text-ink" title={line.text}>{line.text}</span>
             </li>
           );

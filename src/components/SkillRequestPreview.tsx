@@ -8,7 +8,7 @@ export function SkillRequestPreview({ request }: { request: SkillRequestCardData
   const reviewedSha256 = reviewedSkillSha256(request);
   if (!reviewedSha256) {
     return (
-      <div className="mt-3 rounded-lg border border-danger/30 bg-danger/5 p-3 text-[12px] leading-relaxed text-danger">
+      <div className="mt-3 rounded-lg border border-danger/30 bg-danger/5 p-3 text-[12px] leading-relaxed text-danger-text">
         This proposal was created by an older build and cannot be safely applied. Deny it, then ask the bot to
         {request.action === "update" ? " propose the update again." : " create the skill again."}
       </div>

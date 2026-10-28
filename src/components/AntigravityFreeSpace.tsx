@@ -108,7 +108,7 @@ export function AntigravityFreeSpace({ instance, initial = { kind: "idle" } }: {
           {phase.remaining > 0 && t("engines.freeSpace.someLeft")}
         </p>
       )}
-      {error && <p role="alert" className="mt-2 text-[12px] text-danger">{error}</p>}
+      {error && <p role="alert" className="mt-2 text-[12px] text-danger-text">{error}</p>}
     </section>
   );
 }

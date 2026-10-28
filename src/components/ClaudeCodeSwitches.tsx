@@ -34,7 +34,7 @@ function ClaudeConfigSwitch({ feature, enabled, prefix }: { feature: Feature; en
       <div className="min-w-0">
         <div className="text-[14px] font-medium text-ink">{t(`${prefix}.title` as LocaleKey)}</div>
         <p className="mt-1 text-[12px] leading-relaxed text-ink-secondary">{t(`${prefix}.desc` as LocaleKey)}</p>
-        {failed && <p role="alert" className="mt-1 text-[12px] text-danger">{t("mcp.claude.error")}</p>}
+        {failed && <p role="alert" className="mt-1 text-[12px] text-danger-text">{t("mcp.claude.error")}</p>}
       </div>
       <Switch
         checked={enabled}

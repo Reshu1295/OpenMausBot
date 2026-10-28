@@ -144,7 +144,7 @@ function ProfilePhoto() {
         </label>
         {avatarUrl && !draft && <button type="button" className="text-[12px] text-ink-secondary underline" onClick={remove}>{t("settings.profile.avatar.remove")}</button>}
       </div>
-      {error && <div role="alert" className="text-[12px] text-danger">{error}</div>}
+      {error && <div role="alert" className="text-[12px] text-danger-text">{error}</div>}
     </>
   );
 }

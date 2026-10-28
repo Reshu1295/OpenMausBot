@@ -59,7 +59,7 @@ export function PublishedPageCard({ message }: { message: Message }) {
             {busy ? <Loader2 size={14} className="animate-spin" /> : <X size={14} />}{t("chat.page.unpublish")}
           </button>
         </div>
-        {failed && <p role="alert" className="mt-1.5 text-[12px] text-danger">{t("chat.page.unpublishFailed")}</p>}
+        {failed && <p role="alert" className="mt-1.5 text-[12px] text-danger-text">{t("chat.page.unpublishFailed")}</p>}
       </>}
       {card.state === "unpublished" && <p className="mt-1 text-[13px] text-ink-secondary">{t("chat.page.unpublished")}</p>}
       {card.state === "limit" && <>

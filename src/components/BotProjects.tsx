@@ -154,7 +154,7 @@ export function BotProjectDialog({ bot, project, onClose, onCreated }: {
             </label>
           </div>}
           <p className="mt-2 text-[12px] leading-relaxed text-ink-secondary">{t("folder.detail", { name: bot.name })}</p>
-          {error && <p role="alert" className="mt-3 text-[12px] text-danger">{error}</p>}
+          {error && <p role="alert" className="mt-3 text-[12px] text-danger-text">{error}</p>}
           <div className="mt-5 flex justify-end gap-2">
             <button type="button" onClick={onClose} className="rounded-lg px-3 py-2 text-[13px] text-ink-secondary hover:bg-raised">{t("common.cancel")}</button>
             <button type="submit" disabled={!name.trim() || saving} className="rounded-lg bg-accent px-3 py-2 text-[13px] font-medium text-white disabled:opacity-40">{t(saving ? "folder.saving" : project ? "folder.save" : "folder.create")}</button>
@@ -167,10 +167,10 @@ export function BotProjectDialog({ bot, project, onClose, onCreated }: {
               <button type="button" disabled={saving} onClick={() => {
                 setSaving(true); setError(null);
                 dispatch({ type: "deleteProject", botId: bot.id, projectId: project.id, onDeleted: onClose, onError: (message) => { setSaving(false); setError(message); } });
-              }} className="text-[12px] text-danger hover:underline disabled:opacity-40">{t("folder.deleteConfirm")}</button>
+              }} className="text-[12px] text-danger-text hover:underline disabled:opacity-40">{t("folder.deleteConfirm")}</button>
               <button type="button" onClick={() => setDeleting(false)} className="text-[12px] text-ink-secondary hover:underline">{t("common.cancel")}</button>
             </div>
-          </> : <button type="button" disabled={saving} onClick={() => setDeleting(true)} className="text-[12px] text-danger hover:underline disabled:opacity-40">{t("folder.delete")}</button>}
+          </> : <button type="button" disabled={saving} onClick={() => setDeleting(true)} className="text-[12px] text-danger-text hover:underline disabled:opacity-40">{t("folder.delete")}</button>}
         </div>}
       </div>
     </div>, document.body,

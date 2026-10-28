@@ -98,7 +98,7 @@ export function OpenCodeProviderKeys() {
           {adding ? <Loader2 size={13} className="animate-spin" aria-hidden="true" /> : t("common.save")}
         </button>
       </div>
-      {error && <div role="alert" className="text-[12px] leading-4 text-danger">{error}</div>}
+      {error && <div role="alert" className="text-[12px] leading-4 text-danger-text">{error}</div>}
     </div>
   );
 }
@@ -133,7 +133,7 @@ export function AnthropicEveryClaudeBot() {
           <span>{t("keys.anthropic.warning")}</span>
         </p>
       )}
-      {error && <div role="alert" className="text-[12px] leading-4 text-danger">{error}</div>}
+      {error && <div role="alert" className="text-[12px] leading-4 text-danger-text">{error}</div>}
     </div>
   );
 }
@@ -196,7 +196,7 @@ export function VpsConnection() {
           {saving ? <Loader2 size={13} className="animate-spin" aria-hidden="true" /> : clearing ? t("keys.row.remove") : t("common.save")}
         </button>
       </div>
-      {error && <div role="alert" className="text-[12px] leading-4 text-danger">{error}</div>}
+      {error && <div role="alert" className="text-[12px] leading-4 text-danger-text">{error}</div>}
     </div>
   );
 }
@@ -240,7 +240,7 @@ export function OpenAiCompatUrl() {
         {saving && <Loader2 size={13} aria-hidden="true" className="absolute right-2.5 top-1/2 -translate-y-1/2 animate-spin text-ink-secondary" />}
       </div>
       <p className="text-[12px] leading-4 text-ink-secondary">{t("keys.openaiCompat.urlHint")}</p>
-      {error && <div role="alert" className="text-[12px] leading-4 text-danger">{error}</div>}
+      {error && <div role="alert" className="text-[12px] leading-4 text-danger-text">{error}</div>}
     </div>
   );
 }

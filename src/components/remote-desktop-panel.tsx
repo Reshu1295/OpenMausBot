@@ -251,7 +251,7 @@ export function RemoteDesktopPanel({ bot }: { bot: Bot }) {
         <div className="flex min-h-0 flex-1 flex-col px-4 pb-4 pt-1">
           {help?.place === "browser" && <div className="-mt-2 mb-3"><SignInBanner help={help} askerName={asker} onError={setError} /></div>}
           <BrowserPanel bot={bot} signIn={signIn} />
-          {error && <div role="alert" className="mt-2 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-[12px] text-danger">{error}</div>}
+          {error && <div role="alert" className="mt-2 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-[12px] text-danger-text">{error}</div>}
           <p className="mt-2 text-[11px] leading-relaxed text-ink-secondary">
             Watching and driving this browser needs browser control for this paired device, in Settings → Remote access on the host computer.
           </p>
@@ -298,7 +298,7 @@ export function RemoteDesktopPanel({ bot }: { bot: Bot }) {
           {pending ? "Opening…" : "Take control"}
         </button>
         {error && (
-          <div role="alert" className="w-full rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-left text-[12px] text-danger">
+          <div role="alert" className="w-full rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-left text-[12px] text-danger-text">
             {error}
           </div>
         )}

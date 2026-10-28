@@ -52,7 +52,7 @@ export function CallLineItem({ line, busy }: { line: CallRecordLine; busy: boole
         ) : state === "done" ? (
           <Check size={12} className="text-success" />
         ) : state === "stopped" ? (
-          <X size={12} className="text-danger" />
+          <X size={12} className="text-danger-text" />
         ) : (
           <Minus size={12} className="text-ink-tertiary" />
         )}

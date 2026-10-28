@@ -45,7 +45,7 @@ export function HandoffChip({ message, bots, title, onClick }: { message: Messag
   const withBot = bots.find((bot) => bot.id === comm.withBotId);
   return (
     <HandoffReply message={message}>
-      <button type="button" onClick={onClick} title={title} className={cn("ui-pill", message.tool.ok === false && "text-danger")}>
+      <button type="button" onClick={onClick} title={title} className={cn("ui-pill", message.tool.ok === false && "text-danger-text")}>
         <BotAvatar bot={withBot ?? { name: comm.withName, color: comm.withColor }} state="happy" size={16} animated={false} />
         <span className="max-w-[480px] truncate">{message.tool.name}</span>
         <ChevronRight size={13} />

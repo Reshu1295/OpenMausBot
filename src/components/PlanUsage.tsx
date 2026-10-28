@@ -229,7 +229,7 @@ export function PlanUsage() {
         </button>
       </div>
       {loading && !report && <p role="status" className="text-[13px] text-ink-secondary">{t("planUsage.loading")}</p>}
-      {error && <p role="alert" className="mb-3 text-[13px] text-danger">{error}</p>}
+      {error && <p role="alert" className="mb-3 text-[13px] text-danger-text">{error}</p>}
       {report && report.providers.length === 0 && (
         <p className="text-[13px] text-ink-secondary">{t("planUsage.empty")}</p>
       )}
@@ -284,7 +284,7 @@ export function PlanUsage() {
                   )}
                 </div>
               ) : (
-                <p className="text-[13px] text-danger">{providerError(provider)}</p>
+                <p className="text-[13px] text-danger-text">{providerError(provider)}</p>
               )}
             </div>
           ))}

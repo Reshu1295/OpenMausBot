@@ -762,16 +762,16 @@ export function EventEditor({
                   )}
 
                   {intervalInvalid && (
-                    <div id="routine-interval-error" className="text-[11px] text-danger">Choose a whole number from 5 to 1,440 minutes.</div>
+                    <div id="routine-interval-error" className="text-[11px] text-danger-text">Choose a whole number from 5 to 1,440 minutes.</div>
                   )}
                   {intervalDaysInvalid && (
-                    <div id="routine-interval-days-error" className="text-[11px] text-danger">Choose at least one day.</div>
+                    <div id="routine-interval-days-error" className="text-[11px] text-danger-text">Choose at least one day.</div>
                   )}
                   {intervalWindowInvalid && (
-                    <div id="routine-interval-window-error" className="text-[11px] text-danger">Choose a same-day window at least {intervalMinutes || 5} minutes long.</div>
+                    <div id="routine-interval-window-error" className="text-[11px] text-danger-text">Choose a same-day window at least {intervalMinutes || 5} minutes long.</div>
                   )}
                   {intervalEndInvalid && (
-                    <div id="routine-interval-end-error" className="text-[11px] text-danger">Choose an end date after the first run.</div>
+                    <div id="routine-interval-end-error" className="text-[11px] text-danger-text">Choose an end date after the first run.</div>
                   )}
                   <div id="routine-interval-help" className="text-[11px] leading-relaxed text-ink-secondary">{t(overlap === "queue" ? "routines.overlapQueueHelp" : "routines.overlapSkipHelp")}</div>
                 </div>
@@ -1010,7 +1010,7 @@ export function EventEditor({
             </div>
           )}
 
-          {error && <div className="ml-10 flex items-start gap-2 rounded-xl border border-danger/30 bg-danger/10 px-3 py-2.5 text-[13px] text-danger"><CircleAlert size={15} className="mt-0.5 shrink-0" />{error}</div>}
+          {error && <div className="ml-10 flex items-start gap-2 rounded-xl border border-danger/30 bg-danger/10 px-3 py-2.5 text-[13px] text-danger-text"><CircleAlert size={15} className="mt-0.5 shrink-0" />{error}</div>}
         </div>
 
 
@@ -1161,7 +1161,7 @@ export function QuickComposer({
           <textarea value={description} onChange={(event) => setDescription(event.target.value)} rows={3} placeholder={kind === "routine" ? "What should the bot do?" : "Add a description (optional)"} className="min-w-0 flex-1 resize-none rounded-lg border border-hairline/50 bg-inset px-3 py-2 text-[13px] leading-relaxed text-ink outline-none placeholder:text-ink-tertiary focus:border-accent" />
         </div>
         {kind === "routine" && <ResultsDestination bot={bots.find((bot) => bot.id === botIds[0])} value={resultsThreadId} onChange={(threadId) => setResultsThreadId(threadId ?? null)} />}
-        {error && <div className="rounded-lg bg-danger/10 px-3 py-2 text-[12px] text-danger">{error}</div>}
+        {error && <div className="rounded-lg bg-danger/10 px-3 py-2 text-[12px] text-danger-text">{error}</div>}
       </div>
       <div className="flex items-center justify-end gap-2 border-t border-hairline/40 px-4 py-3">
         <button onClick={() => onMore({ ...seed, kind, botIds, name, description, durationMinutes, resultsThreadId })} title="Choose repeating schedules and other options" className="rounded-lg px-3 py-2 text-[12px] font-medium text-accent-text hover:bg-accent/10">More options</button>
@@ -1564,7 +1564,7 @@ export function EventDetails({
       </div>
 
       <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4">
-        {run && <div role="status" aria-live="polite" className="rounded-xl border border-hairline/40 bg-inset p-3"><div className="flex items-center gap-2 text-[12px] font-medium text-ink">{run.status === "running" && <Loader2 size={13} className="animate-spin text-accent-text" />}{routineRunLabel(run)}</div>{run.output && <div className="mt-2 max-h-48 overflow-y-auto whitespace-pre-wrap text-[12px] leading-relaxed text-ink-secondary">{run.output}</div>}{run.error && <div className="mt-2 text-[12px] text-danger">{run.error}</div>}</div>}
+        {run && <div role="status" aria-live="polite" className="rounded-xl border border-hairline/40 bg-inset p-3"><div className="flex items-center gap-2 text-[12px] font-medium text-ink">{run.status === "running" && <Loader2 size={13} className="animate-spin text-accent-text" />}{routineRunLabel(run)}</div>{run.output && <div className="mt-2 max-h-48 overflow-y-auto whitespace-pre-wrap text-[12px] leading-relaxed text-ink-secondary">{run.output}</div>}{run.error && <div className="mt-2 text-[12px] text-danger-text">{run.error}</div>}</div>}
         {run?.attention && <div className="flex items-start gap-2 rounded-xl border border-warning/30 bg-warning/10 px-3 py-2.5 text-warning"><CircleAlert size={15} className="mt-0.5 shrink-0" /><div className="min-w-0 whitespace-pre-wrap text-[12px] leading-relaxed">{run.attention}</div></div>}
         {run?.status === "waiting" && !run.attention && <div className="rounded-xl border border-warning/30 bg-warning/10 px-3 py-2.5 text-[12px] text-warning">This run is waiting. Open its execution thread for more context.</div>}
 
@@ -1598,7 +1598,7 @@ export function EventDetails({
               : <div className="space-y-1">{recentRuns.map((recent) => <RecentRunRow key={recent.id} run={recent} current={recent.id === run?.id} onOpen={() => onOpenRun?.(recent)} />)}</div>}
           </DrawerField>
         )}
-        {error && <div role="alert" className="rounded-lg bg-danger/10 px-3 py-2 text-[12px] text-danger">{error}</div>}
+        {error && <div role="alert" className="rounded-lg bg-danger/10 px-3 py-2 text-[12px] text-danger-text">{error}</div>}
       </div>
 
       <div className="space-y-2 border-t border-hairline/40 px-4 py-3">
@@ -1617,7 +1617,7 @@ export function EventDetails({
           {run && ["queued", "running", "waiting"].includes(run.status) && <button onClick={() => void invoke(`/api/routine-runs/${run.id}/cancel`)} disabled={working} className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[12px] text-ink-secondary hover:bg-raised hover:text-ink disabled:opacity-40"><X size={13} />Cancel run</button>}
           <div className="ml-auto flex items-center gap-1">
             {(routine || call) && <button onClick={onEdit} className="rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-ink hover:bg-raised">{t("routines.edit")}</button>}
-            {(routine || call) && <button onClick={() => void deleteEvent()} className="rounded-lg p-2 text-ink-secondary hover:bg-danger/10 hover:text-danger" title={t("routines.delete")} aria-label={t("routines.delete")}><Trash2 size={14} /></button>}
+            {(routine || call) && <button onClick={() => void deleteEvent()} className="rounded-lg p-2 text-ink-secondary hover:bg-danger/10 hover:text-danger-text" title={t("routines.delete")} aria-label={t("routines.delete")}><Trash2 size={14} /></button>}
           </div>
         </div>
       </div>
@@ -1661,7 +1661,7 @@ function RecentRunRow({ run, current, onOpen }: { run: RoutineRun; current: bool
       {ok
         ? <CheckCircle2 size={14} className="shrink-0 text-success" aria-hidden="true" />
         : problem
-          ? <XCircle size={14} className="shrink-0 text-danger" aria-hidden="true" />
+          ? <XCircle size={14} className="shrink-0 text-danger-text" aria-hidden="true" />
           : active
             ? <Loader2 size={14} className="shrink-0 animate-spin text-accent-text" aria-hidden="true" />
             : <CircleAlert size={14} className="shrink-0 text-ink-tertiary" aria-hidden="true" />}

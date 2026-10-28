@@ -783,7 +783,7 @@ export function LocalVmWorkspace({
       </header>
 
       {controlError && (
-        <div className="mx-3 mt-3 flex items-center gap-2 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-[12px] text-danger">
+        <div className="mx-3 mt-3 flex items-center gap-2 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-[12px] text-danger-text">
           <AlertTriangle size={14} className="shrink-0" /> {controlError}
         </div>
       )}

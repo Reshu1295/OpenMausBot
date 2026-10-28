@@ -41,7 +41,7 @@ export function BuiltInBrowserRow() {
         : browserBlockedOnWindows
         ? t("settings.experimental.browserWindows")
         : browserUnavailableReason(state.config)}
-    message={error ? <p role="alert" className="text-danger">{error}</p> : null}
+    message={error ? <p role="alert" className="text-danger-text">{error}</p> : null}
     >
       <Switch
           checked={browser}
@@ -93,7 +93,7 @@ export function NewBrowserSettings() {
           className="disabled:cursor-wait disabled:opacity-50"
         />
       </div>
-      {error ? <p role="alert" className="mt-2 text-[12px] text-danger">{error}</p> : null}
+      {error ? <p role="alert" className="mt-2 text-[12px] text-danger-text">{error}</p> : null}
     </div>
   );
 }

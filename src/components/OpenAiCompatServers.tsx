@@ -82,7 +82,7 @@ function AddedServers({ servers }: { servers: Array<InstanceInfo & { url?: strin
             disabled={busy !== null}
             aria-label={t("apiInstances.remove", { name: server.displayName })}
             title={t("apiInstances.remove", { name: server.displayName })}
-            className={`${ICON_BUTTON} hover:bg-danger/10 hover:text-danger`}
+            className={`${ICON_BUTTON} hover:bg-danger/10 hover:text-danger-text`}
           >
             <Trash2 size={13} aria-hidden="true" />
           </button>
@@ -108,7 +108,7 @@ function AddedServers({ servers }: { servers: Array<InstanceInfo & { url?: strin
           {busy === "add" ? t("apiInstances.adding") : t("apiInstances.add")}
         </button>
       </div>
-      {error && <div className="mt-1 text-[12px] text-danger">{error}</div>}
+      {error && <div className="mt-1 text-[12px] text-danger-text">{error}</div>}
     </div>
   );
 }
@@ -199,7 +199,7 @@ export function LmStudioServer({ heading = true }: { heading?: boolean } = {}) {
         </button>
         {present && <p className="text-[12px] text-ink-secondary">{t("lmStudio.added")}</p>}
       </div>
-      {error && <div className="mt-1 text-[12px] text-danger">{error}</div>}
+      {error && <div className="mt-1 text-[12px] text-danger-text">{error}</div>}
     </div>
   );
 }

@@ -65,7 +65,7 @@ export function ShareLearnedSkillsSettings() {
           ))}
         </div>
       </div>
-      {error ? <p role="alert" className="mt-2 text-[12px] text-danger">{error}</p> : null}
+      {error ? <p role="alert" className="mt-2 text-[12px] text-danger-text">{error}</p> : null}
     </div>
   );
 }

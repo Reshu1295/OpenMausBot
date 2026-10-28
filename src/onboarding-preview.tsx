@@ -113,7 +113,7 @@ class Crash extends Component<{ children: ReactNode }, { error: Error | null }> 
     return { error };
   }
   render() {
-    return this.state.error ? <pre className="whitespace-pre-wrap p-6 text-[12px] text-danger">{this.state.error.stack}</pre> : this.props.children;
+    return this.state.error ? <pre className="whitespace-pre-wrap p-6 text-[12px] text-danger-text">{this.state.error.stack}</pre> : this.props.children;
   }
 }
 

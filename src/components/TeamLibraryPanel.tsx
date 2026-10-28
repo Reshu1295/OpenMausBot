@@ -521,7 +521,7 @@ export function TeamLibraryPanel({
           <>
             <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-6 pt-6 sm:px-8">
               <TeamImportDetails pending={pending} importedNames={importedNames} org={pendingOrg !== null} />
-              {error && <div role="alert" className="mt-4 rounded-lg bg-danger/10 px-3 py-2 text-[13px] text-danger">{error}</div>}
+              {error && <div role="alert" className="mt-4 rounded-lg bg-danger/10 px-3 py-2 text-[13px] text-danger-text">{error}</div>}
             </div>
 
             <footer className="flex flex-col gap-3 border-t border-hairline/35 px-6 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
@@ -682,7 +682,7 @@ export function TeamLibraryPanel({
                     </div>
                   )}
                   {!catalogLoading && catalogError && (
-                    <div className="rounded-xl bg-danger/10 p-4 text-[13px] text-danger">
+                    <div className="rounded-xl bg-danger/10 p-4 text-[13px] text-danger-text">
                       <p>{catalogError}</p>
                       <button onClick={() => void loadCatalog()} className="mt-3 rounded-full bg-raised px-3.5 py-2 text-ink hover:bg-raised-hover">{t("common.tryAgain")}</button>
                     </div>
@@ -790,7 +790,7 @@ export function TeamLibraryPanel({
                     </div>
                   </div>
                   <GrokImportFlow link={grokLink} onPreview={(preview) => { setGrokLink(null); previewManifest(preview, "grok"); }} />
-                  {error && <div role="alert" className="mt-4 rounded-lg bg-danger/10 px-3 py-2 text-[13px] text-danger">{error}</div>}
+                  {error && <div role="alert" className="mt-4 rounded-lg bg-danger/10 px-3 py-2 text-[13px] text-danger-text">{error}</div>}
                 </div>
               )}
 
@@ -960,7 +960,7 @@ export function TeamLibraryPanel({
                       </p>
                     </div>
                   )}
-                  {error && <div role="alert" className="mt-4 rounded-lg bg-danger/10 px-3 py-2 text-[13px] text-danger">{error}</div>}
+                  {error && <div role="alert" className="mt-4 rounded-lg bg-danger/10 px-3 py-2 text-[13px] text-danger-text">{error}</div>}
                 </div>
               )}
             </div>

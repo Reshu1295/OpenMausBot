@@ -90,7 +90,7 @@ export function ClaudeUpdatePrompt({
       )}
       {(phase.kind === "manual" || phase.kind === "failed") && (
         <>
-          {phase.kind === "failed" && <p className="mb-1.5 break-words text-danger">{phase.error}</p>}
+          {phase.kind === "failed" && <p className="mb-1.5 break-words text-danger-text">{phase.error}</p>}
           <p className="leading-relaxed text-ink-secondary">{t("chat.claudeUpdate.manual")}</p>
           <div className="mt-1.5 flex items-center gap-1 rounded-md bg-inset/60 px-2 py-1 font-mono text-[12px]">
             <span className="flex-1 select-all">{UPDATE_COMMAND}</span>
@@ -101,7 +101,7 @@ export function ClaudeUpdatePrompt({
               title={copyLabel}
               className="rounded-md p-1 text-ink-secondary hover:bg-raised hover:text-ink"
             >
-              {copyState === "copied" ? <Check size={13} className="text-success" /> : copyState === "failed" ? <X size={13} className="text-danger" /> : <Copy size={13} />}
+              {copyState === "copied" ? <Check size={13} className="text-success" /> : copyState === "failed" ? <X size={13} className="text-danger-text" /> : <Copy size={13} />}
             </button>
           </div>
           <div className="mt-2 flex flex-wrap gap-2">

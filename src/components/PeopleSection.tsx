@@ -127,7 +127,7 @@ export function PeopleTable({ people, busy, onRole, onRemove, onLink, readOnly =
             <button type="button" disabled={busy} onClick={() => onRole(person, person.role === "admin" ? "member" : "admin")} className="text-ink-secondary hover:text-ink disabled:opacity-50">
               {person.role === "admin" ? t("people.makeMember") : t("people.makeAdmin")}
             </button>
-            <button type="button" disabled={busy} onClick={() => onRemove(person)} className="text-danger hover:underline disabled:opacity-50">{t("people.remove")}</button>
+            <button type="button" disabled={busy} onClick={() => onRemove(person)} className="text-danger-text hover:underline disabled:opacity-50">{t("people.remove")}</button>
           </span>}
         </div>
       ))}
@@ -143,7 +143,7 @@ export function CopyLink({ link }: { link: string }) {
       <div className="flex items-center gap-2">
         <code className="min-w-0 flex-1 select-all break-all text-ink">{link}</code>
         <button type="button" onClick={copy} className="flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-[12px] text-ink-secondary hover:bg-control hover:text-ink">
-          {state === "copied" ? <Check size={13} className="text-success" /> : state === "failed" ? <X size={13} className="text-danger" /> : <Copy size={13} />}
+          {state === "copied" ? <Check size={13} className="text-success" /> : state === "failed" ? <X size={13} className="text-danger-text" /> : <Copy size={13} />}
           {t(state === "copied" ? "people.copied" : state === "failed" ? "common.copyFailed" : "people.copy")}
         </button>
       </div>
@@ -281,7 +281,7 @@ export function PeopleSection({ simple = false, startOpen = false }: { simple?: 
       </form>
       <p className="mt-2 text-[12px] leading-relaxed text-ink-secondary">{t("people.inviteHint")}</p>
       {link && <CopyLink link={link} />}
-      {error && <p role="alert" className="mt-2 text-[12px] text-danger">{error}</p>}
+      {error && <p role="alert" className="mt-2 text-[12px] text-danger-text">{error}</p>}
       <div className="mt-4">
         <PeopleTable
           people={people}

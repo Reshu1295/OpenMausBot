@@ -62,7 +62,7 @@ export function SignedInSites({ target, scope = {}, sharedBy, disabled = false, 
             <LogOut size={13} />{t("settings.sites.signOutAll")}
           </button>
         )}
-        {error && <p role="alert" className="text-[12px] text-danger">{error}</p>}
+        {error && <p role="alert" className="text-[12px] text-danger-text">{error}</p>}
       </div>
   );
   if (bare) return list;

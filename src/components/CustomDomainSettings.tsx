@@ -158,7 +158,7 @@ export function CustomDomainSettings() {
           </>
         )}
         {notice && <p role="status" className="flex items-start gap-1.5 text-[12px] leading-relaxed text-success"><Check size={14} className="mt-0.5 shrink-0" />{notice}</p>}
-        {error && <p role="alert" className="text-[12px] leading-relaxed text-danger">{error}</p>}
+        {error && <p role="alert" className="text-[12px] leading-relaxed text-danger-text">{error}</p>}
       </div>
     </Card>
   );

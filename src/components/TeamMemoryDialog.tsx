@@ -175,7 +175,7 @@ export function TeamMemoryDialog({ section, label, onClose }: { section: string;
             </div>
           )}
           {entries && <p className="mb-3 text-[12px] text-ink-secondary">{t("teamMemory.loadedSummary", { loaded: loadedIds.length, total: entries.filter(entry => entry.status === "accepted").length })}</p>}
-          {error && <div role="alert" className="mb-3 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-[12px] text-danger">{error} <button onClick={() => void load()} className="underline">{t("teamMemory.reload")}</button></div>}
+          {error && <div role="alert" className="mb-3 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-[12px] text-danger-text">{error} <button onClick={() => void load()} className="underline">{t("teamMemory.reload")}</button></div>}
           {Object.entries(unsaved).map(([id, draft]) => <p key={id} className="mb-3 text-[12px] text-ink-secondary"><strong>{draft.name}</strong> · {t("teamMemory.unsaved", { text: draft.text })}</p>)}
 
           {proposed.length > 0 && (
@@ -252,7 +252,7 @@ export function TeamMemoryDialog({ section, label, onClose }: { section: string;
                         onClick={() => void remove(entry)}
                         disabled={busyId !== null}
                         aria-label={t("teamMemory.remove", { name: entry.name })}
-                        className="shrink-0 rounded-md p-1 text-ink-secondary hover:text-danger disabled:opacity-50"
+                        className="shrink-0 rounded-md p-1 text-ink-secondary hover:text-danger-text disabled:opacity-50"
                       >
                         <Trash2 size={13} />
                       </button>

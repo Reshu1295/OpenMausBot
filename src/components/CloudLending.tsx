@@ -230,7 +230,7 @@ export function CloudLending({ bridge, moving = false }: { bridge: CloudLendingB
       <p className="text-[12px] text-ink-secondary">{t("lending.ownConversations")}</p>
       <p className="text-[12px] text-ink-secondary">{t("lending.stopHelp")}</p>
     </>}
-    {failed && <p role="alert" data-lending-failed={failed} className="text-[13px] text-danger">{t(failed)}</p>}
+    {failed && <p role="alert" data-lending-failed={failed} className="text-[13px] text-danger-text">{t(failed)}</p>}
     {(on || (snapshot.activity?.length ?? 0) > 0) && <LendingActivityList entries={snapshot.activity ?? []} />}
   </div>;
 }

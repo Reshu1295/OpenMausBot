@@ -189,7 +189,7 @@ export function PageNotes({ version, point, share, className }: Pick<PageToolsPr
     );
   }
   if (share.unpublished && !share.url) rows.push(<p key="gone" className="px-1 text-[13px] text-ink-secondary">{t("chat.page.unpublished")}</p>);
-  if (state.kind === "unpublish-failed") rows.push(<p key="stuck" role="alert" className="px-1 text-[13px] text-danger">{t("chat.page.unpublishFailed")}</p>);
+  if (state.kind === "unpublish-failed") rows.push(<p key="stuck" role="alert" className="px-1 text-[13px] text-danger-text">{t("chat.page.unpublishFailed")}</p>);
   if (state.kind === "refused") {
     rows.push(
       <div key="refused" role="alert" className="flex items-center gap-2 rounded-2xl bg-inset px-3 py-2 text-[13px] text-ink-secondary">

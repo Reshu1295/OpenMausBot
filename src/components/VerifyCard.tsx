@@ -13,7 +13,7 @@ function StatusIcon({ status }: { status: RunStep["status"] }) {
     case "passed":
       return <CheckCircle2 aria-hidden="true" className={cn(className, "text-success")} />;
     case "failed":
-      return <XCircle aria-hidden="true" className={cn(className, "text-danger")} />;
+      return <XCircle aria-hidden="true" className={cn(className, "text-danger-text")} />;
     case "unverified":
       return <Circle aria-hidden="true" className={cn(className, "text-ink-secondary")} />;
   }

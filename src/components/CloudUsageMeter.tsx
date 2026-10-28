@@ -43,7 +43,7 @@ export function MeterBar({ meter, label, compact = false }: { meter: CloudUsageM
   );
 }
 const BAR: Record<MeterBand, string> = { ok: "bg-accent", near: "bg-warning", full: "bg-danger" };
-const AMOUNT: Record<MeterBand, string> = { ok: "text-ink-secondary", near: "text-warning", full: "text-danger" };
+const AMOUNT: Record<MeterBand, string> = { ok: "text-ink-secondary", near: "text-warning", full: "text-danger-text" };
 
 export function MeterRow({ meter, compact = false }: { meter: CloudUsageMeter; compact?: boolean }) {
   const label = meterLabel(meter.kind), band = meterBand(meterPercent(meter));
@@ -135,7 +135,7 @@ export function useUpgrade(bridge: CloudPlanBridge | undefined, usage: CloudUsag
 
 export function NoteLine({ note }: { note: UpgradeNote | null }) {
   if (!note) return null;
-  return <p role={note.tone === "bad" ? "alert" : "status"} className={cn("text-[12px] leading-relaxed", note.tone === "bad" ? "text-danger" : note.tone === "good" ? "text-success" : "text-ink-secondary")}>{note.text}</p>;
+  return <p role={note.tone === "bad" ? "alert" : "status"} className={cn("text-[12px] leading-relaxed", note.tone === "bad" ? "text-danger-text" : note.tone === "good" ? "text-success" : "text-ink-secondary")}>{note.text}</p>;
 }
 
 export type UpgradeUi = { busy: "preview" | "change" | null; note: UpgradeNote | null; onUpgrade: (tier?: string) => void };

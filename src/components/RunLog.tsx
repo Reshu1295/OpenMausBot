@@ -48,12 +48,12 @@ export function RunLog({ events }: { events: TimelineEvent[] }) {
                 : event.kind === "result" ? t("inspector.run.response") : event.label;
             return <li key={event.id} className="border-t border-hairline/30 py-3">
               <div className="flex items-start gap-2 text-[12px]">
-                <Icon size={14} aria-hidden="true" className={cn("mt-0.5 shrink-0", event.state === "failed" ? "text-danger" : event.state === "running" ? "animate-spin text-accent-text" : "text-ink-secondary")} />
+                <Icon size={14} aria-hidden="true" className={cn("mt-0.5 shrink-0", event.state === "failed" ? "text-danger-text" : event.state === "running" ? "animate-spin text-accent-text" : "text-ink-secondary")} />
                 <span className="min-w-0 flex-1 break-words font-medium text-ink">{label}</span>
                 <time dateTime={new Date(event.at).toISOString()} className="shrink-0 tabular-nums text-ink-secondary">{formatTime(event.at)}</time>
               </div>
               {event.command && <pre className="mt-2 whitespace-pre-wrap break-all rounded-lg bg-inset p-2 font-mono text-[12px] leading-relaxed text-ink">{event.command}</pre>}
-              {event.kind === "tool" && <p className={cn("mt-1 pl-[22px] text-[11px]", event.state === "failed" ? "text-danger" : "text-ink-secondary")}>{t(STATUS[event.state])}</p>}
+              {event.kind === "tool" && <p className={cn("mt-1 pl-[22px] text-[11px]", event.state === "failed" ? "text-danger-text" : "text-ink-secondary")}>{t(STATUS[event.state])}</p>}
             </li>;
           })}
         </ol>

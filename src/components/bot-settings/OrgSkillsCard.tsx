@@ -93,7 +93,7 @@ export function OrgSkillsCard({ bot, onAdded }: { bot: Bot; onAdded: () => void 
           </div>
         ))}
       </div>
-      {error && <div role="alert" className="mt-2 text-[12px] text-danger">{error}</div>}
+      {error && <div role="alert" className="mt-2 text-[12px] text-danger-text">{error}</div>}
     </div>
   );
 }
