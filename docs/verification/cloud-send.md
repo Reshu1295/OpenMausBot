@@ -87,9 +87,13 @@ My Cloud's welcome (`src/components/cloud-welcome/CloudWelcome.test.ts`): while
 the move runs, or once it has gone, **Bring your stuff** is done by itself, so
 the welcome goes straight on to the AI with nothing to press; back on that step
 it says so in one line, with a fresh start only behind **More**. Before anything
-has come, it offers a fresh start. The line on either page
-(`src/components/CloudSendStrip.test.ts`) shows only the move: on its way, Try
-again after a day of failing, and on My Cloud's page once what arrived.
+has come, it offers a fresh start. The move never shows as a strip over the page
+(`src/components/CloudSendStrip.test.ts`): it lives in the account area at the
+bottom of the sidebar (`src/components/AccountMove.test.ts`). On its way, the
+account line says "Moving to My Cloud…" with the progress in the account menu;
+after a day of failing it says "My Cloud move needs you", the avatar gets a red
+dot, and the menu's top rows give the reason and Try again; on My Cloud's page
+the menu says once what arrived, with the phone to pair and Got it.
 
 ## The real utility port
 

@@ -12,6 +12,7 @@ import {
   resetsIn,
   simplePhoneItems,
   simpleUpdateTop,
+  accountDot,
   accountLabel,
   toolMenuItems,
   type PlanUsageWindows,
@@ -488,6 +489,48 @@ describe("Simple mode's account menu", () => {
   it("names the account button after the person and whatever its dot is raised for", () => {
     expect(accountLabel("You", { automationsNeedYou: false, update: null })).toBe("You");
     expect(accountLabel("Ada", { automationsNeedYou: true, update: "Update failed — try again" })).toBe("Ada · Automations need you · Update failed — try again");
+  });
+
+  it("adds the move to My Cloud: a short warning once failing, shared with automations, and a quiet segment on its way", () => {
+    expect(accountLabel("Omkar", { automationsNeedYou: false, update: null, move: "failed" })).toBe("Omkar · My Cloud move needs you");
+    expect(accountLabel("Omkar", { automationsNeedYou: true, update: null, move: "failed" })).toBe("Omkar · My Cloud move and automations need you");
+    expect(accountLabel("Omkar", { automationsNeedYou: true, update: "Update ready", move: "failed" })).toBe("Omkar · My Cloud move and automations need you · Update ready");
+    expect(accountLabel("Omkar", { automationsNeedYou: false, update: null, move: "sending" })).toBe("Omkar · Moving to My Cloud…");
+    expect(accountLabel("Omkar", { automationsNeedYou: true, update: null, move: "sending" })).toBe("Omkar · Automations need you · Moving to My Cloud…");
+    expect(accountLabel("Omkar", { automationsNeedYou: false, update: null, move: "done" })).toBe("Omkar");
+    expect(accountLabel("Omkar", { automationsNeedYou: true, update: null, move: "done" })).toBe("Omkar · Automations need you");
+    expect(accountLabel("Omkar", { automationsNeedYou: false, update: null, move: null })).toBe("Omkar");
+  });
+
+  it("raises the avatar's dot red for a failing move like automations, the accent for what it brought, and none on its way", () => {
+    expect(accountDot({ automationsNeedYou: false, update: null, move: "failed" })).toBe("danger");
+    expect(accountDot({ automationsNeedYou: true, update: null, move: "failed" })).toBe("danger");
+    expect(accountDot({ automationsNeedYou: false, update: "news", move: "failed" })).toBe("danger");
+    expect(accountDot({ automationsNeedYou: false, update: null, move: "sending" })).toBeNull();
+    expect(accountDot({ automationsNeedYou: false, update: null, move: "done" })).toBe("accent");
+    expect(accountDot({ automationsNeedYou: false, update: null, move: null })).toBeNull();
+    expect(accountDot({ automationsNeedYou: true, update: null, move: null })).toBe("danger");
+    expect(accountDot({ automationsNeedYou: false, update: "failed", move: null })).toBe("danger");
+    expect(accountDot({ automationsNeedYou: false, update: "news", move: "sending" })).toBe("accent");
+  });
+
+  it("puts the move's rows first, in their own group, above a raised update", () => {
+    const move = [{ key: "cloud-move", label: "Your bots couldn't move to My Cloud yet.", onSelect: noop }, { key: "cloud-move-retry", label: "Try again", onSelect: noop }];
+    const update = { key: "update", label: "OpenMausBot 0.2.0 ready, restart", onSelect: noop };
+    expect(groups(build({ move }))).toEqual([
+      ["cloud-move", "cloud-move-retry"],
+      ["usage", "phone-app", "support", "settings"],
+      ["automations", "team-map"],
+      ["place", "switch-place", "account"],
+    ]);
+    expect(groups(build({ move, update, updateTop: { label: "Update ready", action: "Restart" } })).slice(0, 2)).toEqual([["cloud-move", "cloud-move-retry"], ["update"]]);
+    expect(groups(build({ move: [] }))[0]).toEqual(["usage", "phone-app", "support", "settings"]);
+  });
+
+  it("puts the move's rows first in Advanced's account menu too, under their own divider", () => {
+    const move = [{ key: "cloud-move", label: "Moving your bots to My Cloud…", onSelect: noop }];
+    expect(groups(build({ simple: undefined, move }))).toEqual([["cloud-move"], ["usage", "phone-app", "support", "settings", "update"], ["account"]]);
+    expect(groups(build({ simple: undefined }))).toEqual([["usage", "phone-app", "support", "settings", "update"], ["account"]]);
   });
 
   it("draws a person instead of a question mark for someone with no name, at the trigger's own size", () => {
