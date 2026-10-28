@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { SKIN_IDS, SKINS as PICKER } from "@/lib/skins";
 import { distance, oklch, oklchOfP3, p3 } from "./color.ts";
-import { generateDesktop } from "./generate.ts";
+import { generateDesktop, generatePhones } from "./generate.ts";
 import { px, radiusScale } from "./radius.ts";
 import { SKINS } from "./index.ts";
 import { COLOR_TOKENS, WIDE_GAMUT_LIFT, type ColorToken } from "./skin.ts";
@@ -49,5 +49,15 @@ describe("the token source", () => {
         expect(new Set(scale).size, skin.id).toBe(scale.length);
       }
     }
+  });
+
+  it("emits phone themes for the skins the phones ship, opaque, with Daylight and Midnight as the iPhone pair", () => {
+    const phones = generatePhones();
+    for (const skin of SKINS.filter((entry) => entry.phones)) expect(phones["AppearanceSkin.kt"]).toContain(`"${skin.id}", "${skin.label}"`);
+    expect(phones["AppearanceSkin.kt"]).not.toContain('"pop"');
+    expect(phones["AppearanceSkin.kt"]).not.toMatch(/= "[0-9A-F]{8}"/);
+    expect(phones["MausTheme.swift"]).toMatch(/static let app\s+= dynamic\(light: 0xFCFCFC, dark: 0x121212\)/);
+    expect(phones["MausTheme.swift"]).toMatch(/static let surfaceFloat\s+= dynamic\(light: 0xFFFFFF, dark: 0x202020\)/);
+    expect(phones["MausTheme.swift"]).toMatch(/static let dangerText\s+= dynamic\(light: 0xBD2A39, dark: 0xF86E68\)/);
   });
 });
