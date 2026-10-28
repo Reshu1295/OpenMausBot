@@ -2,11 +2,11 @@ import { GEIST } from "../fonts.ts";
 import type { SkinSource } from "../skin.ts";
 
 /**
- * The upstream palette, pixel-sampled from the real Grok app. Repeated here (rather than relying on the `@theme`
- * defaults) so that a `[data-skin]` subtree can switch *back* to it — the picker needs that. Two upstream contrast
- * gaps are preserved deliberately, because this skin's job is to be the original: white on the accent fill measures
- * 3.65:1 and white on the danger fill 3.32:1, both short of AA for the 13–15px labels they carry. Atelier and
- * Foundry fix this via --color-accent-ink.
+ * The upstream palette, pixel-sampled from the real Grok app, as retuned for Simple mode (#3657). Repeated in its own
+ * block (rather than relying on the `@theme` defaults) so that a `[data-skin]` subtree can switch *back* to it — the
+ * picker needs that. Upstream's fills, #1084fe and #ff5667, carried white at 3.65:1 and 3.10:1; they move to the same
+ * hues at a lower lightness so a white label clears AA, while words keep the bright hues through accent-text and
+ * danger-text.
  */
 export default {
   id: "midnight",
@@ -29,7 +29,8 @@ export default {
     ink: "#f5f5f5",
     "ink-secondary": "#f5f5f5a8",
     "ink-tertiary": "#f5f5f591",
-    accent: "#1084fe",
+    // white 4.62:1; was #1084fe (3.65:1)
+    accent: "#0071ea",
     "accent-border": "#459ffe",
     "accent-text": "#7fc0ff",
     focus: "#459ffe",
@@ -38,8 +39,11 @@ export default {
     "bubble-user-ink": "#f5f5f5",
     success: "#38d591",
     "success-ink": "#072114",
-    danger: "#ff5667",
-    "danger-text": "#ff5667",
+    // white 4.61:1; was #ff5667 (3.10:1)
+    danger: "#db314b",
+    // the bright red as words, a touch lighter than #ff5667 so it also reads on the phone's raised menu (4.93:1);
+    // the phone apps use the same value
+    "danger-text": "#f86e68",
     "danger-ink": "#ffffff",
     warning: "#ff9800",
     scrollbar: "#3d3d3d",
@@ -65,7 +69,6 @@ export default {
   wideGamut: {
     tokens: ["accent", "accent-border", "accent-text", "success", "danger", "danger-text", "warning"],
     pinned: {
-      accent: "color(display-p3 0.2062 0.5041 0.9917)",
       "accent-border": "color(display-p3 0.3457 0.6136 0.9909)",
       "accent-text": "color(display-p3 0.5417 0.7465 0.9948)",
     },

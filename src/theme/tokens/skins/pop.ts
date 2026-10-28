@@ -42,7 +42,8 @@ export default {
     success: "#1f7a4d",
     "success-ink": "#ffffff",
     danger: "#d93a2b",
-    "danger-text": "#d93a2b",
+    // the coral as words is a step darker, to read on the sidebar (4.64:1); the fill keeps the brand coral
+    "danger-text": "#ca291c",
     "danger-ink": "#ffffff",
     warning: "#8a5a00",
     scrollbar: "#d0bfa6",
@@ -73,7 +74,6 @@ export default {
       focus: "color(display-p3 0.4751 0.2990 0.9505)",
       success: "color(display-p3 0.2127 0.4772 0.3073)",
       danger: "color(display-p3 0.8102 0.2412 0.1727)",
-      "danger-text": "color(display-p3 0.8102 0.2412 0.1727)",
       warning: "color(display-p3 0.5248 0.3557 0.0473)",
     },
   },

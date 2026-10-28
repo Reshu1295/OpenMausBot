@@ -53,7 +53,8 @@ export default {
     success: "#1f7a4d",
     "success-ink": "#ffffff",
     danger: "#c02b3a",
-    "danger-text": "#c02b3a",
+    // one shade under the fill, so an error also reads on a control (4.60:1); the phones use it too
+    "danger-text": "#bd2a39",
     "danger-ink": "#ffffff",
     warning: "#8a5a00",
     scrollbar: "#c4c4c4",

@@ -108,24 +108,30 @@ function contrast(fgHex, bgHex) {
 
 // Pairs taken from what the components render.
 const SURFACES = ["--color-app", "--color-panel", "--color-raised", "--color-raised-hover", "--color-card", "--color-inset", "--color-composer", "--color-menu"];
+const WORD_SURFACES = ["--color-app", "--color-panel", "--color-card", "--color-menu"];
 const PAIRS = [
   ...SURFACES.map((s) => ["--color-ink", s, 4.5]),
   ...SURFACES.map((s) => ["--color-ink-secondary", s, 4.5]),
   // Quiet text is body-size, so it is held to the same 4.5:1.
   ...SURFACES.map((s) => ["--color-ink-tertiary", s, 4.5]),
   ["--color-bubble-user-ink", "--color-bubble-user", 4.5],
+  // The label a filled button or badge carries.
   ["--color-accent-ink", "--color-accent", 4.5],
   ["--color-danger-ink", "--color-danger", 4.5],
   ["--color-success-ink", "--color-success", 4.5],
-  ["--color-accent-text", "--color-app", 4.5],
-  ["--color-accent-text", "--color-panel", 4.5],
-  ["--color-accent-text", "--color-card", 4.5],
-  ["--color-danger", "--color-card", 4.5],
+  // Accent and danger as words (text-accent-text, text-danger-text): links,
+  // selected labels, errors, delete actions. They sit on the ground, the
+  // sidebar, a card and a menu.
+  ...WORD_SURFACES.flatMap((s) => [
+    ["--color-accent-text", s, 4.5],
+    ["--color-danger-text", s, 4.5],
+  ]),
   ["--color-success", "--color-card", 4.5],
   ["--color-warning", "--color-card", 4.5],
-  // borders and dots are UI components, not text — AA asks 3:1 of them
+  // borders, dots and fills are UI components, not text — AA asks 3:1 of them
   ["--color-hairline", "--color-app", 1.5],
   ["--color-accent", "--color-app", 3],
+  ["--color-danger", "--color-app", 3],
   ["--color-scrollbar", "--color-app", 1.5],
   // The focus ring sits outside the control (outline-offset: 2px), on whatever
   // surface is behind it. WCAG 1.4.11 asks 3:1 of a non-text indicator.
@@ -152,14 +158,7 @@ const PAIRS = [
 ];
 
 const skins = parseSkins(css);
-// Midnight faithfully keeps two upstream contrast gaps. They may improve, but
-// must not get worse; every other below-target pair is a regression.
-const BASELINE_FLOORS = new Map([
-  ["midnight|--color-accent-ink|--color-accent", 3.65],
-  ["midnight|--color-danger-ink|--color-danger", 3.10],
-]);
-const BASELINE_DRIFT = 0.01;
-
+// No skin carries a known gap: every below-target pair fails.
 let failed = false;
 for (const [id, tokens] of skins) {
   const problems = [];
@@ -180,29 +179,22 @@ for (const [id, tokens] of skins) {
     measured++;
     if (ratio < min) problems.push({ fg, bg, ratio, min });
   }
-  let skinFailed = missing.length > 0 || unmeasurable.length > 0;
+  const skinFailed = missing.length > 0 || unmeasurable.length > 0 || problems.length > 0;
   if (missing.length) {
     console.log(`✗ ${id} — undefined token(s): ${[...new Set(missing)].join(", ")}`);
   }
   for (const { fg, bg, fgValue, bgValue } of unmeasurable) {
     console.log(`✗ ${id} — cannot measure ${fg} on ${bg} (${fgValue} on ${bgValue})`);
   }
-  if (problems.length === 0) {
-    if (!skinFailed) console.log(`✓ ${id} — ${measured} pairs, none below target`);
-    if (skinFailed) failed = true;
+  if (!skinFailed) {
+    console.log(`✓ ${id} — ${measured} pairs, none below target`);
     continue;
   }
-  for (const { fg, bg, ratio } of problems) {
-    const floor = BASELINE_FLOORS.get(`${id.replace(/ \(phone\)$/, "")}|${fg}|${bg}`);
-    if (floor === undefined || ratio < floor - BASELINE_DRIFT) skinFailed = true;
-  }
-  console.log(`${skinFailed ? "✗" : "~"} ${id}${skinFailed ? "" : " (known upstream gaps)"}`);
+  failed = true;
+  if (problems.length) console.log(`✗ ${id}`);
   for (const { fg, bg, ratio, min } of problems) {
-    const floor = BASELINE_FLOORS.get(`${id.replace(/ \(phone\)$/, "")}|${fg}|${bg}`);
-    const baseline = floor === undefined ? "" : `; baseline ${floor.toFixed(2)}:1`;
-    console.log(`    ${fg} on ${bg}: ${ratio.toFixed(2)}:1 (needs ${min}:1${baseline})`);
+    console.log(`    ${fg} on ${bg}: ${ratio.toFixed(2)}:1 (needs ${min}:1)`);
   }
-  if (skinFailed) failed = true;
 }
 
 // The inverted bubbles (Daylight's ink-black, Pop's ink) have
@@ -228,6 +220,7 @@ for (const skinId of ["daylight", "pop"]) {
     ["--color-ink-tertiary", "--color-inset"],
     ["--color-accent", "--color-inset"],
     ["--color-accent-text", "--color-bubble-user"],
+    ["--color-danger-text", "--color-bubble-user"],
     ["--color-ink", "--color-control"],
     ["--color-accent-ink", "--color-accent"],
     ["--color-danger-ink", "--color-danger"],
