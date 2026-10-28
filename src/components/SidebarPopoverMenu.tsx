@@ -23,6 +23,8 @@ export interface SidebarMenuItem {
   keepOpen?: boolean;
   submenu?: SidebarMenuItem[];
   chevron?: boolean;
+  /** a sentence that wraps instead of being cut short */
+  wrap?: boolean;
   onSelect: () => void;
   tourId?: string;
 }
@@ -129,6 +131,7 @@ function MenuRows({
                 className={cn(
                   "flex shrink-0 items-center justify-center",
                   look === "compact" ? "size-4 [&>svg]:size-4" : "size-5",
+                  item.wrap && cn("self-start", look === "compact" && "h-[18px]"),
                   item.active ? "text-accent" : look === "roomy" ? "text-ink" : "text-ink-secondary",
                 )}
               >
@@ -137,12 +140,12 @@ function MenuRows({
             )}
             {item.subtitle || item.note ? (
               <span className="flex min-w-0 flex-1 flex-col">
-                <span className="truncate">{item.label}</span>
+                <span className={item.wrap ? "break-words" : "truncate"}>{item.label}</span>
                 {item.subtitle && <span className="truncate text-[12px] font-normal leading-4 text-ink-secondary">{item.subtitle}</span>}
                 {item.note && <span className="text-[12px] font-normal leading-snug text-ink-tertiary">{item.note}</span>}
               </span>
             ) : (
-              <span className="flex-1 truncate">{item.label}</span>
+              <span className={cn("flex-1", item.wrap ? "min-w-0 break-words" : "truncate")}>{item.label}</span>
             )}
             {item.value && <span className={cn("shrink-0 font-normal tabular-nums text-ink-secondary", look === "compact" ? "text-[13px] leading-[18px]" : "text-[14px] leading-5")}>{item.value}</span>}
             {item.trailing}
