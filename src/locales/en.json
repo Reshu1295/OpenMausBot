@@ -1564,6 +1564,7 @@
   "sidebar.copyConversationId": "Copy conversation ID",
   "sidebar.newChannel.title": "New group chat",
   "sidebar.newChannel.name": "Group chat name (for example, Website launch)",
+  "sidebar.newChannel.nameLabel": "Group chat name",
   "sidebar.newChannel.context": "Department (optional): Work, Personal, Client…",
   "sidebar.newChannel.contextAria": "Group chat department",
   "sidebar.newChannel.emptyHint": "Create a bot first. Group chats are made of bots.",
@@ -2740,6 +2741,7 @@
   "engineSetup.finishedSignIn": "I finished signing in",
   "engineSetup.otherComputer": "Signing in from another computer?",
   "engineSetup.otherComputerHint": "After Google redirects to a page that cannot load, paste that page’s complete URL here.",
+  "engineSetup.otherComputerUrl": "Page address from the other computer",
   "engineSetup.sending": "Sending…",
   "engineSetup.sendRedirect": "Send redirect",
   "engineSetup.googleNoLink": "Google sign-in did not return a link.",
@@ -4118,6 +4120,7 @@
   "room.members.ariaMany": "Manage members: {count} bots in this group",
   "room.bulletin.placeholder": "Group instructions: every bot in this group follows them (who does what, tone, goals, a task checklist…)",
   "room.bulletin.title": "Group instructions: shared instructions for every bot here",
+  "room.bulletin.label": "Group instructions",
   "room.bulletin.none": "No group instructions",
   "room.bulletin.add": "Add group instructions…",
   "room.panel.open": "Room settings",
@@ -4575,6 +4578,8 @@
   "routines.editor.new": "New routine",
   "routines.editor.edit": "Edit routine",
   "routines.editor.titlePlaceholder": "What should happen?",
+  "routines.editor.titleLabel": "Title",
+  "routines.editor.descriptionLabel": "Description",
   "routines.editor.who": "Who does it",
   "routines.editor.when": "When",
   "routines.editor.repeat": "Repeat",
@@ -6688,5 +6693,7 @@
   "keys.search.aria": "Search API keys",
   "keys.search.none": "No keys match “{query}”.",
   "keys.openPage": "Open API keys",
-  "engineSetup.apiKey.inline": "Paste it here. It saves and checks itself, and the models show up here."
+  "engineSetup.apiKey.inline": "Paste it here. It saves and checks itself, and the models show up here.",
+  "commandPalette.searchLabel": "Search bots, group chats and messages",
+  "commandPalette.searchPlaceholder": "Search bots, group chats, messages…"
 }
