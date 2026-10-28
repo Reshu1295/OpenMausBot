@@ -55,6 +55,7 @@ export default {
     "success-ink": "#1c150c",
     // a lamp, not a paint chip
     danger: "#e0685e",
+    "danger-text": "#e0685e",
     "danger-ink": "#1c0d0b",
     warning: "#dfa441",
     scrollbar: "#3d3529",

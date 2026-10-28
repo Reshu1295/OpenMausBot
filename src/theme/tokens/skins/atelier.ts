@@ -53,6 +53,7 @@ export default {
     success: "#3f6b47",
     "success-ink": "#ffffff",
     danger: "#a33a32",
+    "danger-text": "#a33a32",
     "danger-ink": "#ffffff",
     // darkened → 4.98:1
     warning: "#7a5f31",

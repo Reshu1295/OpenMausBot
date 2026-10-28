@@ -36,6 +36,7 @@ export default {
     success: "#2f704f",
     "success-ink": "#ffffff",
     danger: "#a83d48",
+    "danger-text": "#a83d48",
     "danger-ink": "#ffffff",
     warning: "#765b2b",
     scrollbar: "#aeb6c0",

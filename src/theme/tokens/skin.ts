@@ -8,6 +8,8 @@
  * - `ink-tertiary`: quiet text (timestamps, hints, placeholders), the quietest ink that still clears 4.5:1 on every
  *   text surface, measured by `pnpm check:contrast`.
  * - `focus`: the ring a keyboard user follows.
+ * - `accent-text`, `danger-text`: accent and danger as words (links, selected labels, errors), tuned to read on the
+ *   skin's surfaces; `accent` and `danger` are the fills, tuned for the label they carry.
  * - `accent-ink`, `danger-ink`, `success-ink`: the label a filled accent, danger or success surface carries.
  * - `bubble-user-ink`: the ink inside the user's own bubble, a hex rather than the ink token so it can be measured.
  * - `maus-line`: the mascot's second speed line, set against the ground.
@@ -19,7 +21,7 @@ export const COLOR_TOKENS = [
   "accent", "accent-border", "accent-text", "focus", "accent-ink",
   "bubble-user", "bubble-user-ink",
   "success", "success-ink",
-  "danger", "danger-ink",
+  "danger", "danger-text", "danger-ink",
   "warning",
   "scrollbar", "maus-line",
 ] as const;
@@ -30,13 +32,13 @@ export type Colors = Record<ColorToken, string>;
 export const THEME_TOKENS = [
   "app", "panel", "raised", "raised-hover", "composer", "composer-ring", "menu", "menu-hover", "menu-active", "card",
   "inset", "control", "hairline", "ink", "ink-secondary", "ink-tertiary", "accent", "accent-border", "focus",
-  "accent-text", "bubble-user", "success", "danger", "warning",
+  "accent-text", "accent-ink", "bubble-user", "success", "success-ink", "danger", "danger-text", "danger-ink", "warning",
 ] as const satisfies readonly ColorToken[];
 export const ROOT_TOKENS = COLOR_TOKENS.filter((token) => !(THEME_TOKENS as readonly string[]).includes(token));
 
 /** The tokens that get a more chromatic Display P3 twin on a wide-gamut screen, unless a skin lists its own. */
 export const WIDE_GAMUT_TOKENS = [
-  "accent", "accent-border", "accent-text", "focus", "success", "danger", "warning",
+  "accent", "accent-border", "accent-text", "focus", "success", "danger", "danger-text", "warning",
 ] as const satisfies readonly ColorToken[];
 /** How much more chroma the P3 twin carries, lightness and hue held. */
 export const WIDE_GAMUT_LIFT = 1.12;

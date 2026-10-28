@@ -226,6 +226,7 @@ export function userBubbleStyle(color: MausColor, { flat = false }: { flat?: boo
     "--color-accent-ink": tone.accentInk,
     "--color-focus": tone.focus,
     "--color-danger": tone.danger,
+    "--color-danger-text": tone.danger,
     "--color-danger-ink": tone.dangerInk,
     "--color-success": tone.success,
     "--color-success-ink": tone.successInk,

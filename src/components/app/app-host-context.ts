@@ -21,7 +21,7 @@ const VARIABLES: ReadonlyArray<readonly [string, string]> = [
   ["--color-text-tertiary", "var(--color-ink-tertiary)"],
   ["--color-text-inverse", "var(--color-app)"],
   ["--color-text-info", "var(--color-accent-text)"],
-  ["--color-text-danger", "var(--color-danger)"],
+  ["--color-text-danger", "var(--color-danger-text)"],
   ["--color-text-success", "var(--color-success)"],
   ["--color-text-warning", "var(--color-warning)"],
   ["--color-text-disabled", "var(--color-ink-tertiary)"],

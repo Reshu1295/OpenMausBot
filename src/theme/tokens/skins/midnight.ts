@@ -39,6 +39,7 @@ export default {
     success: "#38d591",
     "success-ink": "#072114",
     danger: "#ff5667",
+    "danger-text": "#ff5667",
     "danger-ink": "#ffffff",
     warning: "#ff9800",
     scrollbar: "#3d3d3d",
@@ -62,7 +63,7 @@ export default {
   },
   captionSymbol: "#b5b5b5",
   wideGamut: {
-    tokens: ["accent", "accent-border", "accent-text", "success", "danger", "warning"],
+    tokens: ["accent", "accent-border", "accent-text", "success", "danger", "danger-text", "warning"],
     pinned: {
       accent: "color(display-p3 0.2062 0.5041 0.9917)",
       "accent-border": "color(display-p3 0.3457 0.6136 0.9909)",
