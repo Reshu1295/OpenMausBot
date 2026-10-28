@@ -47,7 +47,7 @@ describe("Settings full backups", () => {
     const html = render().html;
     expect(html).toContain('type="file" accept=".ombbackup"');
     expect(html.match(/type="password"/g)).toHaveLength(3);
-    expect(html).toContain("remote VM disks");
+    expect(html).toContain("the disks of remote desktops");
     expect(html).toContain("Saved account credentials and connections are not included");
     expect(html).toContain("existing credentials on the destination stay unchanged");
     expect(html).toContain("not automatically redacted");
