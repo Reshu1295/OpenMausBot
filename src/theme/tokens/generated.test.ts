@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import { SKIN_IDS, SKINS as PICKER } from "@/lib/skins";
 import { distance, oklch, oklchOfP3, p3 } from "./color.ts";
 import { generateDesktop } from "./generate.ts";
+import { px, radiusScale } from "./radius.ts";
 import { SKINS } from "./index.ts";
 import { COLOR_TOKENS, WIDE_GAMUT_LIFT, type ColorToken } from "./skin.ts";
 
@@ -36,6 +37,16 @@ describe("the token source", () => {
         const base = oklch(skin.colors[token as ColorToken]);
         const derived = oklchOfP3(p3({ ...base, c: base.c * WIDE_GAMUT_LIFT }));
         expect(distance(oklchOfP3(pinned), derived), `${skin.id} ${token}`).toBeLessThan(0.03);
+      }
+    }
+  });
+
+  it("keeps every skin's corner scale strictly increasing, on desktop and phone", () => {
+    for (const skin of SKINS) {
+      for (const set of [skin.radius, { ...skin.radius, ...skin.phone?.radius }]) {
+        const scale = Object.values(radiusScale(set)).map(px);
+        expect(scale, skin.id).toEqual([...scale].sort((a, b) => a - b));
+        expect(new Set(scale).size, skin.id).toBe(scale.length);
       }
     }
   });

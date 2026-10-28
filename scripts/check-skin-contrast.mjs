@@ -193,6 +193,11 @@ function oklab(value) {
 }
 const distance = (a, b) => Math.hypot(...oklab(a).map((v, i) => v - oklab(b)[i]));
 const MIN_SUCCESS_DISTANCE = 0.04;
+const RADII = ["--radius-xs", "--radius-sm", "--radius-md", "--radius-lg", "--radius-xl", "--radius-2xl", "--radius-3xl", "--radius-4xl"];
+const cornerPx = (value) => {
+  const match = /^([\d.]+)(px|rem)$/.exec(value ?? "");
+  return match ? Number(match[1]) * (match[2] === "rem" ? 16 : 1) : null;
+};
 
 const skins = parseSkins(css);
 // No skin carries a known gap: every below-target pair fails.
@@ -218,11 +223,18 @@ for (const [id, tokens] of skins) {
   }
   // The float (menus, popovers) sits over cards, so it is never darker than one.
   if (!missing.length && !unmeasurable.length && oklab(tokens["--color-menu"])[0] < oklab(tokens["--color-card"])[0] - 0.002) {
-    problems.push({ fg: "--color-menu", bg: "--color-card", ratio: oklab(tokens["--color-menu"])[0] - oklab(tokens["--color-card"])[0], min: 0, kind: "OKLCH lightness (the float sits below the card)" });
+    problems.push({ text: "--color-menu is darker than --color-card: the float sits below the card it floats over" });
   }
   // Success is a state of its own: a working dot next to an unread one must not read as the same colour.
   const apart = missing.length || unmeasurable.length ? Infinity : distance(tokens["--color-success"], tokens["--color-accent"]);
-  if (apart < MIN_SUCCESS_DISTANCE) problems.push({ fg: "--color-success", bg: "--color-accent", ratio: apart, min: MIN_SUCCESS_DISTANCE, kind: "OKLab distance" });
+  if (apart < MIN_SUCCESS_DISTANCE) problems.push({ text: `--color-success is ${apart.toFixed(3)} from --color-accent in OKLab (needs ${MIN_SUCCESS_DISTANCE}): success must read as its own colour` });
+  // Corners: every step of the scale rounder than the one before, and Tailwind's bare `rounded` at the sm step.
+  const corners = RADII.map((name) => cornerPx(tokens[name]));
+  if (corners.some((size) => size === null)) problems.push({ text: `radius scale incomplete: ${RADII.filter((_, i) => corners[i] === null).join(", ")}` });
+  else for (let i = 1; i < corners.length; i++) {
+    if (corners[i] <= corners[i - 1]) problems.push({ text: `${RADII[i]} (${corners[i]}px) is not rounder than ${RADII[i - 1]} (${corners[i - 1]}px)` });
+  }
+  if (cornerPx(tokens["--radius"]) !== cornerPx(tokens["--radius-sm"])) problems.push({ text: "--radius (Tailwind's bare `rounded`) differs from --radius-sm" });
   const skinFailed = missing.length > 0 || unmeasurable.length > 0 || problems.length > 0;
   if (missing.length) {
     console.log(`✗ ${id} — undefined token(s): ${[...new Set(missing)].join(", ")}`);
@@ -231,13 +243,13 @@ for (const [id, tokens] of skins) {
     console.log(`✗ ${id} — cannot measure ${fg} on ${bg} (${fgValue} on ${bgValue})`);
   }
   if (!skinFailed) {
-    console.log(`✓ ${id} — ${measured} pairs, none below target`);
+    console.log(`✓ ${id} — ${measured} pairs and the corner scale, none below target`);
     continue;
   }
   failed = true;
   if (problems.length) console.log(`✗ ${id}`);
-  for (const { fg, bg, ratio, min, kind } of problems) {
-    console.log(kind ? `    ${fg} is ${ratio.toFixed(3)} from ${bg} in ${kind} (needs ${min})` : `    ${fg} on ${bg}: ${ratio.toFixed(2)}:1 (needs ${min}:1)`);
+  for (const { fg, bg, ratio, min, text } of problems) {
+    console.log(text ? `    ${text}` : `    ${fg} on ${bg}: ${ratio.toFixed(2)}:1 (needs ${min}:1)`);
   }
 }
 

@@ -180,6 +180,15 @@
   --color-warning-text: #ff9800;
   --color-warning-ink: #2b1400;
   --color-shadow: transparent;
+  --radius: 4px;
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 16px;
+  --radius-3xl: 24px;
+  --radius-4xl: 32px;
   /* @generated tokens:theme end */
 
   --font-sans: "Geist Variable", -apple-system, BlinkMacSystemFont,
@@ -281,8 +290,15 @@
   --color-shadow: transparent;
   --font-sans: "Geist Variable", -apple-system, BlinkMacSystemFont,
     "Segoe UI", system-ui, sans-serif;
+  --radius: 4px;
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
   --radius-lg: 0.5rem;
   --radius-xl: 0.75rem;
+  --radius-2xl: 16px;
+  --radius-3xl: 24px;
+  --radius-4xl: 32px;
   --identity-green: #009957;
   --identity-blue: #377FE6;
   --identity-red: #D94B52;
@@ -336,8 +352,15 @@
   --color-shadow: #1a1a18;
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, sans-serif;
+  --radius: 4px;
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 5px;
   --radius-lg: 6px;
   --radius-xl: 10px;
+  --radius-2xl: 16px;
+  --radius-3xl: 24px;
+  --radius-4xl: 32px;
   --identity-green: #007f48;
   --identity-blue: #1b6adc;
   --identity-red: #d12c34;
@@ -391,8 +414,15 @@
   --color-shadow: transparent;
   --font-sans: "Geist Variable", -apple-system, BlinkMacSystemFont,
     "Segoe UI", system-ui, sans-serif;
+  --radius: 2px;
+  --radius-xs: 1px;
+  --radius-sm: 2px;
+  --radius-md: 3px;
   --radius-lg: 4px;
   --radius-xl: 8px;
+  --radius-2xl: 16px;
+  --radius-3xl: 24px;
+  --radius-4xl: 32px;
   --identity-green: #009957;
   --identity-blue: #377FE6;
   --identity-red: #D94B52;
@@ -446,8 +476,15 @@
   --color-shadow: #14201f;
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, sans-serif;
+  --radius: 4px;
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
   --radius-lg: 8px;
   --radius-xl: 14px;
+  --radius-2xl: 16px;
+  --radius-3xl: 24px;
+  --radius-4xl: 32px;
   --identity-green: #007945;
   --identity-blue: #1a65d1;
   --identity-red: #c82a32;
@@ -501,8 +538,15 @@
   --color-shadow: transparent;
   --font-sans: "Geist Variable", -apple-system, BlinkMacSystemFont,
     "Segoe UI", system-ui, sans-serif;
+  --radius: 4px;
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 5px;
   --radius-lg: 6px;
   --radius-xl: 10px;
+  --radius-2xl: 16px;
+  --radius-3xl: 24px;
+  --radius-4xl: 32px;
   --identity-green: #009957;
   --identity-blue: #377FE6;
   --identity-red: #D94B52;
@@ -556,8 +600,15 @@
   --color-shadow: #1d2229;
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, sans-serif;
+  --radius: 4px;
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
   --radius-lg: 8px;
   --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-3xl: 24px;
+  --radius-4xl: 32px;
   --identity-green: #007d47;
   --identity-blue: #1b68d7;
   --identity-red: #ce2c34;
@@ -611,8 +662,15 @@
   --color-shadow: transparent;
   --font-sans: "Geist Variable", -apple-system, BlinkMacSystemFont,
     "Segoe UI", system-ui, sans-serif;
+  --radius: 4px;
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
   --radius-lg: 8px;
   --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-3xl: 24px;
+  --radius-4xl: 32px;
   --identity-green: #009957;
   --identity-blue: #377FE6;
   --identity-red: #D94B52;
@@ -666,8 +724,15 @@
   --color-shadow: #1c1c1c;
   --font-sans: "Geist Variable", -apple-system, BlinkMacSystemFont,
     "Segoe UI", system-ui, sans-serif;
+  --radius: 4px;
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
   --radius-lg: 8px;
   --radius-xl: 14px;
+  --radius-2xl: 16px;
+  --radius-3xl: 24px;
+  --radius-4xl: 32px;
   --identity-green: #00864c;
   --identity-blue: #2271e3;
   --identity-red: #d63a42;
@@ -722,8 +787,15 @@
   --color-shadow: #0f1a13;
   --font-sans: "Geist Variable", -apple-system, BlinkMacSystemFont,
     "Segoe UI", system-ui, sans-serif;
+  --radius: 4px;
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
   --radius-lg: 10px;
   --radius-xl: 16px;
+  --radius-2xl: 21px;
+  --radius-3xl: 24px;
+  --radius-4xl: 32px;
   --identity-green: #00884e;
   --identity-blue: #2573e4;
   --identity-red: #d63f47;
@@ -777,8 +849,15 @@
   --color-shadow: #1b1613;
   --font-sans: "Plus Jakarta Sans", ui-rounded, "SF Pro Rounded", "Geist Variable",
     -apple-system, system-ui, "Segoe UI", sans-serif;
+  --radius: 4px;
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
   --radius-lg: 12px;
   --radius-xl: 18px;
+  --radius-2xl: 24px;
+  --radius-3xl: 32px;
+  --radius-4xl: 43px;
   --identity-green: #00824a;
   --identity-blue: #1c6de0;
   --identity-red: #d4323a;
@@ -832,8 +911,15 @@
   --color-shadow: transparent;
   --font-sans: "Geist Variable", -apple-system, BlinkMacSystemFont,
     "Segoe UI", system-ui, sans-serif;
+  --radius: 4px;
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
   --radius-lg: 8px;
   --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-3xl: 24px;
+  --radius-4xl: 32px;
   --identity-green: #009957;
   --identity-blue: #377FE6;
   --identity-red: #D94B52;

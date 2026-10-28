@@ -1,4 +1,5 @@
 import { oklch, p3 } from "./color.ts";
+import { radiusScale } from "./radius.ts";
 import {
   COLOR_TOKENS, IDENTITY_HUES, RADII, ROOT_TOKENS, THEME_TOKENS, WIDE_GAMUT_LIFT, WIDE_GAMUT_TOKENS,
   type ColorToken, type Colors, type Radius, type SkinSource,
@@ -20,10 +21,20 @@ const colorEntries = (colors: Partial<Colors>, tokens: readonly ColorToken[] = C
   tokens.filter((token) => colors[token] !== undefined).map((token) => [`--color-${token}`, colors[token]!]);
 const radiusEntries = (radius: Partial<Record<Radius, string>>): Entry[] =>
   RADII.filter((size) => radius[size] !== undefined).map((size) => [`--radius-${size}`, radius[size]!]);
+/** The full corner scale, with `--radius` (Tailwind's bare `rounded`) at the sm step. */
+const scaleEntries = (radius: Partial<Record<Radius, string>>): Entry[] => {
+  const scale = radiusScale(radius);
+  return [["--radius", scale.sm], ...radiusEntries({ ...scale, menu: radius.menu })];
+};
+/** The phone's scale where it differs from the skin's own. */
+const phoneScaleEntries = (skin: SkinSource): Entry[] => {
+  const desktop = new Map(scaleEntries(skin.radius));
+  return scaleEntries({ ...skin.radius, ...skin.phone!.radius }).filter(([name, value]) => desktop.get(name) !== value);
+};
 
 /** The default skin's colours in `@theme`, so Tailwind emits a utility for each token. */
 export function themeDefaults(skin: SkinSource): string {
-  return declare("  ", colorEntries(skin.colors, THEME_TOKENS)).join("\n");
+  return [...declare("  ", colorEntries(skin.colors, THEME_TOKENS)), ...declare("  ", scaleEntries(skin.radius))].join("\n");
 }
 
 /** A token's Display P3 twin: the pinned value, or the same lightness and hue with more chroma, fitted to P3. */
@@ -42,7 +53,7 @@ export function skinsCss(skins: readonly SkinSource[], fallback: SkinSource): st
     out.push("", `[data-skin="${skin.id}"] {`, `  --code-color-scheme: ${skin.mode};`);
     out.push(...declare("  ", colorEntries(skin.colors)));
     out.push(`  --font-sans: ${skin.font};`);
-    out.push(...declare("  ", radiusEntries(skin.radius)));
+    out.push(...declare("  ", scaleEntries(skin.radius)));
     out.push(...declare("  ", IDENTITY_HUES.map((hue): Entry => [`--identity-${hue}`, skin.identity[hue]])));
     if (skin.shadowFloat) out.push(`  --shadow-float: ${skin.shadowFloat};`);
     out.push("}");
@@ -77,7 +88,7 @@ export function phoneCss(skins: readonly SkinSource[]): string {
   const out = ["@media (max-width: 767.98px) {"];
   for (const skin of skins.filter((entry) => entry.phone)) {
     out.push(`  :is([data-skin="${skin.id}"]) {`);
-    out.push(...declare("    ", colorEntries(skin.phone!.colors)), ...declare("    ", radiusEntries(skin.phone!.radius)));
+    out.push(...declare("    ", colorEntries(skin.phone!.colors)), ...declare("    ", phoneScaleEntries(skin)));
     out.push("  }");
   }
   out.push("}");
