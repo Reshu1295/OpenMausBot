@@ -265,7 +265,7 @@ function OutboundControl({ bot, onChange }: { bot: Bot; onChange: (policy: Outbo
                 if (event.key === "Enter") (event.target as HTMLInputElement).blur();
               }}
               aria-label={t("permissions.outbound.dailyLimit")}
-              className="w-20 rounded-md bg-inset px-2 py-1 text-[13px] text-ink tabular-nums outline-none focus:ring-1 focus:ring-accent"
+              className="w-20 rounded-md bg-inset px-2 py-1 text-[13px] text-ink tabular-nums outline-none focus:ring-1 focus:ring-focus"
             />
             {t("permissions.outbound.perDay")}
           </label>

@@ -108,7 +108,7 @@ export function RoutineRunCard({
             onClick={onOpen}
             aria-label={`${actionLabel} for ${run.routineName}`}
             className={cn(
-              "flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-[12px] font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent",
+              "flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-[12px] font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-focus",
               run.goalStatus === "needs-input"
                 ? "bg-warning/15 text-warning hover:bg-warning/25"
                 : "text-ink-secondary hover:bg-inset hover:text-ink",
@@ -159,7 +159,7 @@ export function AutomationCaption({ message, line, botId }: { message: Message; 
           type="button"
           onClick={() => openNotificationTarget(dispatch, { botId, threadId: line.executionThreadId }, state, showThreads)}
           aria-label={t("chat.automation.openRunFor", { name: line.name })}
-          className="shrink-0 rounded px-1 hover:bg-inset hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+          className="shrink-0 rounded px-1 hover:bg-inset hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-focus"
         >
           {t("chat.automation.openRun")}
         </button>

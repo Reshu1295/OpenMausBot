@@ -290,7 +290,7 @@ export function AndroidDevicePanel({ status }: { status: AndroidDeviceStatus }) 
             onPointerCancel={() => {
               pointerRef.current = null;
             }}
-            className="mx-auto flex h-[520px] w-full touch-none cursor-pointer items-center justify-center overflow-hidden overscroll-none rounded-[28px] bg-black outline-none ring-1 ring-white/10 focus:ring-2 focus:ring-accent"
+            className="mx-auto flex h-[520px] w-full touch-none cursor-pointer items-center justify-center overflow-hidden overscroll-none rounded-[28px] bg-black outline-none ring-1 ring-white/10 focus:ring-2 focus:ring-focus"
           >
             {frame ? (
               <img

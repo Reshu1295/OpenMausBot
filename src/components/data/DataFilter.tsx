@@ -73,7 +73,7 @@ export function DataFilter({ columns, value, onChange }: { columns: DataColumn[]
         <div className="min-h-0 overflow-y-auto p-3">
           <label className="flex flex-col gap-1.5 text-[11px] text-ink-secondary">{t("data.filter.contains")}
             <input ref={input} value={value.text} onChange={(event) => onChange({ ...value, text: event.target.value })} aria-label={t("data.filter.value")} placeholder={t("data.filter.value")}
-              className="w-full rounded-md border border-hairline/50 bg-inset px-2 py-1.5 text-xs text-ink outline-none focus-visible:ring-1 focus-visible:ring-accent" />
+              className="w-full rounded-md border border-hairline/50 bg-inset px-2 py-1.5 text-xs text-ink outline-none focus-visible:ring-1 focus-visible:ring-focus" />
           </label>
           <button type="button" disabled={!value.text && value.column === undefined} className="mt-2 rounded-md px-1 py-1 text-xs text-ink-secondary hover:text-ink disabled:opacity-40" onClick={() => { onChange({ text: "" }); setChoosing(true); setSearch(""); }}>{t("data.filter.clear")}</button>
         </div>

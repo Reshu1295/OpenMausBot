@@ -674,7 +674,7 @@ function RoomSetup({ group, members }: { group: Group; members: Bot[] }) {
               }}
               disabled={saving}
               className={cn(
-                "flex min-h-[72px] w-full cursor-pointer flex-col items-start justify-between rounded-2xl border px-3 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 disabled:cursor-not-allowed disabled:opacity-50",
+                "flex min-h-[72px] w-full cursor-pointer flex-col items-start justify-between rounded-2xl border px-3 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/40 disabled:cursor-not-allowed disabled:opacity-50",
                 behavior === "auto"
                   ? "border-accent bg-accent/10 text-ink ring-1 ring-accent/30"
                   : "border-hairline/50 bg-inset text-ink-secondary hover:border-hairline hover:bg-raised",
@@ -709,7 +709,7 @@ function RoomSetup({ group, members }: { group: Group; members: Bot[] }) {
                 }}
                 disabled={saving}
                 className={cn(
-                  "flex min-h-[72px] w-full flex-col items-start justify-between rounded-2xl border px-3 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 disabled:cursor-not-allowed disabled:opacity-50",
+                  "flex min-h-[72px] w-full flex-col items-start justify-between rounded-2xl border px-3 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/40 disabled:cursor-not-allowed disabled:opacity-50",
                   behavior === "lead"
                     ? "border-accent bg-accent/10 text-ink ring-1 ring-accent/30"
                     : "border-hairline/50 bg-inset text-ink-secondary hover:border-hairline hover:bg-raised",
@@ -794,7 +794,7 @@ function RoomSetup({ group, members }: { group: Group; members: Bot[] }) {
               }}
               disabled={saving}
               className={cn(
-                "flex min-h-[72px] w-full flex-col items-start justify-between rounded-2xl border px-3 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 disabled:cursor-not-allowed disabled:opacity-50",
+                "flex min-h-[72px] w-full flex-col items-start justify-between rounded-2xl border px-3 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/40 disabled:cursor-not-allowed disabled:opacity-50",
                 behavior === "everyone"
                   ? "border-accent bg-accent/10 text-ink ring-1 ring-accent/30"
                   : "border-hairline/50 bg-inset text-ink-secondary hover:border-hairline hover:bg-raised",
@@ -824,7 +824,7 @@ function RoomSetup({ group, members }: { group: Group; members: Bot[] }) {
               }}
               disabled={saving}
               className={cn(
-                "flex min-h-[72px] w-full flex-col items-start justify-between rounded-2xl border px-3 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 disabled:cursor-not-allowed disabled:opacity-50",
+                "flex min-h-[72px] w-full flex-col items-start justify-between rounded-2xl border px-3 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/40 disabled:cursor-not-allowed disabled:opacity-50",
                 behavior === "mentions"
                   ? "border-accent bg-accent/10 text-ink ring-1 ring-accent/30"
                   : "border-hairline/50 bg-inset text-ink-secondary hover:border-hairline hover:bg-raised",

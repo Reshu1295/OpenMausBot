@@ -1352,7 +1352,7 @@ export function ComputerPanel({
               type="button"
               onClick={() => void takeControl()}
               disabled={controlPending || pending === "join"}
-              className="group relative flex h-full w-full cursor-pointer items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-wait"
+              className="group relative flex h-full w-full cursor-pointer items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus disabled:cursor-wait"
               aria-label={t("computer.openLiveDesktopAria", { name: bot.name })}
               title={t("computer.openLiveDesktop")}
             >
@@ -1696,7 +1696,7 @@ export function ComputerPanel({
                 type="button"
                 aria-pressed={selected}
                 className={cn(
-                  "min-w-0 rounded-lg border px-2.5 py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-card",
+                  "min-w-0 rounded-lg border px-2.5 py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-card",
                   selected
                     ? "border-accent/60 bg-accent/10 text-ink"
                     : "border-hairline/50 bg-panel/30 text-ink-secondary",
@@ -1754,7 +1754,7 @@ export function ComputerPanel({
                   aria-pressed={selected}
                   onClick={() => selectPlace(mode)}
                   className={cn(
-                    "flex min-w-0 flex-col items-center gap-1.5 rounded-lg border px-1.5 py-2.5 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-card",
+                    "flex min-w-0 flex-col items-center gap-1.5 rounded-lg border px-1.5 py-2.5 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-card",
                     selected
                       ? "border-accent/60 bg-accent/10 text-ink"
                       : "border-hairline/50 bg-panel/30 text-ink-secondary",
@@ -1783,7 +1783,7 @@ export function ComputerPanel({
                   disabled={Boolean(bot.busy)}
                   title={bot.busy ? t("place.busy") : undefined}
                   onClick={() => dispatch({ type: "updateTask", botId: profileBot.id, threadId: profileBot.threadId, patch: { surface: null } })}
-                  className="shrink-0 rounded-md px-2 py-0.5 text-[12px] font-medium leading-5 text-accent-text transition-colors hover:bg-control focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-transparent"
+                  className="shrink-0 rounded-md px-2 py-0.5 text-[12px] font-medium leading-5 text-accent-text transition-colors hover:bg-control focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-transparent"
                   data-testid="place-unpin"
                 >
                   {t("place.unpinSimple", {

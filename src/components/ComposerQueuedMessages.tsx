@@ -117,7 +117,7 @@ export function QueuedComposerMessages({
                 disabled={steering}
                 aria-label={steering ? t("composer.queued.steeringAria") : steerDescription}
                 title={steerDescription}
-                className="flex h-7 shrink-0 items-center gap-1 rounded-lg px-2 text-[13px] font-medium text-ink-secondary outline-none hover:bg-raised-hover hover:text-ink focus-visible:ring-2 focus-visible:ring-accent/60 disabled:cursor-wait disabled:opacity-60"
+                className="flex h-7 shrink-0 items-center gap-1 rounded-lg px-2 text-[13px] font-medium text-ink-secondary outline-none hover:bg-raised-hover hover:text-ink focus-visible:ring-2 focus-visible:ring-focus/60 disabled:cursor-wait disabled:opacity-60"
               >
                 <CornerDownRight
                   size={13}
@@ -134,7 +134,7 @@ export function QueuedComposerMessages({
                 onClick={() => onEdit(item.queueId)}
                 aria-label={t("composer.queued.editAria", { index: index + 1, count: items.length })}
                 title={t("composer.queued.editTitle")}
-                className="flex size-7 shrink-0 items-center justify-center rounded-lg text-ink-secondary outline-none hover:bg-raised-hover hover:text-ink focus-visible:ring-2 focus-visible:ring-accent/60"
+                className="flex size-7 shrink-0 items-center justify-center rounded-lg text-ink-secondary outline-none hover:bg-raised-hover hover:text-ink focus-visible:ring-2 focus-visible:ring-focus/60"
               >
                 <Pencil size={14} aria-hidden="true" />
               </button>
@@ -144,7 +144,7 @@ export function QueuedComposerMessages({
               onClick={() => onCancel(item.queueId)}
               aria-label={t("composer.queued.deleteAria", { index: index + 1, count: items.length })}
               title={t("composer.queued.deleteTitle")}
-              className="flex size-7 shrink-0 items-center justify-center rounded-lg text-ink-secondary outline-none hover:bg-raised-hover hover:text-ink focus-visible:ring-2 focus-visible:ring-accent/60"
+              className="flex size-7 shrink-0 items-center justify-center rounded-lg text-ink-secondary outline-none hover:bg-raised-hover hover:text-ink focus-visible:ring-2 focus-visible:ring-focus/60"
             >
               <Trash2 size={14} aria-hidden="true" />
             </button>

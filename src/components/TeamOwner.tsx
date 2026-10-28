@@ -60,7 +60,7 @@ export function OwnerFace({ bot }: { bot: Bot }) {
       const rect = event.currentTarget.getBoundingClientRect();
       requestOwnerPick({ botIds: [bot.id], title: t("owner.pickTitle"), current: owner?.email ?? null, x: rect.left, y: rect.bottom + 4 });
     }}
-    className="flex shrink-0 rounded-full outline-none hover:ring-2 hover:ring-accent/40 focus-visible:ring-2 focus-visible:ring-accent/60">{face}</button>;
+    className="flex shrink-0 rounded-full outline-none hover:ring-2 hover:ring-accent/40 focus-visible:ring-2 focus-visible:ring-focus/60">{face}</button>;
 }
 
 /** Changes who one bot, or every bot of a department, reports to. */

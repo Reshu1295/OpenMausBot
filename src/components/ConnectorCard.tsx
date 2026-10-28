@@ -215,7 +215,7 @@ export function ConnectorCard({ botId, threadId, message }: { botId: string; thr
             onChange={(event) => setLabel(event.target.value)}
             placeholder={t("connectors.aliasPlaceholder")}
             aria-label={t("connectors.aliasAriaAnother", { service: connector.label })}
-            className="mt-1.5 h-8 w-full rounded-full bg-inset px-3 text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none focus:ring-1 focus:ring-accent"
+            className="mt-1.5 h-8 w-full rounded-full bg-inset px-3 text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none focus:ring-1 focus:ring-focus"
           />
         </form>
       ) : error && <p role="alert" className="mt-1.5 text-[12px] text-danger-text">{typeof error === "string" ? error : t(error.key)}</p>}
