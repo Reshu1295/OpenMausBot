@@ -38,7 +38,7 @@ export function CustomDomainDnsRecord({ domain, serverIpv4 }: { domain: string; 
     [t("settings.domain.recordValue"), serverIpv4],
   ] as const;
   return (
-    <section aria-label={t("settings.domain.dnsRecord")} className="space-y-2 rounded-lg border border-hairline/50 p-3">
+    <section aria-label={t("settings.domain.dnsRecord")} className="space-y-2 rounded-lg border border-hairline p-3">
       <p className="text-[12px] font-medium text-ink">{t("settings.domain.dnsRecord")}</p>
       <dl className="space-y-2">
         {rows.map(([label, value]) => (
@@ -72,7 +72,7 @@ export function customDomainProxyExample(status: Pick<CustomDomainStatus, "appPo
 
 export function CustomDomainGuide({ status }: { status: CustomDomainStatus }) {
   return (
-    <details className="rounded-lg border border-hairline/50 bg-inset px-3 py-2.5 text-[12px] text-ink-secondary">
+    <details className="rounded-lg border border-hairline bg-inset px-3 py-2.5 text-[12px] text-ink-secondary">
       <summary className="cursor-pointer font-medium text-ink">{t("settings.domain.guide")}</summary>
       <ol className="mt-3 list-decimal space-y-3 pl-4 leading-relaxed">
         <li>{t("settings.domain.dns")}</li>
@@ -141,7 +141,7 @@ export function CustomDomainSettings() {
           <>
             <form onSubmit={(event) => { event.preventDefault(); if (domain.trim() && !busy) void save(false); }} className="space-y-2">
               <label htmlFor="custom-domain" className="block text-[13px] font-medium text-ink">{t("settings.domain.label")}</label>
-              <input id="custom-domain" type="text" value={domain} disabled={busy !== null} onChange={(event) => { setDomain(event.target.value); setNotice(null); setError(null); }} placeholder="bots.yourcompany.com" autoCapitalize="none" autoCorrect="off" spellCheck={false} className="w-full rounded-lg border border-hairline/50 bg-inset px-3 py-2 text-[13px] text-ink placeholder:text-ink-secondary focus:border-accent focus:outline-none disabled:opacity-50" />
+              <input id="custom-domain" type="text" value={domain} disabled={busy !== null} onChange={(event) => { setDomain(event.target.value); setNotice(null); setError(null); }} placeholder="bots.yourcompany.com" autoCapitalize="none" autoCorrect="off" spellCheck={false} className="w-full rounded-lg border border-hairline bg-inset px-3 py-2 text-[13px] text-ink placeholder:text-ink-secondary focus:border-accent focus:outline-none disabled:opacity-50" />
               <CustomDomainDnsRecord domain={domain} serverIpv4={status.serverIpv4} />
               <p className="text-[12px] leading-relaxed text-ink-secondary">{t("settings.domain.httpsNeeded")}</p>
               <div className="flex flex-wrap gap-2 pt-1">

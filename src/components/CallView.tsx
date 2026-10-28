@@ -340,7 +340,7 @@ export function CallTargetButton({
           id={helpId}
           role="group"
           aria-label="Call unavailable"
-          className={cn("absolute right-0 z-30 w-[280px]", composer ? "bottom-full mb-1.5" : "mt-1.5", "rounded-xl border border-hairline bg-panel p-3 text-left shadow-2xl", helpMotion.className)} {...helpMotion.exitProps}
+          className={cn("absolute right-0 z-30 w-[280px]", composer ? "bottom-full mb-1.5" : "mt-1.5", "rounded-xl border border-edge bg-panel p-3 text-left shadow-2xl", helpMotion.className)} {...helpMotion.exitProps}
         >
           <div className="text-[13px] font-medium text-ink">Call unavailable</div>
           <div className="mt-1 text-[12px] leading-[1.45] text-ink-secondary">{reason}</div>
@@ -351,7 +351,7 @@ export function CallTargetButton({
                 setCallMode("live");
                 start("live");
               }}
-              className="mt-2.5 mr-2 rounded-lg border border-hairline px-3 py-1.5 text-[12px] font-medium text-ink hover:bg-raised"
+              className="mt-2.5 mr-2 rounded-lg border border-edge px-3 py-1.5 text-[12px] font-medium text-ink hover:bg-raised"
               title={callModeHint("live", { cloudHome })}
             >
               {t("call.live.startInstead")}
@@ -826,7 +826,7 @@ function Call({ bot }: { bot: Bot }) {
               speaker.stop();
               listen();
             }}
-            className="rounded-full border border-hairline/50 px-4 py-2 text-[14px] text-ink hover:bg-raised"
+            className="rounded-full border border-hairline px-4 py-2 text-[14px] text-ink hover:bg-raised"
           >
             Interrupt
           </button>

@@ -209,7 +209,7 @@ export function CloudIntent() {
                 onBlur={() => setPeek(null)}
                 className={cn(
                   "animate-rise inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-[13px] transition-[background-color,border-color,color,transform] duration-150 ease-out active:scale-[0.97]",
-                  chosen ? "border-accent/45 bg-accent/10 text-ink" : "border-hairline/50 bg-card/40 text-ink-secondary hover:border-hairline hover:bg-card hover:text-ink",
+                  chosen ? "border-accent/45 bg-accent/10 text-ink" : "border-hairline bg-card/40 text-ink-secondary hover:border-edge hover:bg-card hover:text-ink",
                 )}
                 style={staggerIndex(4 + index)}
               >
@@ -225,7 +225,7 @@ export function CloudIntent() {
           <button type="button" onClick={skip} className="rounded font-medium text-ink underline decoration-ink-secondary/40 underline-offset-[3px] transition-colors hover:decoration-ink">
             {t("cloudIntent.skip")}
           </button>
-          <kbd className="ml-1.5 rounded border border-hairline/60 px-1 py-px font-sans text-[11px] text-ink-secondary">Esc</kbd>
+          <kbd className="ml-1.5 rounded border border-hairline px-1 py-px font-sans text-[11px] text-ink-secondary">Esc</kbd>
           <br />
           {t("cloudIntent.later")}
         </p>

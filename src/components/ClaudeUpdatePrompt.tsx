@@ -46,14 +46,14 @@ export function ClaudeUpdatePrompt({
     <button
       type="button"
       onClick={onRetry}
-      className="flex items-center gap-1.5 rounded-full border border-hairline/40 px-2.5 py-1 text-[13px] text-ink hover:bg-raised-hover"
+      className="flex items-center gap-1.5 rounded-full border border-hairline px-2.5 py-1 text-[13px] text-ink hover:bg-raised-hover"
     >
       <RefreshCw size={12} aria-hidden="true" /> {t("chat.retry")}
     </button>
   );
 
   return (
-    <div className="mt-2 rounded-lg border border-hairline/30 bg-card/60 px-3 py-2.5 text-[13px] text-ink" role="group" aria-label={t("chat.claudeUpdate.aria")}>
+    <div className="mt-2 rounded-lg border border-hairline bg-card/60 px-3 py-2.5 text-[13px] text-ink" role="group" aria-label={t("chat.claudeUpdate.aria")}>
       {phase.kind === "ask" && (
         <>
           <p className="leading-relaxed">{t("chat.claudeUpdate.offer")}</p>
@@ -68,7 +68,7 @@ export function ClaudeUpdatePrompt({
             <button
               type="button"
               onClick={() => setPhase({ kind: "manual" })}
-              className="rounded-full border border-hairline/40 px-3 py-1 text-[13px] text-ink-secondary hover:bg-raised-hover hover:text-ink"
+              className="rounded-full border border-hairline px-3 py-1 text-[13px] text-ink-secondary hover:bg-raised-hover hover:text-ink"
             >
               {t("chat.claudeUpdate.myself")}
             </button>
@@ -110,7 +110,7 @@ export function ClaudeUpdatePrompt({
               <button
                 type="button"
                 onClick={update}
-                className="rounded-full border border-hairline/40 px-2.5 py-1 text-[13px] text-ink-secondary hover:bg-raised-hover hover:text-ink"
+                className="rounded-full border border-hairline px-2.5 py-1 text-[13px] text-ink-secondary hover:bg-raised-hover hover:text-ink"
               >
                 {t("chat.claudeUpdate.tryAgain")}
               </button>

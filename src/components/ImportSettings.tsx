@@ -99,7 +99,7 @@ export function AiAppsImportView({ local, detection, chosen, status, result, onC
   } else {
     body = (
       <>
-        <div className="divide-y divide-hairline/40 overflow-hidden rounded-xl border border-hairline/40">
+        <div className="divide-y divide-hairline overflow-hidden rounded-xl border border-hairline">
           {detection.skills.length > 0 && (
             <ImportRow icon={<BookOpen size={15} />} label={t("onboarding.import.skills")} summary={skillsSummary(detection)}
               hint={t("onboarding.import.skillsHint")} sources={detectionSources(detection.skills)} checked={chosen.skills}

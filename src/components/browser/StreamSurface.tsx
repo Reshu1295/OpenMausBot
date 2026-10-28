@@ -693,7 +693,7 @@ export function StreamSurface(props: {
           />
         ) : null}
         {fileChooser && you ? (
-          <div className="absolute inset-x-3 top-3 z-20 mx-auto flex max-w-sm flex-col gap-2 rounded-xl border border-hairline/60 bg-card p-3 text-ink shadow-xl" role="dialog" aria-label="Choose files for the page">
+          <div className="absolute inset-x-3 top-3 z-20 mx-auto flex max-w-sm flex-col gap-2 rounded-xl border border-hairline bg-card p-3 text-ink shadow-xl" role="dialog" aria-label="Choose files for the page">
             <p className="flex items-center gap-2 text-[13px]"><FileUp size={14} aria-hidden="true" />The page asks for {fileChooser.multiple ? "files" : "a file"}.</p>
             <input
               ref={fileInputRef}
@@ -714,7 +714,7 @@ export function StreamSurface(props: {
           </div>
         ) : null}
         {control?.dialog && control.controller !== "another-viewer" ? (
-          <div className="absolute inset-x-3 top-3 z-20 mx-auto flex max-w-sm flex-col gap-2 rounded-xl border border-hairline/60 bg-card p-3 text-ink shadow-xl" role="dialog" aria-label="Browser dialog">
+          <div className="absolute inset-x-3 top-3 z-20 mx-auto flex max-w-sm flex-col gap-2 rounded-xl border border-hairline bg-card p-3 text-ink shadow-xl" role="dialog" aria-label="Browser dialog">
             <p className="break-words text-[13px]">{control.dialog.message}</p>
             {you ? (
               <>
@@ -741,7 +741,7 @@ export function StreamSurface(props: {
         {notices.length ? (
           <div className="absolute inset-x-3 bottom-3 z-20 flex flex-col items-center gap-2" role="status">
             {notices.map((notice) => (
-              <div key={notice.id} className="flex max-w-full items-center gap-2 rounded-xl border border-hairline/60 bg-card px-3 py-2 text-[12px] text-ink shadow-lg">
+              <div key={notice.id} className="flex max-w-full items-center gap-2 rounded-xl border border-hairline bg-card px-3 py-2 text-[12px] text-ink shadow-lg">
                 {notice.kind === "download" ? (
                   <>
                     <Download size={13} aria-hidden="true" className="shrink-0" />
@@ -764,7 +764,7 @@ export function StreamSurface(props: {
         <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 bg-card p-4 text-center">
           <p role="alert" className="max-w-sm text-[13px] text-ink-secondary">{previewStreamHostSetupMessage(hostSetup)}</p>
           <code className="max-w-md select-all break-all rounded-lg bg-inset px-3 py-2 text-left text-[12px] text-ink">{hostSetup.command}</code>
-          <button type="button" className="rounded-lg border border-hairline px-3 py-1.5 text-[12px] text-ink hover:bg-inset" onClick={() => setHostSetup(null)}>Try again</button>
+          <button type="button" className="rounded-lg border border-edge px-3 py-1.5 text-[12px] text-ink hover:bg-inset" onClick={() => setHostSetup(null)}>Try again</button>
         </div>
       ) : null}
     </div>

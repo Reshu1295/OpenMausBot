@@ -161,7 +161,7 @@ export function CloudProPopup({ view, onPrimary, onSeePlans, onNotNow, onClose }
   }, [onClose]);
   return <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-6" onMouseDown={event => { if (event.target === event.currentTarget) onClose(); }}>
     <div role="dialog" aria-modal="true" aria-labelledby={TITLE} aria-describedby="cloud-pro-popup-body" data-cloud-pro-popup={view.plan} tabIndex={-1}
-      className="relative max-h-full w-full max-w-[440px] overflow-y-auto rounded-2xl border border-hairline/50 bg-panel p-6 text-ink shadow-2xl outline-none">
+      className="relative max-h-full w-full max-w-[440px] overflow-y-auto rounded-2xl border border-hairline bg-panel p-6 text-ink shadow-2xl outline-none">
       <div className="flex items-center gap-2.5 pe-8">
         <Crown size={18} className="shrink-0 text-accent-text" aria-hidden="true" />
         <h2 id={TITLE} tabIndex={-1} className="text-[17px] font-semibold outline-none">{t("cloudProPopup.title")}</h2>

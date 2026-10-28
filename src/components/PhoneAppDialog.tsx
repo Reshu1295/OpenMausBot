@@ -43,7 +43,7 @@ export function PhoneAppDialog({ open, onClose, connect = [] }: { open: boolean;
         role="dialog"
         aria-modal="true"
         aria-labelledby="phone-app-dialog-title"
-        className="max-h-full w-full max-w-[460px] overflow-y-auto rounded-2xl border border-hairline/50 bg-panel p-6 shadow-2xl"
+        className="max-h-full w-full max-w-[460px] overflow-y-auto rounded-2xl border border-hairline bg-panel p-6 shadow-2xl"
       >
         <h2 id="phone-app-dialog-title" className="text-[17px] font-semibold text-ink">
           {t("phoneApp.title")}
@@ -76,7 +76,7 @@ export function PhoneAppDialog({ open, onClose, connect = [] }: { open: boolean;
                 }}
                 className={index === 0
                   ? "flex w-full flex-col items-center rounded-xl bg-accent px-4 py-2 text-[13px] font-medium text-accent-ink hover:opacity-90"
-                  : "flex w-full flex-col items-center rounded-xl border border-hairline/50 px-4 py-2 text-[13px] font-medium text-ink hover:bg-raised"}
+                  : "flex w-full flex-col items-center rounded-xl border border-hairline px-4 py-2 text-[13px] font-medium text-ink hover:bg-raised"}
               >
                 <span>{t("sidebar.menu.connectPhone")}</span>
                 <span className="text-[12px] font-normal opacity-80">{destination.subtitle}</span>

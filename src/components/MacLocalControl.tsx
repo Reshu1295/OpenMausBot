@@ -90,7 +90,7 @@ export function MacLocalControl() {
               type="button"
               onClick={() => void retry()}
               disabled={pending}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-hairline/50 px-3 py-1.5 text-[13px] font-medium text-ink hover:bg-raised disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-hairline px-3 py-1.5 text-[13px] font-medium text-ink hover:bg-raised disabled:opacity-50"
             >
               {pending && <Loader2 size={13} className="animate-spin" />}
               Retry

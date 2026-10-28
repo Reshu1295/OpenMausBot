@@ -85,7 +85,7 @@ function memberMauses(group: Group, members: Bot[]) {
         className={cn(
           "relative inline-flex rounded-full",
           busy && "ring-2 ring-accent/50 ring-offset-1 ring-offset-app",
-          busyElsewhere && "ring-1 ring-hairline ring-offset-1 ring-offset-app",
+          busyElsewhere && "ring-1 ring-edge ring-offset-1 ring-offset-app",
           queueTitle && !busyElsewhere && "ring-1 ring-accent/30 ring-offset-1 ring-offset-app",
         )}
       >
@@ -255,7 +255,7 @@ export function RoomHeader({
               className="flex items-center gap-1.5 rounded-full py-0.5 pl-1 pr-1.5 hover:bg-raised/60"
             >
               {faces}
-              <span className="flex size-[18px] items-center justify-center rounded-full border border-dashed border-hairline/70 text-ink-secondary">
+              <span className="flex size-[18px] items-center justify-center rounded-full border border-dashed border-edge text-ink-secondary">
                 <Plus size={11} />
               </span>
             </button>

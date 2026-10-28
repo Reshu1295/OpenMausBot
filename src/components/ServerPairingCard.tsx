@@ -146,7 +146,7 @@ export function ServerPairingCard({ initialSession = null, initialPairingCodes =
   }
 
   const offerPanel = pairingCodes && offer ? (
-        <div className="mt-4 rounded-lg border border-hairline/40 bg-inset p-4">
+        <div className="mt-4 rounded-lg border border-hairline bg-inset p-4">
           {expired ? (
             <p className="text-[13px] text-ink-secondary">{t("remote.serverPairing.expired")}</p>
           ) : (
@@ -242,7 +242,7 @@ export function ServerPairingCard({ initialSession = null, initialPairingCodes =
       {listed.length === 0 ? (
         <p className="mt-1 text-[13px] text-ink-secondary">{t("remote.serverPairing.noDevices")}</p>
       ) : (
-        <ul className="mt-1 divide-y divide-hairline/40">
+        <ul className="mt-1 divide-y divide-hairline">
           {listed.map((device) => (
             <li key={device.id} className="flex flex-wrap items-center justify-between gap-2 py-2 text-[13px]">
               <span className="text-ink">

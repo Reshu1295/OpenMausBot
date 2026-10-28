@@ -1191,7 +1191,7 @@ export function ComputerPanel({
     <>
     <aside
       className={cn(
-        "animate-panel-in relative flex h-full shrink-0 flex-col border-l border-hairline/40 bg-panel",
+        "animate-panel-in relative flex h-full shrink-0 flex-col border-l border-hairline bg-panel",
         "max-md:absolute max-md:inset-0 max-md:z-40 max-md:w-full!",
       )}
       ref={panelRef}
@@ -1699,7 +1699,7 @@ export function ComputerPanel({
                   "min-w-0 rounded-lg border px-2.5 py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-card",
                   selected
                     ? "border-accent/60 bg-accent/10 text-ink"
-                    : "border-hairline/50 bg-panel/30 text-ink-secondary",
+                    : "border-hairline bg-panel/30 text-ink-secondary",
                   disabled
                     ? "cursor-not-allowed"
                     : "hover:border-accent/40 hover:bg-control/60",
@@ -1720,7 +1720,7 @@ export function ComputerPanel({
               {t("place.pinnedNote", { place: t(placeLabelKey(liveTask.surface)) })}
             </p>
           )}
-          <div className="mt-3 border-t border-hairline/40 pt-3 text-[12px] leading-5 text-ink-secondary" aria-live="polite" data-testid="place-line">
+          <div className="mt-3 border-t border-hairline pt-3 text-[12px] leading-5 text-ink-secondary" aria-live="polite" data-testid="place-line">
             {worksOnView.line}
             {placeActionButton(worksOnView, "mt-1 block font-medium text-accent-text hover:underline")}
           </div>
@@ -1757,7 +1757,7 @@ export function ComputerPanel({
                     "flex min-w-0 flex-col items-center gap-1.5 rounded-lg border px-1.5 py-2.5 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-card",
                     selected
                       ? "border-accent/60 bg-accent/10 text-ink"
-                      : "border-hairline/50 bg-panel/30 text-ink-secondary",
+                      : "border-hairline bg-panel/30 text-ink-secondary",
                     disabled ? "cursor-not-allowed opacity-50" : "hover:border-accent/40 hover:bg-control/60",
                   )}
                 >

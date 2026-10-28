@@ -27,7 +27,8 @@ export default {
     "menu-active": "#f5f5f514",
     inset: "#1b1b1b",
     control: "#282828",
-    hairline: "#383838",
+    hairline: "#38383873",
+    edge: "#383838",
     ink: "#f5f5f5",
     "ink-secondary": "#f5f5f5a8",
     "ink-tertiary": "#f5f5f591",
@@ -89,7 +90,9 @@ export default {
       menu: "#2c2c2e",
       inset: "#1c1c1e",
       control: "#2c2c2e",
-      hairline: "#3a3a3c",
+      hairline: "#3a3a3c73",
+      // a step brighter than the divider, so a control's edge still shows on the raised phone menu (1.39:1)
+      edge: "#424244",
     },
     radius: {
       lg: "12px",

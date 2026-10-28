@@ -230,7 +230,7 @@ function BotDataPanel({ bot, requestedCard }: { bot: Bot; requestedCard?: { id: 
           <summary role="button" className={`${control} cursor-pointer list-none [&::-webkit-details-marker]:hidden`} aria-label={t("data.history")} title={t("data.history")}>
             <History size={14} aria-hidden="true" /><span className="hidden @min-[460px]/data:inline">{t("data.history")}</span><ChevronDown size={12} aria-hidden="true" />
           </summary>
-          <div className="absolute right-0 bottom-full z-30 mb-1 flex max-h-[min(20rem,calc(100cqh-3rem))] w-72 max-w-[70vw] flex-col overflow-y-auto rounded-xl border border-hairline/50 bg-menu p-1.5 shadow-xl" role="menu" aria-label={t("data.history")}>
+          <div className="absolute right-0 bottom-full z-30 mb-1 flex max-h-[min(20rem,calc(100cqh-3rem))] w-72 max-w-[70vw] flex-col overflow-y-auto rounded-xl border border-hairline bg-menu p-1.5 shadow-xl" role="menu" aria-label={t("data.history")}>
             <button type="button" role="menuitemradio" aria-checked={selection === null} className={`${control} text-left`} onClick={(event) => { select(null); event.currentTarget.closest("details")?.removeAttribute("open"); }}>{t("data.latest")}</button>
             {cards.map((candidate) => (
               <button key={candidate.id} type="button" role="menuitemradio" aria-checked={selection !== null && card?.id === candidate.id} className={`${control} text-left`}
@@ -271,8 +271,8 @@ function BotDataPanel({ bot, requestedCard }: { bot: Bot; requestedCard?: { id: 
         aria-valuemin={bounds.min} aria-valuemax={bounds.max} aria-valuenow={queryHeight ?? undefined} tabIndex={0}
         onPointerDown={startResize} onPointerMove={moveResize} onPointerUp={endResize} onPointerCancel={endResize}
         onLostPointerCapture={() => { resizeFrom.current = null; }} onKeyDown={resizeByKey} data-testid="data-query-resize"
-        className="group flex h-1.5 shrink-0 cursor-row-resize touch-none items-center justify-center border-t border-hairline/40 hover:bg-accent/10 focus-visible:bg-accent/10 focus-visible:outline-none">
-        <span className="h-0.5 w-8 rounded-full bg-hairline group-hover:bg-accent/60 group-focus-visible:bg-accent/60" />
+        className="group flex h-1.5 shrink-0 cursor-row-resize touch-none items-center justify-center border-t border-hairline hover:bg-accent/10 focus-visible:bg-accent/10 focus-visible:outline-none">
+        <span className="h-0.5 w-8 rounded-full bg-edge group-hover:bg-accent/60 group-focus-visible:bg-accent/60" />
       </div>
       <div ref={query} id={queryId} style={{ height: queryHeight ?? undefined }} className="flex min-h-0 shrink-0 flex-col overflow-hidden px-3 py-2" data-testid="data-query">
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">

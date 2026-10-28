@@ -12,7 +12,7 @@ const PROVIDERS = {
   custom: { label: "Custom", keyLabel: "Custom image API key", credential: "customImageApiKey" },
 } as const;
 
-const INPUT_CLASS = "w-full min-w-0 rounded-lg border border-hairline/40 bg-inset px-3 py-2 text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none disabled:opacity-50";
+const INPUT_CLASS = "w-full min-w-0 rounded-lg border border-hairline bg-inset px-3 py-2 text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none disabled:opacity-50";
 const BUTTON_CLASS = "flex items-center justify-center gap-1.5 rounded-lg bg-control px-3 py-2 text-[13px] text-ink hover:bg-raised-hover disabled:opacity-50";
 
 export function AvatarImageGenerator({
@@ -223,7 +223,7 @@ export function AvatarImageGenerator({
   );
 
   return (
-    <div className="mt-5 border-t border-hairline/40 pt-4">
+    <div className="mt-5 border-t border-hairline pt-4">
       <div className="flex items-center gap-2 text-[13px] font-medium text-ink">
         <Sparkles size={14} className="text-accent-text" /> {t("botIdentity.ai.generateWith")}
       </div>
@@ -241,7 +241,7 @@ export function AvatarImageGenerator({
       </p>
 
       {configured ? (
-        <details key={provider} className="mt-3 rounded-lg border border-hairline/40 px-3 py-2">
+        <details key={provider} className="mt-3 rounded-lg border border-hairline px-3 py-2">
           <summary className="cursor-pointer text-[12px] text-ink-secondary">{t("botIdentity.ai.connectionSettings")}</summary>
           <div className="mt-3">{connectionForm}</div>
         </details>

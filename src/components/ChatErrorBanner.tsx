@@ -7,7 +7,7 @@ export function ChatNotice({ notice }: { notice: AppState["notice"] }) {
   if (!notice) return null;
   return (
     <div className="w-full px-5">
-      <div role="status" className="mb-2 rounded-lg border border-hairline/40 bg-panel px-3 py-2 text-[13px] text-ink-secondary">
+      <div role="status" className="mb-2 rounded-lg border border-hairline bg-panel px-3 py-2 text-[13px] text-ink-secondary">
         {notice.kind === "note"
           ? notice.text
           : notice.kind === "steer-images"

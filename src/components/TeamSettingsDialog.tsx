@@ -105,7 +105,7 @@ export function TeamSettingsDialog({ team, onClose }: { team: string; onClose: (
       if (event.target === event.currentTarget) close();
     }}>
       <div ref={dialog} role="dialog" aria-modal="true" aria-labelledby="team-settings-title" data-testid="team-settings-dialog"
-        className="max-h-[90vh] w-full max-w-[460px] overflow-y-auto rounded-2xl border border-hairline/50 bg-panel p-5 text-ink shadow-2xl"
+        className="max-h-[90vh] w-full max-w-[460px] overflow-y-auto rounded-2xl border border-hairline bg-panel p-5 text-ink shadow-2xl"
         onKeyDown={(event) => { if (event.key === "Escape" && !consent) { event.stopPropagation(); close(); } }}>
         <div className="mb-2 flex items-center justify-between gap-3">
           <h2 id="team-settings-title" className="text-[17px] font-semibold">{t("teamSettings.title", { name: team || t("teamSettings.general") })}</h2>

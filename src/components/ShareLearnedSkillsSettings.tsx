@@ -38,7 +38,7 @@ export function ShareLearnedSkillsSettings() {
   };
 
   return (
-    <div className="mt-4 border-t border-hairline/30 pt-4" data-testid="share-learned-skills-settings">
+    <div className="mt-4 border-t border-hairline pt-4" data-testid="share-learned-skills-settings">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="min-w-0 flex-1">
           <div className="text-[14px] font-medium text-ink">{t("settings.experimental.shareSkills")}</div>

@@ -139,7 +139,7 @@ export function SignInRequestCard({
     >
       <div dir="ltr" className="break-all text-[20px] font-semibold leading-7 text-ink" data-testid="sign-in-site">{card.site}</div>
       {card.reason && (
-        <blockquote className="mt-1.5 border-s-2 border-hairline ps-2.5 text-[13px] leading-snug text-ink-secondary">
+        <blockquote className="mt-1.5 border-s-2 border-edge ps-2.5 text-[13px] leading-snug text-ink-secondary">
           <bdi dir="auto">“{card.reason}”</bdi> <span className="text-ink-tertiary">— {botName}</span>
         </blockquote>
       )}

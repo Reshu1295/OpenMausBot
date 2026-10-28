@@ -9,13 +9,13 @@ import type { LocaleKey } from "@/locales";
 import { Select } from "./Select";
 import { Card } from "./SettingsPrimitives";
 
-const inputClass = "rounded-lg border border-hairline/40 bg-inset px-3 py-2 text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none [color-scheme:dark]";
+const inputClass = "rounded-lg border border-hairline bg-inset px-3 py-2 text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none [color-scheme:dark]";
 
 export function ActivityRow({ entry }: { entry: ActivityEntry }) {
   const [open, setOpen] = useState(false);
   const detail = entry.type === "admin" && (entry.changed?.length || entry.before || entry.after);
   return (
-    <li className="border-b border-hairline/20 py-2 text-[13px]" data-activity-entry={entry.type}>
+    <li className="border-b border-hairline py-2 text-[13px]" data-activity-entry={entry.type}>
       <div className="grid grid-cols-[auto_1fr] items-start gap-x-3">
         <time className="whitespace-nowrap tabular-nums text-ink-secondary" dateTime={entry.at}>{new Date(entry.at).toLocaleString()}</time>
         <div className="min-w-0">

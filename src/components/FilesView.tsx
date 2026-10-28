@@ -60,7 +60,7 @@ export function FilesView() {
   const { dragProps } = useCaptionChrome();
   const bridge = cloudFilesBridge();
   return <main className="flex min-w-0 flex-1 flex-col overflow-hidden bg-app text-ink">
-    <header {...dragProps} className="flex shrink-0 items-center gap-2.5 border-b border-hairline/40 px-6 py-4 max-md:pl-12">
+    <header {...dragProps} className="flex shrink-0 items-center gap-2.5 border-b border-hairline px-6 py-4 max-md:pl-12">
       <FolderOpen size={18} className="text-ink-secondary" />
       <h1 className="text-[17px] font-semibold">{t("files.title")}</h1>
     </header>
@@ -121,7 +121,7 @@ function FilesPage({ bridge }: { bridge: CloudFilesBridge }) {
         <p className="mt-1 text-[13px] leading-relaxed text-ink-secondary">{t("files.shared.help")}</p>
       </div>
       {state.shared.length > 0
-        ? <ul className="flex flex-col divide-y divide-hairline/40 rounded-xl bg-card">
+        ? <ul className="flex flex-col divide-y divide-hairline rounded-xl bg-card">
           {state.shared.map((folder) => <FolderRow key={folder.id} folder={folder} bridge={bridge} busy={busy} run={run} onStop={() => setAsk({ kind: "stop", folder })} />)}
         </ul>
         : <p className="text-[13px] text-ink-secondary">{t("files.empty")}</p>}
@@ -242,7 +242,7 @@ function FilesDialog({ label, children, actions, onClose }: { label: string; chi
     return () => window.removeEventListener("keydown", onKey);
   }, []);
   return createPortal(<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-6" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
-    <div role="dialog" aria-modal="true" aria-labelledby="files-dialog-label" className="w-full max-w-[440px] rounded-2xl border border-hairline/50 bg-panel p-5 shadow-2xl">
+    <div role="dialog" aria-modal="true" aria-labelledby="files-dialog-label" className="w-full max-w-[440px] rounded-2xl border border-hairline bg-panel p-5 shadow-2xl">
       <h2 id="files-dialog-label" className="text-[15px] font-semibold text-ink">{label}</h2>
       {children}
       <div className="mt-5 flex justify-end gap-2">{actions}</div>

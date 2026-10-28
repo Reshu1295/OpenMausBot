@@ -130,8 +130,14 @@ const PAIRS = [
     ["--color-warning-text", s, 4.5],
   ]),
   ["--color-success", "--color-card", 4.5],
-  // borders, dots and fills are UI components, not text — AA asks 3:1 of them
-  ["--color-hairline", "--color-app", 1.5],
+  // borders, dots and fills are UI components, not text — AA asks 3:1 of them.
+  // A divider (hairline, translucent) only has to be seen; the edge around a
+  // control has to be found.
+  ["--color-hairline", "--color-app", 1.15],
+  ["--color-hairline", "--color-card", 1.1],
+  ["--color-edge", "--color-app", 1.5],
+  ["--color-edge", "--color-card", 1.3],
+  ["--color-edge", "--color-menu", 1.3],
   ["--color-accent", "--color-app", 3],
   ["--color-danger", "--color-app", 3],
   ["--color-warning", "--color-app", 3],

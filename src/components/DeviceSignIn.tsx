@@ -90,7 +90,7 @@ export function DeviceSignInProgress({ auth, browserPkce = false, provider = "co
   }
 
   return (
-    <div className="space-y-2 rounded-lg border border-hairline/50 bg-app p-3">
+    <div className="space-y-2 rounded-lg border border-hairline bg-app p-3">
       {!browserPkce && <><p className="text-[12px] text-ink-secondary">{t(copy.enterCode)}</p>
       <div className="flex items-center justify-between gap-2 rounded-lg bg-inset px-3 py-2">
         <code className="select-all font-mono text-lg font-semibold tracking-widest text-ink">{auth.userCode}</code>

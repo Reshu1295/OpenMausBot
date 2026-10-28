@@ -17,7 +17,7 @@ export function ToolActivity({ tool, place = null, live = false }: { tool: NonNu
   const label = advanced ? tool.name : toolStepLabel(tool);
   const status = tool.ok === undefined ? (live ? t("toolDetail.running") : t("toolDetail.unverified")) : failed ? t("toolDetail.failed") : t("toolDetail.completed");
   return (
-    <details onToggle={(event) => setExpanded(event.currentTarget.open)} className="group/tool w-fit max-w-full rounded-xl border border-hairline/40 bg-panel text-[13px] open:w-[min(38rem,100%)]" data-testid="tool-activity">
+    <details onToggle={(event) => setExpanded(event.currentTarget.open)} className="group/tool w-fit max-w-full rounded-xl border border-hairline bg-panel text-[13px] open:w-[min(38rem,100%)]" data-testid="tool-activity">
       <summary
         role="button"
         aria-expanded={expanded}
@@ -30,7 +30,7 @@ export function ToolActivity({ tool, place = null, live = false }: { tool: NonNu
         {advanced && tool.summary && tool.summary !== tool.name && !nameIsCommand(tool.name) && <span className="min-w-0 flex-1 truncate font-mono" title={tool.summary}>{tool.summary}</span>}
         <ChevronRight size={13} className="ml-auto shrink-0 group-open/tool:rotate-90" aria-hidden="true" />
       </summary>
-      <div className="space-y-3 border-t border-hairline/40 p-3 text-ink-secondary">
+      <div className="space-y-3 border-t border-hairline p-3 text-ink-secondary">
         <div className={cn("text-[11px] font-medium", failed && "text-danger-text")}>{status}</div>
         {label !== tool.name && <div>
           <div className="mb-1 text-[11px] font-medium">{t("toolDetail.tool")}</div>

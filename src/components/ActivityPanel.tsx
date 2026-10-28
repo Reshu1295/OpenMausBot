@@ -94,7 +94,7 @@ export function ActivityPanel({ bot }: { bot: Bot }) {
   };
 
   return (
-    <aside aria-label={t("activity.panel.aria", { name: bot.name })} className="animate-panel-in flex h-full w-[400px] max-w-full shrink-0 flex-col border-l border-hairline/40 bg-panel max-md:absolute max-md:inset-y-0 max-md:right-0 max-md:z-30">
+    <aside aria-label={t("activity.panel.aria", { name: bot.name })} className="animate-panel-in flex h-full w-[400px] max-w-full shrink-0 flex-col border-l border-hairline bg-panel max-md:absolute max-md:inset-y-0 max-md:right-0 max-md:z-30">
       <div {...dragProps} className={cn("flex items-center justify-between px-4 py-3", padClass)}>
         <span className="flex items-center gap-2 text-[15px] font-semibold text-ink">
           <ListChecks size={16} className="text-ink-secondary" /> {t("activity.panel.title")}
@@ -119,7 +119,7 @@ export function ActivityPanel({ bot }: { bot: Bot }) {
         </span>
       </div>
 
-      <p className="border-b border-hairline/40 px-4 pb-3 text-[12px] text-ink-secondary">
+      <p className="border-b border-hairline px-4 pb-3 text-[12px] text-ink-secondary">
         {t("activity.panel.subtitle", { name: bot.name })}
       </p>
 
@@ -152,7 +152,7 @@ function ActivityLine({ row, current, onJump }: { row: ActivityRow; current: boo
     <button
       type="button"
       onClick={onJump}
-      className="flex w-full items-start gap-3 border-b border-hairline/20 px-4 py-2 text-left hover:bg-raised/60"
+      className="flex w-full items-start gap-3 border-b border-hairline px-4 py-2 text-left hover:bg-raised/60"
       title={current ? row.tool : t("activity.panel.openOtherTask", { tool: row.tool })}
     >
       <span className="mt-[2px] shrink-0 tabular-nums text-[11px] text-ink-secondary">{formatActivityTime(row.at)}</span>

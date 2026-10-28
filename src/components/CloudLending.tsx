@@ -165,7 +165,7 @@ export function CloudLending({ bridge, moving = false }: { bridge: CloudLendingB
   const stopped = on ? null : lendingStoppedLine(snapshot.state);
   const lastUsed = lendingLastUsedLine(snapshot);
   const via = snapshot.state?.via === "access" ? t(snapshot.state.terminal ? "lending.viaAccessTerminal" : "lending.viaAccess") : null;
-  return <div data-cloud-lending={enabled ? "on" : "off"} className="mt-2 flex w-full flex-col gap-3 border-t border-hairline/40 pt-4">
+  return <div data-cloud-lending={enabled ? "on" : "off"} className="mt-2 flex w-full flex-col gap-3 border-t border-hairline pt-4">
     <div className="flex items-start justify-between gap-3">
       <div className="min-w-0">
         <p className="text-[14px] font-medium text-ink">{lendingTitle()}</p>
@@ -188,7 +188,7 @@ export function CloudLending({ bridge, moving = false }: { bridge: CloudLendingB
         <legend className="mb-1 text-[13px] font-medium text-ink">{t("lending.folders")}</legend>
         <p className="text-[12px] text-ink-secondary">{t("lending.foldersHelp")}</p>
         <p className="text-[12px] text-ink-secondary">{t("lending.drivesHelp")}</p>
-        {folders.map(folder => <div key={folder.id} className="flex flex-wrap items-center gap-3 rounded-lg border border-hairline/40 p-2">
+        {folders.map(folder => <div key={folder.id} className="flex flex-wrap items-center gap-3 rounded-lg border border-hairline p-2">
           <div className="min-w-0 flex-1"><p className="text-[13px] text-ink">{folder.name}</p><p dir="ltr" className="break-all text-[11px] text-ink-secondary">{folder.path}</p></div>
           <label className="flex items-center gap-2 text-[12px] text-ink-secondary">
             <input type="checkbox" checked={folder.write} onChange={event => lend(folders.map(entry => entry.id === folder.id ? { ...entry, write: event.target.checked } : entry), screen, internet)} />{t("lending.canEdit")}

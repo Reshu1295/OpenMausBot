@@ -66,7 +66,7 @@ export function TeamDialog({ section, rename = false, onClose, onRenamed }: {
       if (event.target === event.currentTarget && !saving) onClose();
     }}>
       <div ref={dialog} role="dialog" aria-modal="true" aria-labelledby="team-dialog-title"
-        className="max-h-[90vh] w-full max-w-[430px] overflow-y-auto rounded-2xl border border-hairline/50 bg-panel p-5 text-ink shadow-2xl"
+        className="max-h-[90vh] w-full max-w-[430px] overflow-y-auto rounded-2xl border border-hairline bg-panel p-5 text-ink shadow-2xl"
         onKeyDown={(event) => {
           if (event.key === "Escape" && !saving) { event.stopPropagation(); onClose(); }
           if (event.key === "Tab") {
@@ -84,7 +84,7 @@ export function TeamDialog({ section, rename = false, onClose, onRenamed }: {
         {(!moving || rename) && <label className="mb-3 block text-[13px] text-ink-secondary">{t("team.name")}
           <input value={name} maxLength={60} disabled={saving} onChange={(event) => setName(event.target.value)}
             onKeyDown={(event) => { if (event.key === "Enter") void save(); }}
-            className="mt-1 w-full rounded-lg border border-hairline/50 bg-inset px-3 py-2 text-[14px] text-ink" />
+            className="mt-1 w-full rounded-lg border border-hairline bg-inset px-3 py-2 text-[14px] text-ink" />
         </label>}
         {!rename && <>
           <p className="mb-3 text-[13px] leading-relaxed text-ink-secondary">

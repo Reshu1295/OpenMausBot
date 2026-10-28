@@ -55,7 +55,7 @@ export function McpCallTimeoutSettings() {
       </label>
       <div
         className={`flex max-w-[220px] items-center rounded-lg border bg-inset ${
-          error ? "border-danger/60" : "border-hairline/40 focus-within:border-focus"
+          error ? "border-danger/60" : "border-hairline focus-within:border-focus"
         }`}
       >
         <input

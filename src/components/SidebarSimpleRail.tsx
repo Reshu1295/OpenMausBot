@@ -4,7 +4,7 @@ import { SidebarProfileMenu, useSimpleAccount, type ArchivedBots } from "./Sideb
 import { UpdateIndicator } from "./UpdateIndicator";
 
 export function SidebarRailSeparator() {
-  return <div aria-hidden="true" data-sidebar-rail-separator="" className="mx-auto my-1.5 h-px w-8 shrink-0 bg-hairline/70" />;
+  return <div aria-hidden="true" data-sidebar-rail-separator="" className="mx-auto my-1.5 h-px w-8 shrink-0 bg-edge" />;
 }
 
 export function SimpleRailFooter({ owner = null, archived }: {

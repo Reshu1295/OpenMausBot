@@ -40,7 +40,8 @@ export default {
     // Sampled at #efefef, which is what the eye reads on the divider — but a hairline that faint fails this repo's own
     // gate (1.5:1 against the page) and every border is drawn at /40 on top of that. #d0d0d0 is the lightest grey that
     // still passes; see scripts/check-skin-contrast.mjs.
-    hairline: "#d0d0d0",
+    hairline: "#d0d0d073",
+    edge: "#d0d0d0",
     ink: "#1c1c1c",
     "ink-secondary": "#555555",
     "ink-tertiary": "#5c5c5c",
@@ -99,7 +100,8 @@ export default {
     raised: "#2f2f2f",
     "raised-hover": "#3d3d3d",
     control: "#2f2f2f",
-    hairline: "#666666",
+    hairline: "#66666673",
+    edge: "#666666",
     accent: "#7fc0ff",
     "accent-text": "#7fc0ff",
     "accent-ink": "#070707",

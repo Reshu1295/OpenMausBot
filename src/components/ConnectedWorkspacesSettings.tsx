@@ -72,7 +72,7 @@ export function ConnectedWorkspacesSettings() {
     <p className="text-[13px] leading-relaxed text-ink-secondary">One desktop app, wherever your bots live. Switching servers does not move or replace your bots, conversations, or provider accounts.</p>
     {saved?.packaged && <Card title="Environments on this computer" subtitle="Separate setups on this computer, each with its own bots, conversations and data folder.">
       {envError && <p role="alert" className="text-[12px] text-danger-text">{envError}</p>}
-      {locals.length > 0 && <ul className="divide-y divide-hairline/40">
+      {locals.length > 0 && <ul className="divide-y divide-hairline">
         {locals.map((entry) => {
           const active = entry.id === saved.activeId;
           return <li key={entry.id} className="flex items-center gap-3 py-3">
@@ -95,7 +95,7 @@ export function ConnectedWorkspacesSettings() {
           </li>;
         })}
       </ul>}
-      {forgetEntry && <div className="mt-3 rounded-lg border border-hairline/40 p-3">
+      {forgetEntry && <div className="mt-3 rounded-lg border border-hairline p-3">
         <label className="flex items-start gap-2 text-[12px] leading-relaxed text-ink-secondary">
           <input type="checkbox" checked={envPurge} disabled={busy} className="mt-0.5" onChange={(event) => setEnvPurge(event.target.checked)} />
           Also delete this folder and everything in it ({forgetEntry.dataDir}). Otherwise the folder, its bots and conversations stay on this computer.
@@ -121,16 +121,16 @@ export function ConnectedWorkspacesSettings() {
       }}>
         <label className="flex flex-col gap-1.5 text-[12px] text-ink-secondary">Name
           <input required value={envName} disabled={busy} maxLength={60} onChange={(event) => setEnvName(event.target.value)} placeholder="My environment"
-            className="w-full rounded-lg border border-hairline/40 bg-inset px-3 py-2 text-[14px] text-ink outline-none focus:border-accent/50" />
+            className="w-full rounded-lg border border-hairline bg-inset px-3 py-2 text-[14px] text-ink outline-none focus:border-accent/50" />
         </label>
         <label className="flex flex-col gap-1.5 text-[12px] text-ink-secondary">Data folder (optional)
           <span className="flex gap-2">
             <input value={envDir} disabled={busy} onChange={(event) => setEnvDir(event.target.value)} placeholder="Leave empty to create one in your home folder"
-              className="w-full rounded-lg border border-hairline/40 bg-inset px-3 py-2 text-[14px] text-ink outline-none focus:border-accent/50" />
+              className="w-full rounded-lg border border-hairline bg-inset px-3 py-2 text-[14px] text-ink outline-none focus:border-accent/50" />
             <button type="button" disabled={busy} onClick={() => void perform(async () => {
               const picked = await bridge.pickDir();
               if (picked?.ok && picked.path) setEnvDir(picked.path);
-            }, setEnvError)} className="shrink-0 rounded-lg border border-hairline/40 px-3 text-[12px] text-ink hover:bg-control disabled:opacity-50">Choose…</button>
+            }, setEnvError)} className="shrink-0 rounded-lg border border-hairline px-3 text-[12px] text-ink hover:bg-control disabled:opacity-50">Choose…</button>
           </span>
         </label>
         <button type="submit" disabled={busy || !envName.trim()} className="flex w-fit items-center gap-2 rounded-lg bg-accent px-3 py-2 text-[13px] font-medium text-accent-ink disabled:opacity-50">
@@ -140,7 +140,7 @@ export function ConnectedWorkspacesSettings() {
     </Card>}
     <Card title="Your servers" subtitle="Saved on this computer. Your hosted bots keep running when you switch away.">
       {!saved ? <p role="status" className="text-[13px] text-ink-secondary">{error ? "Saved servers could not be loaded." : "Loading servers…"}</p> :
-        <ul className="divide-y divide-hairline/40">
+        <ul className="divide-y divide-hairline">
           {[{ id: "local", name: "This computer", origin: "", color: undefined }, ...saved.environments.filter((entry) => entry.kind !== "local")].map((entry) => {
             const active = entry.id === saved.activeId;
             const Icon = entry.id === "local" ? Laptop : Cloud;
@@ -169,11 +169,11 @@ export function ConnectedWorkspacesSettings() {
         <label className="flex flex-col gap-1.5 text-[12px] text-ink-secondary">Server address or pairing link
           <input required value={address} disabled={busy} onChange={(event) => setAddress(event.target.value)}
             placeholder="https://bots.yourcompany.com" autoCapitalize="none" autoCorrect="off" autoComplete="off" spellCheck={false}
-            className="w-full rounded-lg border border-hairline/40 bg-inset px-3 py-2 text-[14px] text-ink outline-none focus:border-accent/50" />
+            className="w-full rounded-lg border border-hairline bg-inset px-3 py-2 text-[14px] text-ink outline-none focus:border-accent/50" />
         </label>
         <label className="flex flex-col gap-1.5 text-[12px] text-ink-secondary">Name (optional)
           <input value={name} disabled={busy} maxLength={60} onChange={(event) => setName(event.target.value)} placeholder="My server"
-            className="w-full rounded-lg border border-hairline/40 bg-inset px-3 py-2 text-[14px] text-ink outline-none focus:border-accent/50" />
+            className="w-full rounded-lg border border-hairline bg-inset px-3 py-2 text-[14px] text-ink outline-none focus:border-accent/50" />
         </label>
         <p className="text-[12px] leading-relaxed text-ink-secondary">Paste a pairing link from your server’s Settings → Remote access, or enter its address and sign in there. Your desktop stays connected afterward.</p>
         <details className="text-[12px] text-ink-secondary"><summary className="cursor-pointer">Need a pairing code?</summary>

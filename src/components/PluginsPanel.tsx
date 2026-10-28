@@ -572,7 +572,7 @@ export function PluginsPanel() {
               data-apps-filter="mcp"
               aria-pressed={filter === "mcp"}
               onClick={() => chooseFilter(filter === "mcp" ? "all" : "mcp")}
-              className={cn(pill, "h-9 border border-hairline/40 px-3.5", filter === "mcp" ? "bg-ink text-app" : "text-ink hover:bg-raised")}
+              className={cn(pill, "h-9 border border-hairline px-3.5", filter === "mcp" ? "bg-ink text-app" : "text-ink hover:bg-raised")}
             >
               <Server size={14} aria-hidden="true" />
               <span className="hidden sm:inline">{t("apps.filter.mcp")}</span>
@@ -771,7 +771,7 @@ export function PluginsPanel() {
           )}
 
           {filter !== "connected" && category === null && (
-            <div className={cn(filter === "all" && "mt-8 border-t border-hairline/30 pt-6", filter === "mcp" && "pt-1")}>
+            <div className={cn(filter === "all" && "mt-8 border-t border-hairline pt-6", filter === "mcp" && "pt-1")}>
               <McpServersPanel embedded hideWhop={filter === "all"} />
             </div>
           )}

@@ -68,7 +68,7 @@ export function TriggerCard({ card, threadId }: { card: OptionCardData; threadId
   const visibleBots = state.bots.filter((bot) => !bot.hidden);
 
   return (
-    <section data-trigger-card={automation.id} data-automation-status={status.state} aria-label={sentence} className="w-full max-w-[640px] rounded-xl border border-hairline/45 bg-card px-3.5 py-2.5 text-[13px]">
+    <section data-trigger-card={automation.id} data-automation-status={status.state} aria-label={sentence} className="w-full max-w-[640px] rounded-xl border border-hairline bg-card px-3.5 py-2.5 text-[13px]">
       <div className="flex items-start gap-2">
         <Zap size={14} className={cn("mt-0.5 shrink-0", status.state === "needs-you" ? "text-warning-text" : automation.enabled ? "text-accent-text" : "text-ink-tertiary")} />
         <button type="button" onClick={() => dispatch({ type: "showRoutines", view: "list", routineId: automation.id })} className="min-w-0 text-left font-medium leading-snug text-ink hover:text-accent-text">

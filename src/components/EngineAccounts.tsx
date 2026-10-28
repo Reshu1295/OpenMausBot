@@ -173,7 +173,7 @@ function RenameForm({ instance, onDone }: { instance: InstanceInfo; onDone: () =
         <input value={name} onChange={(event) => setName(event.target.value)} maxLength={80} autoFocus disabled={saving}
           aria-label={t("accounts.nameLabel")}
           onKeyDown={(event) => { if (event.key === "Escape") { event.stopPropagation(); onDone(); } }}
-          className="min-w-0 flex-1 rounded-lg border border-hairline/40 bg-inset px-2.5 py-1.5 text-[13px] text-ink outline-none focus:border-accent-border disabled:opacity-50" />
+          className="min-w-0 flex-1 rounded-lg border border-hairline bg-inset px-2.5 py-1.5 text-[13px] text-ink outline-none focus:border-accent-border disabled:opacity-50" />
         <button type="submit" disabled={saving || !name.trim()} className="rounded-lg bg-raised px-3 py-1.5 text-[12px] font-medium text-ink hover:bg-raised-hover disabled:opacity-50">
           {saving ? <Loader2 size={13} className="animate-spin" /> : t("common.save")}
         </button>
@@ -289,18 +289,18 @@ export function AddAccount({ label, endpoint, extra, folder: offerFolder = false
     );
   }
   return (
-    <form data-add-account={endpoint} className="space-y-2.5 rounded-xl border border-hairline/50 bg-app p-3" onSubmit={(event) => { event.preventDefault(); void add(); }}>
+    <form data-add-account={endpoint} className="space-y-2.5 rounded-xl border border-hairline bg-app p-3" onSubmit={(event) => { event.preventDefault(); void add(); }}>
       <label className="flex flex-col gap-1 text-[12px] font-medium text-ink">
         {t("accounts.nameLabel")}
         <input value={name} onChange={(event) => setName(event.target.value)} placeholder={t("accounts.namePlaceholder")} maxLength={80} autoFocus required disabled={saving}
-          className="rounded-lg border border-hairline/40 bg-inset px-3 py-2 text-[13px] font-normal text-ink outline-none focus:border-accent-border disabled:opacity-50" />
+          className="rounded-lg border border-hairline bg-inset px-3 py-2 text-[13px] font-normal text-ink outline-none focus:border-accent-border disabled:opacity-50" />
       </label>
       {offerFolder && (
         <details className="text-[12px] text-ink-secondary">
           <summary className="cursor-pointer select-none hover:text-ink">{t("accounts.folderToggle")}</summary>
           <input value={folder} onChange={(event) => setFolder(event.target.value)} placeholder="~/.claude-work" maxLength={4096} spellCheck={false} disabled={saving}
             aria-label={t("accounts.folderToggle")}
-            className="mt-2 w-full rounded-lg border border-hairline/40 bg-inset px-3 py-2 font-mono text-[12px] text-ink outline-none focus:border-accent-border disabled:opacity-50" />
+            className="mt-2 w-full rounded-lg border border-hairline bg-inset px-3 py-2 font-mono text-[12px] text-ink outline-none focus:border-accent-border disabled:opacity-50" />
           <p className="mt-1 leading-relaxed">{t("accounts.folderHint")}</p>
         </details>
       )}
@@ -328,7 +328,7 @@ export function AccountsCard({ group, accounts, advanced, bare = false }: { grou
       </p>}
       {!installed ? <EngineSetup instance={primary} unframed /> : (
         <div className="space-y-2">
-          <ul data-accounts={group} className="divide-y divide-hairline/40 rounded-xl border border-hairline/50 bg-panel/40">
+          <ul data-accounts={group} className="divide-y divide-hairline rounded-xl border border-hairline bg-panel/40">
             {accounts.map((instance) => (
               <AccountRow key={instance.instanceId} group={group} instance={instance}
                 signingIn={signingIn === instance.instanceId}

@@ -124,7 +124,7 @@ export function ConnectAi({ hosted = false, tested }: { hosted?: boolean; tested
       {failed && <p role="alert" className="mt-2 text-[13px] text-danger-text">{t("onboarding.engines.error")}</p>}
 
       {(organisation || others.length > 0) && (
-        <div className="mt-3 w-full divide-y divide-hairline/40 overflow-hidden rounded-2xl bg-card text-left">
+        <div className="mt-3 w-full divide-y divide-hairline overflow-hidden rounded-2xl bg-card text-left">
           {organisation && (
             <OrganisationRow
               bridge={organisation}

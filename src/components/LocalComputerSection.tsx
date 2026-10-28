@@ -388,7 +388,7 @@ export function CloudComputersCard({
           onClick={onRefresh}
           disabled={loading || pending !== null}
           aria-label={t("vm.cloud.refreshAria")}
-          className="flex shrink-0 items-center gap-1.5 rounded-lg border border-hairline/40 px-2.5 py-1.5 text-[12px] text-ink-secondary hover:bg-control hover:text-ink disabled:opacity-40"
+          className="flex shrink-0 items-center gap-1.5 rounded-lg border border-hairline px-2.5 py-1.5 text-[12px] text-ink-secondary hover:bg-control hover:text-ink disabled:opacity-40"
         >
           <RefreshCw size={12} className={cn(loading && "animate-spin")} /> {t("vm.refresh")}
         </button>
@@ -410,7 +410,7 @@ export function CloudComputersCard({
 
       <div
         aria-busy={loading || pending !== null}
-        className="mt-3 overflow-hidden rounded-xl border border-hairline/40"
+        className="mt-3 overflow-hidden rounded-xl border border-hairline"
       >
         {loading && instances.length === 0 ? (
           <div className="flex items-center gap-2 px-3 py-4 text-[13px] text-ink-secondary">
@@ -437,7 +437,7 @@ export function CloudComputersCard({
               key={instance.boxId}
               className={cn(
                 "flex items-start justify-between gap-3 px-3 py-3",
-                index > 0 && "border-t border-hairline/35",
+                index > 0 && "border-t border-hairline",
               )}
             >
               <div className="min-w-0 flex-1">
@@ -472,7 +472,7 @@ export function CloudComputersCard({
                   disabled={loading || instance.inUse || pending !== null || !canSleep}
                   aria-busy={isPending && pending?.action === "sleep" ? true : undefined}
                   title={canSleep ? t("vm.cloud.sleepTitle") : t("vm.cloud.sleepBlocked", { state: state.toLowerCase() })}
-                  className="flex items-center gap-1.5 rounded-lg border border-hairline/40 px-2.5 py-1.5 text-[12px] text-ink-secondary hover:bg-control hover:text-ink disabled:cursor-not-allowed disabled:opacity-40"
+                  className="flex items-center gap-1.5 rounded-lg border border-hairline px-2.5 py-1.5 text-[12px] text-ink-secondary hover:bg-control hover:text-ink disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   {isPending && pending?.action === "sleep" ? <Loader2 size={12} className="animate-spin" /> : <Moon size={12} />}
                   {t("vm.cloud.sleep")}
@@ -534,7 +534,7 @@ export function LocalVmInventoryCard({
           onClick={onRefresh}
           disabled={loading || deletingBotId !== null}
           aria-label={t("vm.perBot.refreshAria")}
-          className="flex shrink-0 items-center gap-1.5 rounded-lg border border-hairline/40 px-2.5 py-1.5 text-[12px] text-ink-secondary hover:bg-control hover:text-ink disabled:opacity-40"
+          className="flex shrink-0 items-center gap-1.5 rounded-lg border border-hairline px-2.5 py-1.5 text-[12px] text-ink-secondary hover:bg-control hover:text-ink disabled:opacity-40"
         >
           <RefreshCw size={12} className={cn(loading && "animate-spin")} /> {t("vm.refresh")}
         </button>
@@ -554,7 +554,7 @@ export function LocalVmInventoryCard({
 
       <div
         aria-busy={loading || deletingBotId !== null}
-        className="mt-3 overflow-hidden rounded-xl border border-hairline/40"
+        className="mt-3 overflow-hidden rounded-xl border border-hairline"
       >
         {loading && instances.length === 0 ? (
           <div className="flex items-center gap-2 px-3 py-4 text-[13px] text-ink-secondary">
@@ -575,7 +575,7 @@ export function LocalVmInventoryCard({
               key={instance.botId}
               className={cn(
                 "flex items-start justify-between gap-3 px-3 py-3",
-                index > 0 && "border-t border-hairline/35",
+                index > 0 && "border-t border-hairline",
               )}
             >
               <div className="min-w-0 flex-1">
@@ -640,7 +640,7 @@ function Step({ n, title, done, children }: { n: number; title: string; done: bo
       <div
         className={cn(
           "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full text-[11px]",
-          done ? "bg-success/20 text-success" : "border border-hairline/50 text-ink-secondary",
+          done ? "bg-success/20 text-success" : "border border-hairline text-ink-secondary",
         )}
       >
         {done ? <Check size={12} /> : n}
@@ -742,7 +742,7 @@ export function LocalVmIdleTimeoutSetting({
         <div
           className={cn(
             "flex w-[150px] shrink-0 items-center rounded-lg border bg-control",
-            error ? "border-danger/60" : "border-hairline/40 focus-within:border-focus",
+            error ? "border-danger/60" : "border-hairline focus-within:border-focus",
           )}
         >
           <input
@@ -1268,7 +1268,7 @@ export function LocalComputerSection() {
               setInventoryRefreshKey((key) => key + 1);
             }}
             disabled={loading || pending !== null}
-            className="flex items-center gap-1.5 rounded-lg border border-hairline/40 px-2.5 py-1 text-[13px] text-ink-secondary hover:bg-control hover:text-ink disabled:opacity-40"
+            className="flex items-center gap-1.5 rounded-lg border border-hairline px-2.5 py-1 text-[13px] text-ink-secondary hover:bg-control hover:text-ink disabled:opacity-40"
           >
             <RefreshCw size={12} /> {t("vm.main.recheck")}
           </button>
@@ -1277,7 +1277,7 @@ export function LocalComputerSection() {
               href={status?.viewer_url ?? c?.view}
               target="_blank"
               rel="noreferrer"
-              className="flex items-center gap-1.5 rounded-lg border border-hairline/40 px-2.5 py-1 text-[13px] text-ink hover:bg-control"
+              className="flex items-center gap-1.5 rounded-lg border border-hairline px-2.5 py-1 text-[13px] text-ink hover:bg-control"
             >
               <ExternalLink size={12} /> {t("vm.main.watch")}
             </a>
@@ -1290,7 +1290,7 @@ export function LocalComputerSection() {
         title={t("vm.isolation.title")}
         subtitle={t("vm.isolation.subtitle")}
       >
-        <div className="flex overflow-hidden rounded-lg border border-hairline/40">
+        <div className="flex overflow-hidden rounded-lg border border-hairline">
           {(["shared", "per-bot"] as const).map((mode, index) => (
             <button
               key={mode}
@@ -1299,7 +1299,7 @@ export function LocalComputerSection() {
               onClick={() => void savePolicy(mode, status?.max_instances ?? 2)}
               className={cn(
                 "flex-1 px-3 py-2 text-[13px] disabled:opacity-50",
-                index > 0 && "border-l border-hairline/40",
+                index > 0 && "border-l border-hairline",
                 status?.mode === mode ? "bg-control text-ink" : "text-ink-secondary hover:text-ink",
               )}
             >

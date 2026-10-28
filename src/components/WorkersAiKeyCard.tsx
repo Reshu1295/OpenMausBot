@@ -10,7 +10,7 @@ import { Card } from "./SettingsPrimitives";
 
 const TOKEN_URL = "https://dash.cloudflare.com/profile/api-tokens";
 const ACCOUNT_ID = /^[0-9a-f]{32}$/i;
-const FIELD = "w-full rounded-lg border border-hairline/40 bg-inset px-3 py-2 text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none";
+const FIELD = "w-full rounded-lg border border-hairline bg-inset px-3 py-2 text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none";
 
 type TestResult = { ok: true; latencyMs: number; extraction?: { ok: boolean } } | { ok: false; reason: string; status?: number; extraction?: { ok: boolean } };
 
@@ -132,7 +132,7 @@ export function WorkersAiKeyCard({ failureText }: { failureText: (result: { reas
             data-testid="workers-ai-test"
             onClick={() => void test()}
             disabled={testing || saving || (!draft && !saved)}
-            className="flex shrink-0 cursor-pointer items-center justify-center rounded-lg border border-hairline/40 px-3 py-2 text-[13px] text-ink-secondary hover:bg-raised/50 hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex shrink-0 cursor-pointer items-center justify-center rounded-lg border border-hairline px-3 py-2 text-[13px] text-ink-secondary hover:bg-raised/50 hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
           >
             {testing ? t("keys.testing") : t("keys.test")}
           </button>

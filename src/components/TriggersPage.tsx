@@ -69,7 +69,7 @@ export function TriggersPage({ onBack, onOpenRoom }: { onBack: () => void; onOpe
 
   return (
     <main className="flex h-full min-w-0 flex-1 flex-col bg-app animate-workspace-in">
-      <header className={cn("shrink-0 border-b border-hairline/35 bg-app py-3 pr-4", macInset && view === "calendar" ? "pl-[86px]" : view === "list" ? "pl-12 md:pl-4" : "pl-4")} style={windowDragStyle}>
+      <header className={cn("shrink-0 border-b border-hairline bg-app py-3 pr-4", macInset && view === "calendar" ? "pl-[86px]" : view === "list" ? "pl-12 md:pl-4" : "pl-4")} style={windowDragStyle}>
         <div className="flex flex-wrap items-center gap-2">
           <button type="button" ref={backButtonRef} onClick={onBack} aria-label="Back" title="Back" className="flex size-9 shrink-0 items-center justify-center rounded-lg text-ink-secondary hover:bg-raised hover:text-ink" style={windowNoDragStyle}><ArrowLeft size={18} /></button>
           <h1 data-tour="automations-page" className="mr-1 text-[18px] font-semibold tracking-tight text-ink">{t("automations.title")}</h1>
@@ -80,7 +80,7 @@ export function TriggersPage({ onBack, onOpenRoom }: { onBack: () => void; onOpe
                 {visibleBots.map((bot) => <option key={bot.id} value={bot.id}>{bot.name}</option>)}
               </Select>
             )}
-            <div role="group" aria-label={t("automations.view")} className="flex items-center rounded-lg border border-hairline/50 bg-panel p-0.5">
+            <div role="group" aria-label={t("automations.view")} className="flex items-center rounded-lg border border-hairline bg-panel p-0.5">
               {(["list", "calendar"] as const).map((option) => (
                 <button key={option} type="button" aria-pressed={view === option} onClick={() => dispatch({ type: "showRoutines", view: option, botId: botFilter === "all" ? undefined : botFilter })}
                   className={cn("rounded-md px-3 py-1 text-[13px] font-medium", view === option ? "bg-raised text-ink shadow-sm" : "text-ink-secondary hover:text-ink")}>
@@ -106,7 +106,7 @@ export function TriggersPage({ onBack, onOpenRoom }: { onBack: () => void; onOpe
                   <div><button type="button" onClick={() => setNewText("")} className="mt-6 inline-flex items-center gap-2 rounded-xl bg-accent px-4 py-2.5 text-[13px] font-medium text-accent-ink hover:brightness-110"><Plus size={15} />{t("automations.new")}</button></div>
                 </section>
               ) : (
-                <ul aria-label={t("automations.title")} className="divide-y divide-hairline/30 overflow-hidden rounded-2xl border border-hairline/40 bg-card">
+                <ul aria-label={t("automations.title")} className="divide-y divide-hairline overflow-hidden rounded-2xl border border-hairline bg-card">
                   {listed.map((automation) => {
                     const status = automationStatus(automation);
                     const name = automation.name.trim();

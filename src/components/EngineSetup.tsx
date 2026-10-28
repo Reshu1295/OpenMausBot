@@ -80,7 +80,7 @@ export function CommandRow({
 
   if (compact) {
     return (
-      <div className="mt-2 flex min-w-0 items-center gap-1.5 rounded-lg border border-hairline/50 bg-app px-2 py-1.5">
+      <div className="mt-2 flex min-w-0 items-center gap-1.5 rounded-lg border border-hairline bg-app px-2 py-1.5">
         <code className="min-w-0 flex-1 truncate font-mono text-[11px] text-ink-secondary" title={command}>
           {command}
         </code>
@@ -115,7 +115,7 @@ export function CommandRow({
 
   return (
     <div className="mt-3">
-      <div className="flex min-w-0 items-center gap-2 rounded-lg border border-hairline/50 bg-app px-2.5 py-2">
+      <div className="flex min-w-0 items-center gap-2 rounded-lg border border-hairline bg-app px-2.5 py-2">
         <code className="min-w-0 flex-1 truncate font-mono text-[12px] text-ink-secondary" title={command}>
           {command}
         </code>
@@ -205,7 +205,7 @@ function ServerEngineInstall({ instance, mode, command, quiet = false }: { insta
       {done && !busy && <p role="status" className="text-center text-[11px] text-success">{t("engineSetup.installVerified")}</p>}
       {error && <p role="alert" className="whitespace-pre-wrap text-[12px] leading-relaxed text-danger-text">{error}</p>}
       {command && (
-        <details className="rounded-lg border border-hairline/50 bg-app px-2.5 py-2 text-[12px] text-ink-secondary">
+        <details className="rounded-lg border border-hairline bg-app px-2.5 py-2 text-[12px] text-ink-secondary">
           <summary className="cursor-pointer select-none">{t("engineSetup.preferTerminal")}</summary>
           <CommandRow command={command} actionLabel={t(mode === "update" ? "engineSetup.openUpdate" : "engineSetup.openInstall")} compact allowTerminal={state.config?.cloudHome !== true} />
         </details>
@@ -368,14 +368,14 @@ function ManagedEngineSetup({ instance, signInOnly }: { instance: InstanceInfo; 
           <button type="button" onClick={() => void check()} className="w-full rounded-lg bg-control px-3 py-2 text-[12px] font-semibold text-ink hover:bg-raised-hover">
             {busy === "check" ? t("common.checking") : t("engineSetup.finishedSignIn")}
           </button>
-          <details className="rounded-lg border border-hairline/50 bg-app px-2.5 py-2 text-[12px] text-ink-secondary">
+          <details className="rounded-lg border border-hairline bg-app px-2.5 py-2 text-[12px] text-ink-secondary">
             <summary className="cursor-pointer select-none">{t("engineSetup.otherComputer")}</summary>
             <p className="mt-2 leading-relaxed">{t("engineSetup.otherComputerHint")}</p>
             <input
               value={callbackUrl}
               onChange={(event) => setCallbackUrl(event.target.value)}
               placeholder="http://127.0.0.1:…/?code=…"
-              className="mt-2 w-full rounded-md border border-hairline bg-inset px-2 py-1.5 text-[11px] text-ink outline-none focus:border-accent"
+              className="mt-2 w-full rounded-md border border-edge bg-inset px-2 py-1.5 text-[11px] text-ink outline-none focus:border-accent"
             />
             <button
               type="button"
@@ -430,7 +430,7 @@ export function ApiKeyHint({ instance }: { instance: InstanceInfo }) {
 function GrokKeyInstead({ className, unframed }: { className?: string; unframed: boolean }) {
   const remote = window.ogb?.remoteClient?.active === true;
   return (
-    <div data-engine-setup-key-instead className={cn(!unframed && "rounded-xl border border-hairline/40 bg-control/30 p-3", className)}>
+    <div data-engine-setup-key-instead className={cn(!unframed && "rounded-xl border border-hairline bg-control/30 p-3", className)}>
       <div className="flex items-start gap-2.5">
         <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-inset text-ink-secondary">
           <KeyRound size={14} />
@@ -450,7 +450,7 @@ function ApiKeyEngineSetup({ instance, className, unframed, configured = false }
     ? { title: "engineSetup.apiKey.configuredTitle", description: remote ? "engineSetup.apiKey.configuredRemote" : inline ? null : "engineSetup.apiKey.configuredDescription", action: "engineSetup.apiKey.change" } as const
     : { title: "engineSetup.apiKey.title", description: remote ? "engineSetup.apiKey.remote" : inline ? "engineSetup.apiKey.inline" : "engineSetup.apiKey.description", action: "engineSetup.apiKey.open" } as const;
   return (
-    <div data-engine-setup-api-key={configured ? "configured" : ""} className={cn(!unframed && "rounded-xl border border-hairline/40 bg-control/30 p-3", className)}>
+    <div data-engine-setup-api-key={configured ? "configured" : ""} className={cn(!unframed && "rounded-xl border border-hairline bg-control/30 p-3", className)}>
       <div className="flex items-start gap-2.5">
         <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-inset text-ink-secondary">
           <KeyRound size={14} />
@@ -543,7 +543,7 @@ export function EngineSetup({
 
   if (!install || instance.snapshot.authenticationUnavailableReason) {
     return (
-      <div className={cn(!unframed && "rounded-xl border border-hairline/40 bg-control/30 p-3", className)}>
+      <div className={cn(!unframed && "rounded-xl border border-hairline bg-control/30 p-3", className)}>
         <div className="text-[13px] font-semibold text-ink">{t("engineSetup.notReady", { name: instance.displayName })}</div>
         <p className="mt-1 text-[12px] leading-relaxed text-ink-secondary">
           {instance.snapshot.authenticationUnavailableReason ?? instance.snapshot.reason ?? t("engineSetup.noReason")}
@@ -553,7 +553,7 @@ export function EngineSetup({
   }
 
   return (
-    <div className={cn(!unframed && "rounded-xl border border-hairline/40 bg-control/30 p-3", className)}>
+    <div className={cn(!unframed && "rounded-xl border border-hairline bg-control/30 p-3", className)}>
       <div className="flex items-start gap-2.5">
         <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-inset text-ink-secondary">
           {signInOnly ? <LogIn size={14} /> : <Download size={14} />}
@@ -579,7 +579,7 @@ export function EngineSetup({
         <>
           <DeviceSignIn key={instance.instanceId} instanceId={instance.instanceId} browserPkce={browserSignIn} provider={provider} />
           {deviceSignIn && provider === "grok" && signInCommand && serverTerminal(cloudHome) && (
-            <details className="mt-2 rounded-lg border border-hairline/50 bg-app px-2.5 py-2 text-[12px] text-ink-secondary">
+            <details className="mt-2 rounded-lg border border-hairline bg-app px-2.5 py-2 text-[12px] text-ink-secondary">
               <summary className="cursor-pointer select-none">{t("engineSetup.preferTerminal")}</summary>
               <CommandRow command={signInCommand} actionLabel={t("engineSetup.openSignIn")} compact />
             </details>
@@ -614,7 +614,7 @@ export function EngineSetup({
       )}
 
       {(install.command || signInCommand) && !deviceSignIn && !browserSignIn && !pasteSignIn && !install.managed && (
-        <div className="mt-3 border-t border-hairline/40 pt-2">
+        <div className="mt-3 border-t border-hairline pt-2">
           <p className="mb-1 text-[12px] leading-relaxed text-ink-secondary">{t("engineSetup.sameMachine")}</p>
           {needsCli(instance) && <p className="mb-1 text-[12px] leading-relaxed text-ink-secondary">{t("engineSetup.pathHint")}</p>}
           <RefreshEngines key={instance.instanceId} />

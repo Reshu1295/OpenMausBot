@@ -42,7 +42,7 @@ export function VerifyCard({
   return (
     <section
       aria-label={t("chat.verify.aria")}
-      className="pointer-events-auto w-[22rem] max-w-full rounded-2xl border border-hairline/40 bg-raised/95 text-ink shadow-lg backdrop-blur-sm"
+      className="pointer-events-auto w-[22rem] max-w-full rounded-2xl border border-hairline bg-raised/95 text-ink shadow-lg backdrop-blur-sm"
     >
       <div className="flex items-center gap-2 px-3 py-2">
         <ListChecks size={14} className="shrink-0 text-accent-text" aria-hidden="true" />
@@ -71,7 +71,7 @@ export function VerifyCard({
           <ol
             tabIndex={0}
             aria-label={t("chat.verify.steps")}
-            className="max-h-56 overflow-y-auto border-t border-hairline/25 px-3 py-1.5 outline-none focus-visible:ring-2 focus-visible:ring-focus/60"
+            className="max-h-56 overflow-y-auto border-t border-hairline px-3 py-1.5 outline-none focus-visible:ring-2 focus-visible:ring-focus/60"
           >
             {steps.map((step) => (
               <li key={step.id} className="flex min-w-0 items-center gap-2 py-1">
@@ -87,11 +87,11 @@ export function VerifyCard({
             ))}
           </ol>
           {skill ? (
-            <div className="border-t border-hairline/25 px-3 py-2 text-[12px] text-ink-secondary">
+            <div className="border-t border-hairline px-3 py-2 text-[12px] text-ink-secondary">
               {t(skill === "saved" ? "chat.verify.saved" : "chat.verify.staged")}
             </div>
           ) : canSave && (
-            <div className="flex flex-col items-end gap-1 border-t border-hairline/25 px-3 py-2">
+            <div className="flex flex-col items-end gap-1 border-t border-hairline px-3 py-2">
               <button
                 type="button"
                 onClick={onSave}

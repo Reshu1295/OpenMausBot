@@ -15,7 +15,7 @@ export function SkillRequestPreview({ request }: { request: SkillRequestCardData
     );
   }
   return (
-    <div className="mt-3 rounded-lg border border-hairline/40 bg-inset p-3">
+    <div className="mt-3 rounded-lg border border-hairline bg-inset p-3">
       <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-ink-secondary">
         <span>
           Review the complete SKILL.md{request.references?.length ? " and its reference files" : ""} before {request.action === "update" ? "replacing the current version" : "enabling"}
@@ -33,7 +33,7 @@ export function SkillRequestPreview({ request }: { request: SkillRequestCardData
         {request.preview}
       </pre>
       {request.references?.map((file) => (
-        <div key={file.path} className="mt-3 border-t border-hairline/40 pt-2">
+        <div key={file.path} className="mt-3 border-t border-hairline pt-2">
           <div className="font-mono text-[11px] text-ink-secondary">{file.path}</div>
           <pre
             tabIndex={0}

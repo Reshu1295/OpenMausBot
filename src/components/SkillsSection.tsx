@@ -203,7 +203,7 @@ export function SkillsSection() {
   };
 
   const inputClass =
-    "w-full rounded-lg border border-hairline/40 bg-inset px-3 py-2 text-[14px] text-ink placeholder:text-ink-secondary focus:outline-none";
+    "w-full rounded-lg border border-hairline bg-inset px-3 py-2 text-[14px] text-ink placeholder:text-ink-secondary focus:outline-none";
 
   return (
     <div className="flex flex-col gap-4">
@@ -256,7 +256,7 @@ export function SkillsSection() {
               {skills.length === 0 ? t("skills.library.empty") : t("skills.library.noMatches")}
             </div>
           ) : (
-            <div className="divide-y divide-hairline/40 overflow-hidden rounded-lg border border-hairline/40">
+            <div className="divide-y divide-hairline overflow-hidden rounded-lg border border-hairline">
               {visible.map((skill) => (
                 <div key={skill.name} className="px-3 py-2.5">
                   <div className="flex items-center gap-2">

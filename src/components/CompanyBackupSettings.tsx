@@ -9,7 +9,7 @@ import { WorkspaceBackupRestartNotice, WorkspaceBackupSummaryView } from "./Work
 type BackupBridge = NonNullable<NonNullable<Window["ogb"]>["companyBackups"]>;
 type BackupList = Awaited<ReturnType<BackupBridge["list"]>>;
 type Dialog = { kind: "create" | "schedule" } | { kind: "restore" | "delete"; entry: CompanyBackupEntry };
-const inputClass = "mt-1 w-full rounded-lg border border-hairline/50 bg-inset px-3 py-2 text-[14px] text-ink disabled:opacity-50";
+const inputClass = "mt-1 w-full rounded-lg border border-hairline bg-inset px-3 py-2 text-[14px] text-ink disabled:opacity-50";
 const bytes = (value: number) => {
   const power = value >= 1024 ** 3 ? 3 : value >= 1024 ** 2 ? 2 : 1;
   return `${new Intl.NumberFormat(activeLocale(), { maximumFractionDigits: 2 }).format(value / 1024 ** power)} ${["", "KiB", "MiB", "GiB"][power]}`;
@@ -70,7 +70,7 @@ export function SavedCompanyBackupSchedule({ bridge }: { bridge: BackupBridge })
     finally { if (current === generation.current) setBusy(false); }
   };
   return <Card title={t("companyBackup.title")} subtitle={t("companyBackup.savedSchedule")}>
-    <div className="rounded-lg border border-hairline/40 p-3">
+    <div className="rounded-lg border border-hairline p-3">
       <div className="flex items-center justify-between gap-3">
         <div className="text-[14px] font-medium">{t("companyBackup.daily")}</div>
         <Switch aria-label={t("companyBackup.daily")} checked disabled={busy} onClick={() => void turnOff()} />
@@ -243,7 +243,7 @@ export function ConnectedCompanyBackupSettings({ connection, bridge }: { connect
   return <Card title={t("companyBackup.title")} subtitle={t("companyBackup.account", { organization: connection.organization?.name ?? "", email: connection.email ?? "" })}>
     <div className="flex flex-col gap-3">
       <p className="text-[13px] text-ink-secondary">{t("companyBackup.managedScope")}</p>
-      {bridge.configureSchedule && schedule && <div className="rounded-lg border border-hairline/40 p-3">
+      {bridge.configureSchedule && schedule && <div className="rounded-lg border border-hairline p-3">
         <div className="flex items-center justify-between gap-3">
           <div><div className="text-[14px] font-medium">{t("companyBackup.daily")}</div><p className="mt-1 text-[12px] text-ink-secondary">{t("companyBackup.scheduleHelp")}</p></div>
           <Switch aria-label={t("companyBackup.daily")} checked={schedule.enabled} disabled={action !== null || !state || (!schedule.enabled && disabled)} onClick={() => schedule.enabled ? void configureSchedule(false) : openDialog({ kind: "schedule" })} />
@@ -262,7 +262,7 @@ export function ConnectedCompanyBackupSettings({ connection, bridge }: { connect
         {listing && <p className="text-[12px] text-ink-secondary">{t("companyBackup.quota", { used: bytes(listing.usedBytes), total: bytes(listing.limits.ownerQuotaBytes), count: listing.limits.retainedSnapshots })}</p>}
         {pending > 0 && <p role="status" className="text-[12px] text-ink-secondary">{t("companyBackup.pending", { count: pending })}</p>}
         {listing && ready.length === 0 && <p className="text-[13px] text-ink-secondary">{t("companyBackup.empty")}</p>}
-        <ul className="divide-y divide-hairline/40">{ready.map((entry) => <li key={entry.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
+        <ul className="divide-y divide-hairline">{ready.map((entry) => <li key={entry.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
           <div className="min-w-0 text-[13px]"><div className="text-ink">{dateLabel(entry)}</div><div className="text-[12px] text-ink-secondary">{bytes(entry.sizeBytes)}{entry.appVersion ? ` · ${entry.appVersion}` : ""}</div><code className="break-all text-[11px] text-ink-secondary">{entry.id}</code></div>
           <div className="flex flex-wrap gap-2"><button type="button" className="ui-button" disabled={disabled} onClick={() => openDialog({ kind: "restore", entry })}>{t("companyBackup.restore")}</button><button type="button" className="ui-button text-danger-text" disabled={disabled} onClick={() => openDialog({ kind: "delete", entry })}>{t("companyBackup.delete")}</button></div>
         </li>)}</ul>
@@ -273,7 +273,7 @@ export function ConnectedCompanyBackupSettings({ connection, bridge }: { connect
     {dialog && <dialog ref={nativeDialog} aria-labelledby="company-backup-dialog-title" onKeyDown={(event) => {
       // The enclosing Settings dialog has its own window-level keyboard trap.
       if (event.key === "Escape" || event.key === "Tab") event.stopPropagation();
-    }} onCancel={(event) => { event.preventDefault(); if (!action) closeDialog(); }} className="fixed inset-0 m-auto max-h-[85dvh] w-[min(34rem,calc(100vw-2rem))] overflow-y-auto rounded-xl border border-hairline/50 bg-app p-5 text-ink shadow-xl backdrop:bg-black/45">
+    }} onCancel={(event) => { event.preventDefault(); if (!action) closeDialog(); }} className="fixed inset-0 m-auto max-h-[85dvh] w-[min(34rem,calc(100vw-2rem))] overflow-y-auto rounded-xl border border-hairline bg-app p-5 text-ink shadow-xl backdrop:bg-black/45">
       <div className="flex flex-col gap-3">
         <h3 id="company-backup-dialog-title" className="text-[16px] font-semibold">{title}</h3>
         {needsRestart && <WorkspaceBackupRestartNotice />}

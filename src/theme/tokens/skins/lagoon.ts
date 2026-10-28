@@ -37,7 +37,8 @@ export default {
     // under the hover tone.
     control: "#c3dcd9",
     // 1.60:1 — level with the other three
-    hairline: "#aebfbd",
+    hairline: "#aebfbd73",
+    edge: "#aebfbd",
     // dark petrol; a neutral black would read as a foreign object on a tinted ground
     ink: "#14201f",
     // 7.0:1 on white, 5.8:1 on the ground

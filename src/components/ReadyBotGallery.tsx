@@ -49,7 +49,7 @@ export function ReadyBotGallery({ search, onDialog, onAdded }: {
       </button>)}
     </div>
     <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
-      {visible.map((bot) => <article key={bot.id} data-ready-bot={bot.id} className="flex flex-col rounded-2xl border border-hairline/40 bg-card p-4">
+      {visible.map((bot) => <article key={bot.id} data-ready-bot={bot.id} className="flex flex-col rounded-2xl border border-hairline bg-card p-4">
         <div className="flex items-center gap-3">
           <MausAvatar color={bot.look.color} bodyId={bot.look.mascotBody} size={40} animated={false} label={bot.name} />
           <div className="min-w-0 flex-1">

@@ -55,7 +55,7 @@ export function GoalToggle({ on, onToggle, solo = false, compact = false }: { on
         compact ? "h-7 px-2.5" : "h-8 px-3",
         on
           ? "border-accent/35 bg-accent/10 text-accent-text"
-          : "border-hairline/20 bg-transparent text-ink-secondary hover:bg-raised hover:text-ink",
+          : "border-hairline bg-transparent text-ink-secondary hover:bg-raised hover:text-ink",
       )}
     >
       <Target size={14} aria-hidden="true" />

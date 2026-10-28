@@ -39,10 +39,10 @@ export function EngineCard({ instance, children, summary, bare = false }: { inst
   // Some CLIs return their executable name rather than a version.
   const version = instance.snapshot.version?.match(/\d+\.\d+(?:\.\d+)?(?:[-+][\w.-]+)?/)?.[0];
   return (
-    <details data-engine-card={instance.instanceId} className="group/engine min-w-0 rounded-2xl border border-hairline/40 bg-card transition-colors open:col-span-full open:border-hairline/70 hover:border-hairline/70">
+    <details data-engine-card={instance.instanceId} className="group/engine min-w-0 rounded-2xl border border-hairline bg-card transition-colors open:col-span-full open:border-edge hover:border-edge">
       <summary className="cursor-pointer list-none rounded-2xl p-4 outline-none focus-visible:ring-2 focus-visible:ring-focus [&::-webkit-details-marker]:hidden">
         <div className="flex min-w-0 items-center gap-3">
-          <span aria-hidden="true" className="flex size-12 shrink-0 items-center justify-center rounded-xl border border-hairline/30 bg-panel">
+          <span aria-hidden="true" className="flex size-12 shrink-0 items-center justify-center rounded-xl border border-hairline bg-panel">
             <InstanceProviderMark instance={instance} size={28} />
           </span>
           <div className="min-w-0 flex-1">
@@ -68,7 +68,7 @@ export function EngineCard({ instance, children, summary, bare = false }: { inst
           )}
         </div>
       </summary>
-      <div className="min-w-0 border-t border-hairline/40 p-4">{children}</div>
+      <div className="min-w-0 border-t border-hairline p-4">{children}</div>
     </details>
   );
 }

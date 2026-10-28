@@ -553,7 +553,7 @@ function GroupCall({ group, members }: { group: Group; members: Bot[] }) {
         {speaker.isSpeaking() && (
           <button
             onClick={interruptSpeech}
-            className="rounded-full border border-hairline/50 px-4 py-2 text-[14px] text-ink hover:bg-raised"
+            className="rounded-full border border-hairline px-4 py-2 text-[14px] text-ink hover:bg-raised"
           >
             Interrupt
           </button>

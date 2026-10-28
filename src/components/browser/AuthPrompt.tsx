@@ -20,7 +20,7 @@ export function AuthPrompt({ origin, realm, onAnswer }: {
     password.value = "";
   };
   return (
-    <form role="dialog" aria-label="Sign in to this site" onSubmit={submit} className="absolute inset-x-3 top-3 z-20 mx-auto flex max-w-sm flex-col gap-2.5 rounded-xl border border-hairline/60 bg-card p-4 text-ink shadow-xl">
+    <form role="dialog" aria-label="Sign in to this site" onSubmit={submit} className="absolute inset-x-3 top-3 z-20 mx-auto flex max-w-sm flex-col gap-2.5 rounded-xl border border-hairline bg-card p-4 text-ink shadow-xl">
       <div className="flex items-center gap-2 text-[13px] font-medium"><LockKeyhole size={14} aria-hidden="true" />Sign in</div>
       <p className="break-words text-[12px] text-ink-secondary">{origin}{realm ? ` asks for “${realm}”` : ""}</p>
       <input name="username" aria-label="Username" autoComplete="off" spellCheck={false} maxLength={1024} placeholder="Username" className="rounded-lg bg-inset px-3 py-2 text-[13px] outline-none focus:ring-1 focus:ring-focus" />

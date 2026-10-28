@@ -131,7 +131,7 @@ export function ClaudeSignIn({ instanceId, autoStart = false, onDone }: {
 
   if (auth?.phase === "waiting" && link) {
     return (
-      <form data-claude-sign-in className="mt-3 space-y-3 rounded-xl border border-hairline/50 bg-app p-3" onSubmit={(event) => { event.preventDefault(); void finish(); }}>
+      <form data-claude-sign-in className="mt-3 space-y-3 rounded-xl border border-hairline bg-app p-3" onSubmit={(event) => { event.preventDefault(); void finish(); }}>
         <div className="space-y-1.5">
           <p className="text-[12px] font-medium text-ink">{t("accounts.claude.step1")}</p>
           <a href={link} target="_blank" rel="noopener noreferrer" onClick={(event) => {
@@ -151,7 +151,7 @@ export function ClaudeSignIn({ instanceId, autoStart = false, onDone }: {
               spellCheck={false}
               autoFocus
               placeholder={t("accounts.claude.codePlaceholder")}
-              className="min-w-0 flex-1 rounded-lg border border-hairline/40 bg-inset px-3 py-2 font-mono text-[13px] text-ink outline-none focus:border-accent-border"
+              className="min-w-0 flex-1 rounded-lg border border-hairline bg-inset px-3 py-2 font-mono text-[13px] text-ink outline-none focus:border-accent-border"
             />
             <button type="submit" disabled={busy !== null || code.trim().length < 8} className="flex shrink-0 items-center gap-1.5 rounded-lg bg-accent px-3 py-2 text-[13px] font-semibold text-white hover:brightness-110 disabled:opacity-50">
               {busy === "finish" && <Loader2 size={13} className="animate-spin" />}

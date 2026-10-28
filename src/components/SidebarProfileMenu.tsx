@@ -627,7 +627,7 @@ export function SidebarProfileMenu({ iconOnly = false, rail = false, circle = fa
             className={cn(
               "relative flex items-center justify-center rounded-xl transition-colors",
               rail ? "size-10" : "size-[46px]",
-              circle && "size-10 rounded-full border border-hairline bg-card",
+              circle && "size-10 rounded-full border border-edge bg-card",
               open ? "bg-raised" : "hover:bg-raised/50",
             )}
           >

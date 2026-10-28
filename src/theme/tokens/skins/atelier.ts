@@ -34,7 +34,8 @@ export default {
     // lifts off it
     control: "#ece4d6",
     // #ece7dd was 1.11:1 on the rail → 1.65:1
-    hairline: "#c8bda8",
+    hairline: "#c8bda873",
+    edge: "#c8bda8",
     // 17.4:1 on white
     ink: "#1a1a18",
     // #8b8578 was 3.67:1 → 5.78:1

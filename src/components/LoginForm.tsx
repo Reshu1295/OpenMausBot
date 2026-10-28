@@ -9,7 +9,7 @@ import type { LoginFieldsInput } from "@/lib/logins";
 // Security: the browser is asked not to fill or remember these fields, what was typed is dropped once saved, and a
 // saved password is never shown.
 
-const FIELD = "w-full min-w-0 rounded-lg border border-hairline/60 bg-inset px-3 py-1.5 text-[13px] text-ink outline-none placeholder:text-ink-tertiary focus:border-accent disabled:opacity-60";
+const FIELD = "w-full min-w-0 rounded-lg border border-hairline bg-inset px-3 py-1.5 text-[13px] text-ink outline-none placeholder:text-ink-tertiary focus:border-accent disabled:opacity-60";
 const LABEL = "flex flex-col gap-1 text-[12px] font-medium text-ink-secondary";
 
 export function LoginForm({

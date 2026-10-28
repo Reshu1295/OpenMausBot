@@ -56,7 +56,7 @@ export function PermissionsSection({
       {shows("chief") && <div
         className={cn(
           "rounded-xl border p-4",
-          bot.chiefOfStaff ? "border-accent/40 bg-accent/10" : "border-hairline/40 bg-card",
+          bot.chiefOfStaff ? "border-accent/40 bg-accent/10" : "border-hairline bg-card",
         )}
       >
         <div className="flex items-center gap-3">
@@ -182,7 +182,7 @@ export function PermissionsSection({
 function PeersListNote({ peers, bots, onOpen }: { peers: readonly string[]; bots: readonly Bot[]; onOpen: () => void }) {
   const names = peers.flatMap((id) => bots.find((other) => other.id === id && !other.hidden)?.name ?? []);
   return (
-    <div className="mt-3 flex flex-wrap items-baseline gap-x-2 gap-y-1 border-t border-hairline/40 pt-3 text-[13px] text-ink-secondary">
+    <div className="mt-3 flex flex-wrap items-baseline gap-x-2 gap-y-1 border-t border-hairline pt-3 text-[13px] text-ink-secondary">
       <span>{names.length ? t("permissions.peers.limited", { names: names.join(", ") }) : t("permissions.peers.none")}</span>
       <button type="button" className="text-accent-text hover:underline" onClick={onOpen}>{t("permissions.peers.everyone")}</button>
     </div>

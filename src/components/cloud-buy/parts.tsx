@@ -8,7 +8,7 @@ import { t } from "@/lib/i18n";
 /** The app's primary action, full width, for the one next step of a screen. */
 export const PRIMARY_WIDE = "ui-button ui-button-primary min-h-11 w-full rounded-xl px-4 text-[15px] font-semibold";
 export const LINK = "rounded-md text-[13px] font-medium text-accent-text underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:opacity-50";
-export const FIELD = "w-full rounded-lg border border-hairline bg-app px-3 py-2.5 text-[14px] text-ink outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-ink-tertiary focus:border-accent focus:ring-[3px] focus:ring-focus/25 disabled:opacity-60 motion-reduce:transition-none";
+export const FIELD = "w-full rounded-lg border border-edge bg-app px-3 py-2.5 text-[14px] text-ink outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-ink-tertiary focus:border-accent focus:ring-[3px] focus:ring-focus/25 disabled:opacity-60 motion-reduce:transition-none";
 
 export function Heading({ title, sub }: { title: string; sub?: ReactNode }) {
   return <div className="pe-8">
@@ -29,7 +29,7 @@ export function StepMark({ state, size = 22 }: { state: "done" | "now" | "next";
   if (state === "done") return <span aria-hidden="true" style={{ width: size, height: size }}
     className="grid shrink-0 place-items-center rounded-full bg-success text-[var(--color-success-ink)]"><Check size={Math.round(size * 0.62)} strokeWidth={2.6} /></span>;
   return <span aria-hidden="true" style={{ width: size, height: size }}
-    className={cn("block shrink-0 rounded-full border-2", state === "now" ? "animate-spin border-accent/25 border-t-accent motion-reduce:animate-none" : "border-hairline")} />;
+    className={cn("block shrink-0 rounded-full border-2", state === "now" ? "animate-spin border-accent/25 border-t-accent motion-reduce:animate-none" : "border-edge")} />;
 }
 
 export function Checklist({ items, label }: { label?: string; items: Array<{ key: string; state: "done" | "now" | "next"; title: string; detail?: string | null }> }) {

@@ -241,9 +241,9 @@ export function MermaidDiagram({ code }: MermaidDiagramProps) {
     );
   }
   return (
-    <div ref={frame} dir="ltr" className="my-2 overflow-hidden rounded-lg border border-hairline/40 bg-inset">
-      <div className="flex items-center justify-between gap-2 border-b border-hairline/30 bg-raised/30 px-3 py-1.5 text-xs">
-        <span title="Mermaid diagram" className="min-w-0 truncate rounded border border-hairline/40 bg-raised px-1.5 py-0.5 text-[11px] font-medium tracking-wide text-ink select-none">
+    <div ref={frame} dir="ltr" className="my-2 overflow-hidden rounded-lg border border-hairline bg-inset">
+      <div className="flex items-center justify-between gap-2 border-b border-hairline bg-raised/30 px-3 py-1.5 text-xs">
+        <span title="Mermaid diagram" className="min-w-0 truncate rounded border border-hairline bg-raised px-1.5 py-0.5 text-[11px] font-medium tracking-wide text-ink select-none">
           Mermaid diagram
         </span>
         <div className="flex shrink-0 items-center gap-1 whitespace-nowrap">
@@ -370,7 +370,7 @@ function Spoiler({ children }: { children?: ReactNode }) {
     );
   }
   return (
-    <span className="mx-px inline rounded px-1 py-px text-[13px] leading-relaxed text-ink underline decoration-dotted decoration-hairline underline-offset-2">
+    <span className="mx-px inline rounded px-1 py-px text-[13px] leading-relaxed text-ink underline decoration-dotted decoration-edge underline-offset-2">
       {children}
       <button
         type="button"
@@ -644,11 +644,11 @@ const MARKDOWN_COMPONENTS: Components = {
   },
   th({ children }: { children?: ReactNode }) {
     return (
-      <th className="border-b border-hairline/40 px-2 py-1.5 text-start font-semibold">{children}</th>
+      <th className="border-b border-hairline px-2 py-1.5 text-start font-semibold">{children}</th>
     );
   },
   td({ children }: { children?: ReactNode }) {
-    return <td className="border-b border-hairline/20 px-2 py-1.5 align-top">{children}</td>;
+    return <td className="border-b border-hairline px-2 py-1.5 align-top">{children}</td>;
   },
   p({ node, children }: BlockProps) {
     return <p dir={blockDirection(node)}>{children}</p>;
@@ -679,14 +679,14 @@ const MARKDOWN_COMPONENTS: Components = {
   },
   blockquote({ node, children }: BlockProps) {
     return (
-      <blockquote dir={blockDirection(node)} className="border-s-2 border-hairline ps-3 text-ink-secondary">{children}</blockquote>
+      <blockquote dir={blockDirection(node)} className="border-s-2 border-edge ps-3 text-ink-secondary">{children}</blockquote>
     );
   },
   del({ children }: { children?: ReactNode }) {
     return <Spoiler>{children}</Spoiler>;
   },
   hr() {
-    return <hr className="border-hairline/40" />;
+    return <hr className="border-hairline" />;
   },
 };
 

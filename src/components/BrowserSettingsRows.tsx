@@ -79,7 +79,7 @@ export function NewBrowserSettings() {
   };
 
   return (
-    <div className="mt-4 border-t border-hairline/30 pt-4" data-testid="new-browser-settings">
+    <div className="mt-4 border-t border-hairline pt-4" data-testid="new-browser-settings">
       <div className="flex items-center justify-between gap-4">
         <div className="min-w-0">
           <div className="text-[14px] font-medium text-ink">{t("settings.experimental.newBrowser")}</div>

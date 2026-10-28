@@ -32,7 +32,7 @@ export function StatStrip({ items }: { items: Array<{ label: string; value: stri
       {items.map((item, index) => (
         <div
           key={item.label}
-          className={cn("min-w-0 px-4 py-3.5 sm:px-5", index % 3 !== 0 && "border-l border-hairline/40", index >= 3 && "border-t border-hairline/40 sm:border-t-0", index === 3 && "sm:border-l")}
+          className={cn("min-w-0 px-4 py-3.5 sm:px-5", index % 3 !== 0 && "border-l border-hairline", index >= 3 && "border-t border-hairline sm:border-t-0", index === 3 && "sm:border-l")}
           title={item.hint}
         >
           <dt className="truncate text-[11px] font-medium uppercase tracking-[0.08em] text-ink-secondary">{item.label}</dt>
@@ -198,7 +198,7 @@ export function TraceWaterfall({ detail, now, actions }: { detail: TraceDetail; 
   }, []);
   const nowPct = live ? ((now - origin) / axis.max) * 100 : null;
   const grid: CSSProperties = {
-    backgroundImage: "linear-gradient(to right, color-mix(in srgb, var(--color-hairline) 55%, transparent) 1px, transparent 1px)",
+    backgroundImage: "linear-gradient(to right, var(--color-hairline) 1px, transparent 1px)",
     backgroundSize: `${100 / (axis.ticks.length - 1)}% 100%`,
   };
   const toggle = (id: string) => setToggled((current) => {
@@ -209,8 +209,8 @@ export function TraceWaterfall({ detail, now, actions }: { detail: TraceDetail; 
   const title = root.title || t(`trace.source.${root.source}`, { bot: root.bots[0]?.name ?? "" });
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-hairline/50 bg-card" data-testid="trace-waterfall" aria-label={t("trace.title")}>
-      <header className="flex items-center gap-3 border-b border-hairline/40 px-5 py-4">
+    <section className="overflow-hidden rounded-2xl border border-hairline bg-card" data-testid="trace-waterfall" aria-label={t("trace.title")}>
+      <header className="flex items-center gap-3 border-b border-hairline px-5 py-4">
         <Sparkles size={16} className="shrink-0 text-accent-text" aria-hidden />
         <span className="shrink-0 text-[15px] font-semibold text-ink">{t("trace.title")}</span>
         <span className="min-w-0 flex-1 truncate text-[15px] text-ink-secondary" title={title}>{title}</span>
@@ -218,10 +218,10 @@ export function TraceWaterfall({ detail, now, actions }: { detail: TraceDetail; 
         {actions}
       </header>
       <StatStrip items={totalsStats(root, t("trace.stat.duration"))} />
-      <div role="tree" aria-label={t("trace.spans")} className="border-t border-hairline/40">
-        <div className="grid grid-cols-1 border-b border-hairline/40 sm:grid-cols-[minmax(220px,38%)_1fr]">
+      <div role="tree" aria-label={t("trace.spans")} className="border-t border-hairline">
+        <div className="grid grid-cols-1 border-b border-hairline sm:grid-cols-[minmax(220px,38%)_1fr]">
           <div className="hidden px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.08em] text-ink-secondary sm:block">{t("trace.span")}</div>
-          <div ref={track} className="relative mx-4 h-9 sm:ml-0 sm:mr-6 sm:border-l sm:border-hairline/40">
+          <div ref={track} className="relative mx-4 h-9 sm:ml-0 sm:mr-6 sm:border-l sm:border-hairline">
             {axis.ticks.map((tick, index) => (
               <span
                 key={tick}
@@ -259,7 +259,7 @@ export function TraceWaterfall({ detail, now, actions }: { detail: TraceDetail; 
                   <RowName row={row} models={state.instances} />
                   {rowFailed(row.node) && row.node.kind === "turn" && <X size={13} className="shrink-0 text-danger-text" aria-label={t("trace.failed")} />}
                 </div>
-                <div className="relative mx-4 h-7 sm:ml-0 sm:mr-6 sm:h-9 sm:border-l sm:border-hairline/40" style={grid}>
+                <div className="relative mx-4 h-7 sm:ml-0 sm:mr-6 sm:h-9 sm:border-l sm:border-hairline" style={grid}>
                   <RowBar row={row} origin={origin} axisMax={axis.max} badges={badges} now={now} trackPx={trackPx} />
                   {nowPct !== null && <span className="absolute inset-y-0 w-px bg-accent/70" style={{ left: `${nowPct}%` }} />}
                 </div>

@@ -117,7 +117,7 @@ function ProfilePhoto() {
     <>
       <div className="flex items-center gap-3">
         {draft ? (
-          <div className="flex w-full flex-col gap-2 rounded-lg border border-hairline/40 bg-inset p-2">
+          <div className="flex w-full flex-col gap-2 rounded-lg border border-hairline bg-inset p-2">
             <div className="flex items-center gap-3">
               <div className="size-16 shrink-0 overflow-hidden rounded-full bg-raised">
                 <img src={draft.previewUrl} alt="" className="size-full object-cover" style={{ transform: `scale(${draft.zoom})` }} />
@@ -179,7 +179,7 @@ export function ProfileFields() {
   };
 
   const inputClass =
-    "w-full rounded-lg border border-hairline/40 bg-inset px-3 py-2 text-[14px] text-ink placeholder:text-ink-secondary focus:outline-none";
+    "w-full rounded-lg border border-hairline bg-inset px-3 py-2 text-[14px] text-ink placeholder:text-ink-secondary focus:outline-none";
   return (
     <div className="flex flex-col gap-3">
       <ProfilePhoto />

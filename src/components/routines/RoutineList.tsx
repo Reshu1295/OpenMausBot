@@ -21,12 +21,12 @@ export function RoutineList({ routines, runs, bots, loading, error, onOpen, onLo
   return <div className="space-y-3" aria-label={t("routines.list")}>
     {error && <div role="alert" className="rounded-lg bg-danger/10 p-3 text-[12px] text-danger-text">{t("routines.loadError")}</div>}
     {loading && <p role="status" className="flex items-center gap-2 p-3 text-[12px] text-ink-secondary"><Loader2 size={14} className="animate-spin" />{t("routines.loading")}</p>}
-    {!loading && !error && sorted.length === 0 && <div className="rounded-xl border border-dashed border-hairline/50 p-5 text-center text-[13px] text-ink-secondary"><Repeat2 size={20} className="mx-auto mb-2 opacity-60" />{t("routines.empty")}</div>}
+    {!loading && !error && sorted.length === 0 && <div className="rounded-xl border border-dashed border-hairline p-5 text-center text-[13px] text-ink-secondary"><Repeat2 size={20} className="mx-auto mb-2 opacity-60" />{t("routines.empty")}</div>}
     {sorted.map((routine) => {
       const latest = latestRoutineRun(routine.id, runs);
       const bot = bots?.find((candidate) => candidate.id === routine.botId);
       const switched = onToggle !== undefined && !routineFinished(routine);
-      return <article key={routine.id} className="rounded-xl border border-hairline/40 bg-card p-3.5" aria-label={routine.name}>
+      return <article key={routine.id} className="rounded-xl border border-hairline bg-card p-3.5" aria-label={routine.name}>
         <div className="flex items-start gap-2">
           <button type="button" onClick={() => onOpen(routine)} className="min-w-0 flex-1 text-left hover:text-accent-text">
             <span className="block truncate text-[13px] font-semibold text-ink">{routine.name}</span>

@@ -970,7 +970,7 @@ export function PhoneSetupFlowView({ controller }: { controller: PhoneSetupContr
                   if (event.key === "Enter" && !c.codeSent && canSubmitEmail) c.requestCode();
                 }}
                 placeholder="you@example.com"
-                className="rounded-lg border border-hairline/50 bg-inset px-3 py-2.5 text-[14px] text-ink outline-none placeholder:text-ink-tertiary focus:border-accent disabled:opacity-50"
+                className="rounded-lg border border-hairline bg-inset px-3 py-2.5 text-[14px] text-ink outline-none placeholder:text-ink-tertiary focus:border-accent disabled:opacity-50"
               />
             </label>
             {c.codeSent && (
@@ -987,7 +987,7 @@ export function PhoneSetupFlowView({ controller }: { controller: PhoneSetupContr
                     if (event.key === "Enter" && c.code.length === 8) c.verifyCode();
                   }}
                   placeholder="12345678"
-                  className="rounded-lg border border-hairline/50 bg-inset px-3 py-2.5 font-mono text-[16px] tracking-[0.18em] text-ink outline-none placeholder:tracking-normal placeholder:text-ink-tertiary focus:border-accent disabled:opacity-50"
+                  className="rounded-lg border border-hairline bg-inset px-3 py-2.5 font-mono text-[16px] tracking-[0.18em] text-ink outline-none placeholder:tracking-normal placeholder:text-ink-tertiary focus:border-accent disabled:opacity-50"
                 />
               </label>
             )}
@@ -1024,12 +1024,12 @@ export function PhoneSetupFlowView({ controller }: { controller: PhoneSetupContr
         )}
         {actionError && <p role="alert" className="mt-3 text-[13px] text-danger-text">{actionError}</p>}
         <div className="my-4 flex items-center gap-3 text-[11px] text-ink-secondary">
-          <span className="h-px flex-1 bg-hairline/40" /> {t("phone.signIn.or")} <span className="h-px flex-1 bg-hairline/40" />
+          <span className="h-px flex-1 bg-hairline" /> {t("phone.signIn.or")} <span className="h-px flex-1 bg-hairline" />
         </div>
         <button
           disabled={c.busy || c.accountBusy}
           onClick={c.useLocal}
-          className="flex items-center justify-center gap-2 rounded-lg border border-hairline/50 py-2.5 text-[13px] text-ink hover:bg-control disabled:opacity-40"
+          className="flex items-center justify-center gap-2 rounded-lg border border-hairline py-2.5 text-[13px] text-ink hover:bg-control disabled:opacity-40"
         >
           <Wifi size={15} /> {t("phone.signIn.wifiInstead")}
         </button>
@@ -1126,7 +1126,7 @@ export function PhoneSetupFlowView({ controller }: { controller: PhoneSetupContr
         </button>
       )}
       {!c.pairingExpired && c.state?.pairing && (
-        <details className="mt-4 w-full max-w-[390px] rounded-lg border border-hairline/40 px-3 py-2 text-left">
+        <details className="mt-4 w-full max-w-[390px] rounded-lg border border-hairline px-3 py-2 text-left">
           <summary className="cursor-pointer text-[12px] text-ink-secondary">{t("phone.code.trouble")}</summary>
           <div className="mt-3 text-[12px] text-ink-secondary">
             {t("phone.code.manual")}

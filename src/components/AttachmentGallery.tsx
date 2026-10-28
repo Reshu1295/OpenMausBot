@@ -202,7 +202,7 @@ function VideoAttachment({ file, message }: { file: GalleryFile; message: Messag
   };
 
   return (
-    <div className="min-w-0 overflow-hidden rounded-xl border border-hairline/40 bg-inset/40">
+    <div className="min-w-0 overflow-hidden rounded-xl border border-hairline bg-inset/40">
       <div className="relative flex aspect-[4/3] items-center justify-center bg-inset">
         {preview && !error ? (
           <video
@@ -238,7 +238,7 @@ function VideoAttachment({ file, message }: { file: GalleryFile; message: Messag
         {!preview && !loading && <Film size={13} className="pointer-events-none absolute left-2 top-2 text-ink-secondary/50" />}
       </div>
       {error && <p role="alert" className="px-3 py-2 text-[11px] text-danger-text">{error}</p>}
-      <AttachedFileChip file={file} linked={file.linked} message={message} className="max-w-none rounded-none border-0 border-t border-hairline/30 bg-transparent" />
+      <AttachedFileChip file={file} linked={file.linked} message={message} className="max-w-none rounded-none border-0 border-t border-hairline bg-transparent" />
     </div>
   );
 }
@@ -307,7 +307,7 @@ function AudioAttachment({ file, message }: { file: GalleryFile; message: Messag
   };
 
   return (
-    <div className="inline-flex w-72 max-w-full flex-col gap-1.5 rounded-2xl border border-hairline/30 bg-inset/60 px-3 py-2.5 text-left">
+    <div className="inline-flex w-72 max-w-full flex-col gap-1.5 rounded-2xl border border-hairline bg-inset/60 px-3 py-2.5 text-left">
       <div className="flex items-center gap-2">
         {src ? <Music size={14} className="shrink-0 text-accent-text" aria-hidden="true" />
           : (
@@ -433,7 +433,7 @@ export function AttachmentGallery({ images = [], files = [], message, eager = fa
         <div className="flex flex-col items-start gap-1.5">
           {documents.map((item) => item.kind === "audio" && message
             ? <AudioAttachment key={`${message.threadId}:${message.messageId}:${item.key}`} file={item.file} message={message} />
-            : item.kind === "file" && <AttachedFileChip key={item.key} file={item.file} linked={item.file.linked} message={message} className="max-w-none rounded-xl border-hairline/25 bg-transparent" />)}
+            : item.kind === "file" && <AttachedFileChip key={item.key} file={item.file} linked={item.file.linked} message={message} className="max-w-none rounded-xl border-hairline bg-transparent" />)}
         </div>
       )}
       {items.length > limit && (

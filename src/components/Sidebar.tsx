@@ -1476,7 +1476,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
               title={attentionTriggerLabel(attention.length)}
               className={cn(
                 "relative flex items-center justify-center text-ink-secondary transition-colors hover:bg-ink/[0.06] hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
-                density === "icons" ? "size-[46px] shrink-0 rounded-xl" : phone ? "size-10 shrink-0 rounded-full border border-hairline bg-card text-ink" : "size-8 rounded-full",
+                density === "icons" ? "size-[46px] shrink-0 rounded-xl" : phone ? "size-10 shrink-0 rounded-full border border-edge bg-card text-ink" : "size-8 rounded-full",
               )}
             >
               <Activity size={density === "icons" ? 20 : 18} strokeWidth={1.5} />
@@ -1539,7 +1539,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
         <div
           data-sidebar-universal-pins=""
           // vh, not %: a percentage has no height to resolve against inside the glass head.
-          className="max-h-[min(40vh,280px)] shrink-0 overflow-y-auto border-b border-hairline/40 px-2 pb-2"
+          className="max-h-[min(40vh,280px)] shrink-0 overflow-y-auto border-b border-hairline px-2 pb-2"
         >
           {density !== "icons" && !pinnedCircles && (
             <div className="px-2 pb-1 pt-1 text-[11px] font-medium uppercase tracking-[0.08em] text-ink-secondary">
@@ -1915,7 +1915,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
               "fixed bottom-4 left-4 z-[60] max-w-[300px] rounded-xl border px-3.5 py-2.5 text-[13px] shadow-xl",
               teamFeedback.error
                 ? "border-danger/30 bg-card text-danger-text"
-                : "border-hairline/50 bg-card text-ink",
+                : "border-hairline bg-card text-ink",
             )}
           >
             <div className="flex items-center gap-3">

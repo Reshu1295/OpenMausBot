@@ -100,7 +100,7 @@ function Preview() {
         <button onClick={() => setRun((r) => r + 1)} className="rounded-lg bg-raised px-3 py-1.5 text-ink hover:bg-raised-hover">Replay</button>
         <span className="ml-auto">?ai=0 for no AI, ?bots=3 for bots to choose from</span>
       </header>
-      <div className="relative overflow-hidden rounded-xl border border-hairline/40 bg-app" style={{ width, height }}>
+      <div className="relative overflow-hidden rounded-xl border border-hairline bg-app" style={{ width, height }}>
         <WelcomeFlow key={`${screen}-${run}`} embedded initialBeat={screen} onDone={() => setRun((r) => r + 1)} />
       </div>
     </div>

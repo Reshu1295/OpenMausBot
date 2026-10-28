@@ -209,8 +209,8 @@ export function RemoteDesktopPanel({ bot }: { bot: Bot }) {
   };
 
   return (
-    <aside className="relative z-20 flex h-full w-[400px] shrink-0 flex-col border-l border-hairline bg-panel" ref={panelRef} data-computer-panel>
-      <div {...dragProps} className={cn("flex items-center justify-between border-b border-hairline px-5 py-4", padClass)}>
+    <aside className="relative z-20 flex h-full w-[400px] shrink-0 flex-col border-l border-edge bg-panel" ref={panelRef} data-computer-panel>
+      <div {...dragProps} className={cn("flex items-center justify-between border-b border-edge px-5 py-4", padClass)}>
         <div>
           <div className="text-[14px] font-medium text-ink">{bot.name}&apos;s computer</div>
           <div className="mt-0.5 text-[11px] text-ink-secondary">
@@ -263,7 +263,7 @@ export function RemoteDesktopPanel({ bot }: { bot: Bot }) {
           type="button"
           onClick={() => void open()}
           disabled={pending || !frame}
-          className="group relative flex aspect-video w-full items-center justify-center overflow-hidden rounded-xl border border-hairline bg-black disabled:cursor-default"
+          className="group relative flex aspect-video w-full items-center justify-center overflow-hidden rounded-xl border border-edge bg-black disabled:cursor-default"
           aria-label={frame ? `Open ${bot.name}'s live desktop` : "VPS preview unavailable"}
         >
           {frame ? (

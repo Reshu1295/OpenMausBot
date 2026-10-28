@@ -129,7 +129,7 @@ export const ASK_SMALL_PILL = ASK_CONTROL;
 export const ASK_QUIET_BUTTON = `${ASK_SMALL_PILL} -my-1 text-ink-tertiary hover:bg-ink/[0.07] hover:text-ink-secondary`;
 
 export const ASK_FIELD =
-  "h-7 rounded-full border border-hairline/60 bg-inset px-3 text-[13px] leading-5 text-ink outline-none placeholder:text-ink-tertiary focus:border-accent disabled:opacity-60";
+  "h-7 rounded-full border border-hairline bg-inset px-3 text-[13px] leading-5 text-ink outline-none placeholder:text-ink-tertiary focus:border-accent disabled:opacity-60";
 
 /** Simple mode's lettered choice: a full-width 40px row with a 24px key-cap and a 14px label. */
 export const ASK_CHOICE_ROW = "flex min-h-10 w-full items-center gap-[11px] rounded-[10px] px-2 py-2 text-start transition-colors focus-visible:bg-ink/[0.06] focus-visible:outline-none disabled:cursor-default";

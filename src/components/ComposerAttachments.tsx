@@ -224,14 +224,14 @@ function Chip({
     <div
       title={title}
       className={cn(
-        "group relative w-[172px] rounded-xl border border-hairline/40 bg-raised px-2.5 py-2",
-        "transition-colors hover:border-hairline",
+        "group relative w-[172px] rounded-xl border border-hairline bg-raised px-2.5 py-2",
+        "transition-colors hover:border-edge",
       )}
     >
       {children}
       <div className="mt-1 flex items-center gap-1">
         <Icon size={11} className="text-ink-tertiary" />
-        <span className="rounded border border-hairline/60 px-1 py-px text-[10px] font-medium tracking-wide text-ink-secondary">
+        <span className="rounded border border-hairline px-1 py-px text-[10px] font-medium tracking-wide text-ink-secondary">
           {label}
         </span>
       </div>
@@ -239,7 +239,7 @@ function Chip({
       <button
         onClick={onRemove}
         aria-label={`Remove ${label === "PASTED" ? "pasted text" : "file"}`}
-        className="absolute -right-1.5 -top-1.5 flex size-5 items-center justify-center rounded-full border border-hairline/60 bg-panel text-ink-secondary opacity-0 transition-opacity hover:text-ink focus-visible:opacity-100 group-hover:opacity-100 touch:opacity-100"
+        className="absolute -right-1.5 -top-1.5 flex size-5 items-center justify-center rounded-full border border-hairline bg-panel text-ink-secondary opacity-0 transition-opacity hover:text-ink focus-visible:opacity-100 group-hover:opacity-100 touch:opacity-100"
       >
         <X size={11} />
       </button>

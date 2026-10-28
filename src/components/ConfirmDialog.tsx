@@ -111,7 +111,7 @@ export function ConfirmDialogCard({
       aria-describedby="confirm-dialog-body"
       className={cn(
         "w-full max-w-[420px] rounded-2xl border bg-panel p-5 shadow-2xl",
-        danger ? "border-danger/30" : "border-hairline/50",
+        danger ? "border-danger/30" : "border-hairline",
       )}
     >
       <div className="flex items-start gap-3">

@@ -7,6 +7,8 @@
  *   `raised` and a card can both be white.
  * - `ink-tertiary`: quiet text (timestamps, hints, placeholders), the quietest ink that still clears 4.5:1 on every
  *   text surface, measured by `pnpm check:contrast`.
+ * - `hairline`: the soft divider every line draws in, translucent so it reads the same over any surface; `edge` is the
+ *   firmer opaque line around a control. Neither takes an opacity modifier.
  * - `focus`: the ring a keyboard user follows.
  * - `accent-text`, `danger-text`: accent and danger as words (links, selected labels, errors), tuned to read on the
  *   skin's surfaces; `accent` and `danger` are the fills, tuned for the label they carry.
@@ -18,7 +20,7 @@
  */
 export const COLOR_TOKENS = [
   "app", "panel", "raised", "raised-hover", "composer", "composer-ring", "card", "menu", "menu-hover", "menu-active",
-  "inset", "control", "hairline",
+  "inset", "control", "hairline", "edge",
   "ink", "ink-secondary", "ink-tertiary",
   "accent", "accent-border", "accent-text", "focus", "accent-ink",
   "bubble-user", "bubble-user-ink",
@@ -33,7 +35,7 @@ export type Colors = Record<ColorToken, string>;
 /** The tokens in `@theme`, so Tailwind emits a utility for each (bg-*, text-*, border-*); the rest are read with var(). */
 export const THEME_TOKENS = [
   "app", "panel", "raised", "raised-hover", "composer", "composer-ring", "menu", "menu-hover", "menu-active", "card",
-  "inset", "control", "hairline", "ink", "ink-secondary", "ink-tertiary", "accent", "accent-border", "focus",
+  "inset", "control", "hairline", "edge", "ink", "ink-secondary", "ink-tertiary", "accent", "accent-border", "focus",
   "accent-text", "accent-ink", "bubble-user", "success", "success-ink", "danger", "danger-text", "danger-ink", "warning",
   "warning-text", "warning-ink",
 ] as const satisfies readonly ColorToken[];

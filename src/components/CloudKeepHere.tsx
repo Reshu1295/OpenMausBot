@@ -46,7 +46,7 @@ function KeepHereSwitch({ bridge, read, write }: { bridge: CloudSendPageBridge; 
       <Switch checked={state.on || state.coming} disabled={busy || state.coming} aria-label={t("cloudAccount.keepHere.title")} onClick={turn} />
     </div>
     {state.coming && <p role="status" className="mt-3 text-[13px] text-ink-secondary">{t("cloudAccount.keepHere.coming")}</p>}
-    {confirm && <div role="group" aria-label={t("cloudAccount.keepHere.confirmTitle")} className="mt-3 rounded-lg border border-hairline/40 p-3">
+    {confirm && <div role="group" aria-label={t("cloudAccount.keepHere.confirmTitle")} className="mt-3 rounded-lg border border-hairline p-3">
       <p className="text-[13px] font-medium text-ink">{t("cloudAccount.keepHere.confirmTitle")}</p>
       <p className="mt-1 text-[13px] leading-relaxed text-ink-secondary">{t("cloudAccount.keepHere.confirm")}</p>
       <div className="mt-3 flex flex-wrap gap-2">

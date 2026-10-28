@@ -17,7 +17,7 @@ export interface McpServerSubmission {
   ownKey?: string;
 }
 
-const FIELD = "mt-1.5 w-full rounded-lg border border-hairline/60 bg-raised px-3 py-2.5 text-[13px] text-ink outline-none focus:border-accent";
+const FIELD = "mt-1.5 w-full rounded-lg border border-hairline bg-raised px-3 py-2.5 text-[13px] text-ink outline-none focus:border-accent";
 const LABEL = "text-[12px] font-medium text-ink-secondary";
 
 function where(draft: McpDraft): string {
@@ -73,7 +73,7 @@ export function McpServerEditor({ server, fixKeys = false, taken, team, busy, on
   const missing = !details && drafts.some((each) => each.urlGap || each.headers.some((row) => row.gap) || each.env.some((row) => row.gap));
 
   return (
-    <div data-mcp-editor className="mt-4 rounded-2xl border border-hairline/60 bg-card p-4 sm:p-5">
+    <div data-mcp-editor className="mt-4 rounded-2xl border border-hairline bg-card p-4 sm:p-5">
       <div className="text-[14px] font-medium text-ink">{adding ? t("mcp.editorNew") : t(keysOnly ? "mcp.fixKeys.title" : "mcp.editorEdit", { name: server.name })}</div>
       {keysOnly && draft && !details && (
         <div className="mt-3 space-y-3">
@@ -88,7 +88,7 @@ export function McpServerEditor({ server, fixKeys = false, taken, team, busy, on
           <span className="text-[13px] text-ink">{t("mcp.paste.prompt")}</span>
           <textarea autoFocus aria-label={t("mcp.paste.label")} value={text} onChange={(event) => paste(event.target.value)} spellCheck={false} rows={3}
             placeholder="https://mcp.example.com/mcp"
-            className="mt-2 w-full resize-y rounded-lg border border-hairline/60 bg-raised px-3 py-2.5 font-mono text-[12px] leading-relaxed text-ink outline-none focus:border-accent" />
+            className="mt-2 w-full resize-y rounded-lg border border-hairline bg-raised px-3 py-2.5 font-mono text-[12px] leading-relaxed text-ink outline-none focus:border-accent" />
         </label>
       )}
       {pasteError && <p role="alert" className="mt-2 text-[12px] leading-relaxed text-danger-text">{t(pasteError)}</p>}

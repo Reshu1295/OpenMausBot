@@ -67,7 +67,7 @@ export function SetupScreen({ started, received, step, slow, ready, sleeps = fal
         </div>
         <div className="flex flex-col gap-1.5">
           <span className="text-[13px] font-medium text-ink-secondary">{t("cloudBuy.setup.preview")}</span>
-          <span data-cloud-preview className="inline-flex max-w-full items-center gap-2 self-start rounded-[10px] border border-hairline/70 bg-app py-1.5 pe-2.5 ps-1.5">
+          <span data-cloud-preview className="inline-flex max-w-full items-center gap-2 self-start rounded-[10px] border border-edge bg-app py-1.5 pe-2.5 ps-1.5">
             <CloudTile color={color} />
             <span className="min-w-0"><span className="block truncate text-[13px] font-semibold leading-tight text-ink">{name}</span>
               <span className="block truncate text-[12px] text-ink-tertiary">{t(sleeps ? "cloudBuy.setup.previewLineSleeps" : "cloudBuy.setup.previewLine", { plan })}</span></span>

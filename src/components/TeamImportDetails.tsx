@@ -18,12 +18,12 @@ export function TeamImportDetails({ pending, importedNames, org = false }: {
         <p className="max-w-2xl text-[14px] leading-relaxed text-ink-secondary">{pending.description}</p>
       )}
       {pending.brief && (
-        <div className="mt-4 rounded-xl border border-hairline px-4 py-3 text-[13px] text-ink-secondary">
+        <div className="mt-4 rounded-xl border border-edge px-4 py-3 text-[13px] text-ink-secondary">
           <div className="font-medium text-ink">{t("teamImport.brief")}</div>
           <p className="mt-1 line-clamp-4 whitespace-pre-wrap break-words">{pending.brief}</p>
         </div>
       )}
-      {Boolean(pending.warnings?.length) && <div className="mt-4 rounded-xl border border-hairline px-4 py-3 text-[13px] text-ink-secondary">
+      {Boolean(pending.warnings?.length) && <div className="mt-4 rounded-xl border border-edge px-4 py-3 text-[13px] text-ink-secondary">
         <div className="mb-2 font-medium text-ink">{pending.leftOut ? t("grokImport.leftOut") : t("templates.backupNotes")}</div>
         {pending.warnings?.map((warning, index) => <p key={index}>{warning}</p>)}
       </div>}
@@ -40,26 +40,26 @@ export function TeamImportDetails({ pending, importedNames, org = false }: {
         </div>
       )}
       {Boolean(pending.skills?.length) && (
-        <div className="mt-4 rounded-xl border border-hairline px-4 py-3 text-[13px] text-ink-secondary">
+        <div className="mt-4 rounded-xl border border-edge px-4 py-3 text-[13px] text-ink-secondary">
           <div className="font-medium text-ink">{org ? t("orgLibrary.skillsOn") : pending.version === 2 ? t("teamImport.skillsOff") : t("templates.skillsDisabled")}</div>
           <p className="mt-1 break-words">{pending.skills?.join(", ")}</p>
           {!org && <p className="mt-1">{pending.version === 2 ? t("teamImport.skillsReview") : t("templates.skillsReview")}</p>}
         </div>
       )}
       {pending.library && Boolean(pending.presets?.length) && (
-        <div className="mt-4 rounded-xl border border-hairline px-4 py-3 text-[13px] text-ink-secondary">
+        <div className="mt-4 rounded-xl border border-edge px-4 py-3 text-[13px] text-ink-secondary">
           <div className="font-medium text-ink">{t("teamImport.presetList")}</div>
           <p className="mt-1 break-words">{pending.presets?.join(", ")}</p>
         </div>
       )}
       {Boolean(pending.offeredSkills?.length) && (
-        <div className="mt-4 rounded-xl border border-hairline px-4 py-3 text-[13px] text-ink-secondary">
+        <div className="mt-4 rounded-xl border border-edge px-4 py-3 text-[13px] text-ink-secondary">
           <div className="font-medium text-ink">{t("teamImport.offeredSkills")}</div>
           <p className="mt-1 break-words">{pending.offeredSkills?.join(", ")}</p>
         </div>
       )}
       {Boolean(pending.connections?.length) && (
-        <div className="mt-4 rounded-xl border border-hairline px-4 py-3 text-[13px] text-ink-secondary">
+        <div className="mt-4 rounded-xl border border-edge px-4 py-3 text-[13px] text-ink-secondary">
           <div className="font-medium text-ink">{t("teamImport.connections", { count: pending.connections?.length ?? 0 })}</div>
           <ul className="mt-1">
             {pending.connections?.map((connection, index) => (
@@ -71,7 +71,7 @@ export function TeamImportDetails({ pending, importedNames, org = false }: {
       {pending.members.length > 0 && <div className="mt-6 text-[12px] font-medium text-ink-secondary">{t("templates.teamMembers")}</div>}
       <div className="mt-2 grid grid-cols-1 gap-x-10 md:grid-cols-2">
         {pending.members.map((member, index) => (
-          <div key={`${member.name}-${index}`} className="flex min-h-[72px] items-center gap-3 border-b border-hairline/35 px-1 py-3">
+          <div key={`${member.name}-${index}`} className="flex min-h-[72px] items-center gap-3 border-b border-hairline px-1 py-3">
             {pending.pictures?.[index]
               ? <img src={pending.pictures[index]!} alt="" className="size-9 shrink-0 rounded-lg object-cover" />
               : (

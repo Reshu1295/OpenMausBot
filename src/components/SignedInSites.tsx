@@ -46,7 +46,7 @@ export function SignedInSites({ target, scope = {}, sharedBy, disabled = false, 
         {sites === null && !error && <p className="text-[12px] text-ink-secondary">{t("settings.sites.loading")}</p>}
         {sites?.length === 0 && <p className="text-[12px] text-ink-secondary">{t("settings.sites.none")}</p>}
         {!!sites?.length && (
-          <ul className="divide-y divide-hairline/30">
+          <ul className="divide-y divide-hairline">
             {sites.map((entry) => (
               <li key={entry.site} className="flex min-w-0 items-center gap-2 py-1.5">
                 <span className="min-w-0 flex-1 truncate text-[13px] text-ink" title={entry.site}>{entry.site}</span>

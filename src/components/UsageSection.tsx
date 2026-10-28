@@ -110,7 +110,7 @@ function WhereItWent({ range, version, onBudget }: { range: { from: string; to: 
   const byOther = useUsageGroups(range, other, version);
   useEffect(() => { onBudget(byBot?.budget ?? null); }, [byBot, onBudget]);
   return (
-    <section className="rounded-2xl border border-hairline/50 bg-card p-5" aria-label={t("usage.page.where")}>
+    <section className="rounded-2xl border border-hairline bg-card p-5" aria-label={t("usage.page.where")}>
       <h3 className="text-[15px] font-medium text-ink">{t("usage.page.where")}</h3>
       <div className="mt-4 grid gap-6 md:grid-cols-2">
         <div>
@@ -217,7 +217,7 @@ export function UsageSection() {
           <Select size="sm" value={period} onChange={(event) => { setPeriod(event.target.value as UsagePeriod); setOpen(null); }} aria-label={t("usage.history.period")}>
             {USAGE_PERIODS.map((option) => <option key={option} value={option}>{t(PERIOD_LABEL_KEYS[option])}</option>)}
           </Select>
-          <a href={usageExportHref(range)} download className="flex items-center gap-1.5 rounded-lg border border-hairline/40 px-2.5 py-1 text-[12px] text-ink-secondary hover:bg-raised/50 hover:text-ink">
+          <a href={usageExportHref(range)} download className="flex items-center gap-1.5 rounded-lg border border-hairline px-2.5 py-1 text-[12px] text-ink-secondary hover:bg-raised/50 hover:text-ink">
             <Download size={13} />{t("usage.history.export")}
           </a>
         </div>
@@ -231,12 +231,12 @@ export function UsageSection() {
         )} />
       ) : (
         <>
-          <section className="overflow-hidden rounded-2xl border border-hairline/50 bg-card" data-testid="usage-totals">
+          <section className="overflow-hidden rounded-2xl border border-hairline bg-card" data-testid="usage-totals">
             {list ? <StatStrip items={totalsStats(list.totals, t("trace.stat.time"))} />
               : <div className="flex items-center gap-2 p-5 text-[13px] text-ink-secondary"><Loader2 size={14} className="animate-spin" />{t("common.checking")}</div>}
           </section>
           <WhereItWent range={range} version={version} onBudget={setBudget} />
-          <section className="rounded-2xl border border-hairline/50 bg-card p-2" aria-label={t("usage.page.runs")}>
+          <section className="rounded-2xl border border-hairline bg-card p-2" aria-label={t("usage.page.runs")}>
             <div className="px-3 pb-1 pt-3">
               <h3 className="text-[15px] font-medium text-ink">{t("usage.page.runs")}</h3>
               <p className="mt-0.5 text-[13px] text-ink-secondary">{t("usage.page.runsHint")}</p>

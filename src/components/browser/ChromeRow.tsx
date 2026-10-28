@@ -75,7 +75,7 @@ export const ChromeRow = forwardRef<HTMLInputElement, {
   const yours = pill === "yours";
   const shown = nav.url === "about:blank" ? "" : nav.url;
   return (
-    <div className="shrink-0 border-b border-hairline/40">
+    <div className="shrink-0 border-b border-hairline">
       <div className="flex min-h-10 items-center gap-1 px-2 pt-1">
         <div className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto" role="tablist" aria-label="Browser tabs">
           {tabs.length ? tabs.map((tab) => (
@@ -94,7 +94,7 @@ export const ChromeRow = forwardRef<HTMLInputElement, {
           title={yours ? t("browser.control.handBack") : t("browser.control.take")}
           disabled={!connected || pill === "elsewhere" || pill === "connecting" || pill === "taking" || pill === "waiting"}
           onClick={yours ? props.onHandBack : props.onTake}
-          className={`flex max-w-56 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-2.5 py-1 text-[11px] disabled:cursor-default ${yours ? "border-accent-border bg-accent/15 text-accent-text" : "border-hairline text-ink-secondary hover:bg-inset hover:text-ink"}`}
+          className={`flex max-w-56 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-2.5 py-1 text-[11px] disabled:cursor-default ${yours ? "border-accent-border bg-accent/15 text-accent-text" : "border-edge text-ink-secondary hover:bg-inset hover:text-ink"}`}
           data-pill={pill}
         >
           {pill === "taking" || pill === "waiting" || pill === "connecting" ? <Loader2 size={12} className="shrink-0 animate-spin" aria-hidden="true" /> : <Hand size={12} className="shrink-0" aria-hidden="true" />}

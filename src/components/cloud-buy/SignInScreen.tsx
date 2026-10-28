@@ -96,7 +96,7 @@ export function SignInScreen({ phase, email, code, profileEmail, busy, now, onBa
     {phase.step === "done" && <p role="status" className="flex items-center gap-2 text-[14px] font-medium text-success">
       <Check size={18} strokeWidth={2.6} aria-hidden="true" />{phase.intent ? t("cloudBuy.signIn.done") : t("cloudBuy.signIn.donePlain")}
     </p>}
-    {problem && <div id="cloud-add-problem" role="alert" className="flex flex-col items-start gap-2.5 rounded-xl border border-hairline/70 bg-card/70 px-3.5 py-3 text-[13px] text-ink">
+    {problem && <div id="cloud-add-problem" role="alert" className="flex flex-col items-start gap-2.5 rounded-xl border border-edge bg-card/70 px-3.5 py-3 text-[13px] text-ink">
       <p>{problemLine(problem, phase.step === "code" ? phase.triesLeft : null)}</p>
       {browser && <button type="button" className="ui-button ui-button-primary" onClick={onBrowser}>{t("cloudBuy.signIn.continueBrowser")}<ExternalLink size={14} aria-hidden="true" /></button>}
       {problem === "expired" && phase.step === "code" && <button type="button" className="ui-button" disabled={busy} onClick={onResend}>{t("cloudBuy.signIn.newCode")}</button>}

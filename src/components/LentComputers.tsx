@@ -124,7 +124,7 @@ export function LentComputersCard() {
       {here && <LendThisComputer bridge={here} />}
       {failed && <p role="alert" className="text-[13px] text-danger-text">{t("lending.cloudSide.error")}</p>}
       {known?.length === 0 && <p className="text-[13px] text-ink-secondary">{t("lending.cloudSide.empty")}</p>}
-      {!!known?.length && <ul className="divide-y divide-hairline/40">
+      {!!known?.length && <ul className="divide-y divide-hairline">
         {known.map((computer) => <li key={computer.id} data-lent-computer={computer.online ? "online" : computer.lent ? "offline" : "stopped"} className="flex items-start gap-2 py-2.5">
           <Laptop size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-ink-secondary" />
           <div className="min-w-0 flex-1">

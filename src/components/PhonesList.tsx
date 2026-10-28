@@ -24,7 +24,7 @@ export function PhonesList() {
   };
 
   return (
-    <div className="border-t border-hairline/30 pt-4">
+    <div className="border-t border-hairline pt-4">
       <div className="text-[13px] text-ink">{t("remote.phones.title")}</div>
       {phones.length === 0 ? (
         <div className="mt-0.5 text-[12px] leading-relaxed text-ink-secondary">{t("remote.phones.empty")}</div>

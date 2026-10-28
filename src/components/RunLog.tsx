@@ -46,7 +46,7 @@ export function RunLog({ events }: { events: TimelineEvent[] }) {
             const label = event.kind === "task" ? t("inspector.run.userInput")
               : event.kind === "screen" ? t("inspector.run.screen")
                 : event.kind === "result" ? t("inspector.run.response") : event.label;
-            return <li key={event.id} className="border-t border-hairline/30 py-3">
+            return <li key={event.id} className="border-t border-hairline py-3">
               <div className="flex items-start gap-2 text-[12px]">
                 <Icon size={14} aria-hidden="true" className={cn("mt-0.5 shrink-0", event.state === "failed" ? "text-danger-text" : event.state === "running" ? "animate-spin text-accent-text" : "text-ink-secondary")} />
                 <span className="min-w-0 flex-1 break-words font-medium text-ink">{label}</span>

@@ -229,7 +229,7 @@ export function PageFullScreen(props: PageToolsProps & {
   return createPortal(
     <div role="dialog" aria-modal="true" aria-label={props.title} data-page-fullscreen={props.doc.messageId}
       className="fixed inset-0 z-50 flex flex-col bg-panel">
-      <div ref={closer} className="flex flex-col gap-2 border-b border-hairline/40 px-4 pb-3 pt-3">
+      <div ref={closer} className="flex flex-col gap-2 border-b border-hairline px-4 pb-3 pt-3">
         <div className="truncate text-[15px] font-semibold text-ink" title={props.title}><bdi dir="auto">{props.title}</bdi></div>
         <PageToolbar {...props} />
         <PageNotes version={props.version} point={point} share={props.share} />

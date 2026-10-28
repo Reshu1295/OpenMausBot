@@ -98,7 +98,7 @@ export function GrokImportView(props: GrokImportViewProps) {
       </div>
       {!card && <CursorLine cursor={props.cursor} card={null} onSignIn={props.onCursorSignIn} onSignOut={props.onCursorSignOut} />}
       {card && (
-        <article className="mt-4 rounded-xl border border-hairline px-4 py-3">
+        <article className="mt-4 rounded-xl border border-edge px-4 py-3">
           <div className="flex items-center gap-2 text-[14px] font-medium text-ink"><GrokBotMark size={15} />{card.name}</div>
           {card.creator && <div className="text-[12px] text-ink-secondary">{t("grokImport.by", { name: card.creator })}</div>}
           {card.description && <p className="mt-1.5 text-[13px] leading-relaxed text-ink-secondary">{card.description}</p>}

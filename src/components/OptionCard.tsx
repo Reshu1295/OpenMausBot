@@ -122,7 +122,7 @@ export function OptionCard({
         </div>
       )}
       {options.length > 0 && !simple && (
-        <div onKeyDown={moveChoiceFocus} className="overflow-hidden rounded-2xl border border-hairline/40">
+        <div onKeyDown={moveChoiceFocus} className="overflow-hidden rounded-2xl border border-hairline">
           {options.map((opt, i) => (
             <button
               key={opt}
@@ -132,13 +132,13 @@ export function OptionCard({
               onClick={() => answer(opt)}
               className={cn(
                 "flex w-full items-center gap-2.5 px-3 py-2 text-start text-[13px] font-medium leading-5 text-ink",
-                i > 0 && "border-t border-hairline/40",
+                i > 0 && "border-t border-hairline",
                 (card.answeredText ?? card.answered) === opt
                   ? "bg-raised-hover"
                   : "hover:bg-raised-hover/60 disabled:hover:bg-transparent",
               )}
             >
-              <span className="flex size-5 shrink-0 items-center justify-center rounded-md border border-hairline/50 bg-control text-[11px] font-medium text-ink-secondary">
+              <span className="flex size-5 shrink-0 items-center justify-center rounded-md border border-hairline bg-control text-[11px] font-medium text-ink-secondary">
                 {LETTERS[i]}
               </span>
               <span dir="auto" className="min-w-0 break-words">{opt}</span>

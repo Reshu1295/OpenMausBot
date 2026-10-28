@@ -160,7 +160,8 @@
   --color-card: #1f1f1f;
   --color-inset: #1b1b1b;
   --color-control: #282828;
-  --color-hairline: #383838;
+  --color-hairline: #38383873;
+  --color-edge: #383838;
   --color-ink: #f5f5f5;
   --color-ink-secondary: #f5f5f5a8;
   --color-ink-tertiary: #f5f5f591;
@@ -246,7 +247,8 @@
   --color-menu-active: #f5f5f514;
   --color-inset: #1b1b1b;
   --color-control: #282828;
-  --color-hairline: #383838;
+  --color-hairline: #38383873;
+  --color-edge: #383838;
   --color-ink: #f5f5f5;
   --color-ink-secondary: #f5f5f5a8;
   --color-ink-tertiary: #f5f5f591;
@@ -299,7 +301,8 @@
   --color-menu-active: var(--color-raised);
   --color-inset: #f5f1eb;
   --color-control: #ece4d6;
-  --color-hairline: #c8bda8;
+  --color-hairline: #c8bda873;
+  --color-edge: #c8bda8;
   --color-ink: #1a1a18;
   --color-ink-secondary: #6b6559;
   --color-ink-tertiary: #6d685c;
@@ -352,7 +355,8 @@
   --color-menu-active: var(--color-raised);
   --color-inset: #0b0a08;
   --color-control: #262019;
-  --color-hairline: #3d3529;
+  --color-hairline: #3d352973;
+  --color-edge: #3d3529;
   --color-ink: #f4efe4;
   --color-ink-secondary: #b0a696;
   --color-ink-tertiary: #9c9384;
@@ -405,7 +409,8 @@
   --color-menu-active: var(--color-raised);
   --color-inset: #d5e8e5;
   --color-control: #c3dcd9;
-  --color-hairline: #aebfbd;
+  --color-hairline: #aebfbd73;
+  --color-edge: #aebfbd;
   --color-ink: #14201f;
   --color-ink-secondary: #4d5c5b;
   --color-ink-tertiary: #566564;
@@ -458,7 +463,8 @@
   --color-menu-active: var(--color-raised);
   --color-inset: #0d0e10;
   --color-control: #2a2d32;
-  --color-hairline: #3b4048;
+  --color-hairline: #3b404873;
+  --color-edge: #3b4048;
   --color-ink: #f2f4f7;
   --color-ink-secondary: #b3b8c2;
   --color-ink-tertiary: #9fa4ad;
@@ -511,7 +517,8 @@
   --color-menu-active: var(--color-raised);
   --color-inset: #e6e9ee;
   --color-control: #d3d9e1;
-  --color-hairline: #b4bbc5;
+  --color-hairline: #b4bbc573;
+  --color-edge: #b4bbc5;
   --color-ink: #1d2229;
   --color-ink-secondary: #59616c;
   --color-ink-tertiary: #5f6671;
@@ -564,7 +571,8 @@
   --color-menu-active: var(--color-raised);
   --color-inset: #0d0b0f;
   --color-control: #2b2630;
-  --color-hairline: #403847;
+  --color-hairline: #40384773;
+  --color-edge: #403847;
   --color-ink: #f4eff6;
   --color-ink-secondary: #b9afbd;
   --color-ink-tertiary: #a199a5;
@@ -617,7 +625,8 @@
   --color-menu-active: #1c1c1c14;
   --color-inset: #ebebeb;
   --color-control: #e3e3e3;
-  --color-hairline: #d0d0d0;
+  --color-hairline: #d0d0d073;
+  --color-edge: #d0d0d0;
   --color-ink: #1c1c1c;
   --color-ink-secondary: #555555;
   --color-ink-tertiary: #5c5c5c;
@@ -671,7 +680,8 @@
   --color-menu-active: var(--color-raised);
   --color-inset: #e7ece8;
   --color-control: #dce3de;
-  --color-hairline: #c9d3cc;
+  --color-hairline: #c9d3cc73;
+  --color-edge: #c9d3cc;
   --color-ink: #0f1a13;
   --color-ink-secondary: #3e4a42;
   --color-ink-tertiary: #4f5c54;
@@ -724,7 +734,8 @@
   --color-menu-active: var(--color-raised);
   --color-inset: #f2e8d7;
   --color-control: #ece0cc;
-  --color-hairline: #1b1613;
+  --color-hairline: #1b161373;
+  --color-edge: #1b1613;
   --color-ink: #1b1613;
   --color-ink-secondary: #3a322d;
   --color-ink-tertiary: #5f5650;
@@ -777,7 +788,8 @@
   --color-menu-active: var(--color-raised);
   --color-inset: #1b1622;
   --color-control: #262030;
-  --color-hairline: #3b3048;
+  --color-hairline: #3b304873;
+  --color-edge: #3b3048;
   --color-ink: #f8efe2;
   --color-ink-secondary: #c2b3cc;
   --color-ink-tertiary: #a898b4;
@@ -1024,7 +1036,7 @@ body {
     /* 4px + 20px line + 4px + a 1px border each side = 30px, so the 32px
        min-height decides the box and the label sits on its center. */
     padding: 0.25rem 0.75rem;
-    border: 1px solid var(--color-hairline);
+    border: 1px solid var(--color-edge);
     background: var(--color-control);
     color: var(--color-ink);
   }
@@ -1084,7 +1096,7 @@ body {
     gap: 0.5rem;
     min-height: 1.75rem;
     padding: 0.125rem 0.75rem;
-    border: 1px solid color-mix(in srgb, var(--color-hairline) 40%, transparent);
+    border: 1px solid var(--color-hairline);
     border-radius: 9999px;
     background: var(--color-panel);
     color: var(--color-ink-secondary);
@@ -1459,7 +1471,7 @@ body {
 }
 
 /* In its place a field shows focus on its own border, in the ring's colour.
-   Unlayered, so it wins over the resting `border-hairline/40` every field
+   Unlayered, so it wins over the resting `border-hairline` every field
    carries as well as over a faint per-file `focus:border-*`. --color-focus
    clears 3:1 on every field surface (pnpm check:contrast). A borderless
    field has no border to paint and is left as it was: a find bar's rounded
@@ -2303,7 +2315,8 @@ html[data-cloud-intent-morph] [data-tour="composer"] { view-transition-name: clo
     --color-raised-hover: #3d3d3d;
     --color-inset: #191919;
     --color-control: #2f2f2f;
-    --color-hairline: #666666;
+    --color-hairline: #66666673;
+    --color-edge: #666666;
     --color-ink: #fcfcfc;
     --color-ink-secondary: #c4c4c4;
     --color-ink-tertiary: #aaaaaa;
@@ -2327,7 +2340,8 @@ html[data-cloud-intent-morph] [data-tour="composer"] { view-transition-name: clo
     --color-raised-hover: #4a4039;
     --color-inset: #2f2722;
     --color-control: #3a322d;
-    --color-hairline: #8a7e74;
+    --color-hairline: #8a7e7473;
+    --color-edge: #8a7e74;
     --color-ink: #ffffff;
     --color-ink-secondary: #e4dad0;
     --color-ink-tertiary: #bdb1a6;
@@ -2708,7 +2722,8 @@ button:disabled.bg-danger {
     --color-menu: #2c2c2e;
     --color-inset: #1c1c1e;
     --color-control: #2c2c2e;
-    --color-hairline: #3a3a3c;
+    --color-hairline: #3a3a3c73;
+    --color-edge: #424244;
     --radius-lg: 12px;
     --radius-xl: 18px;
     --radius-2xl: 22px;
@@ -2721,7 +2736,8 @@ button:disabled.bg-danger {
     --color-composer-ring: #cfd8d1;
     --color-card: #ffffff;
     --color-inset: #e9eeea;
-    --color-hairline: #c1ccc4;
+    --color-hairline: #c1ccc473;
+    --color-edge: #c1ccc4;
     --radius-lg: 12px;
     --radius-xl: 18px;
     --radius-2xl: 22px;

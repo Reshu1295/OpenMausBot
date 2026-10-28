@@ -21,7 +21,7 @@ const COPY = {
   blocked: { label: "Blocked", tone: "text-warning-text", border: "border-warning/35" },
   "limit-reached": { label: "Turn limit reached", tone: "text-warning-text", border: "border-warning/35" },
   paused: { label: "Paused", tone: "text-warning-text", border: "border-warning/35" },
-  stopped: { label: "Stopped", tone: "text-ink-secondary", border: "border-hairline/45" },
+  stopped: { label: "Stopped", tone: "text-ink-secondary", border: "border-hairline" },
   failed: { label: "Failed", tone: "text-danger-text", border: "border-danger/35" },
 } satisfies Record<
   GroupGoalRunCardData["status"],
@@ -97,7 +97,7 @@ export function GoalRunCard({ message, solo = false, onStop }: { message: Messag
           <button
             type="button"
             onClick={onStop}
-            className="shrink-0 rounded-lg border border-hairline/50 px-2.5 py-1 text-[12px] font-medium text-ink-secondary hover:bg-raised hover:text-ink"
+            className="shrink-0 rounded-lg border border-hairline px-2.5 py-1 text-[12px] font-medium text-ink-secondary hover:bg-raised hover:text-ink"
           >
             {t("chat.stop")}
           </button>

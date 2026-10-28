@@ -33,8 +33,8 @@ export function BotProfileAvatarCard({
   const { fileRef, crop, uploading, generating, setSavingConnection, busy, error, upload, removeImage, generate } = useAvatarImage(bot, onPatch);
 
   return (
-    <div className="overflow-hidden rounded-xl border border-hairline/40 bg-card">
-      <div className="flex items-center justify-between border-b border-hairline/40 px-3 py-2.5">
+    <div className="overflow-hidden rounded-xl border border-hairline bg-card">
+      <div className="flex items-center justify-between border-b border-hairline px-3 py-2.5">
         <span className="rounded-lg bg-control px-3 py-1.5 text-[14px] font-medium text-ink">{t("botIdentity.avatar")}</span>
         <button
           disabled={busy}
@@ -96,7 +96,7 @@ export function BotProfileAvatarCard({
         <div className="mb-2 mt-4 text-[12px] font-medium uppercase tracking-[0.08em] text-ink-secondary">
           {t("botIdentity.shape")}
         </div>
-        <div className="grid grid-cols-4 overflow-hidden rounded-lg border border-hairline/40">
+        <div className="grid grid-cols-4 overflow-hidden rounded-lg border border-hairline">
           {BOT_AVATAR_CROPS.map((candidate, index) => (
             <button
               key={candidate}
@@ -106,7 +106,7 @@ export function BotProfileAvatarCard({
               onClick={() => onPatch({ avatarCrop: candidate })}
               className={cn(
                 "py-1.5 text-[13px] disabled:opacity-50",
-                index > 0 && "border-l border-hairline/40",
+                index > 0 && "border-l border-hairline",
                 crop === candidate ? "bg-control text-ink" : "text-ink-secondary hover:bg-control/60 hover:text-ink",
               )}
             >

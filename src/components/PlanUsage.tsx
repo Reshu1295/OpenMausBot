@@ -236,7 +236,7 @@ export function PlanUsage() {
       {report && report.providers.length > 0 && (
         <div className="flex flex-col gap-4">
           {report.providers.map((provider) => (
-            <div key={provider.id} className="border-t border-hairline/30 pt-3 first:border-t-0 first:pt-0">
+            <div key={provider.id} className="border-t border-hairline pt-3 first:border-t-0 first:pt-0">
               <div className="mb-2 flex min-w-0 items-baseline gap-2">
                 <span className="truncate text-[14px] font-medium text-ink">{providerLabel(provider)}</span>
                 {provider.plan && <span className="truncate text-[12px] text-ink-secondary">{provider.plan}</span>}

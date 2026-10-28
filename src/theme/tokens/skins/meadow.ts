@@ -29,7 +29,8 @@ export default {
     inset: "#e7ece8",
     // a chip on a card
     control: "#dce3de",
-    hairline: "#c9d3cc",
+    hairline: "#c9d3cc73",
+    edge: "#c9d3cc",
     ink: "#0f1a13",
     "ink-secondary": "#3e4a42",
     "ink-tertiary": "#4f5c54",
@@ -80,7 +81,8 @@ export default {
       card: "#ffffff",
       inset: "#e9eeea",
       "composer-ring": "#cfd8d1",
-      hairline: "#c1ccc4",
+      hairline: "#c1ccc473",
+      edge: "#c1ccc4",
     },
     radius: {
       lg: "12px",

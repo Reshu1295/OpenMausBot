@@ -453,7 +453,7 @@ export function SkillsSection({ bot }: { bot: Bot }) {
         ) : skills.length === 0 ? (
           <div className="mt-3 rounded-lg bg-inset px-3 py-2 text-[12px] text-ink-secondary">{t("skills.empty")}</div>
         ) : (
-          <div className="mt-3 divide-y divide-hairline/40 overflow-hidden rounded-lg border border-hairline/40">
+          <div className="mt-3 divide-y divide-hairline overflow-hidden rounded-lg border border-hairline">
             {skills.map((skill) => (
               <div key={skill.name} className="px-3 py-2.5">
                 <div className="flex items-center gap-2">

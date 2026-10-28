@@ -399,7 +399,7 @@ export function MemorySection({ bot, active = true, onToggle }: { bot: Bot; acti
           {savedDraft !== null && (
             <div className="mt-3">
               <div className="mb-1 text-[12px] text-ink-secondary">{t("memory.unsavedDraft")}</div>
-              <pre className="max-h-[160px] overflow-auto whitespace-pre-wrap rounded-lg border border-hairline/40 bg-inset p-3 font-mono text-[12px] leading-relaxed text-ink">
+              <pre className="max-h-[160px] overflow-auto whitespace-pre-wrap rounded-lg border border-hairline bg-inset p-3 font-mono text-[12px] leading-relaxed text-ink">
                 {savedDraft}
               </pre>
               <button type="button" className={cn(quietButtonCls, "mt-1")} onClick={() => setSavedDraft(null)}>
@@ -497,7 +497,7 @@ export function MemoryUpkeepCard({
         <Switch checked={enabled} aria-label={t("memory.upkeep.title")} onClick={onToggle} />
       </div>
       {enabled && rooms && (
-        <div className="mt-3 flex items-start justify-between gap-3 border-t border-hairline/40 pt-3">
+        <div className="mt-3 flex items-start justify-between gap-3 border-t border-hairline pt-3">
           <div className="min-w-0">
             <div className="text-[13px] font-medium text-ink">{t("memory.learnFromRooms.title")}</div>
             <p className="mt-0.5 text-[13px] leading-relaxed text-ink-secondary">{t("memory.learnFromRooms.subtitle")}</p>
@@ -624,12 +624,12 @@ export function MemoryFileRows({
       {files.length === 0 ? (
         <div className="mt-2 text-[13px] text-ink-secondary">{t("memory.noneYet")}</div>
       ) : (
-        <div className="mt-2 overflow-hidden rounded-lg border border-hairline/40">
+        <div className="mt-2 overflow-hidden rounded-lg border border-hairline">
           {files.map((file) => (
             <div
               key={file.path}
               className={cn(
-                "flex items-center gap-2 border-b border-hairline/40 px-3 py-2 last:border-b-0",
+                "flex items-center gap-2 border-b border-hairline px-3 py-2 last:border-b-0",
                 selected === file.path ? "bg-control/60" : "hover:bg-control/40",
               )}
             >

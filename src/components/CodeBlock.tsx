@@ -259,10 +259,10 @@ export function CodeBlock({ code, lang, initialWrap = false }: CodeBlockProps) {
   }
 
   return (
-    <div dir="ltr" className="chat-code-block my-2 overflow-hidden rounded-lg border border-hairline/40 bg-inset">
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-hairline/30 bg-raised/30 px-3 py-1.5 text-xs">
+    <div dir="ltr" className="chat-code-block my-2 overflow-hidden rounded-lg border border-hairline bg-inset">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-hairline bg-raised/30 px-3 py-1.5 text-xs">
         <div className="flex min-w-0 flex-1 items-center gap-2">
-          <span title={displayLanguage} className="min-w-0 truncate rounded border border-hairline/40 bg-raised px-1.5 py-0.5 text-[11px] font-medium tracking-wide text-ink select-none">
+          <span title={displayLanguage} className="min-w-0 truncate rounded border border-hairline bg-raised px-1.5 py-0.5 text-[11px] font-medium tracking-wide text-ink select-none">
             {displayLanguage}
           </span>
           {lineCount > 0 && (

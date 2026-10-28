@@ -145,9 +145,9 @@ export function TeamMemoryDialog({ section, label, onClose }: { section: string;
         aria-modal="true"
         aria-labelledby="team-memory-title"
         tabIndex={-1}
-        className="animate-pop-in flex max-h-[min(720px,calc(100dvh-2rem))] w-full max-w-[720px] flex-col overflow-hidden rounded-2xl border border-hairline/50 bg-panel shadow-2xl shadow-black/50 outline-none"
+        className="animate-pop-in flex max-h-[min(720px,calc(100dvh-2rem))] w-full max-w-[720px] flex-col overflow-hidden rounded-2xl border border-hairline bg-panel shadow-2xl shadow-black/50 outline-none"
       >
-        <header className="flex items-start justify-between gap-4 border-b border-hairline/40 px-6 pb-4 pt-6 sm:px-8 sm:pt-7">
+        <header className="flex items-start justify-between gap-4 border-b border-hairline px-6 pb-4 pt-6 sm:px-8 sm:pt-7">
           <div>
             <div className="flex items-center gap-2">
               <Brain size={19} className="text-accent-text" />
@@ -225,7 +225,7 @@ export function TeamMemoryDialog({ section, label, onClose }: { section: string;
                 <h3 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-secondary" title={t(hintKey)}>
                   {t(titleKey)}
                 </h3>
-                <ul className="mt-2 divide-y divide-hairline/20 rounded-xl bg-inset">
+                <ul className="mt-2 divide-y divide-hairline rounded-xl bg-inset">
                   {rows.map((entry) => (
                     <li key={entry.id} className="flex items-start gap-3 px-3 py-2 text-[13px]">
                       <span className="min-w-0 flex-1">
@@ -264,7 +264,7 @@ export function TeamMemoryDialog({ section, label, onClose }: { section: string;
           })}
 
           {adding ? (
-            <div className="rounded-xl border border-hairline/40 bg-card p-3">
+            <div className="rounded-xl border border-hairline bg-card p-3">
               <div className="flex flex-wrap items-center gap-2">
                 <Select size="sm"
                   value={draft.kind}
@@ -282,7 +282,7 @@ export function TeamMemoryDialog({ section, label, onClose }: { section: string;
                   onChange={(event) => setDraft({ ...draft, name: event.target.value })}
                   placeholder={t("teamMemory.namePlaceholder")}
                   aria-label={t("teamMemory.nameLabel")}
-                  className="min-w-[140px] flex-1 rounded-lg border border-hairline/40 bg-inset px-2 py-1 text-[13px] text-ink outline-none focus:border-accent"
+                  className="min-w-[140px] flex-1 rounded-lg border border-hairline bg-inset px-2 py-1 text-[13px] text-ink outline-none focus:border-accent"
                 />
               </div>
               <input
@@ -293,7 +293,7 @@ export function TeamMemoryDialog({ section, label, onClose }: { section: string;
                 }}
                 placeholder={t("teamMemory.detailPlaceholder")}
                 aria-label={t("teamMemory.detailLabel")}
-                className="mt-2 w-full rounded-lg border border-hairline/40 bg-inset px-2 py-1 text-[13px] text-ink outline-none focus:border-accent"
+                className="mt-2 w-full rounded-lg border border-hairline bg-inset px-2 py-1 text-[13px] text-ink outline-none focus:border-accent"
               />
               <div className="mt-2 flex items-center gap-2">
                 <button

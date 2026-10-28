@@ -129,7 +129,7 @@ export function EffortRow({
               "rounded-full border px-2.5 py-1 text-[12px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70",
               selection.effort === level
                 ? "border-accent/60 bg-control text-ink"
-                : "border-hairline/40 text-ink-secondary hover:bg-control/60 hover:text-ink",
+                : "border-hairline text-ink-secondary hover:bg-control/60 hover:text-ink",
             )}
           >
             {level === undefined ? t("model.effort.default") : effortLabel(level)}
@@ -221,7 +221,7 @@ export function ModelVariantRow({ bot, threadId, updateBotDefault, className, la
               onClick={() => choose(option.id)}
               className={cn(
                 "rounded-full border px-2.5 py-1 text-[12px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70 disabled:opacity-50",
-                selection.variant === option.id ? "border-accent/60 bg-control text-ink" : "border-hairline/40 text-ink-secondary hover:bg-control/60 hover:text-ink",
+                selection.variant === option.id ? "border-accent/60 bg-control text-ink" : "border-hairline text-ink-secondary hover:bg-control/60 hover:text-ink",
               )}
             >
               {variantLabel(option, instance.driverKind)}

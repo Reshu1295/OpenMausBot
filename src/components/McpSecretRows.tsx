@@ -10,7 +10,7 @@ export function gapHint(gap: PastedGap): string {
   return t(gap.kind === "variable" ? "mcp.paste.variable" : "mcp.paste.placeholder", { name: gap.names.join(", ") });
 }
 
-const INPUT = "w-full min-w-0 rounded-lg border border-hairline/60 bg-raised px-3 py-2.5 font-mono text-[12px] text-ink outline-none focus:border-accent";
+const INPUT = "w-full min-w-0 rounded-lg border border-hairline bg-raised px-3 py-2.5 font-mono text-[12px] text-ink outline-none focus:border-accent";
 
 /** Name and value rows. Values are typed like passwords and never shown back. `valuesOf` shows only values, under their
  * names: the ones a paste couldn't give, or every named one. */

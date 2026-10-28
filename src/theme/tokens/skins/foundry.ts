@@ -33,7 +33,8 @@ export default {
     inset: "#0b0a08",
     control: "#262019",
     // visible on purpose — this UI has edges
-    hairline: "#3d3529",
+    hairline: "#3d352973",
+    edge: "#3d3529",
     // warm off-white, never pure #fff
     ink: "#f4efe4",
     // 6.7:1 on raised, 5.9:1 on hover

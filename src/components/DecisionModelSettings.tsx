@@ -301,7 +301,7 @@ export function DecisionModelSettings() {
             aria-label={t(openrouter ? "decider.openrouter.key.label" : "decider.key.label")}
             autoComplete="off"
             spellCheck={false}
-            className="w-full rounded-lg border border-hairline/40 bg-inset px-3 py-2 text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none"
+            className="w-full rounded-lg border border-hairline bg-inset px-3 py-2 text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none"
           />
           <button
             type="button"
@@ -321,7 +321,7 @@ export function DecisionModelSettings() {
             data-testid="decider-test"
             onClick={() => void test()}
             disabled={testing || saving || (!draft && !configured)}
-            className="flex shrink-0 cursor-pointer items-center justify-center rounded-lg border border-hairline/40 px-3 py-2 text-[13px] text-ink-secondary hover:bg-raised/50 hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex shrink-0 cursor-pointer items-center justify-center rounded-lg border border-hairline px-3 py-2 text-[13px] text-ink-secondary hover:bg-raised/50 hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
           >
             {testing ? t("keys.testing") : t("keys.test")}
           </button>
@@ -358,7 +358,7 @@ export function DecisionModelSettings() {
             />
           </li>
           {COMING_SOON.map((label) => (
-            <li key={label} data-testid="decider-coming-soon" aria-disabled="true" className="flex items-center justify-between gap-4 border-t border-hairline/40 py-2 opacity-50">
+            <li key={label} data-testid="decider-coming-soon" aria-disabled="true" className="flex items-center justify-between gap-4 border-t border-hairline py-2 opacity-50">
               <span className="text-[13px] text-ink-secondary">{t(label)}</span>
               <span className="rounded bg-control px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-ink-secondary">
                 {t("decider.jobs.comingSoon")}
