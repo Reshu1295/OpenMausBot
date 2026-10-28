@@ -2,7 +2,7 @@ import { GEIST } from "../fonts.ts";
 import type { SkinSource } from "../skin.ts";
 
 /**
- * The upstream palette, pixel-sampled from the real Grok app, as retuned for Simple mode (#3657). Repeated in its own
+ * The upstream palette, pixel-sampled from the real Grok app, as retuned for Simple mode. Repeated in its own
  * block (rather than relying on the `@theme` defaults) so that a `[data-skin]` subtree can switch *back* to it — the
  * picker needs that. Upstream's fills, #1084fe and #ff5667, carried white at 3.65:1 and 3.10:1; they move to the same
  * hues at a lower lightness so a white label clears AA, while words keep the bright hues through accent-text and
@@ -20,7 +20,7 @@ export default {
     composer: "#1f1f1f",
     "composer-ring": "#2a2a2a",
     card: "#1f1f1f",
-    // the float, one step off the card: card, composer and menu stay one raised surface (#3657); the phones
+    // the float, one step off the card: card, composer and menu stay one raised surface; the phones
     // use the same value
     menu: "#202020",
     "menu-hover": "#f5f5f50f",
@@ -53,7 +53,7 @@ export default {
     "warning-ink": "#2b1400",
     scrollbar: "#3d3d3d",
     "maus-line": "#f5f5f5",
-    // no shadows on a dark ground: surfaces part by tone and rim, as Midnight does in Simple mode (#3657)
+    // no shadows on a dark ground: surfaces part by tone and rim, as Midnight does in Simple mode
     shadow: "transparent",
   },
   font: GEIST,

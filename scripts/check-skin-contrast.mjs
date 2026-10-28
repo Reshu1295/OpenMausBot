@@ -178,7 +178,7 @@ const PAIRS = [
   ["--color-menu", "--color-card", 1.02],
 ];
 // Steps a skin keeps flat on purpose. Midnight's card, composer, menu and raised
-// fill are Simple mode's one raised surface (#3657), one 8-bit step apart.
+// fill are Simple mode's one raised surface, one 8-bit step apart.
 const FLAT_BY_DESIGN = new Set(["midnight|--color-raised|--color-card", "midnight|--color-menu|--color-card"]);
 
 /** OKLab coordinates of an opaque hex, for telling two colours apart beyond their luminance. */

@@ -18,7 +18,7 @@
  * - `bubble-user-ink`: the ink inside the user's own bubble, a hex rather than the ink token so it can be measured.
  * - `maus-line`: the mascot's second speed line, set against the ground.
  * - `shadow`: the tint every shadow is drawn in: the ink on a light skin, and transparent on a dark one, which stays
- *   flat as Midnight is in Simple mode (#3657).
+ *   flat as Midnight is in Simple mode.
  */
 export const COLOR_TOKENS = [
   "app", "panel", "raised", "raised-hover", "composer", "composer-ring", "card", "menu", "menu-hover", "menu-active",

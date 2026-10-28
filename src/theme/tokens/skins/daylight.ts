@@ -8,7 +8,7 @@ import type { SkinSource } from "../skin.ts";
  * what --color-bubble-user-ink exists for — see the rule at the bottom of the file. Everything else is a short
  * ladder of greys: page #fcfcfc, sidebar #f5f5f5, selected row #e4e4e4, and white for the composer and menus.
  *
- * Simple mode keeps one canvas and one raised surface (#3657): the greys are tints that go one way from the page
+ * Simple mode keeps one canvas and one raised surface: the greys are tints that go one way from the page
  * (page 99, bot card 94.8, selected row 90.6, hover 87.3 L*), and the composer and menus are the white surface lifted
  * above it with a soft shadow. That order is deliberate, so the ladder check measures it as it is.
  */
