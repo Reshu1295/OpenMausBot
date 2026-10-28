@@ -13,6 +13,7 @@ import { InboxReading } from "./InboxReading";
 import { InboxRowItem } from "./InboxRow";
 import { INBOX_TABS, rowsIn, tabCounts } from "./inbox-view";
 import { useInboxActions } from "./use-inbox-actions";
+import { IconButton } from "../ui/IconButton";
 
 const TAB_LABEL: Record<InboxTab, LocaleKey> = { "needs-you": "needsYou.title", info: "inbox.tab.info", done: "inbox.tab.done" };
 const EMPTY: Record<InboxTab, LocaleKey> = { "needs-you": "inbox.empty.needsYou", info: "inbox.empty.info", done: "inbox.empty.done" };
@@ -41,10 +42,10 @@ export function InboxPanel() {
     <>
       <div className="flex items-center gap-1.5 border-b border-hairline px-3.5 py-2.5">
         <h2 className="flex-1 text-[14px] font-semibold text-ink">{t("inbox.panel.title")}</h2>
-        <button type="button" onClick={closeInbox} aria-label={t("common.close")} title={t("common.close")}
+        <IconButton label={t("common.close")} onClick={closeInbox}
           className="flex size-[26px] shrink-0 items-center justify-center rounded-md text-ink-secondary hover:bg-raised hover:text-ink">
           <X size={14} />
-        </button>
+        </IconButton>
       </div>
       {reading && view ? <InboxReading view={view} row={reading} now={now} /> : (
         <>

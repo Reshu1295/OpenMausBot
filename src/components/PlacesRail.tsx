@@ -17,6 +17,7 @@ import { useDesktopCapabilities } from "./DesktopCapabilities";
 import { MENU_ROW, MENU_SHEET } from "./menu-recipe";
 import { PlaceAddSheet } from "./PlaceAddSheet";
 import { SwatchRadios } from "./SwatchRadios";
+import { IconButton } from "./ui/IconButton";
 
 /** Circles before ⋯ opens the searchable list of every place. */
 export const RAIL_SHOWN = 8;
@@ -220,16 +221,16 @@ export function PlacesRail({ chrome = false }: { chrome?: boolean }) {
       </li>)}
     </ul>
     <div className="relative mt-2 flex flex-col items-center gap-2 pb-3" style={noDrag} ref={moreRef}>
-      {state.places.length > RAIL_SHOWN && <button type="button" aria-label={t("rail.more", { count: state.places.length })} title={t("rail.more", { count: state.places.length })}
+      {state.places.length > RAIL_SHOWN && <IconButton label={t("rail.more", { count: state.places.length })}
         aria-haspopup="dialog" aria-expanded={more} data-rail-more-button onClick={() => setMore(!more)}
         className="grid size-8 place-items-center rounded-full text-ink-secondary hover:bg-ink/[0.06] hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus aria-expanded:bg-ink/[0.06]">
         <MoreHorizontal size={16} aria-hidden="true" />
-      </button>}
+      </IconButton>}
       {more && <MorePlaces places={state.places} canPair={canPair} onOpen={open} onMenu={openMenu} onClose={() => setMore(false)} />}
-      {canAdd && <button type="button" aria-label={t("rail.add")} title={t("rail.add")} aria-haspopup="dialog" data-rail-add onClick={() => { track("rail_add", { step: "opened" }); setAdding(true); }}
+      {canAdd && <IconButton label={t("rail.add")} aria-haspopup="dialog" data-rail-add onClick={() => { track("rail_add", { step: "opened" }); setAdding(true); }}
         className="grid size-8 place-items-center rounded-full border border-dashed border-ink/25 text-ink-secondary hover:border-ink/40 hover:bg-ink/[0.04] hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus">
         <Plus size={16} aria-hidden="true" />
-      </button>}
+      </IconButton>}
     </div>
     {/* The list is read again while it is open: the menu shows the place as main lists it now. */}
     {menu && <div ref={menuRef} style={noDrag}>

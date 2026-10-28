@@ -3,6 +3,7 @@ import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import type { ChromeRailBridge, ChromeRailState } from "../../electron/chrome-rail.mjs";
+import { TOOLTIP_DELAY_MS } from "./ui/Tooltip";
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 let host: HTMLDivElement, root: Root | null = null;
@@ -36,7 +37,16 @@ async function page(rail: ChromeRailBridge | undefined) {
 }
 const button = () => host.querySelector<HTMLButtonElement>("[data-rail-toggle]");
 const toggle = () => host.querySelector<HTMLButtonElement>("[data-rail-switch] [role='switch']");
-const said = () => [button()?.getAttribute("aria-label"), button()?.getAttribute("title"), button()?.getAttribute("aria-expanded"), toggle()?.getAttribute("aria-checked")];
+const said = () => [button()?.getAttribute("aria-label"), button()?.getAttribute("aria-expanded"), toggle()?.getAttribute("aria-checked")];
+/** The tooltip once the pointer rests on the button: its label, shown by the app rather than as a native title. */
+const tooltip = async () => {
+  const target = button()!;
+  await act(async () => { target.dispatchEvent(new PointerEvent("pointerover", { bubbles: true, pointerType: "mouse" })); });
+  await act(async () => { await new Promise((resolve) => setTimeout(resolve, TOOLTIP_DELAY_MS + 50)); });
+  const text = document.getElementById(target.getAttribute("aria-describedby") ?? "")?.textContent;
+  await act(async () => { target.dispatchEvent(new PointerEvent("pointerout", { bubbles: true, pointerType: "mouse" })); });
+  return { text, title: target.getAttribute("title") };
+};
 const click = async (target: HTMLElement | null) => {
   expect(target).toBeTruthy();
   await act(async () => { target!.click(); await Promise.resolve(); });
@@ -47,15 +57,16 @@ it("once main says this window has a rail, the button hides it and shows it agai
   const { rail } = bridge({ available: true, hidden: false });
   await page(rail);
   expect(rail.state, "one offer from the page, whatever asks").toHaveBeenCalledTimes(1);
-  expect(said()).toEqual(["Hide your computers", "Hide your computers", "true", "true"]);
+  expect(said()).toEqual(["Hide your computers", "true", "true"]);
+  expect(await tooltip()).toEqual({ text: "Hide your computers", title: null });
   const row = host.querySelector("[data-rail-switch]")!.textContent!;
   for (const words of ["Show your computers", "A circle for each place your bots live, at the window's left edge."]) expect(row).toContain(words);
   await click(button());
   expect(rail.setHidden).toHaveBeenLastCalledWith(true);
-  expect(said()).toEqual(["Show your computers", "Show your computers", "false", "false"]);
+  expect(said()).toEqual(["Show your computers", "false", "false"]);
   await click(toggle());
   expect(rail.setHidden).toHaveBeenLastCalledWith(false);
-  expect(said()).toEqual(["Hide your computers", "Hide your computers", "true", "true"]);
+  expect(said()).toEqual(["Hide your computers", "true", "true"]);
 });
 
 it("main's word wins: a click it refuses puts the button back, and with one place left the button and the switch go", async () => {
@@ -63,11 +74,11 @@ it("main's word wins: a click it refuses puts the button back, and with one plac
   await page(rail);
   await click(button());
   expect(rail.setHidden).toHaveBeenCalledWith(true);
-  expect(said()).toEqual(["Hide your computers", "Hide your computers", "true", "true"]);
+  expect(said()).toEqual(["Hide your computers", "true", "true"]);
   await push({ available: false, hidden: false });
   expect([button(), toggle()]).toEqual([null, null]);
   await push({ available: true, hidden: true });
-  expect(said()).toEqual(["Show your computers", "Show your computers", "false", "false"]);
+  expect(said()).toEqual(["Show your computers", "false", "false"]);
 });
 
 it("nothing in a browser, on an older app, on a page that isn't beside the rail, or with one place", async () => {

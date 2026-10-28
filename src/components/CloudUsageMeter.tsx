@@ -18,6 +18,7 @@ import {
 import type { LocaleKey } from "@/locales";
 import { useStore } from "@/state/store";
 import { Button } from "./ui/Button";
+import { IconButton } from "./ui/IconButton";
 
 const TEAM_TIERS: readonly string[] = ["team", "business"];
 export type UpgradeSource = "app_usage" | "app_settings";
@@ -150,7 +151,7 @@ export function CloudUsageCardView({ usage, meters, band, upgrade, onHide, onSee
       className="mb-2 rounded-xl border border-hairline bg-card p-3 text-ink shadow-sm">
       <div className="flex items-start justify-between gap-2">
         <h2 id="cloud-usage-card-title" className="min-w-0 text-[13px] font-semibold leading-5">{t(band === "full" ? "usageMeter.card.full" : "usageMeter.card.near")}</h2>
-        <button type="button" onClick={onHide} aria-label={t("usageMeter.card.hide")} title={t("usageMeter.card.hide")} className="ui-icon-button -me-1 -mt-0.5 shrink-0"><X size={14} /></button>
+        <IconButton label={t("usageMeter.card.hide")} onClick={onHide} className="ui-icon-button -me-1 -mt-0.5 shrink-0"><X size={14} /></IconButton>
       </div>
       {meters.map((meter) => <MeterRow key={meter.kind} meter={meter} compact />)}
       <p className="mt-2 text-[12px] text-ink-secondary">{resetLine(usage)}</p>

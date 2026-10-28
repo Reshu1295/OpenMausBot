@@ -8,6 +8,7 @@ import type { LocaleKey } from "@/locales";
 import { InboxSender } from "../InboxLine";
 import { threadUpdatedLabel } from "../SidebarThreadRow";
 import { quickActions, subjectOf, type QuickAction } from "./inbox-view";
+import { IconButton } from "../ui/IconButton";
 
 const ACTION_LOOK: Record<QuickAction, { Icon: LucideIcon; label: LocaleKey }> = {
   allow: { Icon: Check, label: "approval.action.allowOnce" },
@@ -49,9 +50,9 @@ export function InboxRowItem({ row, now, onOpen, onAction, inCard = false }: {
         {actions.map((action) => {
           const { Icon, label } = ACTION_LOOK[action];
           return (
-            <button key={action} type="button" data-inbox-action={action} aria-label={t(label)} title={t(label)} onClick={() => onAction(row, action)} className={ROW_ACTION}>
+            <IconButton label={t(label)} key={action} data-inbox-action={action} onClick={() => onAction(row, action)} className={ROW_ACTION}>
               <Icon size={14} aria-hidden="true" />
-            </button>
+            </IconButton>
           );
         })}
       </span>

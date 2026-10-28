@@ -4,6 +4,7 @@ import { setChromeRailHidden, useChromeRail } from "@/lib/chrome-rail";
 import { t } from "@/lib/i18n";
 import { SettingRow, Switch } from "./SettingsPrimitives";
 import { SIMPLE_TOP_TOGGLE } from "./SidebarSimpleTop";
+import { IconButton } from "./ui/IconButton";
 
 /** The window's rail of places, drawn small: a window with the rail at its left edge and three places on it. */
 export function RailStripIcon({ size }: { size: number }) {
@@ -22,12 +23,12 @@ export function ChromeRailToggle({ advanced, icons, style }: { advanced: boolean
   const rail = useChromeRail();
   if (!rail?.available) return null;
   const label = t(rail.hidden ? "rail.show" : "rail.hide");
-  return <button type="button" data-rail-toggle aria-label={label} title={label} aria-expanded={!rail.hidden} style={style}
+  return <IconButton label={label} data-rail-toggle aria-expanded={!rail.hidden} style={style}
     onClick={() => setChromeRailHidden(!rail.hidden)}
     className={advanced ? cn("flex shrink-0 items-center justify-center text-ink-secondary transition-colors hover:bg-ink/[0.06] hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
       icons ? "size-[46px] rounded-xl" : "size-8 rounded-full") : SIMPLE_TOP_TOGGLE}>
     <RailStripIcon size={advanced && icons ? 20 : 18} />
-  </button>;
+  </IconButton>;
 }
 
 /** Settings' switch for the same rail, while this window has one. */

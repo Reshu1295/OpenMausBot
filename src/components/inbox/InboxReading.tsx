@@ -15,6 +15,7 @@ import { QuestionCard } from "../QuestionCard";
 import { threadUpdatedLabel } from "../SidebarThreadRow";
 import { askOf, closeResponse, subjectOf } from "./inbox-view";
 import { useInboxActions } from "./use-inbox-actions";
+import { IconButton } from "../ui/IconButton";
 
 /** The line as the chat shows it, so an ask answers here with the very card it asks with in the chat. */
 export const asMessage = (row: InboxRow): Message => ({ id: row.id, role: "bot", kind: "options", text: row.text, at: row.at, card: row.card } as Message);
@@ -50,10 +51,10 @@ export function InboxReading({ view, row, now }: { view: InboxView; row: InboxRo
   return (
     <article data-inbox-reading={row.id} aria-label={`${row.from.name} · ${subjectOf(row)}`} className="flex min-h-0 flex-1 flex-col">
       <header className="flex items-start gap-2 border-b border-hairline px-3 py-2.5">
-        <button type="button" onClick={() => readInboxLine(null)} aria-label={t("inbox.action.back")} title={t("inbox.action.back")}
+        <IconButton label={t("inbox.action.back")} onClick={() => readInboxLine(null)}
           className="flex size-7 shrink-0 items-center justify-center rounded-md text-ink-secondary hover:bg-raised hover:text-ink pointer-coarse:size-9">
           <ArrowLeft size={15} aria-hidden="true" />
-        </button>
+        </IconButton>
         <span className="mt-0.5 shrink-0" aria-hidden="true"><InboxSender from={row.from} size={28} /></span>
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline gap-2">
