@@ -132,7 +132,7 @@ describe("updateLabel", () => {
     expect(updateLabel("error", state({ status: "error", message: "Network unreachable" }))).toBe(
       "Network unreachable",
     );
-    expect(updateLabel("error", state({ status: "error" }))).toBe("Update failed. Try again.");
+    expect(updateLabel("error", state({ status: "error" }))).toBe("The update didn't finish. Try again.");
   });
 
   it("points a hand-off at the terminal that finishes it", () => {
