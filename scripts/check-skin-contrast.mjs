@@ -161,6 +161,26 @@ const PAIRS = [
   ["--color-panel", "--color-app", 1.03],
 ];
 
+/** OKLab coordinates of an opaque hex, for telling two colours apart beyond their luminance. */
+function oklab(value) {
+  const { r, g, b } = parseHex(value);
+  const lin = (v) => {
+    const s = v / 255;
+    return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+  };
+  const [lr, lg, lb] = [lin(r), lin(g), lin(b)];
+  const l = Math.cbrt(0.4122214708 * lr + 0.5363325363 * lg + 0.0514459929 * lb);
+  const m = Math.cbrt(0.2119034982 * lr + 0.6806995451 * lg + 0.1073969566 * lb);
+  const s = Math.cbrt(0.0883024619 * lr + 0.2817188376 * lg + 0.6299787005 * lb);
+  return [
+    0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s,
+    1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s,
+    0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s,
+  ];
+}
+const distance = (a, b) => Math.hypot(...oklab(a).map((v, i) => v - oklab(b)[i]));
+const MIN_SUCCESS_DISTANCE = 0.04;
+
 const skins = parseSkins(css);
 // No skin carries a known gap: every below-target pair fails.
 let failed = false;
@@ -183,6 +203,9 @@ for (const [id, tokens] of skins) {
     measured++;
     if (ratio < min) problems.push({ fg, bg, ratio, min });
   }
+  // Success is a state of its own: a working dot next to an unread one must not read as the same colour.
+  const apart = missing.length || unmeasurable.length ? Infinity : distance(tokens["--color-success"], tokens["--color-accent"]);
+  if (apart < MIN_SUCCESS_DISTANCE) problems.push({ fg: "--color-success", bg: "--color-accent", ratio: apart, min: MIN_SUCCESS_DISTANCE, kind: "OKLab distance" });
   const skinFailed = missing.length > 0 || unmeasurable.length > 0 || problems.length > 0;
   if (missing.length) {
     console.log(`✗ ${id} — undefined token(s): ${[...new Set(missing)].join(", ")}`);
@@ -196,8 +219,8 @@ for (const [id, tokens] of skins) {
   }
   failed = true;
   if (problems.length) console.log(`✗ ${id}`);
-  for (const { fg, bg, ratio, min } of problems) {
-    console.log(`    ${fg} on ${bg}: ${ratio.toFixed(2)}:1 (needs ${min}:1)`);
+  for (const { fg, bg, ratio, min, kind } of problems) {
+    console.log(kind ? `    ${fg} is ${ratio.toFixed(3)} from ${bg} in ${kind} (needs ${min})` : `    ${fg} on ${bg}: ${ratio.toFixed(2)}:1 (needs ${min}:1)`);
   }
 }
 

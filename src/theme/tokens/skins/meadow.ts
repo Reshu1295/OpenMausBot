@@ -41,7 +41,8 @@ export default {
     // your own messages, a step under a bot's card
     "bubble-user": "#e1e9e3",
     "bubble-user-ink": "#0f1a13",
-    success: "#1a7a48",
+    // a teal of its own: it was the accent green, so a working dot and an unread dot were one colour
+    success: "#007671",
     "success-ink": "#ffffff",
     danger: "#c02b3a",
     "danger-text": "#c02b3a",
