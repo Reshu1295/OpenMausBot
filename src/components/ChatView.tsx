@@ -470,7 +470,7 @@ const Bubble = memo(function Bubble({
             simple ? !tabled && SIMPLE_BUBBLE_MAX : "max-w-[min(var(--chat-bubble-max),var(--chat-bubble-pct))] rounded-2xl text-[15px] leading-relaxed",
             emerging && "turn-answer",
             user && webhookView
-              ? cn("overflow-hidden border border-accent/25 bg-card text-ink", simple ? cn("rounded-[18px]", SIMPLE_BUBBLE_TEXT) : "shadow-[0_10px_30px_rgba(0,0,0,0.18)]")
+              ? cn("overflow-hidden border border-accent/25 bg-card text-ink", simple ? cn("rounded-[18px]", SIMPLE_BUBBLE_TEXT) : "shadow-[0_10px_30px_color-mix(in_srgb,var(--color-shadow)_18%,transparent)]")
               : attachmentsOnly || split || tabled
                 ? cn("text-ink", simple && SIMPLE_BUBBLE_TEXT)
                 : user

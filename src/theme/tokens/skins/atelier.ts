@@ -65,6 +65,8 @@ export default {
     "warning-ink": "#2b1400",
     scrollbar: "#c9c0ae",
     "maus-line": "#6b6559",
+    // shadows in the ink's own tint, never raw black
+    shadow: "#1a1a18",
   },
   font: SYSTEM,
   radius: { lg: "6px", xl: "10px" },

@@ -54,6 +54,8 @@ export default {
     "warning-ink": "#2b1400",
     scrollbar: "#c3cdc6",
     "maus-line": "#5a675f",
+    // shadows in the ink's own tint, never raw black
+    shadow: "#0f1a13",
   },
   font: GEIST,
   radius: { lg: "10px", xl: "16px" },

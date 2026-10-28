@@ -617,7 +617,7 @@ function RoomSetup({ group, members }: { group: Group; members: Bot[] }) {
     <section
       data-testid="room-setup"
       aria-labelledby="room-setup-title"
-      className="relative z-20 w-full overflow-visible rounded-2xl border border-hairline bg-card shadow-xl shadow-black/10"
+      className="relative z-20 w-full overflow-visible rounded-2xl border border-hairline bg-card shadow-xl shadow-shadow/10"
     >
       <div className="rounded-t-3xl border-b border-hairline bg-panel/70 px-5 py-5 sm:px-7">
         <div className="flex items-start gap-3">
@@ -741,7 +741,7 @@ function RoomSetup({ group, members }: { group: Group; members: Bot[] }) {
                 <div
                   role="listbox"
                   aria-label={t("room.behavior.chooseLead")}
-                  className={cn("absolute left-0 top-full z-30 mt-2 w-72 max-w-[calc(100vw-3rem)] overflow-hidden rounded-2xl border border-hairline bg-panel shadow-2xl shadow-black/20", leadMotion.className)} {...leadMotion.exitProps}
+                  className={cn("absolute left-0 top-full z-30 mt-2 w-72 max-w-[calc(100vw-3rem)] overflow-hidden rounded-2xl border border-hairline bg-panel shadow-2xl shadow-shadow/20", leadMotion.className)} {...leadMotion.exitProps}
                 >
                   <div className="border-b border-hairline px-3 py-2.5">
                     <div className="text-[13px] font-semibold text-ink">{t("room.behavior.chooseLead")}</div>

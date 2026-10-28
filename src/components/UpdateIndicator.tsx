@@ -169,7 +169,7 @@ export function UpdateCard({
         aria-labelledby="update-card-title"
         aria-describedby="update-card-note"
         data-update-card
-        className="animate-pop-in relative w-full max-w-[420px] rounded-2xl border border-hairline bg-panel p-6 shadow-2xl shadow-black/50"
+        className="animate-pop-in relative w-full max-w-[420px] rounded-2xl border border-hairline bg-panel p-6 shadow-2xl shadow-shadow/50"
       >
         <button
           type="button"

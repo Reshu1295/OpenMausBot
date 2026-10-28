@@ -17,6 +17,8 @@
  *   `warning-ink`; `warning-text` is the same amber as words.
  * - `bubble-user-ink`: the ink inside the user's own bubble, a hex rather than the ink token so it can be measured.
  * - `maus-line`: the mascot's second speed line, set against the ground.
+ * - `shadow`: the tint every shadow is drawn in: the ink on a light skin, and transparent on a dark one, which stays
+ *   flat as Midnight is in Simple mode (#3657).
  */
 export const COLOR_TOKENS = [
   "app", "panel", "raised", "raised-hover", "composer", "composer-ring", "card", "menu", "menu-hover", "menu-active",
@@ -27,7 +29,7 @@ export const COLOR_TOKENS = [
   "success", "success-ink",
   "danger", "danger-text", "danger-ink",
   "warning", "warning-text", "warning-ink",
-  "scrollbar", "maus-line",
+  "scrollbar", "maus-line", "shadow",
 ] as const;
 export type ColorToken = (typeof COLOR_TOKENS)[number];
 export type Colors = Record<ColorToken, string>;
@@ -37,7 +39,7 @@ export const THEME_TOKENS = [
   "app", "panel", "raised", "raised-hover", "composer", "composer-ring", "menu", "menu-hover", "menu-active", "card",
   "inset", "control", "hairline", "edge", "ink", "ink-secondary", "ink-tertiary", "accent", "accent-border", "focus",
   "accent-text", "accent-ink", "bubble-user", "success", "success-ink", "danger", "danger-text", "danger-ink", "warning",
-  "warning-text", "warning-ink",
+  "warning-text", "warning-ink", "shadow",
 ] as const satisfies readonly ColorToken[];
 export const ROOT_TOKENS = COLOR_TOKENS.filter((token) => !(THEME_TOKENS as readonly string[]).includes(token));
 

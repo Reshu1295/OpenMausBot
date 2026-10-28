@@ -53,6 +53,8 @@ export default {
     "warning-ink": "#2b1400",
     scrollbar: "#3d3d3d",
     "maus-line": "#f5f5f5",
+    // no shadows on a dark ground: surfaces part by tone and rim, as Midnight does in Simple mode (#3657)
+    shadow: "transparent",
   },
   font: GEIST,
   radius: { lg: "0.5rem", xl: "0.75rem" },

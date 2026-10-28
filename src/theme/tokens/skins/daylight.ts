@@ -67,6 +67,8 @@ export default {
     "warning-ink": "#2b1400",
     scrollbar: "#c4c4c4",
     "maus-line": "#5f5f5f",
+    // shadows in the ink's own tint, never raw black
+    shadow: "#1c1c1c",
   },
   font: GEIST,
   radius: { lg: "8px", xl: "14px" },
@@ -84,7 +86,7 @@ export default {
     silver: "#6e7580",
     chrome: "#697688",
   },
-  shadowFloat: "0 4px 12px -1px rgb(28 28 28 / 0.08), 0 2px 4px -2px rgb(28 28 28 / 0.06)",
+  shadowFloat: "0 4px 12px -1px color-mix(in srgb, var(--color-shadow) 8%, transparent), 0 2px 4px -2px color-mix(in srgb, var(--color-shadow) 6%, transparent)",
   captionSymbol: "#575757",
   wideGamut: {
     pinned: {

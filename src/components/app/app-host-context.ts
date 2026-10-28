@@ -70,9 +70,9 @@ const VARIABLES: ReadonlyArray<readonly [string, string]> = [
   ["--border-radius-full", "9999px"],
   ["--border-width-regular", "1px"],
   ["--shadow-hairline", "0 0 0 1px color-mix(in srgb, var(--color-ink) 20%, var(--color-composer))"],
-  ["--shadow-sm", "0 1px 2px rgb(0 0 0 / 0.08)"],
-  ["--shadow-md", "0 4px 12px rgb(0 0 0 / 0.12)"],
-  ["--shadow-lg", "0 12px 32px rgb(0 0 0 / 0.16)"],
+  ["--shadow-sm", "0 1px 2px color-mix(in srgb, var(--color-shadow) 8%, transparent)"],
+  ["--shadow-md", "0 4px 12px color-mix(in srgb, var(--color-shadow) 12%, transparent)"],
+  ["--shadow-lg", "0 12px 32px color-mix(in srgb, var(--color-shadow) 16%, transparent)"],
 ];
 
 const TOKEN = /var\((--[\w-]+)\)/g;

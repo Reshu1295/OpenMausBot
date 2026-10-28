@@ -90,7 +90,7 @@ import {
 } from "@/lib/composer-commands";
 import { useSlashSkills } from "@/lib/use-slash-skills";
 
-const SIMPLE_COMPOSER = "bg-composer p-2 ring-[0.5px] ring-ink/10 hover:ring-ink/[0.22] focus-within:ring-ink/[0.22] shadow-[0_2px_8px_-1px_rgb(0_0_0/0.05),0_1px_2px_rgb(0_0_0/0.03),0_0_0_1px_rgb(228_228_228/0.04)] [transition:border-radius_300ms,box-shadow_150ms]";
+const SIMPLE_COMPOSER = "bg-composer p-2 ring-[0.5px] ring-ink/10 hover:ring-ink/[0.22] focus-within:ring-ink/[0.22] shadow-[0_2px_8px_-1px_color-mix(in_srgb,var(--color-shadow)_5%,transparent),0_1px_2px_color-mix(in_srgb,var(--color-shadow)_3%,transparent),0_0_0_1px_rgb(228_228_228/0.04)] [transition:border-radius_300ms,box-shadow_150ms]";
 
 const supportsAgents = (instances: InstanceInfo[], candidate?: Bot) =>
   Boolean(candidate && instances.find((instance) => instance.instanceId === candidate.modelSelection.instanceId)?.capabilities?.agentsMcp);

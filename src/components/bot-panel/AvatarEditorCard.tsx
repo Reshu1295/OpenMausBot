@@ -100,7 +100,7 @@ export function AvatarEditorCard({ bot, activeState, onPatch, onClose }: {
       aria-label={t("botPanel.avatar.edit")}
       data-panel-avatar-editor
       onKeyDown={onKeyDown}
-      className="popover-surface absolute inset-x-[-5px] top-[80px] z-30 overflow-hidden rounded-2xl border border-ink/[0.08] bg-menu text-left shadow-2xl shadow-black/50"
+      className="popover-surface absolute inset-x-[-5px] top-[80px] z-30 overflow-hidden rounded-2xl border border-ink/[0.08] bg-menu text-left shadow-2xl shadow-shadow/50"
     >
       <div ref={tabsRef} className="flex items-center gap-0.5 border-b border-ink/[0.06] p-2">
         {TABS.map(([id, label]) => (
