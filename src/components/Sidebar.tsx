@@ -647,6 +647,9 @@ export function BotThreadList({ bot, selected, density, query, pendingQueued, re
           {open && <div role="group" aria-label={t("task.namedList", { name: project.name })}>
             {visible.map(renderThread)}
             {projectTasks.length === 0 && <p className="px-2.5 py-1 text-[11px] text-ink-tertiary">{t("task.empty")}</p>}
+            {/* The short list keeps only the newest threads, so an open folder can hold none of them: offer the rest. */}
+            {!query && !bulk.active && visible.length < projectTasks.length && <button type="button" data-sidebar-folder-show-all={project.id} onClick={() => setShowAll(true)}
+              className="inline-flex h-7 items-center pl-6 text-[13px] font-medium leading-4 text-ink-secondary hover:text-ink">{t("folder.showAll")}</button>}
           </div>}
         </div>;
       })}
@@ -1372,7 +1375,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
       tabIndex={-1}
       aria-label={t("sidebar.aria")}
       data-native-view-overlay
-      data-sidebar data-cloud-sky={state.config?.cloudHome === true ? density === "icons" ? "rail" : advanced ? "advanced" : "simple" : undefined}
+      data-sidebar
       onClick={(event) => {
         // The phone's list covers the whole screen: choosing the bot that is already open has to dismiss it too.
         if (phone && open && event.target instanceof Element && !(event.target instanceof HTMLInputElement) && event.target.closest("[data-sidebar-bot-row], [data-sidebar-hero]")) onClose();
