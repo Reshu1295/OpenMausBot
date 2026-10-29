@@ -967,7 +967,7 @@ describe("the Simple mode popup after the update", () => {
   it("shows once in each browser, claims the launch, and never comes back once it is closed", async () => {
     const html = await launch();
     expect(html).toContain(TITLE);
-    for (const part of ['role="dialog"', 'aria-modal="true"', 'role="switch"', 'aria-checked="false"', "Switch any time in Settings → General."]) expect(html).toContain(part);
+    for (const part of ['role="dialog"', 'aria-modal="true"', 'role="switch"', 'aria-checked="false"', "Switch any time from your name at the bottom left, or in Settings → General."]) expect(html).toContain(part);
     expect(prompts()).toEqual([{ action: "shown", mode: "advanced" }]);
     expect(launchDialogShown()).toBe("notices");
     expect(await settle(), "shown is counted once").toContain(TITLE);

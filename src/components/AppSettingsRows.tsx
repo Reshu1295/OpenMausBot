@@ -233,14 +233,17 @@ export function ColorUserBubblesRow({ simple = false }: { simple?: boolean }) {
   );
 }
 
+/** One setting, named from the side the person is on: "Advanced mode" in Advanced, "Simple mode" (as the prompt and the
+ * You menu call it) in Simple. */
 export function AdvancedModeRow({ simple = false }: { simple?: boolean }) {
   const enabled = useAdvancedMode();
+  const title = t(simple ? "settings.simple.simpleMode" : "settings.advancedMode.title");
   return (
-    <SettingRow className={simple ? undefined : "rounded-2xl border border-accent-border/40 bg-raised-hover/40 py-4"} title={t("settings.advancedMode.title")}
-      subtitle={t(simple ? "settings.simple.advancedMode" : "settings.advancedMode.subtitle")}>
+    <SettingRow className={simple ? undefined : "rounded-2xl border border-accent-border/40 bg-raised-hover/40 py-4"} title={title}
+      subtitle={t(simple ? "settings.simple.simpleModeHint" : "settings.advancedMode.subtitle")}>
       <Switch
-        checked={enabled}
-        aria-label={t("settings.advancedMode.title")}
+        checked={simple ? !enabled : enabled}
+        aria-label={title}
         onClick={() => setAdvancedMode(!enabled)}
       />
     </SettingRow>

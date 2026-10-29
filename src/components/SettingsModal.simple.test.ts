@@ -137,6 +137,11 @@ describe("Settings in Simple mode", () => {
     expect(html).toContain('data-settings-look="simple"');
   });
 
+  it("finds General in Simple search under either name of the mode", () => {
+    const general = SIMPLE_PAGES.find((page) => page.id === "general")!;
+    for (const query of ["simple", "simple mode", "easy mode", "advanced mode"]) expect(general.keywords, query).toEqual(expect.arrayContaining([query]));
+  });
+
   it("files every Advanced page under one Simple page, or hides it", () => {
     const placed = SIMPLE_PAGES.flatMap((page) => page.sections);
     expect(new Set(placed).size).toBe(placed.length);
@@ -145,13 +150,15 @@ describe("Settings in Simple mode", () => {
     for (const id of hidden) expect(SIMPLE_HIDDEN_SECTIONS).toContain(id);
   });
 
-  it("opens General on Account, then Appearance, Notifications, System and Import, with Advanced mode last as a plain row", () => {
+  it("opens General on the Simple mode switch, named as the prompt and the You menu name it, then Account, Appearance, Notifications, System and Import", () => {
     const html = render();
     expect(currentPage(html)).toBe("general");
     expect(groupLabels(html)).toEqual(["Account", "Appearance", "Notifications", "System", "Import", "Organization"]);
-    expect(blocks(html).at(-1)).toBe("advanced-mode");
-    expect([...html.matchAll(/<button[^>]*role="switch"[^>]*>/g)].at(-1)?.[0]).toContain('aria-label="Advanced mode"');
-    expect(html).toContain("Show every control, including tools for builders. Nothing is deleted either way.");
+    expect(blocks(html)[0]).toBe("advanced-mode");
+    const toggle = [...html.matchAll(/<button[^>]*role="switch"[^>]*>/g)][0]?.[0];
+    expect(toggle).toContain('aria-label="Simple mode"');
+    expect(toggle).toContain('aria-checked="true"');
+    expect(html).toContain("Turn it off to show every control, including tools for builders. Nothing is deleted either way.");
     expect(html).not.toContain("border-accent-border/40");
     expect(html).toContain("Add your name");
     expect(html).toMatch(/aria-expanded="false" aria-controls="[^"]+"[^>]*>Add<\/button>/);
@@ -253,7 +260,7 @@ describe("Settings in Simple mode", () => {
     expect(currentPage(general)).toBe("general");
     expect(general).not.toContain("Add your name");
     expect(general).toContain('aria-label="App language"');
-    expect(general).toContain('aria-label="Advanced mode"');
+    expect(general).toContain('aria-label="Simple mode"');
   });
 
   it.each<[AppSettingsSection, string]>([

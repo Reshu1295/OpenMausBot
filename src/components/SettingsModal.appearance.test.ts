@@ -115,16 +115,16 @@ afterEach(() => {
 const render = () => renderToStaticMarkup(createElement(SettingsModal));
 
 describe("Settings → Appearance", () => {
-  it.each([true, false])("flips Advanced mode from General, first in Advanced and last in Simple, when the switch is %s", (enabled) => {
+  // One setting, named from the side the person is on: "Advanced mode" on in Advanced, "Simple mode" on in Simple.
+  it.each([true, false])("flips the mode from the top of General, when Advanced mode is %s", (enabled) => {
     fixture.section = "general";
     fixture.advancedMode = enabled;
     const html = render();
-    if (enabled) expect(html.indexOf('aria-label="Advanced mode"')).toBeLessThan(html.indexOf("Language"));
-    else expect(html.indexOf('aria-label="Advanced mode"')).toBeGreaterThan(html.indexOf("Language"));
-    expect(html).toContain('aria-label="Advanced mode"');
+    const label = enabled ? "Advanced mode" : "Simple mode";
+    expect(html.indexOf(`aria-label="${label}"`)).toBeLessThan(html.indexOf("Language"));
     expect(html).toContain("Nothing is deleted either way");
-    const toggle = fixture.switches.find((props) => props["aria-label"] === "Advanced mode")!;
-    expect(toggle.checked).toBe(enabled);
+    const toggle = fixture.switches.find((props) => props["aria-label"] === label)!;
+    expect(toggle.checked).toBe(true);
     toggle.onClick!({} as never);
     expect(fixture.setAdvancedMode).toHaveBeenCalledWith(!enabled);
     expect(fixture.api).not.toHaveBeenCalled();
@@ -223,6 +223,11 @@ describe("Settings → Appearance", () => {
       html.indexOf('aria-label="Choose tools layout"'),
     );
     expect(fixture.setSidebarToolsLayout).not.toHaveBeenCalled();
+  });
+
+  it("general search finds the mode switch by either of its names", () => {
+    const general = SECTIONS.find((entry) => entry.id === "general")!;
+    for (const query of ["simple", "simple mode", "easy mode", "advanced mode"]) expect(sectionMatches(general, query), query).toBe(true);
   });
 
   it("appearance search finds the tools layout row via toolbar", () => {

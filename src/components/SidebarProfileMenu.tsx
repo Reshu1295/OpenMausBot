@@ -21,6 +21,7 @@ import {
   UserRound,
   UsersRound,
   Zap,
+  Sparkles,
 } from "lucide-react";
 
 import { InitialsAvatar } from "./Avatar";
@@ -44,6 +45,7 @@ import { useUpdaterState, type UpdaterState } from "@/lib/updater";
 import { brand } from "../lib/brand";
 import { cloudColor } from "@/lib/cloud-look";
 import { cn } from "@/lib/cn";
+import { setAdvancedMode, useAdvancedMode } from "@/lib/interface-mode";
 import { meterPercent, resetLine } from "@/lib/usage-meter";
 import type { CloudPlanSnapshot } from "../../electron/cloud-account.mjs";
 import { activeLocale, t } from "@/lib/i18n";
@@ -438,6 +440,7 @@ export function profileMenuItems({
   updateTop = null,
   account,
   simple,
+  simpleMode,
   onUsage,
   onSettings,
   onShortcuts,
@@ -453,6 +456,8 @@ export function profileMenuItems({
   updateTop?: { label: string; action: string } | null;
   account: string | null;
   simple?: { tools: SidebarMenuItem[]; places: SidebarMenuItem[] };
+  /** Simple mode's switch, one click from anywhere: the prompt that offers it shows only once. */
+  simpleMode?: { on: boolean; onToggle: () => void };
   onUsage: () => void;
   onSettings: () => void;
   onShortcuts: () => void;
@@ -484,9 +489,17 @@ export function profileMenuItems({
   } : null;
   const support: SidebarMenuItem = { key: "support", label: t("sidebar.menu.support"), icon: <LifeBuoy size={18} />, submenu: help, onSelect: () => {} };
   const settings: SidebarMenuItem = { key: "settings", label: t("sidebar.menu.settings"), icon: <SettingsIcon size={18} />, onSelect: onSettings };
+  const modeItem: SidebarMenuItem | null = simpleMode ? {
+    key: "simple-mode",
+    label: t("sidebar.menu.simpleMode"),
+    icon: <Sparkles size={18} />,
+    checked: simpleMode.on,
+    trailing: <MenuSwitch on={simpleMode.on} />,
+    onSelect: simpleMode.onToggle,
+  } : null;
   const accountItem: SidebarMenuItem | null = account ? { key: "account", label: account, icon: <CircleUserRound size={18} />, onSelect: onAccount } : null;
   const present = (...items: Array<SidebarMenuItem | null | false>) => items.filter((item): item is SidebarMenuItem => Boolean(item));
-  if (!simple) return [...present(usageItem), ...phone, support, settings, ...present(update), ...(accountItem ? [{ ...accountItem, separatorBefore: true }] : [])];
+  if (!simple) return [...present(usageItem), ...phone, support, settings, ...present(modeItem), ...present(update), ...(accountItem ? [{ ...accountItem, separatorBefore: true }] : [])];
   const raised: SidebarMenuItem | null = update && updateTop ? {
     ...update,
     label: updateTop.label,
@@ -496,11 +509,20 @@ export function profileMenuItems({
   } : null;
   const groups = [
     present(raised),
-    [...present(usageItem), ...phone, { ...support, submenu: raised ? help : [...help, ...present(update)] }, settings],
+    [...present(usageItem), ...phone, { ...support, submenu: raised ? help : [...help, ...present(update)] }, settings, ...present(modeItem)],
     simple.tools,
     [...simple.places, ...present(accountItem)],
   ].filter((group) => group.length > 0);
   return groups.flatMap((group, at) => group.map((item, index) => (at > 0 && index === 0 ? { ...item, separatorBefore: true } : item)));
+}
+
+function MenuSwitch({ on }: { on: boolean }) {
+  return (
+    <span aria-hidden="true" className={cn("relative h-[18px] w-[30px] shrink-0 rounded-full transition-colors motion-reduce:transition-none",
+      on ? "bg-accent" : "bg-ink/[0.14] ring-1 ring-inset ring-ink/40")}>
+      <span className={cn("absolute top-0.5 size-[14px] rounded-full bg-white shadow-sm transition-[left] motion-reduce:transition-none", on ? "left-[14px]" : "left-0.5")} />
+    </span>
+  );
 }
 
 export interface ArchivedBots {
@@ -525,6 +547,7 @@ export function SidebarProfileMenu({ iconOnly = false, rail = false, circle = fa
 } = {}) {
   const { state, dispatch } = useStore();
   const simple = account !== undefined;
+  const advanced = useAdvancedMode();
   const [menuOpen, setMenuOpen] = useState(false);
   const cloudUsage = cloudUsageSummary(useCloudPlanSnapshot(simple ? usageBridge(state.config?.cloudHome === true) : undefined));
   const engineUsage = usePlanUsageSummary(simple && menuOpen && cloudUsage === null && window.ogb?.remoteClient?.active !== true);
@@ -581,6 +604,7 @@ export function SidebarProfileMenu({ iconOnly = false, rail = false, circle = fa
       }),
       places: placeMenuItems(account.place, { owner: account.owner, besideRail, onCloudSettings: () => dispatch({ type: "toggleAppSettings", open: true, section: "cloudAccount" }) }),
     } } : {}),
+    simpleMode: { on: !advanced, onToggle: () => setAdvancedMode(!advanced) },
     onUsage: () => dispatch({ type: "toggleAppSettings", open: true, section: "usage" }),
     onSettings: () => dispatch({ type: "toggleAppSettings" }),
     onShortcuts: () => {

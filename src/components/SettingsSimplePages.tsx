@@ -46,6 +46,9 @@ type Has = (id: AppSettingsSection) => boolean;
 export function SimpleGeneralPage({ has, peopleOpen, onLooks }: { has: Has; peopleOpen: boolean; onLooks: () => void }) {
   return (
     <>
+      <div data-settings-block="advanced-mode" className="scroll-mt-4">
+        <SettingsRows><AdvancedModeRow simple /></SettingsRows>
+      </div>
       {(has("general") || has("people")) && (
         <SettingsGroup label={t("settings.group.account")} block="general">
           <SettingsRows>
@@ -86,9 +89,6 @@ export function SimpleGeneralPage({ has, peopleOpen, onLooks }: { has: Has; peop
       {has("import") && <SettingsGroup label={t("settings.section.import")} block="import"><ImportSettings /></SettingsGroup>}
       {has("organization") && <SettingsGroup label={t("settings.section.organization")} block="organization"><OrganizationSettings /></SettingsGroup>}
       {has("activity") && <SettingsGroup label={t("settings.section.activity")} block="activity"><ActivitySection /></SettingsGroup>}
-      <div data-settings-block="advanced-mode" className="scroll-mt-4">
-        <SettingsRows><AdvancedModeRow simple /></SettingsRows>
-      </div>
     </>
   );
 }

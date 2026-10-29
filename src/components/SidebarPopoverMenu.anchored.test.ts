@@ -128,6 +128,20 @@ describe("the anchored menu in a document", () => {
     expect(document.activeElement).toBe(rows[0]);
   });
 
+  it("walks onto an on/off item, announced as a checkbox with its state", async () => {
+    await act(async () => root.render(createElement(SidebarPopoverMenu, {
+      items: [item("Settings"), item("Simple mode", { checked: true })], ariaLabel: "You", renderTrigger: () => "You",
+    })));
+    await key(trigger(), "ArrowUp");
+    await flush();
+    const settings = sheet()!.querySelector<HTMLElement>('[role="menuitem"]')!;
+    expect(document.activeElement).toBe(settings);
+    await key(settings, "ArrowDown");
+    const toggle = sheet()!.querySelector<HTMLElement>('[role="menuitemcheckbox"]')!;
+    expect(document.activeElement).toBe(toggle);
+    expect(toggle.getAttribute("aria-checked")).toBe("true");
+  });
+
   it("opens the submenu with the inline end arrow and closes only it with Escape", async () => {
     await act(async () => trigger().click());
     const support = [...sheet()!.querySelectorAll<HTMLElement>('[role="menuitem"]')][1]!;

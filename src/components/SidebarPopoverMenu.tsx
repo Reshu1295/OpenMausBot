@@ -22,6 +22,8 @@ export interface SidebarMenuItem {
   trailing?: React.ReactNode;
   value?: string;
   keepOpen?: boolean;
+  /** An on/off item: it is announced as a checkbox in the menu. */
+  checked?: boolean;
   submenu?: SidebarMenuItem[];
   chevron?: boolean;
   onSelect: () => void;
@@ -65,7 +67,7 @@ const isRtl = (element: Element | null) =>
   typeof getComputedStyle === "function" && element ? getComputedStyle(element).direction === "rtl" : false;
 
 const menuItems = (menu: HTMLElement | null) =>
-  menu ? [...menu.querySelectorAll<HTMLElement>(':scope > div > [role="menuitem"]:not(:disabled)')] : [];
+  menu ? [...menu.querySelectorAll<HTMLElement>(':scope > div > :is([role="menuitem"], [role="menuitemcheckbox"]):not(:disabled)')] : [];
 
 export function nextMenuIndex(key: string, current: number, count: number): number | null {
   if (count === 0) return null;
@@ -101,7 +103,8 @@ function MenuRows({
           {item.heading && <div className={MENU_HEADING}>{item.heading}</div>}
           <button
             type="button"
-            role="menuitem"
+            role={item.checked === undefined ? "menuitem" : "menuitemcheckbox"}
+            aria-checked={item.checked}
             data-tour={item.tourId}
             data-menu-key={item.key}
             disabled={item.disabled}
