@@ -489,6 +489,10 @@ export const CodexDriver: ProviderDriver<CodexConfig> = {
       // A leaked API key silently flips Codex's own ChatGPT login to pay-as-you-go.
       stripCredentialEnv(env, ["OPENAI_API_KEY", "OPENMAUSBOT_CHATGPT_TOKEN"]);
       stripWorkspaceCredentialEnv(env);
+      if (config.managed) {
+        stripCredentialEnv(env, ["OPENMAUSBOT_COMPANY_API_KEY"]);
+        Object.assign(env, Object.fromEntries(credentialEnvEntries(input.environment, ["OPENMAUSBOT_COMPANY_API_KEY"])));
+      }
       if (plan) env.CODEX_HOME = join(planDirectory, "codex");
       return env;
     };

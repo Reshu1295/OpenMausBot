@@ -8,6 +8,7 @@ import { CodexDriver } from "./codex.ts";
 
 const cli = fileURLToPath(new URL("../testing/fake-codex-app-server.ts", import.meta.url));
 afterEach(() => { vi.unstubAllEnvs(); });
+const companyKeys = (env: Record<string, string>) => Object.fromEntries(Object.entries(env).filter(([key]) => key.toUpperCase() === "OPENMAUSBOT_COMPANY_API_KEY"));
 
 it.each([
   [{ openmausbot_company_api_key: "lower-key" }, "openmausbot_company_api_key", "lower-key"],
@@ -16,6 +17,7 @@ it.each([
   [{ openmausbot_company_api_key: "lower-key", OPENMAUSBOT_COMPANY_API_KEY: "canonical-key" }, "OPENMAUSBOT_COMPANY_API_KEY", "canonical-key"],
 ] as const)("routes managed Codex to the selected credential without renaming grants (%j)", async (grants, name, value) => {
   vi.stubEnv("OPENMAUSBOT_COMPANY_API_KEY", "inherited-company-key");
+  vi.stubEnv("Openmausbot_Company_Api_Key", "inherited-mixed-key");
   for (const reversed of [false, true]) {
     const receipt = join(homedir(), `managed-${name}-${Object.keys(grants).length}-${reversed}.json`);
     const instance = await CodexDriver.create({
@@ -34,10 +36,11 @@ it.each([
       const seen = JSON.parse(readFileSync(receipt, "utf8"));
       expect(seen.argv).toContain(`model_providers.openmaus_company.env_key="${name}"`);
       expect(seen.env[name]).toBe(value);
-      for (const [key, granted] of Object.entries(grants)) expect(seen.env[key]).toBe(granted);
+      expect(companyKeys(seen.env)).toEqual(grants);
       expect(await instance.generateMemoryText!("synthetic background prompt")).toBe("fake background answer");
       const background = JSON.parse(readFileSync(`${receipt}.text`, "utf8").trim());
       expect(background.argv).toContain(`model_providers.openmaus_company.env_key="${name}"`);
+      expect(background.env.OPENMAUSBOT_COMPANY_API_KEY).toBe((grants as Record<string, string>).OPENMAUSBOT_COMPANY_API_KEY);
     } finally { recorder.stop(); await instance.dispose(); }
   }
 });
