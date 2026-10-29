@@ -12,22 +12,30 @@ export async function confirmAcpTermination(session: AcpSession, close: () => Pr
     else child.once("exit", onExit);
   });
   let timer: ReturnType<typeof setTimeout> | undefined;
+  let confirmed = false;
+  let confirmation: Promise<boolean>;
   try {
-    if (await Promise.race([close(), exited, new Promise<false>((resolve) => {
+    confirmation = close().then(value => { confirmed = value; return value; });
+    if (await Promise.race([confirmation, exited, new Promise<false>((resolve) => {
       if (closeTimeoutMs !== undefined) timer = setTimeout(() => resolve(false), closeTimeoutMs);
     })])) return true;
   } finally {
     clearTimeout(timer);
     child.removeListener("exit", onExit);
   }
+  const closed = confirmation.then(value => value ? true : new Promise<never>(() => {}));
   host.draining = true;
   let reported = false;
-  while (!await killCliTree(child).catch(() => false)) {
+  while (!confirmed && !await Promise.race([closed, killCliTree(child, closeTimeoutMs === undefined ? undefined : 2_000).catch(() => false)])) {
     if (!reported) { reported = true; failed(); }
-    // Keep the turn owned until the whole tree stops, including after its root exits.
-    await new Promise<void>((resolve) => { setTimeout(resolve, 1_000).unref?.(); });
+    // Keep ownership until session closure or confirmed tree termination.
+    try {
+      await Promise.race([closed, new Promise<void>((resolve) => { timer = setTimeout(resolve, 1_000); timer.unref?.(); })]);
+    } finally {
+      clearTimeout(timer);
+    }
   }
-  return !reported;
+  return confirmed || !reported;
 }
 
 export async function awaitAcpTeardown(pending: Promise<unknown>[], failed: () => Error): Promise<void> {

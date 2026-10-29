@@ -3,11 +3,14 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import vm from "node:vm";
 import ts from "typescript";
 import { expect, it, vi } from "vitest";
-import { changedInstanceIds, engineLaunches, loadConfig, saveConfig, syncCredentialEnv } from "../config.ts";
+import { changedInstanceIds, engineLaunches, instanceConfigs, loadConfig, saveConfig, syncCredentialEnv } from "../config.ts";
+import type { InstanceConfigMap } from "../contracts.ts";
 import { EventBus } from "../harness/bus.ts";
 import { reloadProviderInstances } from "../harness/provider-reload.ts";
 import { ProviderRegistry } from "../harness/registry.ts";
 import { makeFakeDriver } from "../testing/fake-driver.ts";
+import { resetPathCache } from "../env-path.ts";
+import { createInstanceRoutes, type InstanceRouteDeps } from "./instances.ts";
 import { createConfigRoutes, type ConfigRouteDeps } from "./config.ts";
 
 const source = ts.createSourceFile("index.ts", readFileSync(new URL("../index.ts", import.meta.url), "utf8"), ts.ScriptTarget.Latest);
@@ -176,6 +179,71 @@ it("config reload retries failed disposal of a removed saved instance", async ()
     expect(registry.get("removed")).toBeNull();
     expect(registry.retiringIds()).toEqual([]);
     expect(dispose).toHaveBeenCalledTimes(3);
+  } finally {
+    dispose.mockResolvedValue();
+    await registry.disposeAll();
+    vi.restoreAllMocks();
+  }
+});
+
+it("instance PATCH clears only its successful pending config reload and preserves failures", async () => {
+  const cfg = { instances: {
+    compat: { driver: "openai-compat", config: { tools: true } },
+    other: { driver: "openai-compat", config: { tools: true } },
+  } };
+  const providerConfigs = () => instanceConfigs(cfg);
+  const before = structuredClone(engineLaunches(providerConfigs()));
+  const fake = makeFakeDriver({ kind: "openai-compat" });
+  const registry = new ProviderRegistry([fake.driver]);
+  await registry.load(providerConfigs());
+  const old = registry.get("compat")!;
+  const dispose = vi.spyOn(old, "dispose").mockRejectedValue(new Error("synthetic teardown blocked"));
+  const create = vi.spyOn(fake.driver, "create");
+  const context = vm.createContext({
+    cfg, saveConfig, instanceConfigs, resetPathCache,
+    providerConfigs, registry, bus: new EventBus(), reloadProviderInstances, changedInstanceIds, engineLaunches,
+    providerInstancesChanging: new Set<string>(), pendingProviderReloads: new Set<string>(), providerFleetReloading: false,
+    store: { bots: [] }, groupSpeakers: new Map(), decorateHostedProvider: undefined,
+    revokeEngineCapabilities() {}, providerAuthSessions: { clearInstance() {} }, drainQueuedSends() {},
+  });
+  const persist = source.statements.find((node) => ts.isFunctionDeclaration(node) && node.name?.text === "persistProviderInstance");
+  if (!persist) throw new Error("Instance persistence function not found");
+  vm.runInContext(reloadCode + pendingCode + ts.transpileModule(persist.getText(source), {
+    compilerOptions: { target: ts.ScriptTarget.ESNext },
+  }).outputText, context);
+  const route = createInstanceRoutes({
+    cfg, registry, store: { bots: [] }, hostedModels: false,
+    providerConfigBusy: { get: () => false, set() {} },
+    providerInstancesChanging: context.providerInstancesChanging,
+    persistProviderInstance: (id: string, instances: InstanceConfigMap) => context.persistProviderInstance(id, instances),
+    describeInstances: async () => [],
+  } as unknown as InstanceRouteDeps);
+  const patch = () => route({
+    method: "PATCH", path: "/api/instances/compat", url: new URL("http://fixture/api/instances/compat"),
+    req: { headers: { "content-type": "application/json" } } as IncomingMessage, res: {} as ServerResponse,
+    auth: { kind: "loopback", scopes: ["admin"] }, readBody: async () => ({ tools: false }),
+    json: (_res, status) => { expect(status).toBe(200); },
+  });
+  try {
+    cfg.instances.compat.config.tools = false;
+    await expect(context.reloadProviders(before)).rejects.toThrow("synthetic teardown blocked");
+    expect(context.hasPendingProviderReload()).toBe(true);
+    expect([...context.pendingProviderReloads]).toEqual(["compat"]);
+    await expect(patch()).rejects.toThrow("synthetic teardown blocked");
+    expect([...context.pendingProviderReloads]).toEqual(["compat"]);
+    dispose.mockResolvedValue();
+    context.pendingProviderReloads.add("other");
+    await patch();
+    const replacement = registry.get("compat");
+    expect(replacement).not.toBe(old);
+    expect.soft([...context.pendingProviderReloads]).toEqual(["other"]);
+    expect(create).toHaveBeenCalledTimes(1);
+    await context.reloadProviders(engineLaunches(providerConfigs()));
+    expect.soft(registry.get("compat")).toBe(replacement);
+    expect.soft(create).toHaveBeenCalledTimes(2);
+    expect(context.hasPendingProviderReload()).toBe(false);
+    await context.reloadProviders(engineLaunches(providerConfigs()));
+    expect.soft(create).toHaveBeenCalledTimes(2);
   } finally {
     dispose.mockResolvedValue();
     await registry.disposeAll();

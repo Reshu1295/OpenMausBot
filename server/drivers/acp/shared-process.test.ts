@@ -491,6 +491,43 @@ describe("ACP threads sharing one agent process", () => {
     }
   });
 
+  it("accepts a pending prompt-stall close confirmation after Stop enters failed termination fallback", async () => {
+    const previous = process.env.OPENMAUS_ACP_PROMPT_IDLE_TIMEOUT_MS;
+    process.env.OPENMAUS_ACP_PROMPT_IDLE_TIMEOUT_MS = "100000";
+    const gateDir = mkdtempSync(join(tmpdir(), "omb-acp-late-close-"));
+    scratches.push(gateDir);
+    const gate = join(gateDir, "release");
+    const f = await fixture({}, { FAKE_ACP_HANG_ON: "HANG", FAKE_ACP_IGNORE_CANCEL: "1", FAKE_ACP_SESSION_CLOSE_GATE: gate });
+    const kill = procs.killCliTree;
+    const killing = vi.spyOn(procs, "killCliTree").mockResolvedValue(false);
+    try {
+      await f.run("thread-idle");
+      vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+      await f.instance.adapter.sendTurn({ threadId: "thread-active", text: "HANG", cwd: f.scratch, approvalMode: "full" });
+      await vi.waitFor(() => expect(f.methods().filter(method => method === "session/prompt")).toHaveLength(2));
+      await vi.advanceTimersByTimeAsync(100_001);
+      await vi.waitFor(() => expect(f.methods().filter(method => method === "session/close")).toHaveLength(1));
+      await f.instance.adapter.interruptTurn("thread-active");
+      await vi.advanceTimersByTimeAsync(10_001);
+      expect(killing).toHaveBeenCalled();
+      expect(f.instance.adapter.hasSession("thread-active")).toBe(true);
+      const attempts = killing.mock.calls.length;
+      writeFileSync(gate, "1");
+      await vi.waitFor(() => expect(f.instance.adapter.hasSession("thread-active")).toBe(false));
+      await vi.advanceTimersByTimeAsync(3_000);
+      expect(killing).toHaveBeenCalledTimes(attempts);
+      expect(f.spawned[0]!.exitCode === null && f.spawned[0]!.signalCode === null).toBe(true);
+      expect(f.methods().filter(method => method === "session/close")).toHaveLength(1);
+      expect(f.recorder.events.filter(event => event.type === "turn.completed" && event.threadId === "thread-active")).toHaveLength(1);
+    } finally {
+      vi.useRealTimers();
+      killing.mockRestore();
+      await Promise.all(f.spawned.map(child => kill(child, 0)));
+      if (previous === undefined) delete process.env.OPENMAUS_ACP_PROMPT_IDLE_TIMEOUT_MS;
+      else process.env.OPENMAUS_ACP_PROMPT_IDLE_TIMEOUT_MS = previous;
+    }
+  });
+
   it("bounds Stop while a prompt-stall session/close is already pending", async () => {
     const previous = process.env.OPENMAUS_ACP_PROMPT_IDLE_TIMEOUT_MS;
     process.env.OPENMAUS_ACP_PROMPT_IDLE_TIMEOUT_MS = "100000";

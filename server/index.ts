@@ -12137,7 +12137,7 @@ async function persistProviderInstance(instanceId: string, instances: NonNullabl
   const configs = Object.hasOwn(instances, instanceId) ? { [instanceId]: instanceConfigs(cfg)[instanceId] } : {};
   const result = await reloadProviderInstances(registry, bus, configs, new Set([instanceId]));
   if (result.failed) throw result.failed.reason;
-  resetPathCache();
+  pendingProviderReloads.delete(instanceId); resetPathCache();
 }
 
 /** The engine a bot's process in a conversation runs on: the running turn's when it is the bot's, else the bot's selection there. */
