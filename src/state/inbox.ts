@@ -29,14 +29,15 @@ function store<T>(initial: T) {
 const list = store<InboxView | null>(null);
 export const currentInbox = list.get;
 export const useInboxView = (): InboxView | null => useSyncExternalStore(list.subscribe, list.get, list.get);
-/** Tests and previews show a list of their own. */
-export const setInboxView = list.set;
 
 let reading: Promise<void> | null = null;
 let readAgain = false;
 let revision = 0;
+let confirmed: InboxView | null = null;
 const pending = new Map<number, { id: string; patch: Partial<InboxRow> }>();
-const replaceList = (view: InboxView) => {
+const publishList = () => {
+  const view = confirmed;
+  if (!view) { list.set(null); return; }
   const rows = view.rows.map((row) => {
     for (const change of pending.values()) {
       if (change.id === row.id) row = { ...row, ...change.patch };
@@ -45,6 +46,9 @@ const replaceList = (view: InboxView) => {
   });
   list.set({ ...view, rows });
 };
+const replaceList = (view: InboxView | null) => { confirmed = view; publishList(); };
+/** Tests and previews show a list of their own. */
+export const setInboxView = replaceList;
 /** Reads the list now, or once more after the read on its way, so the newest answer always lands last. */
 export function refreshInbox(): Promise<void> {
   if (reading) { readAgain = true; return reading; }
@@ -67,26 +71,29 @@ export function refreshInbox(): Promise<void> {
 /** Keeps the list in step with the person's inbox task; nothing off a team. */
 export function useInboxLoader(version: string | null): void {
   useEffect(() => {
-    if (version === null) { list.set(null); return; }
+    if (version === null) { replaceList(null); return; }
     void refreshInbox();
   }, [version]);
 }
 
 const patchRow = (id: string, patch: Partial<InboxRow>) => {
-  const view = list.get();
-  if (view) list.set({ ...view, rows: view.rows.map((row) => (row.id === id ? { ...row, ...patch } : row)) });
+  if (confirmed) confirmed = { ...confirmed, rows: confirmed.rows.map((row) => (row.id === id ? { ...row, ...patch } : row)) };
 };
 
 async function mark(id: string, what: "read" | "done", patch: Partial<InboxRow>): Promise<void> {
   const request = ++revision;
   pending.set(request, { id, patch });
-  patchRow(id, patch);
+  publishList();
   const view = await api<InboxView>(`/api/inbox/${id}/${what}`, { method: "POST", background: true }).catch(() => null);
   const current = request === revision;
   ++revision;
   pending.delete(request);
   if (current && view && Array.isArray(view.rows)) replaceList(view);
-  else void refreshInbox();
+  else {
+    if (view && Array.isArray(view.rows)) patchRow(id, patch);
+    publishList();
+    void refreshInbox();
+  }
 }
 
 /** The person read a line: it is no longer bold. */

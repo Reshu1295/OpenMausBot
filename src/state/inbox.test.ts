@@ -115,3 +115,95 @@ it("removes a failed mutation's overlay and reconciles from the server", async (
   await reply(1, inboxView([messageRow]));
   expect(currentInbox()?.rows[0]).toMatchObject({ tab: "info", unread: true });
 });
+
+it.each(["done", "read"] as const)("removes failed %s before recovery and reconciles after a failed GET", async (what) => {
+  if (what === "done") doneInboxRow(messageRow);
+  else readInboxRow(messageRow);
+  expect(currentInbox()?.rows[0]?.unread).toBe(false);
+  requests[0]!.settled = true;
+  requests[0]!.reject(new Error("offline"));
+  await flush();
+  const beforeRecovery = currentInbox();
+  expect(requests[1]?.path).toBe("/api/inbox");
+  requests[1]!.settled = true;
+  requests[1]!.reject(new Error("offline"));
+  await flush();
+  expect(requests).toHaveLength(2);
+  expect(currentInbox()?.rows[0]).toMatchObject({ tab: "info", unread: true });
+  expect(beforeRecovery?.rows[0]).toMatchObject({ tab: "info", unread: true });
+  const loading = refreshInbox();
+  await reply(2, inboxView([{ ...messageRow, text: "Reconciled text", unread: false }]));
+  await loading;
+  expect(currentInbox()?.rows[0]).toMatchObject({ tab: "info", unread: false, text: "Reconciled text" });
+});
+
+it("keeps another row's pending read when Done and recovery fail", async () => {
+  setInboxView(inboxView([messageRow, { ...reportRow, unread: true }]));
+  doneInboxRow(messageRow);
+  readInboxRow({ ...reportRow, unread: true });
+  requests[0]!.settled = true;
+  requests[0]!.reject(new Error("offline"));
+  await flush();
+  expect(currentInbox()?.rows[0]).toMatchObject({ tab: "info", unread: true });
+  expect(currentInbox()?.rows[1]?.unread).toBe(false);
+  requests[2]!.settled = true;
+  requests[2]!.reject(new Error("offline"));
+  await flush();
+  expect(currentInbox()?.rows[0]?.tab).toBe("info");
+  expect(currentInbox()?.rows[1]?.unread).toBe(false);
+});
+
+it("keeps confirmed Done when an overlapping read and recovery fail", async () => {
+  doneInboxRow(messageRow);
+  readInboxRow(messageRow);
+  await reply(0, done);
+  requests[1]!.settled = true;
+  requests[1]!.reject(new Error("offline"));
+  await flush();
+  expect(currentInbox()?.rows[0]).toMatchObject({ tab: "done", unread: false });
+  requests[2]!.settled = true;
+  requests[2]!.reject(new Error("offline"));
+  await flush();
+  await reply(3, done);
+  expect(currentInbox()?.rows[0]).toMatchObject({ tab: "done", unread: false });
+});
+
+it("keeps confirmed state and pending changes when message reply and recovery fail", async () => {
+  setInboxView(inboxView([messageRow, { ...reportRow, unread: true }]));
+  const sending = replyToInboxRow(inboxView(), messageRow, "Thanks").catch((error: unknown) => error);
+  readInboxRow({ ...reportRow, unread: true });
+  requests[0]!.settled = true;
+  requests[0]!.reject(new Error("offline"));
+  await flush();
+  expect(await sending).toBeInstanceOf(Error);
+  requests[2]!.settled = true;
+  requests[2]!.reject(new Error("offline"));
+  await flush();
+  expect(currentInbox()?.rows[0]).toMatchObject({ tab: "info", unread: true, text: messageRow.text });
+  expect(currentInbox()?.rows[1]?.unread).toBe(false);
+  const loading = refreshInbox();
+  await reply(3, inboxView([{ ...messageRow, text: "Reconciled reply" }, { ...reportRow, unread: true }]));
+  await loading;
+  expect(currentInbox()?.rows[0]?.text).toBe("Reconciled reply");
+  expect(currentInbox()?.rows[1]?.unread).toBe(false);
+});
+
+it("keeps the same row's pending read when Done fails", async () => {
+  doneInboxRow(messageRow);
+  readInboxRow(messageRow);
+  requests[0]!.settled = true;
+  requests[0]!.reject(new Error("offline"));
+  await flush();
+  expect(currentInbox()?.rows[0]).toMatchObject({ tab: "info", unread: false });
+});
+
+it("removes failed Done from the latest confirmed snapshot", async () => {
+  doneInboxRow(messageRow);
+  const loading = refreshInbox();
+  await reply(1, inboxView([{ ...messageRow, text: "Other client's edit" }]));
+  await loading;
+  requests[0]!.settled = true;
+  requests[0]!.reject(new Error("offline"));
+  await flush();
+  expect(currentInbox()?.rows[0]).toMatchObject({ tab: "info", unread: true, text: "Other client's edit" });
+});
