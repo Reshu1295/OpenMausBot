@@ -30,7 +30,9 @@ export type NewWaitCondition =
   | { kind: "process_running" | "process_gone"; process: string }
   | { kind: "bot_idle"; botId: string; botName: string };
 export type WaitCondition =
-  | { kind: "url_contains" | "url_missing"; url: string; text: string }
+  | { kind: "url_contains"; url: string; text: string }
+  /** `sawText`: a check found the text, so its going counts (a page its scripts draw reads bare from the start). */
+  | { kind: "url_missing"; url: string; text: string; sawText: boolean }
   | { kind: "file_exists" | "file_missing"; path: string }
   | { kind: "file_changed"; path: string; before: FileStamp | null }
   | { kind: "process_running" | "process_gone"; process: string }
@@ -62,7 +64,8 @@ export interface WaitManagerOptions {
 
 const stampSchema = z.object({ size: z.number(), mtimeMs: z.number() });
 const conditionSchema = z.union([
-  z.object({ kind: z.enum(["url_contains", "url_missing"]), url: z.string(), text: z.string() }),
+  z.object({ kind: z.literal("url_contains"), url: z.string(), text: z.string() }),
+  z.object({ kind: z.literal("url_missing"), url: z.string(), text: z.string(), sawText: z.boolean() }),
   z.object({ kind: z.enum(["file_exists", "file_missing"]), path: z.string() }),
   z.object({ kind: z.literal("file_changed"), path: z.string(), before: stampSchema.nullable() }),
   z.object({ kind: z.enum(["process_running", "process_gone"]), process: z.string() }),
@@ -200,7 +203,9 @@ export class WaitManager {
     }
     const note = verdict.page && !verdict.page.ok
       ? `The page could not be read just now (${verdict.page.error}); checks go on every minute and slow down while it keeps failing.`
-      : undefined;
+      : condition.kind === "url_missing" && !condition.sawText
+        ? `The page does not say “${condition.text}” now, as a plain check reads it (without running its scripts), so this fires only once it says it and then stops. It may be gone already, or shown only by the page's scripts: tell the person.`
+        : undefined;
     return { state: "created", wait: cloneWait(wait), ...(note ? { note } : {}) };
   }
 
@@ -226,6 +231,8 @@ export class WaitManager {
       case "file_exists":
       case "file_missing": return { kind: condition.kind, path: condition.path };
       case "bot_idle": return { ...condition, sawBusy: false };
+      case "url_contains": return { kind: "url_contains", url: condition.url, text: condition.text };
+      case "url_missing": return { kind: "url_missing", url: condition.url, text: condition.text, sawText: false };
       default: return { ...condition };
     }
   }
@@ -382,7 +389,9 @@ export class WaitManager {
         const page = await this.runPage(condition.url);
         if (!page.ok) return { met: false, page };
         const says = pageSays(page.text, condition.text);
-        return { met: condition.kind === "url_contains" ? says : !says, page: { ok: true } };
+        if (condition.kind === "url_contains") return { met: says, page: { ok: true } };
+        if (says) condition.sawText = true;
+        return { met: condition.sawText && !says, page: { ok: true } };
       }
       case "file_exists": return { met: (await this.probes.stamp(condition.path)) !== null };
       case "file_missing": return { met: (await this.probes.stamp(condition.path)) === null };

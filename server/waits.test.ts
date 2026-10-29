@@ -251,6 +251,29 @@ describe("WaitManager", () => {
     h.advance(5_000); await h.manager.tick(); expect(h.pageCalls).toBe(8);
   });
 
+  it("fires url_missing only once a check saw the text, so a page its scripts draw is never gone at once", async () => {
+    const h = harness();
+    h.page = { ok: true, text: "Loading" };
+    const created = await h.create({ kind: "url_missing", url: "https://shop.test/", text: "Sold out" }, { label: "the shoes" });
+    expect(created).toMatchObject({ state: "created", wait: { condition: { sawText: false } }, note: expect.stringContaining("The page does not say “Sold out” now") });
+    h.advance(60_000); await h.manager.tick();
+    expect(h.posts).toEqual([]);
+    h.page = { ok: true, text: "Shoes: Sold out" }; h.advance(60_000); await h.manager.tick();
+    expect([h.posts, h.reload().list("bot-1")[0]?.condition]).toEqual([[], expect.objectContaining({ sawText: true })]);
+    h.page = { ok: true, text: "Shoes: In stock" }; h.advance(60_000); await h.manager.tick();
+    expect(h.posts).toEqual([{ status: "fired", text: "the shoes: done. https://shop.test/ no longer says “Sold out”." }]);
+  });
+
+  it("counts text the page shows when a url_missing wait is made as seen, with no note", async () => {
+    const h = harness();
+    h.page = { ok: true, text: "Shoes: Sold out" };
+    const created = await h.create({ kind: "url_missing", url: "https://shop.test/", text: "sold out" }, { label: "the shoes" });
+    expect(created).toMatchObject({ state: "created", wait: { condition: { sawText: true } } });
+    expect(created).not.toHaveProperty("note");
+    h.page = { ok: true, text: "Shoes: In stock" }; h.advance(60_000); await h.manager.tick();
+    expect(h.posts).toEqual([{ status: "fired", text: "the shoes: done. https://shop.test/ no longer says “sold out”." }]);
+  });
+
   it("never fetches two pages at once, even for concurrent creates", async () => {
     const h = harness();
     h.page = { ok: true, text: "building" };
