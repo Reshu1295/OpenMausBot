@@ -47,6 +47,8 @@ export interface LendingSummary {
   clouds: string[];
   using: string[];
   paused: boolean;
+  /** A pause needs a save retry or review after an unclean exit; sharing stays stopped. */
+  pauseError?: string;
   busy: { env: string; action: string } | null;
 }
 export interface AutomaticGrant { folders: SharedFolder[]; screen: boolean; internet: true; chrome: true; terminal: false }
