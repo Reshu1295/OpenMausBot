@@ -219,6 +219,7 @@ describe("connected-apps broker boundaries", () => {
     const connectedResponse = await connectedServices(installation, env as never, ctx as never);
     await expect(connectedResponse.json()).resolves.toMatchObject({
       configured: true,
+      complete: true,
       services: {
         toolkit_41: {
           connected: true,

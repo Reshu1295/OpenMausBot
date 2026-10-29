@@ -64,7 +64,7 @@ beforeAll(async () => {
     for await (const chunk of req) raw += chunk;
     const body = raw ? JSON.parse(raw) : {};
     res.setHeader("content-type", "application/json");
-    if (req.url === "/v1/connectors/connected") return res.end(JSON.stringify({ services: { gmail: { connected: true }, slack: { connected: true } } }));
+    if (req.url === "/v1/connectors/connected") return res.end(JSON.stringify({ complete: true, services: { gmail: { connected: true }, slack: { connected: true } } }));
     if (req.url === "/api/tool_router/session/fixture-session") {
       if (blockSession) {
         sessionEntered = true;

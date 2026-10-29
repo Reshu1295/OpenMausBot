@@ -173,7 +173,8 @@ export async function listConnectedAccounts(env: Env, userId: string, slugs: str
     const body = connectedAccountsPageSchema.parse(await response.json());
     accounts.push(...body.items);
     const next = body.next_cursor || undefined;
-    if (!next || seenCursors.has(next)) return accounts;
+    if (!next) return accounts;
+    if (seenCursors.has(next)) throw new Error("Connected-account inventory contains a pagination cursor cycle");
     seenCursors.add(next);
     cursor = next;
   }

@@ -459,10 +459,11 @@ async function listSessionToolkits(
       `/tool_router/session/${encodeURIComponent(sessionId)}/toolkits?${params}`,
     );
     if (!response.ok) throw new Error(await upstreamError(response, "Toolkit inventory unavailable"));
-    const body = toolkitPageSchema.parse(await response.json());
-    toolkits.push(...(body.items ?? []));
+    const body = toolkitPageSchema.required({ items: true }).parse(await response.json());
+    toolkits.push(...body.items);
     const next = body.next_cursor || undefined;
-    if (!next || seenCursors.has(next)) return toolkits;
+    if (!next) return toolkits;
+    if (seenCursors.has(next)) throw new Error("Toolkit inventory contains a pagination cursor cycle");
     seenCursors.add(next);
     cursor = next;
   }
@@ -549,6 +550,7 @@ async function connectedServices(
   ]);
   return json({
     configured: true,
+    complete: true,
     services: allServiceStates(summarizeAccounts(accounts, []), toolkits),
   });
 }

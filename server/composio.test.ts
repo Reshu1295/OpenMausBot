@@ -73,7 +73,7 @@ let brokerMcpTools: Array<{ name: string; description?: string }> | null = null;
 let brokerToolsListFail = false;
 // What /broker/v1/connectors/connected serves; null falls back to github
 // only, the state the existing validation tests were written against.
-let brokerConnectedServicesBody: { services: Record<string, { connected: boolean; status: string }> } | null = null;
+let brokerConnectedServicesBody: { complete: boolean; services: Record<string, { connected: boolean; status: string }> } | null = null;
 // What /broker/v1/catalog serves; null falls back to github only.
 let brokerCatalogBody: { items: Array<{ slug: string; name: string }> } | null = null;
 // The project's own auth configs, and those the stub Session was created with: a Session knows only the configs named at creation.
@@ -115,7 +115,7 @@ beforeAll(async () => {
       if (req.method === "GET" && url.pathname === "/broker/v1/connectors/connected") {
         res.writeHead(200, { "content-type": "application/json" });
         return res.end(JSON.stringify(
-          brokerConnectedServicesBody ?? { services: { github: { connected: true, status: "ACTIVE" } } },
+          brokerConnectedServicesBody ?? { complete: true, services: { github: { connected: true, status: "ACTIVE" } } },
         ));
       }
       if (req.method === "POST" && url.pathname.endsWith("/authorize")) {
@@ -947,6 +947,7 @@ describe.sequential("Composio Sessions", () => {
   it("passes the connected-service slugs to the bridge alongside the allowlist", async () => {
     setManagedBrokerAccess({ url: origin + "/broker", token: "f".repeat(64) });
     brokerConnectedServicesBody = {
+      complete: true,
       services: {
         bland_ai: { connected: true, status: "ACTIVE" },
         bland: { connected: true, status: "ACTIVE" },
@@ -1054,6 +1055,7 @@ describe.sequential("Composio Sessions", () => {
   it("accepts an underscored service's own tool names in its grant", async () => {
     setManagedBrokerAccess({ url: origin + "/broker", token: "f".repeat(64) });
     brokerConnectedServicesBody = {
+      complete: true,
       services: {
         bland_ai: { connected: true, status: "ACTIVE" },
         bland: { connected: true, status: "ACTIVE" },
@@ -1404,7 +1406,7 @@ describe("connector tool inventory", () => {
     const broken = vi.spyOn(globalThis, "fetch").mockRejectedValueOnce(new Error("synthetic inventory timeout"));
     try {
       await expect(listConnectorTools({})).rejects.toThrow(/synthetic inventory timeout/);
-      brokerConnectedServicesBody = { services: { bland_ai: { connected: true, status: "ACTIVE" } } };
+      brokerConnectedServicesBody = { complete: true, services: { bland_ai: { connected: true, status: "ACTIVE" } } };
       await expect(listConnectorTools({})).resolves.toEqual({ bland_ai: [{ name: "BLAND_AI_MAKE_CALL" }] });
     } finally {
       broken.mockRestore();
@@ -1417,6 +1419,7 @@ describe("connector tool inventory", () => {
   it("groups an underscored service under its own slug using the connected services", async () => {
     setManagedBrokerAccess({ url: origin + "/broker", token: "c".repeat(64) });
     brokerConnectedServicesBody = {
+      complete: true,
       services: { bland_ai: { connected: true, status: "ACTIVE" }, github: { connected: true, status: "ACTIVE" } },
     };
     brokerMcpTools = [

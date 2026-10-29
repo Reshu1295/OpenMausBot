@@ -86,7 +86,7 @@ const connectorServiceSchema = z.object({
   status: z.string().optional(),
   accounts: z.array(z.object({ id: z.string(), alias: z.string().optional(), status: z.string() })).optional(),
 });
-const connectorServicesResponseSchema = z.object({ services: z.record(z.string(), connectorServiceSchema).optional() });
+const connectorServicesResponseSchema = z.object({ services: z.record(z.string(), connectorServiceSchema).optional(), complete: z.boolean().optional() });
 const removalResponseSchema = z.object({ removed: z.number() });
 const authUrlResponseSchema = z.object({ url: z.string().optional() });
 const linkResponseSchema = z.object({ redirect_url: z.string().optional() });
@@ -362,7 +362,8 @@ async function listConnectedAccounts(
     const body = connectedAccountsPageSchema.parse(await response.json());
     accounts.push(...body.items);
     const next = body.next_cursor || undefined;
-    if (!next || seenCursors.has(next)) return accounts;
+    if (!next) return accounts;
+    if (seenCursors.has(next)) throw new Error("Composio account inventory contains a pagination cursor cycle");
     seenCursors.add(next);
     cursor = next;
   }
@@ -385,10 +386,11 @@ async function listSessionToolkits(
       { headers: projectHeaders(apiKey), signal: AbortSignal.timeout(15_000) },
     );
     if (!response.ok) throw new Error(await responseError(response, `Composio toolkits: HTTP ${response.status}`));
-    const body = toolkitPageSchema.parse(await response.json());
-    toolkits.push(...(body.items ?? []));
+    const body = toolkitPageSchema.required({ items: true }).parse(await response.json());
+    toolkits.push(...body.items);
     const next = body.next_cursor || undefined;
-    if (!next || seenCursors.has(next)) return toolkits;
+    if (!next) return toolkits;
+    if (seenCursors.has(next)) throw new Error("Composio toolkit inventory contains a pagination cursor cycle");
     seenCursors.add(next);
     cursor = next;
   }
@@ -475,7 +477,7 @@ export async function connectedServicesInventory(cfg: AppConfig, as?: BrokerAcce
   if (!apiKey) {
     const response = await brokerRequest("/v1/connectors/connected", undefined, as);
     if (!response.ok) await throwBrokerError(response, `Connected apps: HTTP ${response.status}`);
-    const body = connectorServicesResponseSchema.required().parse(await response.json());
+    const body = connectorServicesResponseSchema.required({ services: true }).parse(await response.json());
     const services = canonicalServiceRecord(body.services);
     return {
       services: Object.fromEntries(
@@ -486,7 +488,7 @@ export async function connectedServicesInventory(cfg: AppConfig, as?: BrokerAcce
           accounts: state.accounts ?? [],
         }]),
       ),
-      complete: true,
+      complete: body.complete === true,
     };
   }
   const session = await ensureProjectSession(cfg);
