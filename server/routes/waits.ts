@@ -6,7 +6,7 @@ import { WAIT_HOURS, WAIT_KINDS, type WaitKind } from "../../shared/waits.ts";
 import type { Surface } from "../../shared/wire.ts";
 import type { json as sendJson } from "../harness/http.ts";
 import { expandHome } from "../wait-probes.ts";
-import { waitList, type NewWaitCondition, type WaitManager } from "../waits.ts";
+import { WAIT_WAKE_MS, waitList, type NewWaitCondition, type WaitManager } from "../waits.ts";
 import { PASS } from "./table.ts";
 
 const WAITS = "/api/internal/waits";
@@ -222,7 +222,8 @@ export function createWaitRoutes(deps: { waits: Pick<WaitManager, "create" | "li
     if (result.state === "already") return void json(res, 200, { text: result.text });
     const { wait, note } = result;
     const then = request.followUp ? `, and you will then do what you wrote in follow_up${deps.cloudHome ? " in a run that reports in its own results chat, not this one" : ""}` : "";
-    const sleeps = deps.sleeps ? " Checks pause while My Cloud sleeps, so the message can come late: tell the person that too." : "";
+    const every = WAIT_WAKE_MS / 60_000;
+    const sleeps = deps.sleeps ? ` While My Cloud sleeps it wakes to check every ${every} minutes, so the message can come up to ${every} minutes late: tell the person that too.` : "";
     const text = `Waiting for ${wait.label} (wait id ${wait.id}): plain checks, no AI, until ${iso(wait.expiresAt)}. When it happens a message lands in this chat${then}.${sleeps} Tell the person in one sentence; do not keep checking yourself.`;
     return void json(res, 201, { text: note ? `${text}\n\n${note}` : text });
   };

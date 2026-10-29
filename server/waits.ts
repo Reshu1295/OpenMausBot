@@ -22,6 +22,8 @@ import {
 
 export const WAIT_LIMITS = { perBot: 10, total: 50 } as const;
 export const WAIT_TICK_MS = 5_000, URL_CHECK_MS = 60_000, URL_BACKOFF_MAX_MS = 15 * 60_000;
+/** A sleeping Cloud wakes this often while a wait is open, to check it; checks pause in between. */
+export const WAIT_WAKE_MS = 30 * 60_000;
 export const NO_PROCESS_LIST = "This computer can't list its programs, so I can't wait for one.";
 
 export type NewWaitCondition =
@@ -261,6 +263,12 @@ export class WaitManager {
 
   owners(): string[] {
     return [...new Set(this.waits.map((w) => w.botId))];
+  }
+
+  /** When a sleeping Cloud should wake to check: WAIT_WAKE_MS on while a wait is open, never a page's next minute (the
+   * home would never sleep), null with none open. */
+  nextWakeAt(): number | null {
+    return this.waits.some((w) => !w.ending) ? this.now() + WAIT_WAKE_MS : null;
   }
 
   removeForBot(botId: string): number {

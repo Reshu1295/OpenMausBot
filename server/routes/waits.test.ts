@@ -46,14 +46,14 @@ describe("the waits route", () => {
     expect(payload.text).toContain("you will then do what you wrote in follow_up");
     expect(payload.text).toContain("plain checks, no AI, until 1970-01-01T00:00:00.000Z");
   });
-  it("says on a Cloud home that checks pause while My Cloud sleeps and that the follow-up reports in its own results chat", async () => {
+  it("says on a Cloud home that a sleeping My Cloud wakes to check every 30 minutes, and that the follow-up reports in its own results chat", async () => {
     const here = (await call("POST", "/api/internal/waits", { ...FILE_WAIT, follow_up: "Deploy it." })).payload.text!;
     expect(here).toContain("lands in this chat, and you will then do what you wrote in follow_up. Tell the person");
     expect(here).not.toContain("My Cloud");
     const cloud = (await call("POST", "/api/internal/waits", { ...FILE_WAIT, follow_up: "Deploy it." }, {}, true)).payload.text!;
     expect(cloud).toContain("lands in this chat, and you will then do what you wrote in follow_up in a run that reports in its own results chat, not this one.");
-    expect(cloud).toContain(" Checks pause while My Cloud sleeps, so the message can come late: tell the person that too. Tell the person in one sentence;");
-    expect((await call("POST", "/api/internal/waits", FILE_WAIT, {}, true)).payload.text).toContain("lands in this chat. Checks pause while My Cloud sleeps");
+    expect(cloud).toContain(" While My Cloud sleeps it wakes to check every 30 minutes, so the message can come up to 30 minutes late: tell the person that too. Tell the person in one sentence;");
+    expect((await call("POST", "/api/internal/waits", FILE_WAIT, {}, true)).payload.text).toContain("lands in this chat. While My Cloud sleeps it wakes to check every 30 minutes");
   });
   it("never says a Team Cloud sleeps: its plan never does", async () => {
     const team = (await call("POST", "/api/internal/waits", { ...FILE_WAIT, follow_up: "Deploy it." }, {}, true, false)).payload.text!;
