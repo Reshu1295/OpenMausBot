@@ -298,7 +298,7 @@ function reloadFixture() {
     .map(turn => [`cap-${turn.threadId}`, { botId: turn.botId, threadId: turn.threadId }]));
   const context = vm.createContext({
     reloadProviderInstances,
-    providerFleetReloading: false, providerInstancesChanging: new Set<string>(),
+    providerFleetReloading: false, providerInstancesChanging: new Set<string>(), pendingProviderReloads: new Set<string>(),
     providerConfigs: () => configs, changedInstanceIds, engineLaunches: (launched: typeof configs) => engineLaunches(launched, {}),
     decorateHostedProvider: undefined,
     internalCapabilities: capabilities, sessionCredentials: bearers,

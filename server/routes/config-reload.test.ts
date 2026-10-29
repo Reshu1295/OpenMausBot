@@ -15,6 +15,17 @@ const reload = source.statements.find((node) => ts.isFunctionDeclaration(node) &
 if (!reload) throw new Error("Provider reload function not found");
 const reloadCode = ts.transpileModule(reload.getText(source), { compilerOptions: { target: ts.ScriptTarget.ESNext } }).outputText;
 
+let pendingReload: ts.Expression | undefined;
+const findPendingReload = (node: ts.Node): void => {
+  if (ts.isPropertyAssignment(node) && node.name.getText(source) === "hasPendingProviderReload") pendingReload = node.initializer;
+  ts.forEachChild(node, findPendingReload);
+};
+findPendingReload(source);
+if (!pendingReload) throw new Error("Pending provider reload predicate not found");
+const pendingCode = ts.transpileModule(`globalThis.hasPendingProviderReload = ${pendingReload.getText(source)}`, {
+  compilerOptions: { target: ts.ScriptTarget.ESNext },
+}).outputText;
+
 it.each(["PATCH", "PUT"])("%s /api/config retries identical saved settings until the retiring owner can be replaced", async (method) => {
   syncCredentialEnv({ openaiCompat: { key: "synthetic-old-key" } });
   saveConfig({ openaiCompat: { key: "synthetic-old-key" } });
@@ -34,12 +45,12 @@ it.each(["PATCH", "PUT"])("%s /api/config retries identical saved settings until
   const providerInstancesChanging = new Set<string>();
   const context = vm.createContext({
     providerConfigs, registry, bus, reloadProviderInstances, changedInstanceIds, engineLaunches,
-    providerInstancesChanging, providerFleetReloading: false,
+    providerInstancesChanging, pendingProviderReloads: new Set<string>(), providerFleetReloading: false,
     store: { bots: [] }, groupSpeakers: new Map(),
     decorateHostedProvider: undefined,
     revokeEngineCapabilities() {}, providerAuthSessions: { clearInstance() {} }, drainQueuedSends() {},
   });
-  vm.runInContext(reloadCode, context);
+  vm.runInContext(reloadCode + pendingCode, context);
   let busy = false;
   let attempts = 0;
   const route = createConfigRoutes({
@@ -49,7 +60,7 @@ it.each(["PATCH", "PUT"])("%s /api/config retries identical saved settings until
     computerProviderConfigTransitions: new Set(),
     configStatus: () => ({ saved: true }), configForAccess: (status: unknown) => status,
     broadcast() {}, revokeEngineCapabilities() {},
-    hasPendingProviderReload: () => registry.retiringIds().length > 0,
+    hasPendingProviderReload: () => context.hasPendingProviderReload(),
     reloadProviders: async (before: Record<string, unknown>) => {
       attempts++;
       await context.reloadProviders(before);
@@ -102,6 +113,71 @@ it.each(["PATCH", "PUT"])("%s /api/config retries identical saved settings until
   } finally {
     dispose.mockResolvedValue();
     bus.detach("compat");
+    await registry.disposeAll();
+    vi.restoreAllMocks();
+  }
+});
+
+it.each(["managed-desktop", "cloud-credit"])("config reload preserves a retiring %s owner outside saved settings", async (instanceId) => {
+  const configs = { compat: { driver: "openai-compat", environment: { OPENAI_COMPAT_API_KEY: "new-key" } } };
+  const before = engineLaunches({ compat: { driver: "openai-compat", environment: { OPENAI_COMPAT_API_KEY: "old-key" } } });
+  const fake = makeFakeDriver({ kind: "openai-compat" });
+  const registry = new ProviderRegistry([fake.driver]);
+  await registry.load({ ...configs, [instanceId]: { driver: "openai-compat" } });
+  const managed = registry.get(instanceId)!;
+  const dispose = vi.spyOn(managed, "dispose").mockRejectedValue(new Error("synthetic managed teardown blocked"));
+  const bus = new EventBus();
+  bus.attach(registry.instances());
+  const context = vm.createContext({
+    providerConfigs: () => configs, registry, bus, reloadProviderInstances, changedInstanceIds, engineLaunches,
+    providerInstancesChanging: new Set<string>(), pendingProviderReloads: new Set<string>(), providerFleetReloading: false,
+    store: { bots: [] }, groupSpeakers: new Map(), decorateHostedProvider: undefined,
+    revokeEngineCapabilities() {}, providerAuthSessions: { clearInstance() {} }, drainQueuedSends() {},
+  });
+  vm.runInContext(reloadCode + pendingCode, context);
+  try {
+    await expect(registry.dispose(instanceId)).rejects.toThrow("synthetic managed teardown blocked");
+    dispose.mockResolvedValue();
+    expect.soft(context.hasPendingProviderReload()).toBe(false);
+    await context.reloadProviders(before);
+    expect.soft(registry.get(instanceId)).toBe(managed);
+    expect.soft(registry.retiringIds()).toEqual([instanceId]);
+    expect.soft(dispose).toHaveBeenCalledTimes(1);
+  } finally {
+    dispose.mockResolvedValue();
+    bus.detachAll();
+    await registry.disposeAll();
+    vi.restoreAllMocks();
+  }
+});
+
+it("config reload retries failed disposal of a removed saved instance", async () => {
+  const before = engineLaunches({ removed: { driver: "openai-compat" } });
+  const fake = makeFakeDriver({ kind: "openai-compat" });
+  const registry = new ProviderRegistry([fake.driver]);
+  await registry.load({ removed: { driver: "openai-compat" } });
+  const old = registry.get("removed")!;
+  const dispose = vi.spyOn(old, "dispose").mockRejectedValue(new Error("synthetic removed teardown blocked"));
+  const context = vm.createContext({
+    providerConfigs: () => ({}), registry, bus: new EventBus(), reloadProviderInstances, changedInstanceIds, engineLaunches,
+    providerInstancesChanging: new Set<string>(), pendingProviderReloads: new Set<string>(), providerFleetReloading: false,
+    store: { bots: [] }, groupSpeakers: new Map(), decorateHostedProvider: undefined,
+    revokeEngineCapabilities() {}, providerAuthSessions: { clearInstance() {} }, drainQueuedSends() {},
+  });
+  vm.runInContext(reloadCode + pendingCode, context);
+  try {
+    await expect(context.reloadProviders(before)).rejects.toThrow("synthetic removed teardown blocked");
+    expect(registry.retiringIds()).toEqual(["removed"]);
+    expect(context.hasPendingProviderReload()).toBe(true);
+    await expect(context.reloadProviders({})).rejects.toThrow("synthetic removed teardown blocked");
+    dispose.mockResolvedValue();
+    await context.reloadProviders({});
+    expect(context.hasPendingProviderReload()).toBe(false);
+    expect(registry.get("removed")).toBeNull();
+    expect(registry.retiringIds()).toEqual([]);
+    expect(dispose).toHaveBeenCalledTimes(3);
+  } finally {
+    dispose.mockResolvedValue();
     await registry.disposeAll();
     vi.restoreAllMocks();
   }

@@ -410,7 +410,7 @@ export function createAcpDriver(support: AcpSupport): ProviderDriver<AcpConfig> 
           host.retired += 1;
           recycleWhenIdle(host);
           if (sessionId && host.initResult?.agentCapabilities?.sessionCapabilities?.close) {
-            session.closeConfirmed = host.request(null, "session/close", { sessionId }, why === "cancel-timeout" ? 5_000 : 30_000).then(() => true, () => false);
+            session.closeConfirmed = host.request(null, "session/close", { sessionId }, ["cancel-timeout", "stop", "stopAll", "dispose"].includes(why) ? 5_000 : 30_000).then(() => true, () => false);
           }
           return;
         }

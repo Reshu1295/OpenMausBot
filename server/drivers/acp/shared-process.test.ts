@@ -459,6 +459,38 @@ describe("ACP threads sharing one agent process", () => {
     }, 20_000,
   );
 
+  it.each(["dispose", "stopAll"] as const)("falls back from unanswered shared session/close before the %s teardown bound", async (action) => {
+    const gateDir = mkdtempSync(join(tmpdir(), "omb-acp-teardown-close-"));
+    scratches.push(gateDir);
+    const f = await fixture({}, { FAKE_ACP_HANG_ON: "HANG", FAKE_ACP_SESSION_CLOSE_GATE: join(gateDir, "release") });
+    await f.run("thread-idle");
+    const running = f.run("thread-active", { text: "HANG" });
+    await vi.waitFor(() => expect(f.methods().filter(method => method === "session/prompt")).toHaveLength(2));
+    const child = f.spawned[0]!;
+    const kill = procs.killCliTree;
+    let fallbackAllowed = false;
+    const killing = vi.spyOn(procs, "killCliTree").mockImplementation(target => fallbackAllowed ? kill(target, 0) : Promise.resolve(false));
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    const closing = (action === "dispose" ? f.instance.dispose() : f.instance.adapter.stopAll()).catch(error => error);
+    try {
+      await vi.advanceTimersByTimeAsync(5_000);
+      expect(f.instance.adapter.hasSession("thread-active")).toBe(true);
+      fallbackAllowed = true;
+      await vi.advanceTimersByTimeAsync(1_000);
+      vi.useRealTimers();
+      await vi.waitFor(() => expect(f.instance.adapter.hasSession("thread-active")).toBe(false));
+      expect(child.exitCode !== null || child.signalCode !== null).toBe(true);
+      expect((await running).done).toMatchObject({ ok: false, stopReason: "stop_failed" });
+      expect(await closing).toBeUndefined();
+    } finally {
+      vi.useRealTimers();
+      killing.mockRestore();
+      await kill(child, 0);
+      await closing;
+      await running;
+    }
+  });
+
   it.each(["dispose", "stopAll"] as const)("bounds failed %s and retains execution for a later Stop", async (action) => {
     const f = await fixture({ shareProcess: false }, { FAKE_ACP_HANG_ON: "HANG", FAKE_ACP_IGNORE_CANCEL: "1" });
     const running = f.run("thread-a", { text: "HANG" });

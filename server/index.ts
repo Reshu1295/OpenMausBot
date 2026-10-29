@@ -12160,7 +12160,7 @@ function revokeEngineCapabilities(engines: ReadonlySet<string>): void {
 
 async function reloadProviders(before: Record<string, unknown>) {
   const configs = providerConfigs();
-  const changed = new Set([...changedInstanceIds(before, engineLaunches(configs)), ...registry.retiringIds()]);
+  const changed = new Set([...changedInstanceIds(before, engineLaunches(configs)), ...pendingProviderReloads, ...registry.retiringIds().filter(id => Object.hasOwn(before, id))]);
   if (!changed.size) return;
   const onChanged = (botId: string, threadId: string) => changed.has(threadEngineId(botId, threadId) ?? "");
   const direct = store.bots.flatMap((bot) => store.tasks(bot.id)
@@ -12219,16 +12219,16 @@ async function reloadProviders(before: Record<string, unknown>) {
       if (group) store.patchGroup(group.id, { busyBotId: activeGroupSpeaker(group.id)?.botId ?? null });
       store.setActivity(speaker.botId, "idle");
     }
-    for (const id of reloaded) providerInstancesChanging.delete(id);
+    for (const id of changed) if (!reloaded.has(id)) pendingProviderReloads.add(id);
+    for (const id of reloaded) { providerInstancesChanging.delete(id); pendingProviderReloads.delete(id); }
     providerFleetReloading = false;
   }
-  // Killed turns settle without turn.completed: drain what queued behind them onto the new fleet.
   drainQueuedSends();
 }
-
 // Config writes replace the engines they change. Single-flight, so two settings requests cannot drop each other's changes.
 let providerConfigBusy = false;
 const providerInstancesChanging = new Set<string>();
+const pendingProviderReloads = new Set<string>();
 let mcpConfigBusy = false;
 
 const workspaceBackupAccess = {
@@ -12548,7 +12548,7 @@ const postiz = createPostiz({ cfg: () => cfg, mcpOAuth, persistMcpServers, mcpCo
   checkedModelSelection, policyModelRefusal, browserSessionSpec, configStatus,
   configForAccess: (status, auth) => configForAccess(status as ReturnType<typeof configStatus>, auth.scopes.includes("admin"), auth.kind === "session" ? auth.session : null),
   ...(CLOUD_TEAM ? { ownProfile: (auth: RequestAuth, profile: { name?: string; avatarUrl?: string; aboutMe?: string }) => auth.kind === "session" ? (teamHost.saveMemberProfile(auth.session, profile), true) : false } : {}),
-  resyncOpenCodeProviderKeys, revokeEngineCapabilities, reloadProviders, broadcast, drainQueuedSends, postiz, hasPendingProviderReload: () => registry.retiringIds().length > 0,
+  resyncOpenCodeProviderKeys, revokeEngineCapabilities, reloadProviders, broadcast, drainQueuedSends, postiz, hasPendingProviderReload: () => pendingProviderReloads.size > 0 || registry.retiringIds().some(id => Object.hasOwn(providerConfigs(), id)),
 }));
 ROUTES.push(createInstanceRoutes({
   store, cfg, registry, sessions, providerAuthSessions,

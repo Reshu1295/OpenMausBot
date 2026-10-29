@@ -30,7 +30,7 @@ export async function awaitAcpTeardown(pending: Promise<unknown>[], failed: () =
   let timer: ReturnType<typeof setTimeout> | undefined;
   try {
     await Promise.race([
-      Promise.all(pending).then((results) => { if (results.includes(false)) throw failed(); }),
+      Promise.all(pending),
       new Promise<never>((_, reject) => { timer = setTimeout(() => reject(failed()), 10_000); }),
     ]);
   } finally {
