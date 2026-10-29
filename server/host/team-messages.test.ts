@@ -189,7 +189,7 @@ describe("Marco's assistant", () => {
   const assistant = (reply: string) => {
     const generate = vi.fn(async (_botId: string, _prompt: string) => reply);
     const busy = vi.fn(async () => [BUSY]);
-    return { generate, busy, f: fixture({ representative: { generate, busy, timeZone: () => "UTC" } }) };
+    return { generate, busy, f: fixture({ representative: { generate, busy, timeZone: () => "UTC", now: () => BUSY.start - 5 * 60 * 60_000 } }) };
   };
 
   it("answers a free/busy question itself, says so where it was asked and in his inbox, and notifies him once", async () => {
