@@ -193,7 +193,7 @@ it("shows each outbound batch recipient and amount with explicit preview truncat
   expect(relayed).toHaveLength(before);
 });
 
-it.each(["scope", "turn"])("rechecks %s revocation after project-session metadata and before the actual send", async (revocation) => {
+it.each(["scope", "inventory", "turn"])("rechecks %s revocation after project-session metadata and before the actual send", async (revocation) => {
   const b = await bot("Session race " + revocation);
   const token = await mint(b.id, b.threadId);
   const before = relayed.length;
@@ -204,11 +204,12 @@ it.each(["scope", "turn"])("rechecks %s revocation after project-session metadat
   await api("POST", `/api/threads/${b.threadId}/respond`, { requestId: card.card.requestId, behavior: "allow" });
   await expect.poll(() => sessionEntered, { timeout: 5_000 }).toBe(true);
   if (revocation === "scope") await api("PATCH", `/api/bots/${b.id}`, { connectorScopes: { apps: { gmail: "read" } } });
+  else if (revocation === "inventory") await api("PATCH", `/api/bots/${b.id}`, { connectorScopes: { apps: { gmail: "write" } } });
   else await mint(b.id, b.threadId);
   blockSession();
   blockSession = undefined;
   const result = await held;
-  if (revocation === "scope") expect(result.body.result.isError).toBe(true);
+  if (revocation !== "turn") expect(result.body.result.isError).toBe(true);
   else expect(result.status).toBe(401);
   expect(relayed).toHaveLength(before);
 });

@@ -57,8 +57,8 @@ it.each(["connected_accounts", "toolkits"])("refuses opaque calls from the actua
   }
 });
 
-it("returns controlled direct-call refusals during incomplete discovery and recovers without weakening underscore grants", async () => {
-  let mode = "legacy";
+it.each(["legacy", "incomplete", "cycle", "page cap"])("ordinary unrestricted calls succeed during %s discovery failure while restricted calls fail closed", async (failure) => {
+  let mode = failure;
   const executed: string[] = [];
   const broker = createServer(async (req, res) => {
     let raw = "";
@@ -69,7 +69,7 @@ it("returns controlled direct-call refusals during incomplete discovery and reco
         res.writeHead(503);
         return res.end(JSON.stringify({ error: "service unavailable" }));
       }
-      return res.end(JSON.stringify({ services: { slack: { connected: true }, bland_ai: { connected: true } },
+      return res.end(JSON.stringify({ services: { slack: { connected: true }, bland: { connected: true }, bland_ai: { connected: true } },
         ...(mode === "legacy" ? {} : { complete: mode === "complete" }) }));
     }
     if (req.url === "/v1/mcp") {
@@ -120,20 +120,24 @@ it("returns controlled direct-call refusals during incomplete discovery and reco
       expect.soft(response.status, JSON.stringify(body)).toBe(200);
       return body;
     };
-    for (const grants of [undefined, { slack: { tools: "*" }, bland: { tools: "*" } }]) {
-      if (grants) await api("PATCH", `/api/bots/${bot.id}`, { connectorTools: grants });
-      for (const failure of ["legacy", "incomplete", "cycle", "page cap"]) {
-        mode = failure;
-        const result = (await call("SLACK_LIST_CHANGES")).result;
-        expect.soft(result?.isError, failure).toBe(true);
-        expect.soft(result?.content[0]?.text, failure).toMatch(/discovery.*unavailable|inventory.*verified/i);
+    expect((await call("SLACK_LIST_CHANNELS")).result).toEqual({ content: [{ type: "text", text: "synthetic direct tool success" }] });
+    expect(executed).toEqual(["SLACK_LIST_CHANNELS"]);
+    for (const permissions of [
+      { connectorScopes: { apps: { slack: "read", bland: "write" } } },
+      { connectorScopes: null, connectorTools: { slack: { tools: "*" }, bland: { tools: "*" } } },
+    ]) {
+      await api("PATCH", `/api/bots/${bot.id}`, permissions);
+      for (const name of ["SLACK_LIST_CHANNELS", "BLAND_AI_SEND_MESSAGE"]) {
+        const result = (await call(name)).result;
+        expect.soft(result?.isError, name).toBe(true);
+        expect.soft(result?.content[0]?.text, name).toMatch(/discovery.*unavailable|inventory.*verified/i);
       }
+      expect(executed).toEqual(["SLACK_LIST_CHANNELS"]);
     }
-    expect(executed).toEqual([]);
     mode = "complete";
-    expect((await call("SLACK_LIST_CHANGES")).result).toEqual({ content: [{ type: "text", text: "synthetic direct tool success" }] });
+    expect((await call("SLACK_LIST_CHANNELS")).result).toEqual({ content: [{ type: "text", text: "synthetic direct tool success" }] });
     expect((await call("BLAND_AI_SEND_MESSAGE")).result.isError).toBe(true);
-    expect(executed).toEqual(["SLACK_LIST_CHANGES"]);
+    expect(executed).toEqual(["SLACK_LIST_CHANNELS", "SLACK_LIST_CHANNELS"]);
   } finally {
     await fixture?.close();
     await new Promise<void>((resolve) => broker.close(() => resolve()));

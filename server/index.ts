@@ -14615,7 +14615,7 @@ const handleRequest = async (req: IncomingMessage, res: ServerResponse) => {
         const actor = teamConnections.relayActor(internalCapability); if (actor.refusal) return json(res, 200, { jsonrpc: "2.0", id: (body as { id?: unknown }).id ?? null, result: { content: [{ type: "text", text: actor.refusal }], isError: true } });
         // Verdict every tools/call frame against connectorTools; a grants record makes every unrecognized shape a deny.
         const call = connectorCallFromFrame(body);
-        let serviceSlugs: readonly string[] = [];
+        let serviceSlugs: readonly string[] | undefined;
         if (call.kind === "unrecognized" && currentSender.connectorTools !== undefined) {
           appendDecision(DATA_DIR, {
             threadId: internalCapability.threadId,
@@ -14636,9 +14636,8 @@ const handleRequest = async (req: IncomingMessage, res: ServerResponse) => {
           }));
         }
         if (call.kind === "tools") {
-          // Real connected-service slugs, so an underscored service (bland_ai) is not captured by a plain-prefix grant (bland).
           try {
-            serviceSlugs = await composio.connectedServiceSlugs(cfg, actor.access);
+            if (currentSender.connectorTools !== undefined || currentSender.connectorScopes !== undefined) serviceSlugs = await composio.connectedServiceSlugs(cfg, actor.access);
           } catch {
             res.writeHead(200, { "content-type": "application/json", "cache-control": "no-store" });
             return res.end(JSON.stringify({
@@ -14751,6 +14750,7 @@ const handleRequest = async (req: IncomingMessage, res: ServerResponse) => {
             const fresh = store.bot(internalCapability.botId);
             if (!fresh || fresh.composio === false || !composio.configured(cfg)) refuseDispatch("Connected apps were disabled while this call waited.");
             const freshAccess = connectorAccessDecision(fresh.connectorScopes, connectorCalls, serviceSlugs);
+            if (call.kind === "tools" && !serviceSlugs && (fresh.connectorTools !== undefined || fresh.connectorScopes !== undefined)) refuseDispatch("This bot's connected-app permissions now require account discovery. Nothing was run.");
             if (!freshAccess.ok || (opaque && fresh.connectorTools !== undefined) ||
                 (call.kind === "tools" && !evaluateConnectorTools(call.names, fresh.connectorTools, serviceSlugs).allowed) ||
                 (call.kind === "unrecognized" && fresh.connectorTools !== undefined)) {
