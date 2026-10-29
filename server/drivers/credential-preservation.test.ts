@@ -141,3 +141,18 @@ it.each(["Claude", "Muse"])("preserves an empty canonical %s credential beside a
     }
   } finally { recorder.stop(); await instance.dispose(); }
 });
+
+it.each(CLAUDE_ACCOUNT_ENV_KEYS)("selects the canonical empty %s before consulting Claude account settings", (name) => {
+  const configDir = join(homedir(), "canonical-empty-settings");
+  mkdirSync(configDir, { recursive: true });
+  writeFileSync(join(configDir, "settings.json"), JSON.stringify({ apiKeyHelper: "synthetic-disk-helper" }));
+  for (const entries of [
+    [[name.toLowerCase(), "alias-key"], [name, ""]],
+    [[name, ""], [name.toLowerCase(), "alias-key"]],
+  ]) {
+    expect(readClaudeAuthSettings({ CLAUDE_CONFIG_DIR: configDir }, Object.fromEntries(entries)))
+      .toEqual({ apiKeyHelper: "synthetic-disk-helper" });
+  }
+  expect(readClaudeAuthSettings({ CLAUDE_CONFIG_DIR: configDir }, { [name]: "canonical-key", [name.toLowerCase()]: "" }))
+    .toEqual({});
+});

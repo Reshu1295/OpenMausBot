@@ -164,7 +164,7 @@ export function readClaudeAuthSettings(
   env: NodeJS.ProcessEnv,
   instanceEnvironment: NodeJS.ProcessEnv = {},
 ): { env?: Record<string, string>; apiKeyHelper?: string } {
-  if (credentialEnvEntries(instanceEnvironment, CLAUDE_ACCOUNT_ENV_KEYS).some(([, value]) => value)) return {};
+  if (CLAUDE_ACCOUNT_ENV_KEYS.some(name => credentialEnvValue(instanceEnvironment, name))) return {};
   try {
     const settings = JSON.parse(readFileSync(join(resolveClaudeConfigDir(undefined, env), "settings.json"), "utf8"));
     const authEnv: Record<string, string> = {};
