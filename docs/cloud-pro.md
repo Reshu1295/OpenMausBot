@@ -1568,8 +1568,10 @@ its own nonces. `200`:
 
 `busy` holds fixed codes only: `turn`, `run`, `live-call`, `computer`,
 `maintenance`, `recent-activity`, `recent-work`, `just-woke`, `due-soon`.
-`nextDueAt` is the earliest enabled routine's next run or queued run's retry:
-the Admin starts a sleeping home a minute before it. `wokeAt` is the boot, or
+`nextDueAt` is the earliest enabled routine's next run or queued run's retry,
+or, while a bot waits for something (`wait_until`), 30 minutes on, so its
+checks go on that often: the Admin starts a sleeping home a minute before it
+(3 minutes for one stopped to sleep, which boots). `wokeAt` is the boot, or
 the last resume (noticed as a jump of the clock, by the tick or by a request).
 `wokeBy` (additive) is the first request after that, if one came within 30 s:
 its kind as a fixed code by path alone (`events` the page's stream, `version`
