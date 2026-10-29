@@ -63,6 +63,7 @@ Use only mapped, tested commands:
 - [Computer panel focus hand-off](computer-panel-focus.md)
 - [Taking control of a bot's computer](take-control.md)
 - [Native dictation retention and send-to-stop](dictation.md)
+- [Browser dictation through a local transcription worker](server-dictation.md)
 - [Proactive routines and the brief](proactive-routines.md)
 - [Waits: tell me when, with no AI while waiting](waits.md)
 - [A new Cloud's first hour](first-hour.md)
