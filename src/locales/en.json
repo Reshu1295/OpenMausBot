@@ -629,7 +629,7 @@
   "approval.applied.changedSince": "Changed since, so it can't be undone here.",
   "approval.applied.undoFailed": "Couldn't undo: {error}",
   "approval.applied.cancelling": "Cancelling…",
-  "approval.applied.cancelFailed": "Couldn't cancel: {error}",
+  "approval.applied.cancelFailed": "Couldn't cancel the wait. Try again, or ask {name} to stop it.",
   "approval.applied.shareSkill": "Share with department",
   "approval.applied.sharingSkill": "Sharing…",
   "approval.applied.sharedSkill": "shared with {names}",

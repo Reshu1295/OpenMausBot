@@ -24,7 +24,7 @@ export const WAIT_LIMITS = { perBot: 10, total: 50 } as const;
 export const WAIT_TICK_MS = 5_000, URL_CHECK_MS = 60_000, URL_BACKOFF_MAX_MS = 15 * 60_000;
 /** A sleeping Cloud wakes this often while a wait is open, to check it; checks pause in between. */
 export const WAIT_WAKE_MS = 30 * 60_000;
-export const NO_PROCESS_LIST = "This computer can't list its programs, so I can't wait for one.";
+export const NO_PROCESS_LIST = "This computer can't list its programs, so a program wait can't work here. Wait for a file or a page instead.";
 
 export type NewWaitCondition =
   | { kind: "url_contains" | "url_missing"; url: string; text: string }
@@ -177,7 +177,7 @@ export class WaitManager {
     if (full) return full;
     const condition = await this.startingCondition(input.condition);
     const verdict = await this.probe(condition, undefined);
-    if (verdict.gone) return { state: "refused", status: 400, error: `${(condition as { botName: string }).botName} no longer exists.` };
+    if (verdict.gone) return { state: "refused", status: 400, error: `${(condition as { botName: string }).botName} no longer exists. Use a name or id from list_bots.` };
     if (verdict.unlisted) return { state: "refused", status: 400, error: NO_PROCESS_LIST };
     if (verdict.page && !verdict.page.ok && verdict.page.refused) return { state: "refused", status: 400, error: verdict.page.error };
     if (verdict.met) return { state: "already", text: `${describeCondition(condition)} already. Nothing was set up: tell the person now.` };

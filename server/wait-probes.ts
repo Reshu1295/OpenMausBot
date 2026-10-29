@@ -250,7 +250,7 @@ export async function fetchPageText(rawUrl: string, options: PageFetchOptions = 
       const addresses = literal ? [{ address: host, family: literal }] : await withinSignal(lookup(host), signal);
       if (addresses.length === 0) return fail("That address could not be found.");
       if (!addresses.every(({ address }) => allow({ host, address }))) {
-        return fail(`${host} points at this computer or a private network, which waits never check.`, true);
+        return fail(`${host} points at this computer or a private network, which waits never check. Use a page on the public web.`, true);
       }
       signal.throwIfAborted();
       const answer = await requestOnce(url, addresses[0], signal, maxBytes);

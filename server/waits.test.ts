@@ -140,7 +140,7 @@ describe("WaitManager", () => {
     const h = harness();
     const processes = vi.fn(async (): Promise<ProcessEntry[]> => { throw new Error("spawn ps ENOENT"); });
     h.manager = new WaitManager({ file: h.file, now: h.now, probes: { processes }, sourceAlive: () => true, botBusy: () => false, post: h.post, followUp: h.followUp, showCard: h.showCard, settleCard: h.settleCard });
-    expect(await h.create({ kind: "process_gone", process: "make" })).toEqual({ state: "refused", status: 400, error: "This computer can't list its programs, so I can't wait for one." });
+    expect(await h.create({ kind: "process_gone", process: "make" })).toEqual({ state: "refused", status: 400, error: "This computer can't list its programs, so a program wait can't work here. Wait for a file or a page instead." });
     expect(h.manager.owners()).toEqual([]);
     processes.mockResolvedValueOnce([{ pid: 1, name: "make" }]);
     expect(await h.create({ kind: "process_gone", process: "make" })).toMatchObject({ state: "created" });

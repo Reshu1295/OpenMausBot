@@ -241,9 +241,12 @@ function AppliedChangeLine({
     setError(undefined);
     api(`/api/threads/${threadId}/undo`, { method: "POST", body: JSON.stringify({ requestId: card.requestId }) })
       .catch((failure: unknown) => {
+        // A wait that had already ended answers 409, and its card then says how it ended.
+        if (cancels && failure instanceof ApiError && failure.status === 409) return;
         setError(failure instanceof ApiError && failure.body?.code === "changed-since"
           ? t("approval.applied.changedSince")
-          : t(cancels ? "approval.applied.cancelFailed" : "approval.applied.undoFailed", { error: failure instanceof Error ? failure.message : String(failure) }));
+          : cancels ? t("approval.applied.cancelFailed", { name })
+            : t("approval.applied.undoFailed", { error: failure instanceof Error ? failure.message : String(failure) }));
       })
       .finally(() => setUndoing(false));
   };
