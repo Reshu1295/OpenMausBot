@@ -545,7 +545,7 @@ async function connectedServices(
   const session = await ensureSession(installation, env, ctx);
   const [toolkits, accounts] = await Promise.all([
     listSessionToolkits(env, session.sessionId),
-    listConnectedAccounts(env, actingUser(installation), []).catch(() => []),
+    listConnectedAccounts(env, actingUser(installation), []),
   ]);
   return json({
     configured: true,

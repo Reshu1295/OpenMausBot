@@ -257,23 +257,8 @@ describe("connected-apps broker boundaries", () => {
     )).toBe(true);
 
     connectedAccountsUnavailable = true;
-    const fallbackResponse = await connectedServices(installation, env as never, ctx as never);
-    await expect(fallbackResponse.json()).resolves.toMatchObject({
-      configured: true,
-      services: {
-        gmail: {
-          connected: true,
-          status: "ACTIVE",
-          accounts: [{ id: "ca_work", status: "ACTIVE" }],
-        },
-        publicsearch: { connected: true, status: "ACTIVE", accounts: [] },
-        selectedonly: {
-          connected: true,
-          status: "ACTIVE",
-          accounts: [{ id: "ca_session_only", status: "ACTIVE" }],
-        },
-      },
-    });
+    await expect(connectedServices(installation, env as never, ctx as never))
+      .rejects.toThrow(/connected-account read not granted/);
     connectedAccountsUnavailable = false;
     await expect((await disconnectAccount("gmail", "ca_work", installation, env as never, ctx as never)).json())
       .resolves.toEqual({ removed: 1 });

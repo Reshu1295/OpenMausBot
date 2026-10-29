@@ -970,8 +970,58 @@ describe.sequential("Composio Sessions", () => {
     }
   });
 
-  it("reads an unreachable connection inventory as no service slugs", async () => {
-    await expect(connectedServiceSlugs({})).resolves.toEqual([]);
+  it("rejects an unreachable connection inventory instead of reporting no service slugs", async () => {
+    await expect(connectedServiceSlugs({})).rejects.toThrow(/unavailable/);
+  });
+
+  it("does not cache a failed inventory and retries discovery on the same backend", async () => {
+    setManagedBrokerAccess({ url: origin + "/broker", token: "9".repeat(64) });
+    const broken = vi.spyOn(globalThis, "fetch").mockRejectedValueOnce(new Error("synthetic inventory timeout"));
+    try {
+      await expect(connectedServiceSlugs({})).rejects.toThrow(/synthetic inventory timeout/);
+      await expect(connectedServiceSlugs({})).resolves.toEqual(["github"]);
+    } finally {
+      broken.mockRestore();
+      setManagedBrokerAccess(null);
+    }
+  });
+
+  it("rejects incomplete account discovery without caching its partial service slugs", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(Date.now() + 61_000);
+    const cfg: AppConfig = { composio: { apiKey: "ak_test", userId: "openmausbot_existing", sessionId: "trs_test" } };
+    connectedAccountsUnavailable = true;
+    try {
+      await expect(connectedServiceSlugs(cfg)).rejects.toThrow(/inventory.*incomplete/i);
+      connectedAccountsUnavailable = false;
+      await expect(connectedServiceSlugs(cfg)).resolves.toContain("toolkit_41");
+    } finally {
+      connectedAccountsUnavailable = false;
+      vi.useRealTimers();
+    }
+  });
+
+  it("rejects a broker response without an inventory instead of caching an empty one", async () => {
+    setManagedBrokerAccess({ url: origin + "/broker", token: "b".repeat(64) });
+    const broken = vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(Response.json({}));
+    try {
+      await expect(connectedServiceSlugs({})).rejects.toThrow(/services/);
+    } finally {
+      broken.mockRestore();
+      setManagedBrokerAccess(null);
+    }
+  });
+
+  it("does not mount a granted bot's bridge when the service inventory is unavailable", async () => {
+    setManagedBrokerAccess({ url: origin + "/broker", token: "b".repeat(64) });
+    try {
+      await expect(mcpIntegration({}, {
+        harnessUrl: "http://127.0.0.1:1", commsToken: "fixture", botId: "bot", threadId: "thread",
+        connectorTools: { bland: { tools: "*" } },
+      })).rejects.toThrow(/invalid broker token/);
+    } finally {
+      setManagedBrokerAccess(null);
+    }
   });
 
   it("validates grant patches against connected services and the catalog", async () => {
@@ -1347,6 +1397,22 @@ describe("a connector tools/list that fails", () => {
 describe("connector tool inventory", () => {
   const initializeCalls = () =>
     calls.filter((call) => call.path.endsWith("/v1/mcp") && call.body?.method === "initialize");
+
+  it("refuses to group tools using an unavailable service inventory", async () => {
+    setManagedBrokerAccess({ url: origin + "/broker", token: "8".repeat(64) });
+    brokerMcpTools = [{ name: "BLAND_AI_MAKE_CALL" }];
+    const broken = vi.spyOn(globalThis, "fetch").mockRejectedValueOnce(new Error("synthetic inventory timeout"));
+    try {
+      await expect(listConnectorTools({})).rejects.toThrow(/synthetic inventory timeout/);
+      brokerConnectedServicesBody = { services: { bland_ai: { connected: true, status: "ACTIVE" } } };
+      await expect(listConnectorTools({})).resolves.toEqual({ bland_ai: [{ name: "BLAND_AI_MAKE_CALL" }] });
+    } finally {
+      broken.mockRestore();
+      brokerMcpTools = null;
+      brokerConnectedServicesBody = null;
+      setManagedBrokerAccess(null);
+    }
+  });
 
   it("groups an underscored service under its own slug using the connected services", async () => {
     setManagedBrokerAccess({ url: origin + "/broker", token: "c".repeat(64) });

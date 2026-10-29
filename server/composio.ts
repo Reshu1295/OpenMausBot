@@ -475,8 +475,8 @@ export async function connectedServicesInventory(cfg: AppConfig, as?: BrokerAcce
   if (!apiKey) {
     const response = await brokerRequest("/v1/connectors/connected", undefined, as);
     if (!response.ok) await throwBrokerError(response, `Connected apps: HTTP ${response.status}`);
-    const body = connectorServicesResponseSchema.parse(await response.json());
-    const services = canonicalServiceRecord(body.services ?? {});
+    const body = connectorServicesResponseSchema.required().parse(await response.json());
+    const services = canonicalServiceRecord(body.services);
     return {
       services: Object.fromEntries(
         Object.entries(services).map(([slug, state]) => [slug, {
@@ -588,14 +588,12 @@ export async function connectedServiceSlugs(cfg: AppConfig, as?: BrokerAccess): 
     return connectorServiceSlugsCache.slugs;
   }
   if (connectorServiceSlugsRequest?.identity === identity) return connectorServiceSlugsRequest.slugs;
-  const walk = connectedServices(cfg, as).then(
-    (services) => {
-      const slugs = Object.keys(services);
-      connectorServiceSlugsCache = { at: Date.now(), identity, slugs };
-      return slugs;
-    },
-    () => [] as readonly string[],
-  );
+  const walk = connectedServicesInventory(cfg, as).then(({ services, complete }) => {
+    if (!complete) throw new Error("Connected-app inventory is incomplete; account discovery did not finish.");
+    const slugs = Object.keys(services);
+    connectorServiceSlugsCache = { at: Date.now(), identity, slugs };
+    return slugs;
+  });
   connectorServiceSlugsRequest = { identity, slugs: walk };
   try {
     return await walk;
@@ -625,8 +623,7 @@ function connectorToolListing(tool: unknown): ConnectorToolListing | null {
 }
 
 async function collectConnectorTools(cfg: AppConfig): Promise<Record<string, ConnectorToolListing[]>> {
-  const connected = await connectedServices(cfg).catch(() => null);
-  const candidates = connected ? Object.keys(connected) : [];
+  const candidates = await connectedServiceSlugs(cfg);
   const initialize = await relayMcp(cfg, {
     jsonrpc: "2.0",
     id: "omb-grants-initialize",

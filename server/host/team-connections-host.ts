@@ -41,7 +41,7 @@ export interface TeamConnectionsHostDeps {
   isSessionLive(id: string): boolean;
   /** The connected-apps service a member's own installation is made on; null: none here. */
   brokerUrl(): string | null;
-  composio: Pick<typeof Composio, "configured" | "mcpIntegration" | "connectedServices" | "connectedServiceSlugs" | "authorizeService" | "removeService">;
+  composio: Pick<typeof Composio, "configured" | "mcpIntegration" | "connectedServices" | "connectedServicesInventory" | "connectedServiceSlugs" | "authorizeService" | "removeService">;
 }
 
 const list = (names: readonly string[]) => names.length <= 1 ? names.join("") : `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`;
@@ -75,8 +75,8 @@ export function createTeamConnectionsHost(deps: TeamConnectionsHostDeps) {
     const entry = connectedApps.get(key) ?? { at: -Infinity, apps: null, reading: null };
     connectedApps.set(key, entry);
     if (!entry.reading && Date.now() - entry.at >= (entry.apps ? APPS_FRESH_MS : APPS_RETRY_MS)) {
-      entry.reading = deps.composio.connectedServices(deps.cfg(), as).then((services) => {
-        entry.apps = Object.entries(services).filter(([, state]) => state.connected).map(([slug]) => slug);
+      entry.reading = deps.composio.connectedServicesInventory(deps.cfg(), as).then(({ services, complete }) => {
+        if (complete) entry.apps = Object.entries(services).filter(([, state]) => state.connected).map(([slug]) => slug);
       }, () => {}).finally(() => { entry.at = Date.now(); entry.reading = null; });
     }
     if (!entry.apps && entry.reading) {
@@ -181,7 +181,13 @@ export function createTeamConnectionsHost(deps: TeamConnectionsHostDeps) {
       for (const call of calls) {
         if (call.slug === "COMPOSIO_PROXY_EXECUTE") {
           if (own) continue;
-          const held = await deps.composio.connectedServiceSlugs(deps.cfg()).catch(() => [] as readonly string[]);
+          let held: readonly string[];
+          try {
+            held = await deps.composio.connectedServiceSlugs(deps.cfg());
+          } catch {
+            return "Code that calls apps can't run here because the team's connected-app inventory could not be verified. "
+              + "It may still include apps connected by each person. Nothing was run. Try again when discovery is available.";
+          }
           const kept = apps.filter((slug) => held.includes(slug));
           if (kept.length) return lines.opaque(kept.map(appLabel));
           continue;
