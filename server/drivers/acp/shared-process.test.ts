@@ -407,6 +407,91 @@ describe("ACP threads sharing one agent process", () => {
     });
   });
 
+  it.skipIf(process.platform === "win32").each([
+    { label: "same group", detached: false, exitOnPrompt: false },
+    ...(process.platform === "linux" ? [{ label: "detached Linux helper", detached: true, exitOnPrompt: false }] : []),
+    { label: "root exit with inherited pipe", detached: false, exitOnPrompt: true },
+  ])(
+    "confirms descendants before timeout and collateral host-exit completions ($label)", async ({ detached, exitOnPrompt }) => {
+      const root = mkdtempSync(join(tmpdir(), "omb-acp-tree-"));
+      scratches.push(root);
+      const previous = process.env.OPENMAUS_ACP_PROMPT_IDLE_TIMEOUT_MS;
+      let descendant: number | undefined;
+      const running = () => {
+        if (!descendant) return false;
+        if (process.platform === "linux") {
+          try {
+            const stat = readFileSync(`/proc/${descendant}/stat`, "utf8");
+            return !["Z", "X"].includes(stat.slice(stat.lastIndexOf(")") + 2).split(" ")[0]!);
+          } catch { return false; }
+        }
+        try { process.kill(descendant, 0); return true; } catch { return false; }
+      };
+      try {
+        process.env.OPENMAUS_ACP_PROMPT_IDLE_TIMEOUT_MS = "100";
+        const cli = join(dirname(FAKE_CLI), "fake-acp-tree-cli.mjs");
+        const f = await fixture({ resolveCommand: async () => ({ command: process.execPath, args: [cli] }) }, {
+          FAKE_ACP_TREE: root, FAKE_ACP_TREE_DETACHED: detached ? "1" : "0", FAKE_ACP_TREE_EXIT_PROMPT: exitOnPrompt ? "1" : "0",
+        });
+        const other = f.run("thread-b");
+        await vi.waitFor(() => expect(existsSync(join(root, "prompt-s1"))).toBe(true));
+        descendant = Number(readFileSync(join(root, "descendant"), "utf8"));
+        expect(running()).toBe(true);
+        const aliveAtCompletion: boolean[] = [];
+        f.instance.adapter.onEvent((event) => {
+          if (event.type !== "turn.completed") return;
+          aliveAtCompletion.push(running());
+          writeFileSync(join(root, "release"), "1");
+        });
+        const result = await f.run("thread-a");
+        expect(f.spawned).toHaveLength(1);
+        expect(aliveAtCompletion.length).toBeGreaterThan(0);
+        expect(aliveAtCompletion.every((alive) => !alive)).toBe(true);
+        await other;
+        expect(result.done).toMatchObject({ ok: false, stopReason: "rpc_error" });
+        expect(aliveAtCompletion).toEqual([false, false]);
+        expect(existsSync(join(root, "effect"))).toBe(false);
+      } finally {
+        if (descendant && running()) process.kill(descendant, "SIGKILL");
+        if (previous === undefined) delete process.env.OPENMAUS_ACP_PROMPT_IDLE_TIMEOUT_MS;
+        else process.env.OPENMAUS_ACP_PROMPT_IDLE_TIMEOUT_MS = previous;
+      }
+    }, 20_000,
+  );
+
+  it.each(["dispose", "stopAll"] as const)("bounds failed %s and retains execution for a later Stop", async (action) => {
+    const f = await fixture({ shareProcess: false }, { FAKE_ACP_HANG_ON: "HANG", FAKE_ACP_IGNORE_CANCEL: "1" });
+    const running = f.run("thread-a", { text: "HANG" });
+    await vi.waitFor(() => expect(existsSync(join(f.scratch, "methods.json"))
+      && readFileSync(join(f.scratch, "methods.json"), "utf8").includes('"session/prompt"')).toBe(true));
+    const [child] = f.spawned;
+    const kill = procs.killCliTree;
+    const killing = vi.spyOn(procs, "killCliTree").mockResolvedValue(false);
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
+    let result: unknown;
+    const closing = (action === "dispose" ? f.instance.dispose() : f.instance.adapter.stopAll()).then(
+      () => { result = "resolved"; }, (error: unknown) => { result = error; },
+    );
+    try {
+      await vi.advanceTimersByTimeAsync(3_600_000);
+      expect(result).toBeInstanceOf(Error);
+      expect((result as Error).message).toMatch(/teardown.*could not be ended/i);
+      expect(f.instance.adapter.hasSession("thread-a")).toBe(true);
+      expect(f.instance.adapter.enginePid?.("thread-a")).toBe(child!.pid);
+      expect(f.recorder.events.filter((event) => event.type === "turn.completed")).toHaveLength(0);
+      expect(f.recorder.events.some((event) => event.type === "runtime.error" && /teardown/.test(event.message))).toBe(true);
+      if (action === "stopAll") await expect(f.instance.adapter.sendTurn({ threadId: "thread-a", text: "next", cwd: f.scratch })).rejects.toThrow("already running");
+    } finally {
+      vi.useRealTimers();
+      killing.mockRestore();
+      await kill(child!, 0);
+      await closing;
+    }
+    await f.instance.adapter.interruptTurn("thread-a");
+    await running;
+    expect(f.recorder.events.filter((event) => event.type === "turn.completed")).toHaveLength(1);
+  });
+
   it("asks for admission before it starts a process or adds a session, never for a thread already running", async () => {
     const f = await fixture();
     const asked: Array<[string, number | undefined]> = [];

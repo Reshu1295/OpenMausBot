@@ -2596,6 +2596,7 @@ describe("ACP turns (fake CLI)", () => {
         expect(recorder.events.some((event) => event.type === "runtime.error")).toBe(true);
       } finally {
         await Promise.all(stop.mock.calls.map(([child]) => kill(child, 0)));
+        stop.mockRestore();
       }
     });
 
