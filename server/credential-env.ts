@@ -61,11 +61,17 @@ export function stripCredentialEnv(env: Record<string, string | undefined>, name
 
 export function credentialEnvEntries(env: Readonly<NodeJS.ProcessEnv>, names: readonly string[]): [string, string | undefined][] {
   const selected = new Set(names.map(name => name.toUpperCase()));
-  return Object.entries(env).filter(([key]) => selected.has(key.toUpperCase()));
+  return Object.entries(env).filter(([key]) => selected.has(key.toUpperCase())).sort(([left], [right]) => {
+    const a = left.toUpperCase(), b = right.toUpperCase();
+    if (a !== b) return a < b ? -1 : 1;
+    if (left === a) return right === b ? 0 : -1;
+    if (right === b) return 1;
+    return left < right ? -1 : left > right ? 1 : 0;
+  });
 }
 
 export function credentialEnvValue(env: Readonly<NodeJS.ProcessEnv>, name: string): string | undefined {
-  return credentialEnvEntries(env, [name]).find(([, value]) => value)?.[1];
+  return credentialEnvEntries(env, [name])[0]?.[1];
 }
 
 /** Env a provider CLI may read as its billing identity; a foreign key must never move a subscription CLI onto API billing. */

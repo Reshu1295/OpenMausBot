@@ -25,7 +25,7 @@ const spellings = (key: string) => [key, key.toLowerCase(), key[0] + key.slice(1
 
 beforeEach(() => {
   for (const key of new Set([...Object.keys(process.env), ...PROVIDER_CREDENTIAL_ENV])) {
-    if (PROVIDER_CREDENTIAL_ENV.some(name => name === key.toUpperCase())) vi.stubEnv(key, "");
+    if (PROVIDER_CREDENTIAL_ENV.some(name => name === key.toUpperCase())) vi.stubEnv(key, undefined);
   }
   vi.stubGlobal("fetch", vi.fn(async () => new Response("offline fixture", { status: 503 })));
 });
@@ -150,7 +150,7 @@ const acpDrivers = [
 
 for (const { driver, key: canonical } of acpDrivers) {
   it.each(spellings(canonical))(driver.driverKind + " recognizes explicit %s", async (key) => {
-    for (const alias of spellings(canonical)) vi.stubEnv(alias, "");
+    for (const alias of spellings(canonical)) vi.stubEnv(alias, undefined);
     const home = join(homedir(), `${driver.driverKind}-${key}`);
     const instance = await driver.create({
       instanceId: `readiness-${key}`, displayName: "Fixture", enabled: true,

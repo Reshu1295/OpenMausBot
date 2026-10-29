@@ -118,3 +118,26 @@ it.each(["anthropic_api_key", "Anthropic_Api_Key"])("prefers an explicit Claude 
   }));
   expect(readClaudeAuthSettings({ CLAUDE_CONFIG_DIR: configDir }, { [key]: "explicit-key" })).toEqual({});
 });
+
+it.each(["Claude", "Muse"])("preserves an empty canonical %s credential beside a nonempty alias", async (kind) => {
+  const name = kind === "Claude" ? "ANTHROPIC_API_KEY" : "META_API_KEY";
+  const environment = { [name.toLowerCase()]: "synthetic-alias", [name]: "" };
+  const executed = vi.spyOn(procs, "execCli").mockImplementation((_cli, _args, _opts, callback) => callback(null, "1.4.6"));
+  const spawned = vi.spyOn(procs, "spawnCli");
+  const input = { instanceId: "empty-canonical", displayName: "Fixture", enabled: true, environment };
+  const instance = kind === "Claude"
+    ? await ClaudeDriver.create({ ...input, config: ClaudeDriver.decodeConfig({ cli }) })
+    : await MuseCodeDriver.create({ ...input, config: MuseCodeDriver.decodeConfig({ cli: "unused-fixture" }) });
+  const recorder = recordEvents(instance.adapter);
+  try {
+    if (kind === "Claude") {
+      const { turnId } = await instance.adapter.sendTurn({ threadId: "empty-canonical", text: "hello" });
+      expect(await recorder.until(event => event.type === "turn.completed" && event.turnId === turnId)).toMatchObject({ ok: true });
+    } else await instance.snapshot();
+    const environments = kind === "Claude" ? spawned.mock.calls.filter(call => call[3] === "bot").map(call => call[2].env) : executed.mock.calls.map(call => call[2].env);
+    expect(environments.length).toBeGreaterThan(0);
+    for (const env of environments) {
+      expect(Object.fromEntries(Object.entries(env ?? {}).filter(([key]) => key.toUpperCase() === name))).toEqual(environment);
+    }
+  } finally { recorder.stop(); await instance.dispose(); }
+});

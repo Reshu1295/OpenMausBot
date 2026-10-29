@@ -94,8 +94,10 @@ const DISCOVERY: AcpDiscoveryOptions = {
 /** The home holds the CLI's stored login, GH_HOST picks the GitHub it signs in to, and a token in the
  * environment outranks both; only its digest is kept. */
 const signInKey = (env: Record<string, string | undefined>, cli: string) => {
-  const tokens = createHash("sha256").update(TOKEN_ENV.map((name) => credentialEnvValue(env, name)?.trim() ?? "").join("\0")).digest("hex");
-  return [cli, copilotHome(env), env.GH_HOST ?? "", tokens].join("\0");
+  const entries = credentialEnvEntries(env, TOKEN_ENV);
+  const tokens = createHash("sha256").update(TOKEN_ENV.map((name) => credentialEnvValue(env, name) ?? "").join("\0"));
+  if (entries.some(([key]) => key !== key.toUpperCase())) tokens.update(JSON.stringify(entries));
+  return [cli, copilotHome(env), env.GH_HOST ?? "", tokens.digest("hex")].join("\0");
 };
 const signIns = new Map<string, { signedIn: Promise<boolean>; until: number }>();
 const lastSignIns = new Map<string, boolean>();

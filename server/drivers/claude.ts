@@ -134,7 +134,7 @@ function claudeEnvironment(
   stripWorkspaceCredentialEnv(env);
   // An inherited ANTHROPIC_API_KEY would flip a subscription login to pay-as-you-go.
   stripCredentialEnv(env, ["ANTHROPIC_API_KEY"]);
-  for (const [key, value] of credentialEnvEntries(instanceEnvironment, ["ANTHROPIC_API_KEY"])) if (value) env[key] = value;
+  for (const [key, value] of credentialEnvEntries(instanceEnvironment, ["ANTHROPIC_API_KEY"])) env[key] = value;
   applyClaudeInject(env, model);
   return env;
 }
