@@ -11,7 +11,7 @@ import { join } from "node:path";
 import { Connection, MspError, type DuplexTransport } from "@muse-code/sdk";
 import { z } from "zod";
 import { instanceEnvNames } from "../bot-box/env.ts";
-import { stripCredentialEnv, PROVIDER_CREDENTIAL_ENV, stripControlPlaneEnv, WORKSPACE_CREDENTIAL_ENV } from "../credential-env.ts";
+import { credentialEnvEntries, credentialEnvValue, stripCredentialEnv, PROVIDER_CREDENTIAL_ENV, stripControlPlaneEnv, WORKSPACE_CREDENTIAL_ENV } from "../credential-env.ts";
 import type {
   ModelCatalog, ProviderDriver, ProviderInstance, ProviderSnapshot, RequestOutcome, RuntimeEvent,
   RuntimeEventListener, SendTurnInput, SteerOutcome,
@@ -280,7 +280,7 @@ export const MuseCodeDriver: ProviderDriver<MuseConfig> = {
       const env: Record<string, string | undefined> = { ...process.env, ...input.environment, PATH: augmentedPath(), MUSE_NO_AUTO_UPDATE: "1" };
       stripCredentialEnv(env, [...PROVIDER_CREDENTIAL_ENV, ...WORKSPACE_CREDENTIAL_ENV]);
       stripControlPlaneEnv(env);
-      for (const [key, value] of Object.entries(input.environment)) if (key.toUpperCase() === "META_API_KEY" && value) env[key] = value;
+      for (const [key, value] of credentialEnvEntries(input.environment, ["META_API_KEY"])) if (value) env[key] = value;
       return env;
     };
 
@@ -354,7 +354,7 @@ export const MuseCodeDriver: ProviderDriver<MuseConfig> = {
 
     /** `muse login` saves under the engine's HOME, so an instance with its own HOME is its own account. */
     const signedIn = () => {
-      if (input.environment.META_API_KEY) return true;
+      if (credentialEnvValue(input.environment, "META_API_KEY")) return true;
       const env = childEnv();
       const home = env.HOME || homedir();
       return existsSync(join(env.XDG_CONFIG_HOME || join(home, ".config"), "muse", "auth.json"))
@@ -767,9 +767,9 @@ export const MuseCodeDriver: ProviderDriver<MuseConfig> = {
           return { state: "unavailable", reason: "Sign in to Muse Code: run `muse login` in a terminal.", authenticated: false, version };
         }
         return {
-          state: "available", authenticated: true, version, billing: input.environment.META_API_KEY ? "metered" : "subscription",
+          state: "available", authenticated: true, version, billing: credentialEnvValue(input.environment, "META_API_KEY") ? "metered" : "subscription",
           ...(!catalogLoaded && catalogError ? { warning: { title: "Muse Code models", message: "Muse Code did not list its models yet; showing the known ones." } } : {}),
-          account: { method: input.environment.META_API_KEY ? "api-key" : "login" },
+          account: { method: credentialEnvValue(input.environment, "META_API_KEY") ? "api-key" : "login" },
         };
       },
       async dispose() {

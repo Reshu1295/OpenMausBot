@@ -11,7 +11,7 @@ import { homedir } from "node:os";
 import { codexConfigMcp, codexConfigRunsServer, mountedMcpServerName } from "./codex-mcp-names.ts";
 
 import { DATA_DIR, stripWorkspaceCredentialEnv } from "../config.ts";
-import { stripCredentialEnv } from "../credential-env.ts";
+import { credentialEnvValue, stripCredentialEnv } from "../credential-env.ts";
 import { laterStartup, openStartupModelCatalog, writeStartupModelCache } from "../startup-model-catalog.ts";
 import { hostedWorkspaceConfigured } from "../enterprise.ts";
 import { cloudHomeConfigured } from "../cloud-home.ts";
@@ -612,7 +612,7 @@ export const CodexDriver: ProviderDriver<CodexConfig> = {
         if (!config.managed.models.includes(turn.model)) {
           throw new Error("Company model access is unavailable: " + turn.model + " is not approved for your organization. Reconnect your organization; personal billing will not be used.");
         }
-        if (!input.environment.OPENMAUSBOT_COMPANY_API_KEY) {
+        if (!credentialEnvValue(input.environment, "OPENMAUSBOT_COMPANY_API_KEY")) {
           throw new Error("Company model access is unavailable: OPENMAUSBOT_COMPANY_API_KEY is missing. Reconnect your organization; personal billing will not be used.");
         }
         if (!input.environment.CODEX_HOME) {
@@ -1655,7 +1655,7 @@ export const CodexDriver: ProviderDriver<CodexConfig> = {
     const { version } = probe;
     if (planAuth) return { state: "available", version, chatgptPlan: true, billing: "subscription", ...await planAuth.snapshot(), update: await codexReleaseUpdate(version, config.cli),
       ...(planWarning ? { warning: { title: "Check ChatGPT connection", message: planWarning } } : {}) };
-    if (config.managed) return { state: "available", version, authenticated: Boolean(input.environment.OPENMAUSBOT_COMPANY_API_KEY && input.environment.CODEX_HOME), billing: "metered" };
+    if (config.managed) return { state: "available", version, authenticated: Boolean(credentialEnvValue(input.environment, "OPENMAUSBOT_COMPANY_API_KEY") && input.environment.CODEX_HOME), billing: "metered" };
     const previousCliVersion = modelsCliVersion;
     modelsCliVersion = version;
     if (previousCliVersion !== null && previousCliVersion !== version) await refreshModels();
@@ -1691,7 +1691,7 @@ export const CodexDriver: ProviderDriver<CodexConfig> = {
       mkdirSync(join(planDirectory, "codex"), { recursive: true, mode: 0o700 });
       providerArgs = chatgptPlanCodexArgs();
     } else if (config.managed) {
-      if (!input.environment.OPENMAUSBOT_COMPANY_API_KEY || !input.environment.CODEX_HOME) {
+      if (!credentialEnvValue(input.environment, "OPENMAUSBOT_COMPANY_API_KEY") || !input.environment.CODEX_HOME) {
         throw new Error("Company model access is unavailable. Reconnect your organization; personal billing will not be used.");
       }
       providerArgs = managedCodexArgs(config.managed);

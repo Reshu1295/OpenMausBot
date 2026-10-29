@@ -56,8 +56,16 @@ export function stripWorkspaceCredentialEnv(env: Record<string, string | undefin
 
 /** Known secret names are private in every casing, including on case-sensitive platforms. */
 export function stripCredentialEnv(env: Record<string, string | undefined>, names: readonly string[]): void {
-  const denied = new Set(names.map((name) => name.toUpperCase()));
-  for (const key of Object.keys(env)) if (denied.has(key.toUpperCase())) delete env[key];
+  for (const [key] of credentialEnvEntries(env, names)) delete env[key];
+}
+
+export function credentialEnvEntries(env: Readonly<NodeJS.ProcessEnv>, names: readonly string[]): [string, string | undefined][] {
+  const selected = new Set(names.map(name => name.toUpperCase()));
+  return Object.entries(env).filter(([key]) => selected.has(key.toUpperCase()));
+}
+
+export function credentialEnvValue(env: Readonly<NodeJS.ProcessEnv>, name: string): string | undefined {
+  return credentialEnvEntries(env, [name]).find(([, value]) => value)?.[1];
 }
 
 /** Env a provider CLI may read as its billing identity; a foreign key must never move a subscription CLI onto API billing. */
