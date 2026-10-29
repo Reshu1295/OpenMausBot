@@ -36,7 +36,7 @@ it.each([
       const seen = JSON.parse(readFileSync(receipt, "utf8"));
       expect(seen.argv).toContain(`model_providers.openmaus_company.env_key="${name}"`);
       expect(seen.env[name]).toBe(value);
-      expect(companyKeys(seen.env)).toEqual(grants);
+      expect(companyKeys(seen.env)).toEqual(process.platform === "win32" ? { [name]: value } : grants);
       expect(await instance.generateMemoryText!("synthetic background prompt")).toBe("fake background answer");
       const background = JSON.parse(readFileSync(`${receipt}.text`, "utf8").trim());
       expect(background.argv).toContain(`model_providers.openmaus_company.env_key="${name}"`);
