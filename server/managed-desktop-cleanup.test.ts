@@ -1,7 +1,10 @@
 import { readFileSync } from "node:fs";
 import vm from "node:vm";
 import ts from "typescript";
-import { expect, it } from "vitest";
+import { expect, it, vi } from "vitest";
+import { reloadProviderInstances } from "./harness/provider-reload.ts";
+import { ProviderRegistry } from "./harness/registry.ts";
+import { makeFakeDriver } from "./testing/fake-driver.ts";
 import { changedInstanceIds, engineLaunches } from "./config.ts";
 
 // Runs the real cleanup functions sliced from index.ts: importing index.ts would start a server.
@@ -24,6 +27,7 @@ const code = ts.transpileModule([
   section("async function stopCompanyInstances(", "async function persistProviderInstance("),
 ].join("\n"), { compilerOptions: { target: ts.ScriptTarget.ESNext } }).outputText;
 const reloadProvidersCode = ts.transpileModule(
+  section("async function persistProviderInstance(", "/** The engine a bot's process in a conversation runs on") +
   section("/** The engine a bot's process in a conversation runs on", "// Config writes replace the engines they change."),
   { compilerOptions: { target: ts.ScriptTarget.ESNext } },
 ).outputText;
@@ -293,6 +297,7 @@ function reloadFixture() {
   const capabilities = new Map([...threads.filter(thread => thread.busy), ...[...rooms].map(([threadId, room]) => ({ threadId, ...room }))]
     .map(turn => [`cap-${turn.threadId}`, { botId: turn.botId, threadId: turn.threadId }]));
   const context = vm.createContext({
+    reloadProviderInstances,
     providerFleetReloading: false, providerInstancesChanging: new Set<string>(),
     providerConfigs: () => configs, changedInstanceIds, engineLaunches: (launched: typeof configs) => engineLaunches(launched, {}),
     decorateHostedProvider: undefined,
@@ -319,6 +324,7 @@ function reloadFixture() {
     providerAuthSessions: { clearInstance: (id: string) => log.push(`auth:${id}`) },
     bus: { detach: (id: string) => log.push(`detach:${id}`), attach: (instances: Array<{ instanceId: string }>) => log.push(`attach:${instances.map(instance => instance.instanceId)}`) },
     registry: {
+      retiringIds: () => [],
       dispose: async (id: string) => { log.push(`dispose:${id}`); },
       load: async (loaded: object) => { log.push(`load:${Object.keys(loaded)}`); },
       get: (id: string) => ({ instanceId: id }),
@@ -375,6 +381,94 @@ it("a changed key replaces only its engine and tells only that engine's requeste
   expect(f.threads.find(thread => thread.threadId === "eli-work")?.busy).toBe(false);
   expect(f.context.providerInstancesChanging.size).toBe(0);
   expect(f.context.providerFleetReloading).toBe(false);
+});
+
+it.each([false, true])("failed provider reload retains turn ownership and retries saved settings (removed=%s)", async (removed) => {
+  const f = reloadFixture();
+  const fake = makeFakeDriver({ kind: "openai-compat" });
+  const registry = new ProviderRegistry([fake.driver]);
+  await registry.load({ compat: f.configs().compat });
+  f.context.registry = registry;
+  const old = registry.get("compat")!;
+  const dispose = vi.spyOn(old, "dispose").mockRejectedValue(new Error("tree still running"));
+  const engines = new Map(f.context.runningTurnEngines);
+  const speakers = new Map(f.context.groupSpeakers);
+  const owners = new Map(f.context.turnResourceOwners);
+  const next = { ...f.configs(), compat: { driver: "openai-compat", environment: { OPENAI_COMPAT_API_KEY: "k2" } } };
+  const configs = removed ? { claude: f.configs().claude } : next;
+  try {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      await expect(f.save(configs)).rejects.toThrow("tree still running");
+      expect(registry.get("compat")).toBe(old);
+      expect(f.context.runningTurnEngines).toEqual(engines);
+      expect(f.context.groupSpeakers).toEqual(speakers);
+      expect(f.context.turnResourceOwners).toEqual(owners);
+      expect(f.threads.find(thread => thread.threadId === "eli-work")?.busy).toBe(true);
+      expect(f.settled).toEqual([]);
+      expect(f.log.some(line => line.startsWith("detach:") || line.startsWith("attach:") || line.startsWith("message:"))).toBe(false);
+      expect(f.context.providerInstancesChanging.has("compat")).toBe(true);
+      expect(f.context.providerFleetReloading).toBe(false);
+    }
+    dispose.mockResolvedValue();
+    await f.save(configs);
+    expect(registry.get("compat")).not.toBe(old);
+    expect(f.context.providerInstancesChanging.size).toBe(0);
+    expect(f.threads.find(thread => thread.threadId === "eli-work")?.busy).toBe(false);
+    expect(f.settled).toHaveLength(1);
+    await f.save(configs);
+    expect(f.settled).toHaveLength(1);
+    expect(f.log.filter(line => line === "detach:compat")).toHaveLength(1);
+  } finally {
+    dispose.mockResolvedValue();
+    await registry.disposeAll();
+  }
+});
+
+it.each([false, true])("failed single-instance persistence keeps its event subscription until disposal succeeds (removed=%s)", async (removed) => {
+  const f = reloadFixture();
+  const fake = makeFakeDriver({ kind: "openai-compat" });
+  const registry = new ProviderRegistry([fake.driver]);
+  await registry.load({ compat: f.configs().compat });
+  const old = registry.get("compat")!;
+  const dispose = vi.spyOn(old, "dispose").mockRejectedValue(new Error("tree still running"));
+  Object.assign(f.context, { registry, saveConfig() {}, cfg: {}, instanceConfigs: (cfg: { instances: object }) => cfg.instances, resetPathCache() {} });
+  try {
+    await expect(f.context.persistProviderInstance("compat", removed ? {} : f.configs())).rejects.toThrow("tree still running");
+    expect(registry.get("compat")).toBe(old);
+    expect(f.log).not.toContain("detach:compat");
+    dispose.mockResolvedValue();
+    await f.context.persistProviderInstance("compat", removed ? {} : f.configs());
+    expect(f.log.filter(line => line === "detach:compat")).toHaveLength(1);
+    if (!removed) expect(f.log).toContain("attach:compat");
+  } finally {
+    dispose.mockResolvedValue();
+    await registry.disposeAll();
+  }
+});
+
+it("settles only successfully replaced engines when another engine fails disposal", async () => {
+  const f = reloadFixture();
+  const compat = makeFakeDriver({ kind: "openai-compat" }), claude = makeFakeDriver({ kind: "claudeAgent" });
+  const registry = new ProviderRegistry([compat.driver, claude.driver]);
+  await registry.load(f.configs());
+  f.context.registry = registry;
+  const old = registry.get("compat")!;
+  const dispose = vi.spyOn(old, "dispose").mockRejectedValue(new Error("tree still running"));
+  try {
+    await expect(f.save({ compat: { driver: "openai-compat" }, claude: { driver: "claudeAgent", environment: { CHANGED: "yes" } } }))
+      .rejects.toThrow("tree still running");
+    expect(registry.get("compat")).toBe(old);
+    expect(f.threads.find(thread => thread.threadId === "eli-work")?.busy).toBe(true);
+    expect(f.threads.find(thread => thread.threadId === "mira-work")?.busy).toBe(false);
+    expect(f.context.runningTurnEngines.has("eli-work")).toBe(true);
+    expect(f.context.runningTurnEngines.has("mira-work")).toBe(false);
+    expect(f.log).not.toContain("detach:compat");
+    expect(f.log).toContain("attach:claude");
+    expect([...f.context.providerInstancesChanging]).toEqual(["compat"]);
+  } finally {
+    dispose.mockResolvedValue();
+    await registry.disposeAll();
+  }
 });
 
 it("ends a room stopped by the harness with its cause, and one the person stopped as theirs", () => {

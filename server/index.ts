@@ -270,6 +270,7 @@ import {
 } from "./send-idempotency.ts";
 import { EventBus } from "./harness/bus.ts";
 import { engineMemory, enginesByUse, ProviderRegistry } from "./harness/registry.ts"; import { afterFirstEngineRead, holdUntilFirstEngineRead } from "./first-engine-read.ts";
+import { reloadProviderInstances } from "./harness/provider-reload.ts";
 import { ManagedDesktopProviders } from "./managed-desktop.ts";
 import { mainThread, wasOldestThread } from "./main-thread.ts";
 import { computerKindForResource, ManagedDesktopPolicy, type ComputerKind } from "./managed-policy.ts";
@@ -12133,14 +12134,9 @@ async function persistProviderInstance(instanceId: string, instances: NonNullabl
   saveConfig({ instances }, { replaceInstances: true });
   cfg.instances = instances;
   providerAuthSessions.clearInstance(instanceId);
-  bus.detach(instanceId);
-  if (Object.hasOwn(instances, instanceId)) {
-    await registry.load({ [instanceId]: instanceConfigs(cfg)[instanceId] });
-    const live = registry.get(instanceId);
-    if (live) bus.attach([live]);
-  } else {
-    await registry.dispose(instanceId);
-  }
+  const configs = Object.hasOwn(instances, instanceId) ? { [instanceId]: instanceConfigs(cfg)[instanceId] } : {};
+  const result = await reloadProviderInstances(registry, bus, configs, new Set([instanceId]));
+  if (result.failed) throw result.failed.reason;
   resetPathCache();
 }
 
@@ -12164,32 +12160,32 @@ function revokeEngineCapabilities(engines: ReadonlySet<string>): void {
 
 async function reloadProviders(before: Record<string, unknown>) {
   const configs = providerConfigs();
-  const changed = new Set(changedInstanceIds(before, engineLaunches(configs)));
+  const changed = new Set([...changedInstanceIds(before, engineLaunches(configs)), ...registry.retiringIds()]);
   if (!changed.size) return;
   const onChanged = (botId: string, threadId: string) => changed.has(threadEngineId(botId, threadId) ?? "");
   const direct = store.bots.flatMap((bot) => store.tasks(bot.id)
     .filter((task) => threadBusy(bot.id, task.threadId) && onChanged(bot.id, task.threadId))
-    .map((task) => ({ botId: bot.id, threadId: task.threadId, owner: turnResourceOwners.get(task.threadId) })));
-  const rooms = [...groupSpeakers.entries()].filter(([threadId, speaker]) => onChanged(speaker.botId, threadId));
+    .map((task) => ({ botId: bot.id, threadId: task.threadId, owner: turnResourceOwners.get(task.threadId), instanceId: threadEngineId(bot.id, task.threadId) })));
+  const rooms = [...groupSpeakers.entries()].filter(([threadId, speaker]) => onChanged(speaker.botId, threadId))
+    .map(([threadId, speaker]) => [threadId, speaker, threadEngineId(speaker.botId, threadId)] as const);
   const cause = "turn interrupted — provider settings changed";
   providerFleetReloading = true;
   for (const id of changed) providerInstancesChanging.add(id);
   // Those engines' processes are about to die: revoke before the first await.
   revokeEngineCapabilities(changed);
-  for (const id of changed) { providerAuthSessions.clearInstance(id); bus.detach(id); }
+  for (const id of changed) providerAuthSessions.clearInstance(id);
   for (const task of direct) cancelDirectTurnDispatch(task.botId, task.threadId);
   for (const [threadId] of rooms) {
     const group = store.groupByThread(threadId);
     if (group) cancelGroupTurnOperations(group.id, threadId, { status: "stopped", detail: stoppedTurnOutcome({ reason: cause, activities: [] }), byHarness: true });
   }
+  let reloaded = new Set<string>();
   try {
-    const kept = [...changed].filter((id) => Object.hasOwn(configs, id));
-    await Promise.all([...changed].filter((id) => !Object.hasOwn(configs, id)).map((id) => registry.dispose(id)));
-    await registry.load(Object.fromEntries(kept.map((id) => [id, configs[id]])), decorateHostedProvider);
-    bus.attach(kept.flatMap((id) => registry.get(id) ?? []));
+    const result = await reloadProviderInstances(registry, bus, configs, changed, decorateHostedProvider);
+    reloaded = result.reloaded;
+    if (result.failed) throw result.failed.reason;
   } finally {
-    // Teardown can swallow terminal events: settle every exact conversation, so no task stays busy forever.
-    for (const { botId, threadId, owner } of direct) {
+    for (const { botId, threadId, owner } of direct.filter(task => reloaded.has(task.instanceId ?? ""))) {
       const interrupted = stoppedTurnText(threadId, liveTurnByThread.get(threadId), cause);
       stopScreenPoller(botId, threadId);
       releaseLocalVmThread(threadId);
@@ -12210,7 +12206,7 @@ async function reloadProviders(before: Record<string, unknown>) {
       }
       settleDirectFollowup(owner?.generation, { ok: false, text: interrupted });
     }
-    for (const [threadId, speaker] of rooms) {
+    for (const [threadId, speaker] of rooms.filter(([, , instanceId]) => reloaded.has(instanceId ?? ""))) {
       releaseLocalVmThread(threadId);
       releaseTurnResources(turnResourceOwners.get(threadId));
       endForeignTurns(threadId);
@@ -12223,7 +12219,7 @@ async function reloadProviders(before: Record<string, unknown>) {
       if (group) store.patchGroup(group.id, { busyBotId: activeGroupSpeaker(group.id)?.botId ?? null });
       store.setActivity(speaker.botId, "idle");
     }
-    for (const id of changed) providerInstancesChanging.delete(id);
+    for (const id of reloaded) providerInstancesChanging.delete(id);
     providerFleetReloading = false;
   }
   // Killed turns settle without turn.completed: drain what queued behind them onto the new fleet.

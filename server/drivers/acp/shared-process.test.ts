@@ -492,6 +492,67 @@ describe("ACP threads sharing one agent process", () => {
     expect(f.recorder.events.filter((event) => event.type === "turn.completed")).toHaveLength(1);
   });
 
+  it("keeps the registry owner after bounded disposal and reloads once after confirmed exit", async () => {
+    const { ProviderRegistry } = await import("../../harness/registry.ts");
+    const { reloadProviderInstances } = await import("../../harness/provider-reload.ts");
+    const { EventBus } = await import("../../harness/bus.ts");
+    const bus = new EventBus(async () => {});
+    const delivered: RuntimeEvent[] = [];
+    bus.subscribe(event => delivered.push(event));
+    const f = await fixture({ shareProcess: false }, { FAKE_ACP_HANG_ON: "HANG", FAKE_ACP_IGNORE_CANCEL: "1" });
+    const create = vi.fn(async () => f.instance);
+    const registry = new ProviderRegistry([{ ...createAcpDriver(SUPPORT), create }]);
+    const configs = { "shared-test": { driver: SUPPORT.driverKind } };
+    await registry.load(configs);
+    const old = registry.get("shared-test")!;
+    bus.attach([old]);
+    const running = f.run("thread-a", { text: "HANG" });
+    await vi.waitFor(() => expect(existsSync(join(f.scratch, "methods.json"))
+      && readFileSync(join(f.scratch, "methods.json"), "utf8").includes('"session/prompt"')).toBe(true));
+    const child = f.spawned[0]!;
+    const kill = procs.killCliTree;
+    const killing = vi.spyOn(procs, "killCliTree").mockResolvedValue(false);
+    try {
+      for (let attempt = 0; attempt < 2; attempt++) {
+        vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
+        const reload = reloadProviderInstances(registry, bus, configs, new Set(["shared-test"]));
+        await vi.advanceTimersByTimeAsync(10_001);
+        const { failed } = await reload;
+        const error = failed?.reason;
+        expect(error).toBeInstanceOf(Error);
+        expect((error as Error).message).toMatch(/teardown.*could not be ended/i);
+        expect(registry.get("shared-test")).toBe(old);
+        expect(create).toHaveBeenCalledTimes(1);
+        expect(old.adapter.hasSession("thread-a")).toBe(true);
+        expect(old.adapter.enginePid?.("thread-a")).toBe(child.pid);
+        expect(child.exitCode === null && child.signalCode === null).toBe(true);
+        expect(f.recorder.events.filter(event => event.type === "turn.completed")).toHaveLength(0);
+        vi.useRealTimers();
+      }
+      killing.mockRestore();
+      await kill(child, 0);
+      await old.adapter.interruptTurn("thread-a");
+      await running;
+      expect(f.recorder.events.filter(event => event.type === "turn.completed")).toHaveLength(1);
+      expect(delivered.filter(event => event.type === "turn.completed")).toHaveLength(1);
+      const fresh = await fixture({ shareProcess: false });
+      create.mockResolvedValue(fresh.instance);
+      await registry.load(configs);
+      expect(create).toHaveBeenCalledTimes(2);
+      expect(registry.get("shared-test")).toBe(fresh.instance);
+      expect((await fresh.run("thread-a")).done).toMatchObject({ ok: true });
+    } finally {
+      vi.useRealTimers();
+      killing.mockRestore();
+      await kill(child, 0);
+      await old.adapter.interruptTurn("thread-a");
+      await running;
+      await registry.disposeAll();
+      bus.detachAll();
+      await bus.flush();
+    }
+  });
+
   it("asks for admission before it starts a process or adds a session, never for a thread already running", async () => {
     const f = await fixture();
     const asked: Array<[string, number | undefined]> = [];
