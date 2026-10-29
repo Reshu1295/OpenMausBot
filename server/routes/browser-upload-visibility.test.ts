@@ -59,8 +59,8 @@ it("does not store or deliver a held upload after revocation while the viewer is
       authorize: async () => null, current, restartRefusal: () => null,
       viewers: {
         fileChooserOffered: (_browser, owner, chooser) => { reading.resolve(); return service.fileChooserOffered(target.session, owner, chooser); },
-        answerFileChooser: (_browser, owner, chooser, paths) => {
-          const answering = service.answerFileChooser(target.session, owner, chooser, paths);
+        answerFileChooser: (_browser, owner, chooser, paths, isCurrent) => {
+          const answering = service.answerFileChooser(target.session, owner, chooser, paths, isCurrent);
           finishClose.resolve();
           return answering;
         },

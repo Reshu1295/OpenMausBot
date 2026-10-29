@@ -95,7 +95,7 @@ async function answerUpload(req: IncomingMessage, deps: BrowserViewerRouteDeps, 
   }
   if (!isCurrent()) return { status: 409, error: "This browser session changed. Reopen the browser panel." };
   const paths = storeUploads(files, join(deps.dataDir, "browser-uploads"));
-  if (await deps.viewers.answerFileChooser(browser, owner, chooser, paths).catch(() => false)) return null;
+  if (await deps.viewers.answerFileChooser(browser, owner, chooser, paths, isCurrent).catch(() => false)) return null;
   for (const file of paths) rmSync(dirname(file), { recursive: true, force: true });
   return { status: 409, error: PICKER_CLOSED };
 }
