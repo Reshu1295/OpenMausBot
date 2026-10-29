@@ -16,6 +16,7 @@ import { compactBudget, compactionReading, contextWindowFor, shouldCompact } fro
 import { autoCompactWindow } from "./drivers/claude.ts";
 import { RoomContextTracker, roomResetNote } from "./room-context.ts";
 import { createRoomTranscript, GROUP_CONTEXT_MESSAGES } from "./host/room-transcript.ts";
+import { bootServer } from "./host/boot.ts";
 import { createRoomSessions } from "./host/room-sessions.ts";
 import { LentComputers, provenRequestPerson, SharedComputers, sharedComputerOperation } from "./shared-computers.ts"; import { lentScreenResult } from "./lent-screen-guidance.ts"; import { DeviceLinks } from "./device-links.ts";
 import { cloudHomeLendingRefusal, createCloudRoutineAuthors, ownerOnlyConversation } from "./cloud-lending.ts"; import { assertRoomFolder } from "./room-folder.ts"; import { cloudConnectedAppsBrokerUrl, startCloudHomeConnectedApps, stopCloudHomeConnectedApps } from "./cloud-connected-apps.ts"; import { createTeamConnectionsHost } from "./host/team-connections-host.ts"; import { createCloudLendingTurns } from "./host/cloud-lending-turns.ts"; import { createTeamConnectionRoutes } from "./routes/team-connections.ts";
@@ -275,7 +276,7 @@ import { mainThread, wasOldestThread } from "./main-thread.ts";
 import { computerKindForResource, ManagedDesktopPolicy, type ComputerKind } from "./managed-policy.ts";
 import { hostedModelPolicy, HOSTED_MODEL_POLICY_HEADER } from "./hosted-models.ts";
 import { CLOUD_HOME_SECRET_KEYS, CLOUD_IGNORED_KEYS, cloudHomeConfiguration, cloudHomeOffersPlace, cloudHomePlaceRefusal, firstCloudTurnPatch } from "./cloud-home.ts";
-import { botBox, startBotBoxAtBoot } from "./bot-box/boot.ts";
+import { botBox } from "./bot-box/boot.ts";
 import { createCloudSignedHost } from "./host/cloud-signed-host.ts"; import { hiddenThreadRefusal, hideOthersSyncFolders } from "./host/team-private.ts"; import { createTeamMemberLeft } from "./host/team-member-left.ts"; import { createVisibilityHost } from "./host/visibility-host.ts";
 import { createCloudPower, registerCloudPower, wokeFromSleep, type CloudPower } from "./cloud-power.ts"; import { createSharedComputerRoutes } from "./routes/shared-computers.ts";
 import { lentCopies, noteSyncBotTurn } from "./routes/cloud-sync.ts";
@@ -471,7 +472,7 @@ import { createOutboundHold, OUTBOUND_HOLD_MS, type OutboundHoldAnswer } from ".
 import { connectorCallsIn, outboundCallsIn } from "../shared/outbound.ts";
 import { connectorAccessDecision, describeConnectorScopes } from "../shared/connector-scopes.ts";
 import { bindThreadLogCapProvider } from "./thread-log-rotation.ts";
-import { listenWebhookIngress, type WebhookIngress } from "./webhook-ingress.ts";
+import type { WebhookIngress } from "./webhook-ingress.ts";
 import { addressFor } from "./webhook-address.ts";
 import { assertModelVariantSupported, memberTurnSelection } from "./member-turn.ts";
 import { WebhookManager } from "./webhooks.ts";
@@ -514,7 +515,7 @@ import {
 } from "./turn-dispatch-guard.ts";
 import { createGracefulShutdown } from "./graceful-shutdown.ts";
 import { acquireDataDirLeaseForProcess } from "./data-dir-lease.ts";
-import { createWorkspaceAccess, describeEdition, editionForSettings, editionStatus, entitled, hostedWorkspaceConfiguration, hostedWorkspaceConfigured, licenseWarning, sharedWorkspaceFullAccessConfigured, loadEnterpriseLayer, workspaceMembership, type WorkspaceAccess } from "./enterprise.ts";
+import { describeEdition, editionForSettings, editionStatus, entitled, hostedWorkspaceConfiguration, hostedWorkspaceConfigured, licenseWarning, sharedWorkspaceFullAccessConfigured, loadEnterpriseLayer, workspaceMembership, type WorkspaceAccess } from "./enterprise.ts";
 import { environmentDescriptor, loadEnvironmentId, serverVersion } from "./environment.ts";
 import { WorkspaceBackupMaintenance } from "./workspace-backup-maintenance.ts";
 import { createWorkspaceBackupRoutes, isWorkspaceBackupSessionControl } from "./workspace-backup-http.ts";
@@ -534,7 +535,7 @@ import {
   resolveRequestAuth,
   parseCookies,
   serializeSessionCookie,
-  sessionCookieName, ownerOrAdmin,
+  ownerOrAdmin,
 } from "./request-auth.ts";
 import { cookieMaxAgeSeconds, formatPairingCode, SessionRegistry, type Scope, type SessionRecord } from "./sessions.ts";
 import { ThreadStarters } from "./thread-starters.ts";
@@ -632,12 +633,8 @@ import { withScopeHint } from "./connector-scope-hint.ts";
 import { connectorRequestItems } from "./connector-request-items.ts";
 import { personAsks as personAskAt } from "./thread-presence.ts";
 
-const startPort = Number(process.env.OMB_PORT || process.env.OGB_PORT || 8799);
-const startWebhookPort = Number(process.env.OMB_WEBHOOK_PORT) || startPort + 1;
-let PORT = startPort;
-let WEBHOOK_PORT = startWebhookPort;
-const HOST = "127.0.0.1";
-const MAX_PORT_ATTEMPTS = 100;
+let PORT = Number(process.env.OMB_PORT || process.env.OGB_PORT || 8799);
+let WEBHOOK_PORT = Number(process.env.OMB_WEBHOOK_PORT) || PORT + 1;
 const WEBHOOK_PUBLIC_URL = process.env.OMB_WEBHOOK_PUBLIC_URL || undefined;
 const STATIC_DIR = process.env.OMB_STATIC_DIR || null;
 
@@ -716,7 +713,6 @@ if (CLOUD_HOME) {
 }
 holdIncludedServices(CLOUD_ENV);
 for (const key of CLOUD_HOME_SECRET_KEYS) delete process.env[key];
-// The bot box (server/bot-box) starts after the port binds: its harness gate forwards to the bound port, still before any engine starts.
 if (CLOUD_HOME && Object.keys(CLOUD_SECRETS).length === 0) {
   console.warn("cloud home: its secrets came in this process's environment, which anything running as the same user can read in /proc; start it with cloud-home-start");
 }
@@ -739,16 +735,11 @@ const onePassword = new OnePasswordLogins({
 });
 if (logins.onePasswordToken()) void onePassword.refresh();
 const botLogins = new BotLogins(logins, onePassword);
-// Assigned after the server binds: the session cookie is keyed on the port the
-// instance actually bound, not the configured start port. Cookies are not
-// port-scoped, so the name is the only thing separating two instances in the
-// same browser profile. Every consumer reads it per request (or is created
-// after the bind), so it sees the final cookie name.
+// Assigned once the real bind port is known (server/host/boot.ts).
 let SESSION_COOKIE: string;
 const HOSTED_WORKSPACE = hostedWorkspaceConfigured();
 let workspaceAccess: WorkspaceAccess | null = null;
 const DESKTOP_MANAGED = process.env.OMB_DESKTOP_PARENT === "1";
-const PORT_PINNED = process.env.OMB_PORT_PINNED === "1" || DESKTOP_MANAGED;
 const SHARED_WORKSPACE_FULL_ACCESS = sharedWorkspaceFullAccessConfigured();
 const sharedWorkspaceFullAccessEnabled = () => SHARED_WORKSPACE_FULL_ACCESS && Boolean(workspaceAccess) && entitled("admin");
 const HOSTED_FULL_ACCESS_REFUSAL = "On a shared company workspace Full access comes only from the operator's dedicated policy";
@@ -9659,15 +9650,7 @@ ROUTES.push(createLimitResetRoutes({ clock: limitClock, routines: routines!, req
   created: (id, auth) => cloudRoutineAuthors?.wrote(id, auth.kind === "session" ? actorKey(auth) : CLOUD_NOBODY_KEY) }));
 
 let webhookIngress: WebhookIngress | null = null;
-let webhookIngressError: string | null = null;
-// The webhook receiver is bound after the main server resolves its port so a
-// busy webhook port does not drag the main port forward with it.
-
-const webhookIngressStatus = () => ({
-  available: Boolean(webhookIngress),
-  baseUrl: webhookIngress?.baseUrl ?? `http://127.0.0.1:${WEBHOOK_PORT}`,
-  ...(webhookIngressError ? { error: webhookIngressError } : {}),
-});
+const webhookIngressStatus = () => bound.webhookIngressStatus();
 ROUTES.push(createWebhookRoutes({ webhooks, ingress: webhookIngressStatus, visible: (auth) => visibleTo(viewerFor(auth)) }));
 
 const RUNTIME_KEEP_MS = 30 * 24 * 60 * 60_000;
@@ -15708,8 +15691,7 @@ function runtimeHoldsRoot(threadId: string): boolean {
   return coordinator.active().some((n) => !n.parentId && n.threadId === threadId && !ENDED.has(n.status));
 }
 
-// Registered before the port loop: a signal during bot-box, engine or webhook
-// startup is still a graceful shutdown, never an abrupt kill.
+// Registered before the bind so a signal during startup is still a graceful shutdown.
 const gracefulShutdown = createGracefulShutdown({
   cleanup: [
     () => {
@@ -15787,57 +15769,29 @@ for (const signal of ["SIGINT", "SIGTERM"] as const) {
   process.on(signal, gracefulShutdown);
 }
 
-function isEaddrinuse(error: unknown): boolean {
-  return typeof error === "object" && error !== null && (error as { code?: unknown }).code === "EADDRINUSE";
-}
-
-// Bind the main server first. When the desktop parent or CLI spawns us it sets
-// OMB_PORT and then polls that exact port, so a packaged child or `serve`
-// invocation must not silently move. Source/headless runs may walk forward
-// until they find a free port.
-const mainAttempts = PORT_PINNED ? 1 : MAX_PORT_ATTEMPTS + 1;
-for (let offset = 0; offset < mainAttempts; offset++) {
-  const candidatePort = startPort + offset;
-  try {
-    await new Promise<void>((resolve, reject) => {
-      const onError = (error: Error) => {
-        server.off("error", onError);
-        reject(error);
-      };
-      server.once("error", onError);
-      PORT = candidatePort;
-      server.listen(candidatePort, HOST, () => {
-        server.off("error", onError);
-        companyRuntimeReady();
-        resolve();
-      });
-    });
-    console.log(`openmausbot server on http://${HOST}:${PORT}`);
-    break;
-  } catch (error) {
-    if (PORT_PINNED || !isEaddrinuse(error)) throw error;
-  }
-}
-
-if (!server.listening) {
-  throw new Error(`could not find an available port after ${MAX_PORT_ATTEMPTS + 1} attempts starting from ${startPort}`);
-}
-
-// On a Cloud home every bot turn runs in the bot box: start it now that the
-// harness gate's forward target is the bound port, still before any engine.
-await startBotBoxAtBoot({ dataDir: DATA_DIR, port: PORT });
-
-// The session cookie is scoped by port; compute it once the real bind port is
-// known so the UI and remote clients get a cookie matching this listener.
-SESSION_COOKIE = sessionCookieName(PORT, ENVIRONMENT_ID);
-
-// The hosted-workspace handoff cookie is keyed on the bound port too.
-workspaceAccess = createWorkspaceAccess({ sessions, cookieName: SESSION_COOKIE, closeSessionStreams });
-// With the bridge's five-second deadline, this bounds stale portal access on quiet streams to fifteen seconds.
-workspaceAccessTimer = workspaceAccess ? setInterval(() => {
-  void workspaceAccess!.revalidate().catch((error) => console.warn("workspace access revalidation failed", error));
-}, 10_000) : null;
-workspaceAccessTimer?.unref();
+// A supervised child must stay on the port its parent polls; an unpinned server walks to a free port.
+const bound = await bootServer({
+  server,
+  host: "127.0.0.1",
+  port: PORT,
+  webhookPort: WEBHOOK_PORT,
+  pinned: process.env.OMB_PORT_PINNED === "1" || DESKTOP_MANAGED,
+  assignPort: (candidatePort) => { PORT = candidatePort; },
+  onListening: companyRuntimeReady,
+  dataDir: DATA_DIR,
+  environmentId: ENVIRONMENT_ID,
+  sessions,
+  closeSessionStreams,
+  webhooks,
+  webhookPublicUrl: WEBHOOK_PUBLIC_URL,
+  webhookClaimRequest: () => { moveFreeze.assertTurns(); return workspaceMaintenance.request(); },
+});
+PORT = bound.port;
+WEBHOOK_PORT = bound.webhookPort;
+webhookIngress = bound.webhookIngress;
+SESSION_COOKIE = bound.sessionCookie;
+workspaceAccess = bound.workspaceAccess;
+workspaceAccessTimer = bound.workspaceAccessTimer;
 
 browserSweep.start(); moveFreeze.hold(() => appTriggers.start(), () => void appTriggers.stop()); startCloudHomeConnectedApps({ cloudHome: CLOUD_HOME !== null, dataDir: DATA_DIR, cloudGrant: CLOUD_ENV.OMB_CLOUD_CONNECTED_APPS_GRANT, apply: (access) => { composio.setManagedBrokerAccess(access); broadcast({ kind: "config", ...configStatus() }); } });
 void afterFirstEngineRead().then(() => { if (builtInBrowserEnabled(cfg)) chromeLauncher.start(); });
@@ -15846,51 +15800,12 @@ drainQueuedSends();
 drainQueuedChannelSends();
 void cloudComputerPower.armRunning();
 startUpkeep({ bots: () => store.bots, retentionDays: () => threadEventLogRetentionDays(cfg), busy: threadBusy, openDirectHandoff: (threadId) => coordinator.activeDirect(threadId) });
-if (enginesRead) {
-  await enginesRead;
-}
+await enginesRead;
 if (!companyShutdown) {
   // Only once every registry is initialized and the endpoint listens: earlier dispatch can hit uninitialized bindings.
   moveFreeze.hold(() => { routines!.start(); proactive.start(); }, () => { routines!.stop(); proactive.stop(); });
   limitClock.start();
   moveFreeze.hold(() => memoryUpkeep.start(), () => memoryUpkeep.stop());
-}
-
-// Bind the webhook receiver in its own loop after the main server is locked.
-// A busy webhook port must not prevent the main server from using its
-// configured port, and the webhook must not steal the resolved main port.
-const webhookAttempts = PORT_PINNED ? 1 : MAX_PORT_ATTEMPTS + 1;
-for (let offset = 0; offset < webhookAttempts; offset++) {
-  const candidateWebhookPort = startWebhookPort + offset;
-  if (candidateWebhookPort === PORT) continue;
-  try {
-    webhookIngress = await listenWebhookIngress(webhooks, {
-      port: candidateWebhookPort,
-      publicBaseUrl: WEBHOOK_PUBLIC_URL,
-      claimRequest: () => { moveFreeze.assertTurns(); return workspaceMaintenance.request(); },
-    });
-    WEBHOOK_PORT = candidateWebhookPort;
-    webhookIngressError = null;
-    const advertised = WEBHOOK_PUBLIC_URL ? ` (advertised as ${webhookIngress.baseUrl})` : "";
-    console.log(`openmausbot webhook receiver on http://${webhookIngress.host}:${webhookIngress.port}${advertised}`);
-    break;
-  } catch (error) {
-    if (PORT_PINNED || !isEaddrinuse(error)) {
-      webhookIngressError = error instanceof Error ? error.message : String(error);
-      console.error(`openmausbot webhook receiver unavailable: ${webhookIngressError}`);
-      break;
-    }
-  }
-}
-
-utilityParentPort?.postMessage({
-  type: "openmausbot:listen",
-  port: PORT,
-  webhookPort: WEBHOOK_PORT,
-});
-
-export function getResolvedPort(): number | undefined {
-  return server.listening ? PORT : undefined;
 }
 
 if (TUNNEL_SOCKET) {
