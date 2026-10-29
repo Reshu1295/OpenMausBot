@@ -106,6 +106,22 @@ function runEntry(dir, cacheRoot, extraEnv = {}) {
   return { status: result.status, stderr: result.stderr, report: line ? JSON.parse(line) : null };
 }
 
+test("bootstrap leaves queued desktop capabilities for the server listener", (t) => {
+  const dir = stage(t, `process.parentPort.on("message", ({ data }) => console.log(data.type));`);
+  const preload = path.join(dir, "parent.mjs");
+  writeFileSync(preload, `
+    const listeners = [];
+    let queued = true;
+    Object.defineProperty(process, "parentPort", { value: { on(_event, listener) {
+      listeners.push(listener);
+      if (queued) { queued = false; queueMicrotask(() => listeners.forEach(fn => fn({ data: { type: "openmausbot:desktop-mutation-token" } }))); }
+    } } });
+  `);
+  const result = spawnSync(process.execPath, ["--import", preload, path.join(dir, "server", "desktop-entry.mjs")], { encoding: "utf8", timeout: 20_000 });
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /openmausbot:desktop-mutation-token/);
+});
+
 const cacheFiles = (cacheRoot) =>
   readdirSync(cacheRoot)
     .filter((name) => /^v\d+\.\d+\.\d+-/.test(name))
