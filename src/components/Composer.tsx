@@ -6,7 +6,7 @@ import { useStore, visibleMessages, currentTaskBot, type Bot, type Group, type I
 import { cn } from "@/lib/cn";
 import { PHONE_LAYOUT, useMediaQuery } from "@/lib/use-media-query";
 import { useMenuMotion } from "./MenuMotion";
-import { ELEVATED_FLOAT } from "./elevated";
+import { ELEVATED_CARD, ELEVATED_FLOAT } from "./elevated";
 import { activeLocale, t } from "@/lib/i18n";
 import { useAdvancedMode } from "@/lib/interface-mode";
 import { imeComposing, sendKeyLabel, sendsMessage, useSendKey } from "@/lib/send-key";
@@ -749,11 +749,11 @@ export function Composer({
         <MentionMenu listRef={mentionListRef} motion={mentionMotion} choices={candidates} highlight={highlight}
           everyoneCount={mentionEveryoneCount} onPick={pickMention} onHighlight={setHighlight} />
         {approval && (
-          <div className="mb-2 overflow-hidden rounded-2xl bg-composer ring-1 ring-composer-ring">
+          <div className={cn("mb-2 overflow-hidden rounded-[20px]", ELEVATED_CARD)}>
             <PendingApprovalPanel
               key={approval.requestId}
               pending={approval}
-              botName={approvalBot?.name}
+              botName={approvalBot?.name} asker={approvalBot}
               count={approvals.length}
               index={0}
               locale={activeLocale()}
@@ -795,7 +795,7 @@ export function Composer({
             data-composer-backdrop
             className={cn("pointer-events-none absolute -left-5 -right-5 bg-app", advanced ? "-bottom-3 top-1/2" : cn("top-0", simpleDock ? "-bottom-4" : "-bottom-3"))}
           />
-        <div ref={shellRef} data-tour="composer" data-multiline={multiline ? "" : undefined} className={cn("@container/composer relative z-[1]", singleRow ? "flex items-end gap-2" : simpleDock ? cn(SIMPLE_COMPOSER, multiline ? "rounded-[18px]" : "rounded-[22px]") : "rounded-2xl bg-composer px-2 py-1.5 ring-1 ring-composer-ring")}>
+        <div ref={shellRef} data-tour="composer" data-multiline={multiline ? "" : undefined} className={cn("@container/composer relative z-[1]", singleRow ? "flex items-end gap-2" : simpleDock ? cn(SIMPLE_COMPOSER, multiline ? "rounded-[18px]" : "rounded-[22px]") : cn("rounded-2xl px-2 py-1.5", ELEVATED_FLOAT))}>
         {singleRow && !locked && (
           <div className="flex shrink-0 items-center">
             <PhonePlus
@@ -813,7 +813,7 @@ export function Composer({
             />
           </div>
         )}
-        <div className={singleRow ? cn("min-w-0 flex-1 rounded-[26px] px-3 py-1.5", advanced ? "bg-composer ring-1 ring-composer-ring" : ELEVATED_FLOAT) : "contents"}>
+        <div className={singleRow ? cn("min-w-0 flex-1 rounded-[26px] px-3 py-1.5", ELEVATED_FLOAT) : "contents"}>
         {replyTo && <ComposerReplyStrip message={replyTo} fallbackName={bot?.name} onClear={onClearReply} />}
         <div data-composer-row className={cn("flex items-end", simpleDock ? "gap-1.5" : "gap-1", !singleRow && !simpleDock && "@max-[30rem]/composer:flex-wrap")}>
           <input
@@ -837,7 +837,7 @@ export function Composer({
                 title={t("composer.attach")}
                 className="flex size-8 shrink-0 items-center justify-center rounded-full text-ink-secondary hover:bg-control hover:text-ink"
               >
-                <Paperclip size={17} />
+                <Paperclip size={16} strokeWidth={1.75} absoluteStrokeWidth />
               </button>}
               {/* Simple mode shows a mode's chip only while it is on, so a choice made in the + menu or the bot panel stays in view. */}
               {goal && (advanced || goal.on) && <GoalToggle {...goal} compact={simpleDock} />}
@@ -949,8 +949,7 @@ export function Composer({
           })}
           aria-label={t("composer.placeholder.bot", { name: group ? group.name : (bot?.name ?? "") })}
             className={cn(
-              "block max-h-[9rem] w-full resize-none overflow-y-auto bg-transparent focus:outline-none",
-              advanced ? "placeholder:text-ink-secondary" : "placeholder:text-ink-tertiary",
+              "block max-h-[9rem] w-full resize-none overflow-y-auto bg-transparent placeholder:text-ink-tertiary focus:outline-none",
               !simpleDock && "px-1 text-[15px]",
               simpleDock ? "min-h-7 px-0.5 py-1 text-[14px] leading-5" : "min-h-6 py-1 leading-6",
             )}
@@ -964,10 +963,10 @@ export function Composer({
             className={cn(
               "flex shrink-0 items-center justify-center rounded-full",
               !simpleDock ? "size-8 text-ink-secondary hover:bg-raised hover:text-ink"
-                : stopInSlot ? "size-7 hover:brightness-110"
+                : stopInSlot ? cn("size-7", slot.button.className)
                 : SIMPLE_CONTROL,
             )}
-            style={stopInSlot ? { backgroundColor: slot.fill, color: slot.ink } : undefined}
+            style={stopInSlot ? slot.button.style : undefined}
             title={t("chat.stop")}
           >
             <Square size={simpleDock ? 10 : 14} className="fill-current" />
@@ -986,7 +985,7 @@ export function Composer({
             )}
             title={recording ? t("composer.dictation.stopHint") : t("composer.dictation.hint")}
           >
-            {simpleDock ? <Mic size={16} strokeWidth={1.75} absoluteStrokeWidth className="[&_rect]:fill-current" /> : <Mic size={18} />}
+            <Mic size={16} strokeWidth={1.75} absoluteStrokeWidth className="[&_rect]:fill-current" />
           </button>
         )}
         {callShown && bot && !group && <CallButton bot={bot} placement="composer" fill={advanced || singleRow ? undefined : slot.fill} ink={slot.ink} inverse={singleRow} />}
@@ -997,16 +996,14 @@ export function Composer({
             disabled={attachmentPending}
             aria-label={sendNames.label}
             title={sendNames.title}
-            style={simpleDock && !(busy && !canSteer) ? { backgroundColor: slot.fill, color: slot.ink } : undefined}
+            style={busy && !canSteer ? undefined : slot.button.style}
             className={cn(
-              "flex shrink-0 items-center justify-center rounded-full",
-              simpleDock ? "size-7 animate-[slot-fade-in_120ms_ease-out] disabled:cursor-default disabled:opacity-40" : "size-8 text-white",
-              busy && !canSteer
-                  ? "bg-raised text-ink-secondary hover:bg-raised-hover"
-                  : simpleDock ? "hover:brightness-110" : "bg-accent hover:brightness-110",
+              "flex shrink-0 items-center justify-center rounded-full disabled:cursor-default",
+              simpleDock ? "size-7 animate-[slot-fade-in_120ms_ease-out]" : "size-8",
+              busy && !canSteer ? "bg-raised text-ink-secondary hover:bg-raised-hover" : slot.button.className,
             )}
           >
-            {busy && !canSteer ? <Clock size={simpleDock ? 14 : 15} /> : simpleDock ? <ArrowUp size={16} strokeWidth={1.75} absoluteStrokeWidth /> : <ArrowUp size={17} />}
+            {busy && !canSteer ? <Clock size={simpleDock ? 14 : 15} /> : <ArrowUp size={16} strokeWidth={1.75} absoluteStrokeWidth />}
           </button>
           )}
           </div>
