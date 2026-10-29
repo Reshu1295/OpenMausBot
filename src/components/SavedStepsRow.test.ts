@@ -60,6 +60,6 @@ describe("the saved-steps setting", () => {
     fixture.api.mockRejectedValue("nope");
     (render().toggle!.props.onClick as () => void)();
     await flush();
-    expect(render().html).toContain("Could not change this setting");
+    expect(render().html).toContain("Couldn&#x27;t change this setting. Try again.");
   });
 });

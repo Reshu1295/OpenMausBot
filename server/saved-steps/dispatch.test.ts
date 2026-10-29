@@ -234,7 +234,7 @@ describe("SavedStepsDispatch.sendTurn", () => {
     });
     expect(events.filter((e) => e.type === "request.opened")[1]).toMatchObject({ tool: "mcp__computer__set_value", summary: `set_value on ${LABEL}` });
     expect(events.find((e) => e.type === "request.resolved")).toMatchObject({ behavior: "allow", source: "user", approvalScope: "local-computer" });
-    expect(events.at(-2)).toMatchObject({ itemType: "assistant_text", text: "Done — repeated 2 saved steps: clicked “Document”, filled in “Document”." });
+    expect(events.at(-2)).toMatchObject({ itemType: "assistant_text", text: "Done. I repeated 2 saved steps: clicked “Document”, filled in “Document”." });
     expect(JSON.stringify(events)).not.toContain("hello world");
     expect(events.at(-1)).toMatchObject({ type: "turn.completed", ok: true, stopReason: "end_turn", provider: "claudeAgent", providerInstanceId: "claude" });
     expect(dispatch.replayed("t1", turnId)).toBe(RECIPE.id);
@@ -283,7 +283,7 @@ describe("SavedStepsDispatch.sendTurn", () => {
     const { turnId } = await dispatch.sendTurn(engine, REQ, INPUT, start);
     await vi.waitFor(() => expect(turnCompleted()).toHaveLength(1));
     expect(events.slice(-2)).toMatchObject([
-      { type: "item.completed", itemType: "assistant_text", turnId, text: expect.stringContaining("Done — repeated 2 saved steps") },
+      { type: "item.completed", itemType: "assistant_text", turnId, text: expect.stringContaining("Done. I repeated 2 saved steps") },
       { type: "turn.completed", turnId, ok: true },
     ]);
     expect(dispatch.replayed("t1", turnId)).toBe(RECIPE.id);

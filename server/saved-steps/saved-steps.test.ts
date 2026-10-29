@@ -203,7 +203,7 @@ describe("SavedSteps.requestSettled", () => {
     steps.recipes.save("b1", { ...RECIPE, createdAt: NOW - 5_000, lastUsedAt: NOW - 5_000 });
     const replayed = vi.spyOn(steps.dispatch, "replayed").mockImplementation((threadId, turnId) => (threadId === "t1" && turnId === "turn-r" ? "r1" : undefined));
     steps.journal.taint({ threadId: "t1", generation: "g1" });
-    const reply: Message = { ...REPLY, id: "reply-r", turnId: "turn-r", text: "Done — repeated 2 saved steps." };
+    const reply: Message = { ...REPLY, id: "reply-r", turnId: "turn-r", text: "Done. I repeated 2 saved steps." };
 
     steps.requestSettled(settled({ request: { ...LINE, quickModel: "Haiku 4.5" }, reply, after: [reply] }));
 

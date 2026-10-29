@@ -265,7 +265,7 @@ The wrapper emits the normal runtime events (`turn.started`, an item per step,
 `assistant_text`, `turn.completed {ok:true}`), so transcript, digest and request
 settling work unchanged. The reply says what the steps did, from their stored
 targets, never what an earlier run saw ("You have 12 unread emails" repeated
-would be stale every time): "Done — repeated 2 saved steps: opened Mail,
+would be stale every time): "Done. I repeated 2 saved steps: opened Mail,
 clicked “Inbox”.", at most five steps listed, then "and N more". It is marked
 `savedSteps: {recipeId, replayed: true}`.
 

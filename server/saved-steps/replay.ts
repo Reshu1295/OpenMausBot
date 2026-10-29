@@ -87,7 +87,7 @@ export function replayedReply(recipe: Pick<Recipe, "steps">): string {
   const { steps } = recipe;
   const listed = steps.slice(0, LISTED_STEPS).map(stepDone);
   const more = steps.length - listed.length;
-  return `Done — repeated ${steps.length} saved step${steps.length === 1 ? "" : "s"}: ${listed.join(", ")}${more > 0 ? `, and ${more} more` : ""}.`;
+  return `Done. I repeated ${steps.length} saved step${steps.length === 1 ? "" : "s"}: ${listed.join(", ")}${more > 0 ? `, and ${more} more` : ""}.`;
 }
 
 export function fallbackNote(outcome: Extract<ReplayOutcome, { kind: "failed" }>): string {
@@ -100,5 +100,5 @@ export function fallbackNote(outcome: Extract<ReplayOutcome, { kind: "failed" }>
 }
 
 export function declinedReply(outcome: Extract<ReplayOutcome, { kind: "declined" }>): string {
-  return `I stopped repeating the saved steps: ${stepSummary(outcome.tool, outcome.label)} was declined.`;
+  return `I stopped the saved steps because a step on ${outcome.label} was declined. Nothing after it ran.`;
 }

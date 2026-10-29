@@ -214,15 +214,15 @@ describe("buildRecipe", () => {
 
   describe("final, can't-undo actions", () => {
     it.each([
-      "Send", "Senden", "Envoyer", "Enviar", "Invia", "Wyślij", "Отправить", "Надіслати", "Gönder", "Gửi", "भेजें", "送信", "发送", "傳送",
-      "Delete", "Löschen", "Supprimer", "Usuń", "Удалить", "Sil", "Xóa", "削除", "删除", "Buy now", "Jetzt kaufen", "Acheter", "Kup teraz", "購入",
+      "Send", "Senden", "Envoyer", "Enviar", "Invia", "Wyślij", "Отправить", "Надіслати", "Gönder", "Gửi", "भेजें", "보내기", "送信", "发送", "傳送",
+      "Delete", "Löschen", "Supprimer", "Usuń", "Удалить", "Sil", "Xóa", "삭제", "削除", "删除", "Buy now", "Jetzt kaufen", "Acheter", "Kup teraz", "구매하기", "購入",
       "Pay", "Bezahlen", "Pagar", "Оплатить", "Öde", "付款", "Publish", "Publier", "Pubblica", "公開", "Submit", "Absenden", "Place your order",
       "Zahlungspflichtig bestellen", "Sipariş ver", "Đặt hàng", "注文を確定する", "下单", "Transfer", "Überweisen", "Przelej", "转账", "Don’t Save", "Empty Trash",
     ])("never saves a click on %s", (label) => {
       expect(bare([shown([row(4, "AXButton", label)]), action("click", { element_token: "s1-e4" })])).toEqual({ ok: false, reason: "final-action" });
     });
 
-    it.each(["Save a Copy", "Open", "Inbox", "Sent", "Drafts", "Cancel", "OK", "Speichern", "Ouvrir", "保存"])("still saves a click on %s", (label) => {
+    it.each(["Save a Copy", "Open", "Inbox", "Sent", "Drafts", "Cancel", "OK", "Speichern", "Ouvrir", "확인", "保存"])("still saves a click on %s", (label) => {
       expect(bare([shown([row(4, "AXButton", label)]), action("click", { element_token: "s1-e4" })]).ok).toBe(true);
     });
 
@@ -287,7 +287,7 @@ describe("buildRecipe", () => {
       expect(bare([shown([row(4, "AXSecureTextField", "Password")]), action("click", { element_token: "s1-e4" })])).toEqual({ ok: false, reason: "secret-field" });
     });
 
-    it.each(["Password", "Enter your password", "Passwort", "Mot de passe", "Contraseña", "Senha", "Hasło", "Пароль", "Şifre", "Mật khẩu", "पासवर्ड",
+    it.each(["Password", "Enter your password", "Passwort", "Mot de passe", "Contraseña", "Senha", "Hasło", "Пароль", "Şifre", "Mật khẩu", "पासवर्ड", "비밀번호",
       "パスワード", "密码", "密碼", "PIN", "Card number", "Verification code"])("never saves typing into a field labelled %s", (label) => {
       expect(typed(row(4, "AXTextField", label, { value_read: true }))).toEqual({ ok: false, reason: "secret-field" });
     });

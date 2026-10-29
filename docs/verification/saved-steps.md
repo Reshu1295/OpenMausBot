@@ -108,7 +108,7 @@ with `pnpm control:omb wait --bot $BOT_ID --task $T1 --timeout 300 --url $URL`
    type again. The thread shows `mcp__computer__click` and
    `mcp__computer__set_value`, each with an "approved … (full access)" row
    naming the target and not the typed text, and the reply
-   "Done — repeated 2 saved steps: clicked “Document”, filled in “Document”."
+   "Done. I repeated 2 saved steps: clicked “Document”, filled in “Document”."
    with `savedSteps: {recipeId: R, replayed: true}`.
 3. **Stop a live replay.** `touch "$SCRATCH/hold"`, send round 1's words, and
    once `cua-calls.jsonl` logs the new `click`, run
@@ -126,7 +126,7 @@ with `pnpm control:omb wait --bot $BOT_ID --task $T1 --timeout 300 --url $URL`
    "Typed hello world into TextEdit again." has `learned: true` and a new
    recipe id. That second prompt rebuilds the conversation ("This conversation
    received an update outside your provider session…") and holds round 2's
-   line and its "Done — repeated 2 saved steps…" reply, which the engine never
+   line and its "Done. I repeated 2 saved steps…" reply, which the engine never
    saw; no later prompt in T1 repeats them.
 6. **Auto place.**
    `curl -s -X POST $URL/api/bots/$BOT_ID/tasks -H 'content-type: application/json' -H "origin: $URL" -d '{}'`

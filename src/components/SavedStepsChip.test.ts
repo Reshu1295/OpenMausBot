@@ -71,7 +71,7 @@ describe("the saved-steps chip under a reply", () => {
     (render(LEARNED).forget!.props.onClick as () => void)();
     await flush();
     const after = render(LEARNED);
-    expect(after.alert!.props.children).toContain("Could not forget these steps");
+    expect(after.alert!.props.children).toContain("Couldn't forget these steps. Try again.");
     expect(after.forget).toBeDefined();
   });
 });

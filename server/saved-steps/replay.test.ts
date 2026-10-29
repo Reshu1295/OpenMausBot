@@ -197,8 +197,8 @@ describe("replay wording", () => {
     const mail = { bundleId: "com.apple.mail", name: "Mail" };
     const inbox = { role: "AXRow", label: "Inbox", path: [] };
     expect(replayedReply({ steps: [{ tool: "launch_app", args: { name: "Mail" } }, { tool: "click", args: {}, app: mail, window: { title: "Inbox" }, element: inbox }] }))
-      .toBe("Done — repeated 2 saved steps: opened Mail, clicked “Inbox”.");
-    expect(replayedReply({ steps: [{ tool: "bring_to_front", args: {}, app: mail }] })).toBe("Done — repeated 1 saved step: brought Mail to the front.");
+      .toBe("Done. I repeated 2 saved steps: opened Mail, clicked “Inbox”.");
+    expect(replayedReply({ steps: [{ tool: "bring_to_front", args: {}, app: mail }] })).toBe("Done. I repeated 1 saved step: brought Mail to the front.");
   });
 
   it("names each kind of step by its saved target", () => {
@@ -210,17 +210,17 @@ describe("replay wording", () => {
       { tool: "scroll", args: { direction: "down" }, app, window: { title: "Untitled" }, element },
       { tool: "set_value", args: { value: "hello world" }, app, window: { title: "Untitled" }, element },
       { tool: "hotkey", args: { keys: ["cmd", "s"] }, app, window: { title: "Untitled" } },
-    ] })).toBe("Done — repeated 5 saved steps: double-clicked “Document”, right-clicked “Document”, scrolled “Document”, "
+    ] })).toBe("Done. I repeated 5 saved steps: double-clicked “Document”, right-clicked “Document”, scrolled “Document”, "
       + "filled in “Document”, pressed cmd+s in “Untitled”.");
   });
 
   it("lists five steps, then says how many more", () => {
     const step = (label: string) => ({ tool: "click" as const, args: {}, app: { name: "Notes" }, window: { title: "Notes" }, element: { role: "AXButton", label, path: [] } });
     expect(replayedReply({ steps: ["a", "b", "c", "d", "e", "f", "g"].map(step) }))
-      .toBe("Done — repeated 7 saved steps: clicked “a”, clicked “b”, clicked “c”, clicked “d”, clicked “e”, and 2 more.");
-    expect(replayedReply({ steps: [step("x".repeat(80))] })).toBe(`Done — repeated 1 saved step: clicked “${"x".repeat(59)}…”.`);
+      .toBe("Done. I repeated 7 saved steps: clicked “a”, clicked “b”, clicked “c”, clicked “d”, clicked “e”, and 2 more.");
+    expect(replayedReply({ steps: [step("x".repeat(80))] })).toBe(`Done. I repeated 1 saved step: clicked “${"x".repeat(59)}…”.`);
   });
 
   it("says what was declined", () => expect(declinedReply({ kind: "declined", tool: "set_value", label: '"Document" in TextEdit' }))
-    .toBe('I stopped repeating the saved steps: set_value on "Document" in TextEdit was declined.'));
+    .toBe('I stopped the saved steps because a step on "Document" in TextEdit was declined. Nothing after it ran.'));
 });
