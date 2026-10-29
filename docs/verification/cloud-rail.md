@@ -141,6 +141,11 @@ This computer's card, with no colour or picture yet
 
 ![This computer's Sidebar color and Sidebar picture in Settings, plain](evidence/sidebar-look-everyone/after-card-simple-daylight.png)
 
+The sidebar's button for the rail, with the rail shown and hidden
+(`evidence/rail-collapse/`):
+
+![The sidebar's button for the rail on the same spot, the rail shown and hidden](evidence/rail-collapse/after-button-spot-daylight.png)
+
 This is not production qualification: the places and the purchase are the
 preview's fixtures, and no Admin, browser checkout or desktop window is
 involved.
