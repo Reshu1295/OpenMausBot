@@ -23,8 +23,8 @@ interface Profile {
 
 const flag = (on: boolean) => (on ? "1" : "0");
 
-/** Every combination agentsIntegration() can produce; a name without "+non-chief" is a Chief of Staff's turn, and
- * every one is a person's own request, which may pick its computer, unless it says otherwise. */
+/** Every combination agentsIntegration() can produce; a name without "+non-chief" is a Chief of Staff's conversation, and
+ * every one is a direct chat whose bot may pick its computer, unless it says otherwise. */
 function profiles(): Record<string, Profile> {
   const all: Record<string, Profile> = {};
   for (const chief of [true, false]) {
@@ -59,8 +59,8 @@ function profiles(): Record<string, Profile> {
   };
   // The person's MausBot holds a Chief's powers and adds its notification pair; MAUSBOT_ADDS bounds what that costs.
   for (const name of ["default", "skills+shared+voice"]) all[`${name}+mausbot`] = { env: { ...all[name]!.env, OMB_MAUSBOT: "1" } };
-  // A turn that cannot pick its computer: a hand-off, a routine or webhook run, a continuation. A room's turn is one too.
-  all["default+handoff"] = { env: { ...all.default!.env, OMB_COMPUTER_SELECTION: "0" } };
+  // A chat that can never pick its computer: its Works on is Off, or it works on its team's computer. A room is one too.
+  all["default+no-computer-pick"] = { env: { ...all.default!.env, OMB_COMPUTER_SELECTION: "0" } };
   for (const name of ["default", "non-chief"]) all[`${name}+room`] = { env: { ...all[name]!.env, OMB_COMPUTER_SELECTION: "0", OMB_ROOM: "1" } };
   return all;
 }
@@ -103,7 +103,7 @@ const BUDGET_BASELINE: Record<string, number> = {
   "skills+shared+voice+escalations": 61489,
   "skills+shared+voice+escalations+x": 65328,
   "skills+shared+voice+escalations+x+team": 65960,
-  "default+handoff": 53747,
+  "default+no-computer-pick": 53747,
   "default+room": 48473,
   "non-chief+room": 39416,
 };
@@ -288,9 +288,9 @@ describe("agents proxy tools/list golden", () => {
     }
   });
 
-  it("leaves out only what a room's turn, and a turn that cannot pick its computer, would be refused", () => {
+  it("leaves out only what a room, and a chat that can never pick its computer, would be refused", () => {
     const names = (name: string) => toolsOf(wires[name]!).map((tool) => tool.name);
-    expect(names("default+handoff")).toEqual(names("default").filter((tool) => tool !== "select_computer"));
+    expect(names("default+no-computer-pick")).toEqual(names("default").filter((tool) => tool !== "select_computer"));
     for (const name of ["default", "non-chief"]) {
       expect(names(`${name}+room`), name).toEqual(names(name).filter((tool) => !["select_computer", "show_widget", "show_html"].includes(tool)));
     }

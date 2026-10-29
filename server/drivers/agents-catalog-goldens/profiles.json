@@ -1124,7 +1124,7 @@
       "mark_notifications_read"
     ]
   },
-  "default+handoff": {
+  "default+no-computer-pick": {
     "bytes": 53747,
     "sha256": "ac3d1d2f86d5ca9dd0d70353089b0ce5b4d48cb771311ca1dce7d0a7e675be47",
     "tools": [

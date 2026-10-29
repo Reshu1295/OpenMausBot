@@ -517,7 +517,7 @@
       "use_tool"
     ]
   },
-  "default+handoff": {
+  "default+no-computer-pick": {
     "bytes": 14970,
     "sha256": "e8b1ef16bc202a97bb76b66fd3c693db30dce6c70482fa2a365d31bec959d17c",
     "tools": [
