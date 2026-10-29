@@ -153,6 +153,7 @@ import {
   localVmIdleTimeoutMinutes,
   localVmMaxInstances,
   localVmMode,
+  localVmPreservesInstalledApps,
   roomTurnTimeoutMinutes,
   mcpCallTimeoutMinutes,
   cacheKeepWarmSettings,
@@ -416,6 +417,7 @@ import { desktopComputer, thisComputerNotReady } from "./desktop-computer.ts";
 import { askToUseYourComputer, cancelYourComputerAsks, dismissStaleYourComputerCards, yourComputerCallFrom, yourComputerWaiting } from "./your-computer-consent.ts";
 import { discoverExistingPerBotLocalVms, localVmInventoryEntry } from "./local-vm-inventory.ts";
 import { createLocalVmUpdater, LOCAL_VM_UPDATING_PROBLEM, recoverLocalVms, VPS_OUTDATED_HINT, vpsDesktopOutdated, withoutHostWhileUpdating } from "./desktop-updates.ts";
+import { keepInstalledAppsBeforeRemove } from "./local-vm-profiles.ts";
 import { localVmStopReason, recordLocalVmIdleStop } from "./local-vm-stop-reason.ts";
 import { ComputerIdleTimer } from "./computer-idle.ts";
 import { createCloudComputerPower } from "./host/cloud-computer-power.ts";
@@ -5704,6 +5706,9 @@ const localVmUpdates = createLocalVmUpdater({
   lifecycleBusy: localVmLifecycleBusy,
   inUse: (target) => localVmModeChangeBusy || localVmActiveThreads.has(target.key) || Boolean(localVmLeaseFor(target).current(localVmOwnerBusy)),
   updated: (target, status) => { noteLocalVmSeen(target, status); localVmIdleFor(target).touch(); },
+  keepApps: async (target, status, stop) => localVmPreservesInstalledApps(cfg)
+    ? keepInstalledAppsBeforeRemove(target, status, stop)
+    : "none",
   log: (message) => console.warn(message),
 });
 /** A turn that needs its desktop waits out the one-time update with one plain line, rather than fail or move elsewhere. */
@@ -11945,6 +11950,7 @@ function configStatus() {
       mode: localVmMode(cfg),
       maxInstances: localVmMaxInstances(cfg),
       idleTimeoutMinutes: localVmIdleTimeoutMinutes(cfg),
+      preserveInstalledApps: localVmPreservesInstalledApps(cfg),
     },
     features: {
       skillAuthoring: skillAuthoringEnabled(cfg),
@@ -12039,7 +12045,7 @@ async function describeInstances() {
     const described = {
       ...instance, ...testedAi.info(instance),
       ...(entry?.icon ? { icon: entry.icon } : {}),
-      ...(entry?.access ? { access: entry.access } : {}), ...(heldKeys?.refusal(instance.instanceId) ? { snapshot: { state: "unavailable" as const, reason: TRIAL_KEY_HELD } } : {}),
+      ...(entry?.access ? { access: entry.access } : {}), ...(entry?.driver === "openai-compat" && typeof (entry.config as { replyWaitMinutes?: unknown } | undefined)?.replyWaitMinutes === "number" ? { replyWaitMinutes: (entry.config as { replyWaitMinutes: number }).replyWaitMinutes } : {}), ...(heldKeys?.refusal(instance.instanceId) ? { snapshot: { state: "unavailable" as const, reason: TRIAL_KEY_HELD } } : {}),
     };
     if (hostedModels) return { ...described, readOnly: true,
       install: undefined, authentication: undefined, cli: undefined, cliCandidates: [],
