@@ -16,3 +16,8 @@ export interface WaitCardData {
   followUp: string;
   settled?: "fired" | "expired" | "cancelled";
 }
+
+/** `OptionCardData.waitRequest`: set on the card a wait with a follow-up showed. */
+export interface WaitCardField {
+  waitRequest?: WaitCardData;
+}
