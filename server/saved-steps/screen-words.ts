@@ -1,6 +1,6 @@
-/** Words another app shows in the person's own language, in each language this app ships (src/locales). A word names a
- * whole word or phrase; `word*` also matches longer words that start with it; `=word` matches only a label that is
- * exactly that. Languages written without spaces match anywhere in the label. */
+/** Words another app shows in the person's own language, for each language this app ships its interface in. A word
+ * names a whole word or phrase; `word*` also matches longer words that start with it; `=word` matches only a label that
+ * is exactly that. Languages written without spaces match anywhere in the label. */
 export interface LanguageWords { words: readonly string[]; unspaced?: true }
 
 /** Security invariant: steps that press one of these (send, delete, buy, pay, post, submit, order, transfer, publish and

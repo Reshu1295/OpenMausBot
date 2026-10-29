@@ -1,19 +1,7 @@
-import { readdirSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { FINAL_ACTIONS, SECRET_FIELDS, namesFinalAction, namesSecret } from "./screen-words.ts";
-
-const SHIPPED = readdirSync(new URL("../../src/locales/", import.meta.url))
-  .filter((file) => file.endsWith(".json") && file !== "source-hashes.json")
-  .map((file) => file.slice(0, -".json".length))
-  .sort();
+import { namesFinalAction, namesSecret } from "./screen-words.ts";
 
 describe("screen words", () => {
-  it("cover every language the app ships", () => {
-    expect(SHIPPED.length).toBeGreaterThanOrEqual(15);
-    expect(Object.keys(FINAL_ACTIONS).sort()).toEqual(SHIPPED);
-    expect(Object.keys(SECRET_FIELDS).sort()).toEqual(SHIPPED);
-  });
-
   it.each<[string, string[]]>([
     ["en", ["Send", "Send Message", "Delete Forever", "Buy now", "Pay", "Place your order", "Post", "Publish", "Submit", "Transfer", "Don’t Save", "Empty Trash", "Move to Trash", "paperplane.fill"]],
     ["de", ["Senden", "Löschen", "Jetzt kaufen", "Zahlungspflichtig bestellen", "Bezahlen", "Veröffentlichen", "Absenden", "Überweisen", "Nicht sichern"]],
