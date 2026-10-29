@@ -11,7 +11,7 @@ import { homedir } from "node:os";
 import { codexConfigMcp, codexConfigRunsServer, mountedMcpServerName } from "./codex-mcp-names.ts";
 
 import { DATA_DIR, stripWorkspaceCredentialEnv } from "../config.ts";
-import { credentialEnvEntries, credentialEnvValue, stripCredentialEnv } from "../credential-env.ts";
+import { credentialEnvEntries, credentialEnvValue, stripCredentialEnv, withoutCredentialEnv } from "../credential-env.ts";
 import { laterStartup, openStartupModelCatalog, writeStartupModelCache } from "../startup-model-catalog.ts";
 import { hostedWorkspaceConfigured } from "../enterprise.ts";
 import { cloudHomeConfigured } from "../cloud-home.ts";
@@ -481,7 +481,7 @@ export const CodexDriver: ProviderDriver<CodexConfig> = {
     const planDirectory = join(DATA_DIR, "providers", "chatgpt-plan", createHash("sha256").update(instanceId).digest("hex"));
     const childEnv = (): Record<string, string | undefined> => {
       const env: Record<string, string | undefined> = {
-        ...process.env,
+        ...(config.managed ? withoutCredentialEnv(process.env, ["OPENMAUSBOT_COMPANY_API_KEY"]) : process.env),
         ...input.environment,
         PATH: augmentedPath(),
         NPM_CONFIG_LOGLEVEL: "error",
@@ -489,10 +489,6 @@ export const CodexDriver: ProviderDriver<CodexConfig> = {
       // A leaked API key silently flips Codex's own ChatGPT login to pay-as-you-go.
       stripCredentialEnv(env, ["OPENAI_API_KEY", "OPENMAUSBOT_CHATGPT_TOKEN"]);
       stripWorkspaceCredentialEnv(env);
-      if (config.managed) {
-        stripCredentialEnv(env, ["OPENMAUSBOT_COMPANY_API_KEY"]);
-        Object.assign(env, Object.fromEntries(credentialEnvEntries(input.environment, ["OPENMAUSBOT_COMPANY_API_KEY"])));
-      }
       if (plan) env.CODEX_HOME = join(planDirectory, "codex");
       return env;
     };

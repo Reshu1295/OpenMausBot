@@ -59,6 +59,12 @@ export function stripCredentialEnv(env: Record<string, string | undefined>, name
   for (const [key] of credentialEnvEntries(env, names)) delete env[key];
 }
 
+export function withoutCredentialEnv(env: Readonly<NodeJS.ProcessEnv>, names: readonly string[]): NodeJS.ProcessEnv {
+  const copy = { ...env };
+  stripCredentialEnv(copy, names);
+  return copy;
+}
+
 export function credentialEnvEntries(env: Readonly<NodeJS.ProcessEnv>, names: readonly string[]): [string, string | undefined][] {
   const selected = new Set(names.map(name => name.toUpperCase()));
   return Object.entries(env).filter(([key]) => selected.has(key.toUpperCase())).sort(([left], [right]) => {
