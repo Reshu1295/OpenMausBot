@@ -7,6 +7,7 @@ import { homedir, tmpdir } from "node:os";
 import { join, dirname, isAbsolute, normalize } from "node:path";
 
 import { DATA_DIR, stripWorkspaceCredentialEnv } from "../config.ts";
+import { stripCredentialEnv } from "../credential-env.ts";
 import { openStartupModelCatalog, writeStartupModelCache } from "../startup-model-catalog.ts";
 import { writeFileAtomic, writeFileAtomicIfChanged } from "../atomic.ts";
 import { augmentedPath } from "../env-path.ts";
@@ -122,21 +123,20 @@ function claudeEnvironment(
   const env: NodeJS.ProcessEnv = { BASH_MAX_TIMEOUT_MS: "600000", ...source, PATH: augmentedPath(), NPM_CONFIG_LOGLEVEL: "error" };
   if (configDir?.trim()) {
     env.CLAUDE_CONFIG_DIR = resolveClaudeConfigDir(configDir, env);
+    // Subscription OAuth always comes from this account's own login, never the parent's.
+    stripCredentialEnv(env, CLAUDE_ACCOUNT_ENV_KEYS);
     for (const key of CLAUDE_ACCOUNT_ENV_KEYS) {
-      // Subscription OAuth always comes from this account's own login, never the parent's.
-      if (key.startsWith("CLAUDE_CODE_OAUTH_") || key.endsWith("_FILE_DESCRIPTOR") || !Object.hasOwn(instanceEnvironment, key)) {
-        delete env[key];
-      }
+      if (!key.startsWith("CLAUDE_CODE_OAUTH_") && !key.endsWith("_FILE_DESCRIPTOR") && Object.hasOwn(instanceEnvironment, key)) env[key] = instanceEnvironment[key];
     }
   } else if (env.CLAUDE_CONFIG_DIR) {
     env.CLAUDE_CONFIG_DIR = resolveClaudeConfigDir(undefined, env);
   }
-  delete env.CLAUDECODE;
-  delete env.CLAUDE_CODE_ENTRYPOINT;
+  stripCredentialEnv(env, ["CLAUDECODE", "CLAUDE_CODE_ENTRYPOINT"]);
   stripWorkspaceCredentialEnv(env);
-  const applied = applyClaudeInject(env, model);
   // An inherited ANTHROPIC_API_KEY would flip a subscription login to pay-as-you-go.
-  if (!applied.injected && !instanceEnvironment.ANTHROPIC_API_KEY) delete env.ANTHROPIC_API_KEY;
+  stripCredentialEnv(env, ["ANTHROPIC_API_KEY"]);
+  if (instanceEnvironment.ANTHROPIC_API_KEY) env.ANTHROPIC_API_KEY = instanceEnvironment.ANTHROPIC_API_KEY;
+  applyClaudeInject(env, model);
   return env;
 }
 

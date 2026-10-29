@@ -50,8 +50,14 @@ export function stripControlPlaneEnv(env: Record<string, string | undefined>): v
 }
 
 export function stripWorkspaceCredentialEnv(env: Record<string, string | undefined>): void {
-  for (const key of WORKSPACE_CREDENTIAL_ENV) delete env[key];
+  stripCredentialEnv(env, WORKSPACE_CREDENTIAL_ENV);
   stripControlPlaneEnv(env);
+}
+
+/** Known secret names are private in every casing, including on case-sensitive platforms. */
+export function stripCredentialEnv(env: Record<string, string | undefined>, names: readonly string[]): void {
+  const denied = new Set(names.map((name) => name.toUpperCase()));
+  for (const key of Object.keys(env)) if (denied.has(key.toUpperCase())) delete env[key];
 }
 
 /** Env a provider CLI may read as its billing identity; a foreign key must never move a subscription CLI onto API billing. */

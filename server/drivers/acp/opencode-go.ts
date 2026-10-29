@@ -507,8 +507,8 @@ function withholdProviderKeysWhenManaged(
   instanceEnvironment: Readonly<Record<string, string>>,
 ): void {
   if (providerKeysAllowed()) return;
-  for (const key of OPENCODE_PROVIDER_ENV) {
-    if (!Object.hasOwn(instanceEnvironment, key)) delete env[key];
+  for (const key of Object.keys(env)) {
+    if ((OPENCODE_PROVIDER_ENV as readonly string[]).includes(key.toUpperCase()) && !Object.hasOwn(instanceEnvironment, key)) delete env[key];
   }
 }
 
