@@ -253,7 +253,16 @@ it("instance PATCH clears only its successful pending config reload and preserve
   }
 });
 
-it("provider reload preserves its cause when disposal completes the turn before returning", async () => {
+it.each([
+  { name: "preserves its cause when disposal completes the interrupted turn", when: "none", rejects: false, stopReason: "interrupted", expected: "Turn interrupted — provider settings changed" },
+  { name: "preserves an independent error before reload", when: "before", rejects: false, stopReason: "error", expected: "Authentication failed: API key expired" },
+  { name: "preserves an independent error during disposal", when: "during", rejects: false, stopReason: "error", expected: "Authentication failed: API key expired" },
+  { name: "preserves an independent error after rejected disposal", when: "after", rejects: true, stopReason: "error", expected: "Authentication failed: API key expired" },
+  { name: "preserves an error even when the terminal reason is interrupted", when: "during", rejects: false, stopReason: "interrupted", expected: "Authentication failed: API key expired" },
+  { name: "restores an earlier stop cause after rejected disposal", when: "stopping", rejects: true, stopReason: "interrupted", expected: "Stopped by the original request" },
+  { name: "preserves an independent terminal reason", when: "none", rejects: false, stopReason: "max_tokens", expected: "The turn did not complete (max_tokens)" },
+  { name: "removes a rejected reload cause before a later interruption", when: "none", rejects: true, stopReason: "interrupted", expected: "The turn did not complete (interrupted)" },
+])("provider reload $name", async ({ when, rejects, stopReason, expected }) => {
   const configs = { compat: { driver: "openai-compat", environment: { OPENAI_COMPAT_API_KEY: "new-key" } } };
   const before = engineLaunches({ compat: { driver: "openai-compat", environment: { OPENAI_COMPAT_API_KEY: "old-key" } } });
   const fake = makeFakeDriver({ kind: "openai-compat" });
@@ -278,8 +287,10 @@ it("provider reload preserves its cause when disposal completes the turn before 
   const dispose = vi.spyOn(old, "dispose").mockImplementation(async () => {
     enterDisposal();
     await cliEnded;
-    emit({ eventId: "reload-completed", createdAt: "2026-10-29T00:00:00.000Z", type: "turn.completed", provider: "openai-compat", threadId, turnId, ok: false, stopReason: "interrupted" });
+    if (rejects) throw new Error("synthetic teardown blocked");
+    complete();
   });
+  const complete = () => emit({ eventId: "reload-completed", createdAt: "2026-10-29T00:00:00.000Z", type: "turn.completed", provider: "openai-compat", threadId, turnId, ok: false, stopReason });
   const releaseTurnResources = vi.fn();
   const store = {
     bots: [{ id: "helper" }],
@@ -296,7 +307,7 @@ it("provider reload preserves its cause when disposal completes the turn before 
     turnResourceOwners: new Map([[threadId, owner]]), liveTurnByThread: new Map([[threadId, turnId]]),
     turnStops, stoppedTurnOutcome, directFollowupTurns,
     shouldIgnoreProviderEvent: () => false,
-    watchdog: { settle() {} }, revokeInternalCapabilityForProviderEvent() {},
+    watchdog: { settle() {}, observe() {} }, coordinator: { progress() {} }, revokeInternalCapabilityForProviderEvent() {},
     unansweredApprovals: { annotate: (_threadId: string, _turnId: string, text: string) => text },
     settleDirectCoordination: (_generation: string, outcome: { ok: boolean; text: string }) => { outcomes.push(outcome); },
     settleDirectFollowup: (_generation: string, outcome?: { ok: boolean; text: string }) => {
@@ -315,23 +326,40 @@ it("provider reload preserves its cause when disposal completes the turn before 
   vm.runInContext(reloadCode + ts.transpileModule(stoppedText.getText(source) + "\n" + terminalSubscriber.getText(source), {
     compilerOptions: { target: ts.ScriptTarget.ESNext },
   }).outputText, context);
+  const fail = () => emit({ eventId: "independent-error", createdAt: "2026-10-29T00:00:00.000Z", type: "runtime.error", provider: "openai-compat", threadId, turnId, message: "Authentication failed: API key expired" });
+  if (when === "stopping") turnStops.stopping(threadId, turnId, "stopped by the original request");
+  if (when === "before") fail();
   const reloading = context.reloadProviders(before);
   try {
     await disposing;
     expect(outcomes).toEqual([]);
     expect(releaseTurnResources).not.toHaveBeenCalled();
     expect(registry.get("compat")).toBe(old);
+    if (when === "during") fail();
     endCli();
-    await reloading;
+    if (rejects) {
+      await expect(reloading).rejects.toThrow("synthetic teardown blocked");
+      expect.soft(turnStops.read(threadId, turnId)?.cause).toBe(when === "stopping" ? "stopped by the original request" : undefined);
+      expect(outcomes).toEqual([]);
+      expect(registry.get("compat")).toBe(old);
+      expect(releaseTurnResources).not.toHaveBeenCalled();
+      if (when === "after") fail();
+      complete();
+    } else await reloading;
     expect(outcomes).toEqual([{
       ok: false,
-      text: "Turn interrupted — provider settings changed. No tool calls were seen before it stopped.",
+      text: expected + ". No tool calls were seen before it stopped.",
     }]);
-    expect(registry.get("compat")).not.toBe(old);
-    expect(releaseTurnResources).toHaveBeenCalledWith(owner);
+    if (rejects) {
+      expect(registry.get("compat")).toBe(old);
+      expect(releaseTurnResources).not.toHaveBeenCalled();
+    } else {
+      expect(registry.get("compat")).not.toBe(old);
+      expect(releaseTurnResources).toHaveBeenCalledWith(owner);
+    }
   } finally {
     endCli();
-    await reloading;
+    await reloading.catch(() => {});
     dispose.mockResolvedValue();
     bus.detachAll();
     await bus.flush();

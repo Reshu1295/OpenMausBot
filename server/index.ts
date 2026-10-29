@@ -5070,7 +5070,7 @@ const roomStallCompletions = new RoomTurnStallRegistry();
 const turnStops = new TurnStops();
 function stoppedTurnText(threadId: string, turnId: string | undefined, cause?: string, stopReason?: string | null): string {
   const stop = turnStops.read(threadId, turnId);
-  const reason = cause ?? stop?.cause ?? stop?.error ?? `The turn did not complete (${stopReason?.trim() || "no reason given"})`;
+  const reason = cause ?? stop?.error ?? (stopReason === "interrupted" ? stop?.cause : undefined) ?? `The turn did not complete (${stopReason?.trim() || "no reason given"})`;
   const said = turnId ? store.messagesFor(threadId).findLast(message =>
     message.role === "bot" && message.kind === "text" && message.turnId === turnId)?.text : undefined;
   return stoppedTurnOutcome({
@@ -12165,7 +12165,11 @@ async function reloadProviders(before: Record<string, unknown>) {
   const onChanged = (botId: string, threadId: string) => changed.has(threadEngineId(botId, threadId) ?? "");
   const direct = store.bots.flatMap((bot) => store.tasks(bot.id)
     .filter((task) => threadBusy(bot.id, task.threadId) && onChanged(bot.id, task.threadId))
-    .map((task) => ({ botId: bot.id, threadId: task.threadId, owner: turnResourceOwners.get(task.threadId), instanceId: threadEngineId(bot.id, task.threadId) })));
+    .map((task) => {
+      const turnId = liveTurnByThread.get(task.threadId);
+      return { botId: bot.id, threadId: task.threadId, owner: turnResourceOwners.get(task.threadId), instanceId: threadEngineId(bot.id, task.threadId),
+        turnId, previousCause: turnStops.read(task.threadId, turnId)?.cause };
+    }));
   const rooms = [...groupSpeakers.entries()].filter(([threadId, speaker]) => onChanged(speaker.botId, threadId))
     .map(([threadId, speaker]) => [threadId, speaker, threadEngineId(speaker.botId, threadId)] as const);
   const cause = "turn interrupted — provider settings changed";
@@ -12175,7 +12179,7 @@ async function reloadProviders(before: Record<string, unknown>) {
   revokeEngineCapabilities(changed);
   for (const id of changed) providerAuthSessions.clearInstance(id);
   for (const task of direct) {
-    turnStops.stopping(task.threadId, liveTurnByThread.get(task.threadId), cause);
+    turnStops.stopping(task.threadId, task.turnId, cause);
     cancelDirectTurnDispatch(task.botId, task.threadId);
   }
   for (const [threadId] of rooms) {
@@ -12188,6 +12192,13 @@ async function reloadProviders(before: Record<string, unknown>) {
     reloaded = result.reloaded;
     if (result.failed) throw result.failed.reason;
   } finally {
+    for (const { threadId, turnId, previousCause, instanceId } of direct) {
+      if (reloaded.has(instanceId ?? "") || liveTurnByThread.get(threadId) !== turnId) continue;
+      const stop = turnStops.read(threadId, turnId);
+      if (stop?.cause !== cause) continue;
+      if (previousCause === undefined) delete stop.cause;
+      else stop.cause = previousCause;
+    }
     for (const { botId, threadId, owner } of direct.filter(task => reloaded.has(task.instanceId ?? ""))) {
       const interrupted = stoppedTurnText(threadId, liveTurnByThread.get(threadId), cause);
       stopScreenPoller(botId, threadId);
