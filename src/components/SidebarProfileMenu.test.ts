@@ -38,6 +38,8 @@ import type { CloudMachine } from "../../electron/cloud-home.mjs";
 import { PHONE_APPS, PhoneAppDialog, type PhoneAppConnect } from "./PhoneAppDialog";
 import type { UpdaterState } from "@/lib/updater";
 import type { SidebarMenuItem } from "./SidebarPopoverMenu";
+import { moveMenuItems } from "./AccountMove";
+import { moveLine } from "@/lib/cloud-send";
 import { InitialsAvatar } from "./Avatar";
 
 const state = (patch: Partial<UpdaterState>): UpdaterState => ({ status: "idle", ...patch }) as UpdaterState;
@@ -515,21 +517,33 @@ describe("Simple mode's account menu", () => {
     expect(accountDot({ automationsNeedYou: false, update: "news", move: "sending" })).toBe("accent");
   });
 
-  it("puts the move's rows first, in their own group, above a raised update", () => {
-    const move = [{ key: "cloud-move", label: "Your bots couldn't move to My Cloud yet.", onSelect: noop }, { key: "cloud-move-retry", label: "Try again", onSelect: noop }];
+  it("puts the move's row first, in its own group, above a raised update", () => {
+    const move = [{ key: "cloud-move", label: "Try My Cloud move again", title: "My Cloud did not answer.", onSelect: noop }];
     const update = { key: "update", label: "OpenMausBot 0.2.0 ready, restart", onSelect: noop };
     expect(groups(build({ move }))).toEqual([
-      ["cloud-move", "cloud-move-retry"],
+      ["cloud-move"],
       ["usage", "phone-app", "support", "settings"],
       ["automations", "team-map"],
       ["place", "switch-place", "account"],
     ]);
-    expect(groups(build({ move, update, updateTop: { label: "Update ready", action: "Restart" } })).slice(0, 2)).toEqual([["cloud-move", "cloud-move-retry"], ["update"]]);
+    expect(groups(build({ move, update, updateTop: { label: "Update ready", action: "Restart" } })).slice(0, 2)).toEqual([["cloud-move"], ["update"]]);
     expect(groups(build({ move: [] }))[0]).toEqual(["usage", "phone-app", "support", "settings"]);
   });
 
-  it("puts the move's rows first in Advanced's account menu too, under their own divider", () => {
-    const move = [{ key: "cloud-move", label: "Moving your bots to My Cloud…", onSelect: noop }];
+  it("gives a failing or moving move one row shaped like Usage and Settings: a label and an icon, no second line", () => {
+    const shape = (item: SidebarMenuItem) => ({ lines: [item.subtitle, item.note].filter(Boolean).length, wrap: item.wrap === true, icon: Boolean(item.icon) });
+    const failing = moveMenuItems(moveLine({ phase: "copy", failing: { error: "Some of this computer's things did not reach My Cloud." } }, "local"), { onOpen: noop, onRetry: noop, onClose: noop });
+    const moving = moveMenuItems(moveLine({ phase: "copy", chats: { done: 34, total: 120 } }, "local"), { onOpen: noop, onRetry: noop, onClose: noop });
+    for (const move of [failing, moving]) {
+      const items = build({ move });
+      expect(groups(items)[0]).toEqual(["cloud-move"]);
+      const settings = items.find((item) => item.key === "settings")!;
+      expect(shape(items[0]!)).toEqual(shape(settings));
+    }
+  });
+
+  it("puts the move's row first in Advanced's account menu too, under its own divider", () => {
+    const move = [{ key: "cloud-move", label: "Moving to My Cloud…", title: "Moving your bots to My Cloud… 34 of 120 chats", onSelect: noop }];
     expect(groups(build({ simple: undefined, move }))).toEqual([["cloud-move"], ["usage", "phone-app", "support", "settings", "update"], ["account"]]);
     expect(groups(build({ simple: undefined }))).toEqual([["usage", "phone-app", "support", "settings", "update"], ["account"]]);
   });

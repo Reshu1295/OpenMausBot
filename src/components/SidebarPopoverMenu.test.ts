@@ -38,12 +38,26 @@ it("draws an item's attention dot on the item itself, in its tone", () => {
 
 it("lets a sentence wrap instead of cutting it short, with its icon on the first line", () => {
   const html = render([
-    { key: "move", label: "Your bots couldn't move to My Cloud yet.", note: "My Cloud did not answer.", wrap: true, icon: "!", onSelect: () => {} },
-    { key: "progress", label: "Moving your bots to My Cloud… 34 of 120 chats", wrap: true, onSelect: () => {} },
+    { key: "arrived", label: "Everything from this computer is here: 4 bots and 148 chats.", note: "OPENAI_API_KEY stayed on this computer.", wrap: true, icon: "!", onSelect: () => {} },
+    { key: "sentence", label: "Everything from this computer is here: 4 bots, 2 skills and 148 chats.", wrap: true, onSelect: () => {} },
     { key: "plain", label: "Settings", onSelect: () => {} },
-  ]).replaceAll("&#x27;", "'");
-  expect(html).toContain('<span class="break-words">Your bots couldn\'t move to My Cloud yet.</span>');
-  expect(html).toContain('<span class="flex-1 min-w-0 break-words">Moving your bots to My Cloud… 34 of 120 chats</span>');
+  ]);
+  expect(html).toContain('<span class="break-words">Everything from this computer is here: 4 bots and 148 chats.</span>');
+  expect(html).toContain('<span class="flex-1 min-w-0 break-words">Everything from this computer is here: 4 bots, 2 skills and 148 chats.</span>');
   expect(html).toMatch(/self-start[^"]*">!<\/span>/);
   expect(html).toContain('<span class="flex-1 truncate">Settings</span>');
+});
+
+it("puts what a one-line row leaves out in its tooltip, drawn the same as every other row", () => {
+  const html = render([
+    { key: "cloud-move", label: "Try My Cloud move again", title: "My Cloud did not answer.", icon: "!", keepOpen: true, onSelect: () => {} },
+    { key: "settings", label: "Settings", icon: "!", onSelect: () => {} },
+  ]);
+  const row = (key: string) => html.match(new RegExp(`<button[^>]*data-menu-key="${key}"[^>]*>.*?</button>`))?.[0] ?? "";
+  expect(row("cloud-move")).toContain('title="My Cloud did not answer."');
+  expect(row("settings")).not.toContain("title=");
+  const look = (key: string) => row(key).match(/ class="([^"]*)"/)?.[1];
+  expect(look("settings")).toMatch(/\bitems-center\b/);
+  expect(look("cloud-move")).toBe(look("settings"));
+  expect(row("cloud-move")).toContain('<span class="flex-1 truncate">Try My Cloud move again</span>');
 });

@@ -90,10 +90,13 @@ it says so in one line, with a fresh start only behind **More**. Before anything
 has come, it offers a fresh start. The move never shows as a strip over the page
 (`src/components/CloudSendStrip.test.ts`): it lives in the account area at the
 bottom of the sidebar (`src/components/AccountMove.test.ts`). On its way, the
-account line says "Moving to My Cloud…" with the progress in the account menu;
-after a day of failing it says "My Cloud move needs you", the avatar gets a red
-dot, and the menu's top rows give the reason and Try again; on My Cloud's page
-the menu says once what arrived, with the phone to pair and Got it.
+account line says "Moving to My Cloud…" and so does one row in the account
+menu, with the progress in its tooltip; after a day of failing the line says "My
+Cloud move needs you" and ends with Try again, the avatar gets a red dot, and the
+menu's top row says "Try My Cloud move again", the size of every other row, with
+the reason in its tooltip. Both run the one retry, and both wait with a spinner
+while it runs. On My Cloud's page the menu says once what arrived, with the phone
+to pair and Got it.
 
 ## The real utility port
 

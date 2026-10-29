@@ -4,7 +4,7 @@ import { cn } from "@/lib/cn";
 import type { SidebarDensity } from "@/lib/sidebar-preferences";
 import { useStore } from "@/state/store";
 
-import { AccountMoveStatus, useAccountMoveKind } from "./AccountMove";
+import { AccountMoveStatus, useAccountMoveLine } from "./AccountMove";
 import { CloudUsageCard } from "./CloudUsageMeter";
 import { endCloudHowTo, useWorkspacePlace, type WorkspacePlace } from "./DesktopWorkspaceSwitcher";
 import { SidebarConnectApps } from "./SidebarConnectApps";
@@ -28,15 +28,15 @@ function SimpleSidebarFooter({ owner, archived }: { owner: string | null; archiv
   const { state } = useStore();
   const place = useSimplePlace();
   const account = useSimpleAccount(place, owner, archived);
-  const moveKind = useAccountMoveKind(state.config?.cloudHome === true);
+  const move = useAccountMoveLine(state.config?.cloudHome === true);
   const footer = useRef<HTMLDivElement>(null);
-  // The move's line opens the account menu just below it, where its rows and Try again are.
+  // The move's words open the account menu just below them, where the move's row is.
   const openAccount = () => footer.current?.querySelector("[data-sidebar-account]")?.closest("button")?.click();
   return (
     <div ref={footer} data-sidebar-footer="simple" className="px-4 pb-4 pt-2">
       <CloudUsageCard />
       <SidebarPlaceStatus place={place} className="mb-2 px-1" />
-      <AccountMoveStatus kind={moveKind} onOpen={openAccount} className="px-1" />
+      <AccountMoveStatus kind={move.kind} retry={move.retry} onOpen={openAccount} className="ps-1" />
       <div className="flex items-center gap-2 not-first:mt-2">
         <SidebarProfileMenu simple={account} />
         <SidebarConnectApps />

@@ -25,6 +25,8 @@ export interface SidebarMenuItem {
   chevron?: boolean;
   /** a sentence that wraps instead of being cut short */
   wrap?: boolean;
+  /** the row's tooltip, for what its one line leaves out */
+  title?: string;
   onSelect: () => void;
   tourId?: string;
 }
@@ -110,6 +112,7 @@ function MenuRows({
             role="menuitem"
             data-tour={item.tourId}
             data-menu-key={item.key}
+            title={item.title}
             disabled={item.disabled}
             aria-haspopup={item.submenu ? "menu" : undefined}
             aria-expanded={item.submenu ? openSubmenu === item.key : undefined}
