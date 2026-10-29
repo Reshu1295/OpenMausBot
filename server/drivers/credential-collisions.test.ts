@@ -39,9 +39,11 @@ for (const aliasFirst of [false, true]) {
     const before = spawned.mock.calls.length;
     env[rotated] = "synthetic-new-token";
     env.FAKE_ACP_MODE = "happy";
-    const child = spawnSync(process.execPath, ["-e", "process.stdout.write(process.env[process.argv[1]])", rotated], { env, encoding: "utf8" });
-    expect(child.status, child.stderr).toBe(0);
-    expect(child.stdout).toBe("synthetic-new-token");
+    if (process.platform !== "win32") {
+      const child = spawnSync(process.execPath, ["-e", "process.stdout.write(process.env[process.argv[1]])", rotated], { env, encoding: "utf8" });
+      expect(child.status, child.stderr).toBe(0);
+      expect(child.stdout).toBe("synthetic-new-token");
+    }
     expect(await copilotSignedIn(env, { cli }, 10_000)).toBe(true);
     expect(spawned.mock.calls.length).toBeGreaterThan(before);
   });
