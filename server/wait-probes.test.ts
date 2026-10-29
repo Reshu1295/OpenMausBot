@@ -71,6 +71,23 @@ describe("file and process probes", () => {
     expect(pageSays(text, "status:   SHIPPED")).toBe(true);
     expect(pageSays(text, "shipped=1")).toBe(false);
   });
+  it("keeps a < with no > after it as text, and hides a script or comment left open as a browser does", () => {
+    expect(pageText("a < b")).toBe("a < b");
+    expect(pageText("<p>In stock</p><script>if (a < b) x = '<b>Sold out</b>'</script><SCRIPT>y</SCRIPT ><p>today</p>")).toBe("In stock today");
+    expect(pageText("<!-- <p>Sold out</p> -->In stock<!-->!<script>never closed <p>Sold out</p>")).toBe("In stock !");
+    expect(pageText("In stock<!-- never closed <p>Sold out</p>")).toBe("In stock");
+  });
+  it("reads a hostile 2 MB page in well under a second", () => {
+    // 64 KB first, so a reader that backtracks fails here in a second or two instead of running for minutes at 2 MB.
+    for (const [size, budgetMs] of [[64 * 1024, 250], [PAGE_MAX_BYTES, 1000]] as const) {
+      for (const unit of ["<", "<a ", "<!--", "<script>", "<style ", "<<>", "&lt;"]) {
+        const page = unit.repeat(Math.ceil(size / unit.length)).slice(0, size);
+        const started = performance.now();
+        pageText(page);
+        expect(performance.now() - started, `${size} bytes of ${unit}`).toBeLessThan(budgetMs);
+      }
+    }
+  });
 });
 
 describe("fetchPageText", () => {

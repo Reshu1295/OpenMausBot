@@ -112,13 +112,48 @@ function decodeEntities(text: string): string {
   });
 }
 
+/** `<script` or `<style` as a whole tag name: an element whose text a page never shows. */
+const HIDDEN_OPEN = /<(script|style)(?!\w)/iy;
+const HIDDEN_CLOSE: Record<string, RegExp> = { script: /<\/script[\s/>]/gi, style: /<\/style[\s/>]/gi };
+
+/**
+ * Where the markup starting with the `<` at `open` ends (just past it), or -1 when that `<` is text: no `>` follows
+ * anywhere, so no later `<` starts a tag either. A comment, script or style left open runs to the end, as in a browser.
+ */
+function markupEnd(body: string, open: number): number {
+  if (body.startsWith("<!--", open)) {
+    const close = body.indexOf("-->", open + 2);
+    return close === -1 ? body.length : close + 3;
+  }
+  const close = body.indexOf(">", open + 1);
+  if (close === -1) return -1;
+  HIDDEN_OPEN.lastIndex = open;
+  const hidden = HIDDEN_OPEN.exec(body)?.[1]?.toLowerCase();
+  if (!hidden) return close + 1;
+  const end = HIDDEN_CLOSE[hidden]!;
+  end.lastIndex = close + 1;
+  const found = end.exec(body);
+  const after = found ? body.indexOf(">", found.index) : -1;
+  return after === -1 ? body.length : after + 1;
+}
+
+/**
+ * A page's words: tags, comments, scripts and styles out, entities decoded, spaces collapsed. One linear pass, so a
+ * hostile 2 MB page costs milliseconds (the patterns this replaced backtracked, and took minutes on a page of `<`).
+ */
 export function pageText(body: string): string {
-  const stripped = body
-    .replace(/<script\b[\s\S]*?<\/script\s*>/gi, " ")
-    .replace(/<style\b[\s\S]*?<\/style\s*>/gi, " ")
-    .replace(/<!--[\s\S]*?-->/g, " ")
-    .replace(/<[^>]*>/g, " ");
-  return decodeEntities(stripped).replace(/\s+/g, " ").trim();
+  const words: string[] = [];
+  for (let at = 0; at < body.length;) {
+    const open = body.indexOf("<", at);
+    const end = open === -1 ? -1 : markupEnd(body, open);
+    if (end === -1) {
+      words.push(body.slice(at));
+      break;
+    }
+    words.push(body.slice(at, open), " ");
+    at = end;
+  }
+  return decodeEntities(words.join("")).replace(/\s+/g, " ").trim();
 }
 
 export function pageSays(text: string, wanted: string): boolean {
