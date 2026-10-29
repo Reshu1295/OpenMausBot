@@ -31,6 +31,7 @@ const LEAN: Record<NotifyKind, Lean> = {
   spend: "needs-you",
   brief: "needs-you",
   wait: "fyi",
+  notice: "fyi",
 };
 
 const LIST_LIMIT = 40;
