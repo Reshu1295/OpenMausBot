@@ -12,9 +12,9 @@
 //   openmausbot run | send | wait | doctor | team apply | export | …
 //
 // This module only exports: openmausbot.ts runs main(), so bundling this file into other entries never runs it twice.
-import { spawn, type ChildProcess } from "node:child_process";
+import { spawn } from "node:child_process";
 import { randomBytes } from "node:crypto";
-import { closeSync, existsSync, mkdirSync, openSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { createInterface } from "node:readline/promises";
@@ -34,8 +34,9 @@ import { runSentinelCli } from "./sentinel/cli.ts";
 import { runFleetCommand, type FleetInput } from "./fleet-cli.ts";
 import { startFleetAgent } from "./fleet-agent.ts";
 import { fleetLayout } from "./fleet.ts";
-import { explainTailscaleFailure, tailscaleServe, tailscaleServeOff, tailscaleStatus, type TailscaleStatus } from "./tailscale.ts";
+import { explainTailscaleFailure, tailscaleServeOff, tailscaleStatus, type TailscaleStatus } from "./tailscale.ts";
 import { defaultSetupIo, SetupCancelled, type SetupIo } from "./cli-prompts.ts";
+import { launchServeChild, type RunningServe, type ServeChildHandle } from "./cli-serve.ts";
 import { HEADLESS_VERB_NAMES, USAGE } from "./cli-usage.ts";
 import { normalizePhoneOrigin, phonePairingInstructions, runPhoneSetup } from "./cli-phone-setup.ts";
 import { browserSignInLines, pairingBlock } from "./cli-pairing.ts";
@@ -747,8 +748,9 @@ export async function runServe(options: CliOptions, log: (line: string) => void 
   const env: NodeJS.ProcessEnv = {
     ...process.env,
     OMB_DATA_DIR: options.dataDir,
-    OMB_PORT: String(options.port),
-    OMB_WEBHOOK_PORT: process.env.OMB_WEBHOOK_PORT || String(options.port + 1),
+    // OMB_PORT and OMB_WEBHOOK_PORT are assigned per launch attempt by
+    // cli-serve.ts: it negotiates a free pair, then pins the child to it.
+    OMB_PORT_PINNED: "1",
   };
   if (options.local) delete env.OMB_PUBLIC_URL;
   // The per-launch secret goes over stdin, not the environment that every engine the server starts inherits.
@@ -760,59 +762,15 @@ export async function runServe(options: CliOptions, log: (line: string) => void 
   if (entry.skillsDir && !process.env.OMB_SKILLS_DIR) env.OMB_SKILLS_DIR = entry.skillsDir;
   if (options.label && !process.env.OMB_ENVIRONMENT_LABEL) env.OMB_ENVIRONMENT_LABEL = options.label;
   if (plan) env.OMB_TUNNEL_SOCKET = plan.origin.socketPath;
-  let logPath: string | undefined;
-  let logFd: number | undefined;
-  let tailscaleServing = false;
-  let tailscaleAttempted = false;
-  let startupCancelled = false;
-  const cancelStartup = () => { startupCancelled = true; };
-  process.on("SIGINT", cancelStartup);
-  process.on("SIGTERM", cancelStartup);
-  let child: ChildProcess;
-  try {
-    if (options.guided) {
-      const logsDir = join(options.dataDir, "logs");
-      mkdirSync(logsDir, { recursive: true, mode: 0o700 });
-      logPath = join(logsDir, `server-${Date.now()}-${process.pid}.log`);
-      logFd = openSync(logPath, "wx", 0o600);
-      log("\nStarting your workspace…");
-    }
-    if (tailscale) {
-      tailscaleAttempted = true;
-      const served = await tailscaleServe(tailscale, options.port);
-      if (startupCancelled) throw new SetupCancelled();
-      if ("failure" in served) throw new Error(`--tailscale: ${explainTailscaleFailure(served.failure)}`);
-      tailscaleServing = true;
-      publicUrl = served.origin;
-      log(`tailscale: serving https://${tailscale.dnsName} → http://127.0.0.1:${options.port} (only your tailnet can reach it)`);
-    }
-    if (startupCancelled) throw new SetupCancelled();
-    if (publicUrl) env.OMB_PUBLIC_URL = publicUrl;
-    child = spawn(entry.command, entry.args, { env, stdio: [ownerToken ? "pipe" : "ignore", logFd ?? "inherit", logFd ?? "inherit"] });
-    if (ownerToken) {
-      child.stdin?.on("error", () => {});
-      child.stdin?.end(`${ownerToken}\n`);
-      serveOwnerToken = ownerToken;
-    }
-  } catch (error) {
-    if ((tailscaleServing || (startupCancelled && tailscaleAttempted)) && tailscale) await tailscaleServeOff(tailscale).catch(() => undefined);
-    plan?.account?.service.dispose();
-    if (plan) cleanupTunnelOrigin(plan.origin);
-    if (error instanceof SetupCancelled) {
-      log("Startup cancelled. No server was started; your saved work is unchanged.");
-      return 130;
-    }
-    throw error;
-  } finally {
-    if (logFd !== undefined) closeSync(logFd);
-    process.removeListener("SIGINT", cancelStartup);
-    process.removeListener("SIGTERM", cancelStartup);
-  }
-  let exited: number | null = null;
-  const childExit = new Promise<number>((done) => {
-    child.once("error", () => { exited = 1; done(1); });
-    child.once("exit", (code, signal) => { exited = code ?? (signal === "SIGTERM" || signal === "SIGINT" ? 0 : 1); done(exited); });
-  });
+  // cli-serve.ts owns the launch itself — negotiating a free loopback port
+  // pair, pinning the child to it, proving readiness, and relaunching on the
+  // next pair when a third party steals a negotiated port before the child
+  // binds. runServe keeps teardown: stop() reaches the in-flight child through
+  // the handle the launcher registers, so a signal mid-relaunch still kills
+  // the newest attempt.
+  const tailscaleState = tailscale ? { status: tailscale, serving: false, attempted: false } : null;
+  let running: RunningServe | null = null;
+  let currentChild: ServeChildHandle | null = null;
   let tunnel: RunningTunnel | null = null;
   let caddy: RunningCaddy | null = null;
   let stopping: Promise<void> | null = null;
@@ -823,43 +781,55 @@ export async function runServe(options: CliOptions, log: (line: string) => void 
       // The gateway and the edge stop accepting before the server they forward to goes away.
       if (tunnel) await tunnel.stop().catch(() => undefined);
       if (caddy) await caddy.stop().catch(() => undefined);
-      if (tailscaleServing && tailscale) await tailscaleServeOff(tailscale).catch(() => undefined);
-      if (exited === null) {
-        child.kill("SIGTERM");
-        const timer = setTimeout(() => child.kill("SIGKILL"), 10_000);
-        timer.unref();
-        await childExit;
-        clearTimeout(timer);
-      }
+      if (tailscaleState?.serving) await tailscaleServeOff(tailscaleState.status).catch(() => undefined);
+      await currentChild?.terminate();
       if (plan) cleanupTunnelOrigin(plan.origin);
     })();
     return stopping;
   };
-  const onSignal = () => { void stop(); };
-  process.on("SIGINT", onSignal);
-  process.on("SIGTERM", onSignal);
 
   try {
-    const deadline = Date.now() + 60_000;
-    while (Date.now() < deadline && exited === null && !stopping) {
-      if (await serverUp(options.port, child.pid)) break;
-      await new Promise((r) => setTimeout(r, 250));
-    }
-    if (exited !== null) {
-      if (exited !== 0) log(`OpenMausBot could not start.${logPath ? ` Details: ${logPath}` : " See the output above."}`);
-      return exited;
-    }
-    if (stopping) return await childExit;
-    if (!(await serverUp(options.port, child.pid))) {
-      console.error(`OpenMausBot did not become ready within a minute.${logPath ? ` Details: ${logPath}` : " See its output above."}`);
-      await stop();
-      return 1;
-    }
-    if (stopping || exited !== null) return await childExit;
+    const launched = await launchServeChild({
+      entry,
+      env,
+      dataDir: options.dataDir,
+      guided: options.guided,
+      requestedPort: options.port,
+      requestedWebhookPort: Number(process.env.OMB_WEBHOOK_PORT) || options.port + 1,
+      publicUrl,
+      ownerToken,
+      tailscale: tailscaleState,
+      log,
+      error: (line) => console.error(line),
+      stopping: () => stopping !== null,
+      stop,
+      onShutdown: () => { void stop(); },
+      onChild: (handle) => { currentChild = handle; },
+      onSpawnFailure: () => {
+        plan?.account?.service.dispose();
+        if (plan) cleanupTunnelOrigin(plan.origin);
+      },
+      onCancelled: () => log("Startup cancelled. No server was started; your saved work is unchanged."),
+      onOwnerToken: (token) => { serveOwnerToken = token; },
+      serverUp,
+      webhookIngressAvailable: async (port) => {
+        try {
+          return (await api(port, "/api/webhooks")).body?.ingress?.available;
+        } catch {
+          return undefined;
+        }
+      },
+    });
+    if (launched.status === "stopping") return await launched.exit;
+    if (launched.status === "exit") return launched.code;
+    running = launched.server;
+    const { port, webhookPort } = running;
+    publicUrl = running.publicUrl;
+    if (stopping || running.exited !== null) return await running.exit;
     if (options.domain && caddyBinary) {
       try {
-        caddy = await startCaddy({ binary: caddyBinary, dataDir: options.dataDir, domain: options.domain, appPort: options.port, webhookPort: Number(env.OMB_WEBHOOK_PORT), log });
-        log(`https: Caddy serves ${publicUrl} → http://127.0.0.1:${options.port}; it gets the certificate from Let's Encrypt once DNS for ${options.domain} points at this machine`);
+        caddy = await startCaddy({ binary: caddyBinary, dataDir: options.dataDir, domain: options.domain, appPort: port, webhookPort, log });
+        log(`https: Caddy serves ${publicUrl} → http://127.0.0.1:${port}; it gets the certificate from Let's Encrypt once DNS for ${options.domain} points at this machine`);
         void caddy.exited.then((code) => {
           if (!stopping) log(`caddy: stopped (exit ${code ?? "signal"}); ${publicUrl} is no longer served. Stop and start the server again.`);
         });
@@ -869,11 +839,11 @@ export async function runServe(options: CliOptions, log: (line: string) => void 
         return 1;
       }
     }
-    if (plan && child.pid) {
+    if (plan && running.pid) {
       tunnel = startTunnel({
         dataDir: options.dataDir,
         access: plan.access,
-        originTarget: { pid: child.pid, socketPath: plan.origin.socketPath },
+        originTarget: { pid: running.pid, socketPath: plan.origin.socketPath },
         binaryPath: plan.binary,
         guardian: plan.guardian,
         onState: (state) => log(describeTunnelState(state, plan.access.endpoint)),
@@ -883,11 +853,11 @@ export async function runServe(options: CliOptions, log: (line: string) => void 
       void plan.account?.service.restore().catch(() => undefined);
     }
     log("");
-    log(`OpenMausBot is running on http://127.0.0.1:${options.port}${publicUrl ? `, reachable at ${publicUrl}` : ""}`);
+    log(`OpenMausBot is running on http://127.0.0.1:${port}${publicUrl ? `, reachable at ${publicUrl}` : ""}`);
     if (options.guided) {
       log("Your bots and conversations are saved automatically.");
-      log(`Details if you need help: ${logPath}`);
-      if (options.open !== false && !await openDashboard(options.port)) log("Open the local address above in a browser on this computer.");
+      log(`Details if you need help: ${running.logPath}`);
+      if (options.open !== false && !await openDashboard(port)) log("Open the local address above in a browser on this computer.");
     } else {
       log(`data: ${options.dataDir}`);
       log(describeBrowserEngine(browserEngineStatus({ dataDir: options.dataDir })));
@@ -898,15 +868,15 @@ export async function runServe(options: CliOptions, log: (line: string) => void 
         // No pairing secret is created or sent to the public address until its identity is verified.
         log("Preparing the phone connection…");
         let timer: ReturnType<typeof setTimeout> | undefined;
-        await Promise.race([tunnel.started.catch(() => undefined), childExit,
+        await Promise.race([tunnel.started.catch(() => undefined), running.exit,
           new Promise((done) => { timer = setTimeout(done, 15_000); })]);
         if (timer) clearTimeout(timer);
       }
-      if (!stopping && exited === null) await showPhonePairing(options, publicUrl, log).catch((error: unknown) => log(`no pairing code: ${message(error)}`));
+      if (!stopping && running.exited === null) await showPhonePairing({ ...options, port }, publicUrl, log).catch((error: unknown) => log(`no pairing code: ${message(error)}`));
     } else if (options.pair) {
       log("");
       try {
-        log(await mintPairing(options.port, { label: options.label ? `${options.label} owner` : undefined, client: options.client, publicUrl: publicUrl ?? undefined, guided: options.guided }));
+        log(await mintPairing(port, { label: options.label ? `${options.label} owner` : undefined, client: options.client, publicUrl: publicUrl ?? undefined, guided: options.guided }));
         if (!options.guided) log("\nanother device later:  openmausbot pair --label \"Kitchen iPad\"");
       } catch (error) {
         log(`no pairing code: ${message(error)}`);
@@ -915,12 +885,11 @@ export async function runServe(options: CliOptions, log: (line: string) => void 
     }
     log(options.guided ? "\nKeep this terminal open while using your bots. Ctrl+C stops the server, not your saved work." : "stop with Ctrl+C");
     if (options.guided) log("Next time: openmausbot · Change AI or phone setup: openmausbot setup · Pair another phone: openmausbot pair");
-    return await childExit;
+    return await running.exit;
   } finally {
     serveOwnerToken = undefined;
     await stop();
-    process.removeListener("SIGINT", onSignal);
-    process.removeListener("SIGTERM", onSignal);
+    running?.disarm();
   }
 }
 

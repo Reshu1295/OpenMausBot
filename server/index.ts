@@ -16,6 +16,7 @@ import { compactBudget, compactionReading, contextWindowFor, shouldCompact } fro
 import { autoCompactWindow } from "./drivers/claude.ts";
 import { RoomContextTracker, roomResetNote } from "./room-context.ts";
 import { createRoomTranscript, GROUP_CONTEXT_MESSAGES } from "./host/room-transcript.ts";
+import { bootServer } from "./host/boot.ts";
 import { createRoomSessions } from "./host/room-sessions.ts";
 import { LentComputers, provenRequestPerson, SharedComputers, sharedComputerOperation } from "./shared-computers.ts"; import { lentScreenResult } from "./lent-screen-guidance.ts"; import { DeviceLinks } from "./device-links.ts";
 import { cloudHomeLendingRefusal, createCloudRoutineAuthors, ownerOnlyConversation } from "./cloud-lending.ts"; import { assertRoomFolder } from "./room-folder.ts"; import { cloudConnectedAppsBrokerUrl, startCloudHomeConnectedApps, stopCloudHomeConnectedApps } from "./cloud-connected-apps.ts"; import { createTeamConnectionsHost } from "./host/team-connections-host.ts"; import { createCloudLendingTurns } from "./host/cloud-lending-turns.ts"; import { createTeamConnectionRoutes } from "./routes/team-connections.ts";
@@ -275,7 +276,7 @@ import { mainThread, wasOldestThread } from "./main-thread.ts";
 import { computerKindForResource, ManagedDesktopPolicy, type ComputerKind } from "./managed-policy.ts";
 import { hostedModelPolicy, HOSTED_MODEL_POLICY_HEADER } from "./hosted-models.ts";
 import { CLOUD_HOME_SECRET_KEYS, CLOUD_IGNORED_KEYS, cloudHomeConfiguration, cloudHomeOffersPlace, cloudHomePlaceRefusal, firstCloudTurnPatch } from "./cloud-home.ts";
-import { botBox, startBotBoxAtBoot } from "./bot-box/boot.ts";
+import { botBox } from "./bot-box/boot.ts";
 import { createCloudSignedHost } from "./host/cloud-signed-host.ts"; import { hiddenThreadRefusal, hideOthersSyncFolders } from "./host/team-private.ts"; import { createTeamMemberLeft } from "./host/team-member-left.ts"; import { createVisibilityHost } from "./host/visibility-host.ts";
 import { createCloudPower, registerCloudPower, wokeFromSleep, type CloudPower } from "./cloud-power.ts"; import { createSharedComputerRoutes } from "./routes/shared-computers.ts";
 import { lentCopies, noteSyncBotTurn } from "./routes/cloud-sync.ts";
@@ -471,7 +472,7 @@ import { createOutboundHold, OUTBOUND_HOLD_MS, type OutboundHoldAnswer } from ".
 import { connectorCallsIn, outboundCallsIn } from "../shared/outbound.ts";
 import { connectorAccessDecision, describeConnectorScopes } from "../shared/connector-scopes.ts";
 import { bindThreadLogCapProvider } from "./thread-log-rotation.ts";
-import { listenWebhookIngress, type WebhookIngress } from "./webhook-ingress.ts";
+import type { WebhookIngress } from "./webhook-ingress.ts";
 import { addressFor } from "./webhook-address.ts";
 import { assertModelVariantSupported, memberTurnSelection } from "./member-turn.ts";
 import { WebhookManager } from "./webhooks.ts";
@@ -514,7 +515,7 @@ import {
 } from "./turn-dispatch-guard.ts";
 import { createGracefulShutdown } from "./graceful-shutdown.ts";
 import { acquireDataDirLeaseForProcess } from "./data-dir-lease.ts";
-import { createWorkspaceAccess, describeEdition, editionForSettings, editionStatus, entitled, hostedWorkspaceConfiguration, hostedWorkspaceConfigured, licenseWarning, sharedWorkspaceFullAccessConfigured, loadEnterpriseLayer, workspaceMembership, type WorkspaceAccess } from "./enterprise.ts";
+import { describeEdition, editionForSettings, editionStatus, entitled, hostedWorkspaceConfiguration, hostedWorkspaceConfigured, licenseWarning, sharedWorkspaceFullAccessConfigured, loadEnterpriseLayer, workspaceMembership, type WorkspaceAccess } from "./enterprise.ts";
 import { environmentDescriptor, loadEnvironmentId, serverVersion } from "./environment.ts";
 import { WorkspaceBackupMaintenance } from "./workspace-backup-maintenance.ts";
 import { createWorkspaceBackupRoutes, isWorkspaceBackupSessionControl } from "./workspace-backup-http.ts";
@@ -534,7 +535,7 @@ import {
   resolveRequestAuth,
   parseCookies,
   serializeSessionCookie,
-  sessionCookieName, ownerOrAdmin,
+  ownerOrAdmin,
 } from "./request-auth.ts";
 import { cookieMaxAgeSeconds, formatPairingCode, SessionRegistry, type Scope, type SessionRecord } from "./sessions.ts";
 import { ThreadStarters } from "./thread-starters.ts";
@@ -632,8 +633,8 @@ import { withScopeHint } from "./connector-scope-hint.ts";
 import { connectorRequestItems } from "./connector-request-items.ts";
 import { personAsks as personAskAt } from "./thread-presence.ts";
 
-const PORT = Number(process.env.OMB_PORT || process.env.OGB_PORT || 8799);
-const WEBHOOK_PORT = Number(process.env.OMB_WEBHOOK_PORT || PORT + 1);
+let PORT = Number(process.env.OMB_PORT || process.env.OGB_PORT || 8799);
+let WEBHOOK_PORT = Number(process.env.OMB_WEBHOOK_PORT) || PORT + 1;
 const WEBHOOK_PUBLIC_URL = process.env.OMB_WEBHOOK_PUBLIC_URL || undefined;
 const STATIC_DIR = process.env.OMB_STATIC_DIR || null;
 
@@ -712,7 +713,6 @@ if (CLOUD_HOME) {
 }
 holdIncludedServices(CLOUD_ENV);
 for (const key of CLOUD_HOME_SECRET_KEYS) delete process.env[key];
-await startBotBoxAtBoot({ dataDir: DATA_DIR, port: PORT }); // The bot box (server/bot-box): on a Cloud home every bot turn runs in it, decided before any engine starts.
 if (CLOUD_HOME && Object.keys(CLOUD_SECRETS).length === 0) {
   console.warn("cloud home: its secrets came in this process's environment, which anything running as the same user can read in /proc; start it with cloud-home-start");
 }
@@ -735,7 +735,8 @@ const onePassword = new OnePasswordLogins({
 });
 if (logins.onePasswordToken()) void onePassword.refresh();
 const botLogins = new BotLogins(logins, onePassword);
-const SESSION_COOKIE = sessionCookieName(PORT, ENVIRONMENT_ID);
+// Assigned once the real bind port is known (server/host/boot.ts).
+let SESSION_COOKIE: string;
 const HOSTED_WORKSPACE = hostedWorkspaceConfigured();
 let workspaceAccess: WorkspaceAccess | null = null;
 const DESKTOP_MANAGED = process.env.OMB_DESKTOP_PARENT === "1";
@@ -1413,7 +1414,7 @@ const mcpOAuth = new McpOAuthManager({
   },
 });
 // Connector tool grants only filter tools/list; the relay's verdict decides each call.
-const teamConnections = createTeamConnectionsHost({ team: CLOUD_TEAM, dataDir: DATA_DIR, cfg: () => cfg, adminOrigin: CLOUD_HOME?.adminOrigin ?? null, harnessUrl: `http://127.0.0.1:${PORT}`, audienceOf: teamHost.audienceOf,
+const teamConnections = createTeamConnectionsHost({ team: CLOUD_TEAM, dataDir: DATA_DIR, cfg: () => cfg, adminOrigin: CLOUD_HOME?.adminOrigin ?? null, harnessUrl: () => `http://127.0.0.1:${PORT}`, audienceOf: teamHost.audienceOf,
   requester: (threadId, generation) => { const owner = directRequestOwners.get(threadId); return provenRequestPerson(owner, generation ?? owner?.generation ?? "", (id) => linePersonKey(store.messagesFor(threadId).find((message) => message.id === id))); },
   mint: (capability) => mintInternalCapability({ ...capability, depth: 0, kind: "connectors", skillAuthoring: false, createdBots: 0, openedThreads: 0 }), mcpOAuth, isSessionLive: (id) => sessions.isLive(id),
   botMcp: (bot) => mcpServersHost.mounted(bot), brokerUrl: () => (CLOUD_TEAM ? cloudConnectedAppsBrokerUrl() || null : null), composio }); teamConnections.primeApps();
@@ -2456,7 +2457,7 @@ const {
   browserRuntime, browserLive, usedBrowserSessions, browserSweep, temporaryBrowserSessions,
   currentBrowserSession, forgetTemporaryBrowser, myChromeAvailable, usesMyChrome, lentChromeSummary, browserSessionSpec, browserIntegration,
   browserReady, currentBrowserSpec, loginInput, browserSystemPrompt, closeBrowser, browserEngineSwitched, eraseDeletedBrowser, engineSummary, browserSessionsOf, signedInSitesTarget, uploadPaths, eraseAudienceBrowsers,
-} = createBrowserHost({ cfg, store: () => store, turnResources, activeInternalGenerationByThread, mintInternalCapability, DESKTOP_MANAGED, CLOUD_HOME, PORT, engineMemory, audienceOf: teamHost.browserAudience, ...(CLOUD_TEAM ? { browserBox: (fd: number, ro: readonly string[]) => botBox.browserBox(fd, ro) } : {}), lendRefusal: (turn) => cloudLendingRefusal({ botId: store.botByThread(turn.threadId)?.id ?? "", threadId: turn.threadId, generation: turn.generation }), device: () => deviceLinks.route(CLOUD_HOME_LENDER) ?? sharedComputers.internetAway(CLOUD_HOME_LENDER) ?? { unshared: true as const }, lentChrome: CLOUD_PERSONAL ? { route: () => deviceLinks.chromeRoute(CLOUD_HOME_LENDER), lender: () => sharedComputers.chromeLender(CLOUD_HOME_LENDER) } : undefined });
+} = createBrowserHost({ cfg, store: () => store, turnResources, activeInternalGenerationByThread, mintInternalCapability, DESKTOP_MANAGED, CLOUD_HOME, PORT: () => PORT, engineMemory, audienceOf: teamHost.browserAudience, ...(CLOUD_TEAM ? { browserBox: (fd: number, ro: readonly string[]) => botBox.browserBox(fd, ro) } : {}), lendRefusal: (turn) => cloudLendingRefusal({ botId: store.botByThread(turn.threadId)?.id ?? "", threadId: turn.threadId, generation: turn.generation }), device: () => deviceLinks.route(CLOUD_HOME_LENDER) ?? sharedComputers.internetAway(CLOUD_HOME_LENDER) ?? { unshared: true as const }, lentChrome: CLOUD_PERSONAL ? { route: () => deviceLinks.chromeRoute(CLOUD_HOME_LENDER), lender: () => sharedComputers.chromeLender(CLOUD_HOME_LENDER) } : undefined });
 
 const dataSheets = new DataSheetRegistry({
   broadcast: (frame) => broadcast({ ...frame }),
@@ -2900,7 +2901,7 @@ const phones = createPhones({
   dataDir: DATA_DIR, shared: Boolean(HOSTED_WORKSPACE || CLOUD_TEAM), cloudHome: Boolean(CLOUD_HOME), cloudOwnerKey: CLOUD_OWNER_KEY,
   loopbackTrust: LOOPBACK.trust, sharedMembership, store, sessions, routines: () => routines, ownerOrAdmin, cloudOwnerSession,
   cloudLendingRefusal, cloudLendingTurn, originIsUser: (turn) => turnOrigin(turn).kind === "user", request: (threadId) => directRequestOwners.get(threadId),
-  nudge: (frame) => broadcast(frame, { adminOnly: true }), harnessUrl: `http://127.0.0.1:${PORT}`,
+  nudge: (frame) => broadcast(frame, { adminOnly: true }), harnessUrl: () => `http://127.0.0.1:${PORT}`,
   mint: (botId, turn) => mintInternalCapability({ botId, ...turn, kind: "device", depth: 0, skillAuthoring: false, createdBots: 0, openedThreads: 0 }),
   active: (turn) => internalCapabilityIsActive(turn as InternalCapability),
 });
@@ -9649,24 +9650,7 @@ ROUTES.push(createLimitResetRoutes({ clock: limitClock, routines: routines!, req
   created: (id, auth) => cloudRoutineAuthors?.wrote(id, auth.kind === "session" ? actorKey(auth) : CLOUD_NOBODY_KEY) }));
 
 let webhookIngress: WebhookIngress | null = null;
-let webhookIngressError: string | null = null;
-try {
-  webhookIngress = await listenWebhookIngress(webhooks, {
-    port: WEBHOOK_PORT, publicBaseUrl: WEBHOOK_PUBLIC_URL,
-    claimRequest: () => { moveFreeze.assertTurns(); return workspaceMaintenance.request(); },
-  });
-  const advertised = WEBHOOK_PUBLIC_URL ? ` (advertised as ${webhookIngress.baseUrl})` : "";
-  console.log(`openmausbot webhook receiver on http://${webhookIngress.host}:${webhookIngress.port}${advertised}`);
-} catch (error) {
-  webhookIngressError = error instanceof Error ? error.message : String(error);
-  console.error(`openmausbot webhook receiver unavailable: ${webhookIngressError}`);
-}
-
-const webhookIngressStatus = () => ({
-  available: Boolean(webhookIngress),
-  baseUrl: webhookIngress?.baseUrl ?? `http://127.0.0.1:${WEBHOOK_PORT}`,
-  ...(webhookIngressError ? { error: webhookIngressError } : {}),
-});
+const webhookIngressStatus = () => bound.webhookIngressStatus();
 ROUTES.push(createWebhookRoutes({ webhooks, ingress: webhookIngressStatus, visible: (auth) => visibleTo(viewerFor(auth)) }));
 
 const RUNTIME_KEEP_MS = 30 * 24 * 60 * 60_000;
@@ -12310,7 +12294,7 @@ const publishedPages = createPublishedPages({ dataDir: DATA_DIR, cloudHome: CLOU
 // `let` slots are read per request.
 ROUTES.push(createThreadRoutes({
   store, userName: userNameFor, sessions, groupUsageReader, lendingEnabled,
-  hostedWorkspace: HOSTED_WORKSPACE, sessionCookie: SESSION_COOKIE, loopback: LOOPBACK, defaultPage: DEFAULT_PAGE,
+  hostedWorkspace: HOSTED_WORKSPACE, sessionCookie: () => SESSION_COOKIE, loopback: LOOPBACK, defaultPage: DEFAULT_PAGE,
   workspaceAccess: () => workspaceAccess,
   desktopMutationToken: () => desktopMutationToken,
   companionMutationToken: () => companionMutationToken,
@@ -15631,12 +15615,6 @@ const pruneDecisionLog = () => {
 };
 pruneDecisionLog();
 setInterval(pruneDecisionLog, 6 * 60 * 60_000).unref();
-workspaceAccess = createWorkspaceAccess({ sessions, cookieName: SESSION_COOKIE, closeSessionStreams });
-// With the bridge's five-second deadline, this bounds stale portal access on quiet streams to fifteen seconds.
-const workspaceAccessTimer = workspaceAccess ? setInterval(() => {
-  void workspaceAccess!.revalidate().catch((error) => console.warn("workspace access revalidation failed", error));
-}, 10_000) : null;
-workspaceAccessTimer?.unref();
 console.log(describeBrand(loadBrand()));
 
 // Before any row below settles: an interrupted dispatch's words come back with a review notice, never to a model a second time.
@@ -15685,37 +15663,10 @@ if (CLOUD_HOME) registerCloudPower(cloudPower = createCloudPower({ dataDir: DATA
   liveCall: () => liveCalls.current() !== null, computer: () => cloudComputerPower.awake() || boatLifecycleBusyBots.size > 0, nextDueAt: () => { const due = [routines?.nextDueAt() ?? null, proactive.brief.nextWakeAt()].filter((at): at is number => at !== null); return due.length ? Math.min(...due) : null; },
   maintenance: () => workspaceMaintenance.active || providerFleetReloading || providerAuthSessions.active || browserEngineInstall !== null } }));
 
-server.listen(PORT, "127.0.0.1", async () => {
-  companyRuntimeReady();
-  console.log(`openmausbot server on http://127.0.0.1:${PORT}`);
-  browserSweep.start(); moveFreeze.hold(() => appTriggers.start(), () => void appTriggers.stop()); startCloudHomeConnectedApps({ cloudHome: CLOUD_HOME !== null, dataDir: DATA_DIR, cloudGrant: CLOUD_ENV.OMB_CLOUD_CONNECTED_APPS_GRANT, apply: (access) => { composio.setManagedBrokerAccess(access); broadcast({ kind: "config", ...configStatus() }); } });
-  void afterFirstEngineRead().then(() => { if (builtInBrowserEnabled(cfg)) chromeLauncher.start(); });
-  followupsReady = true;
-  drainQueuedSends();
-  drainQueuedChannelSends();
-  void cloudComputerPower.armRunning();
-  startUpkeep({ bots: () => store.bots, retentionDays: () => threadEventLogRetentionDays(cfg), busy: threadBusy, openDirectHandoff: (threadId) => coordinator.activeDirect(threadId) });
-  if (enginesRead) {
-    await enginesRead;
-    if (companyShutdown) return;
-  }
-  // Only once every registry is initialized and the endpoint listens: earlier dispatch can hit uninitialized bindings.
-  moveFreeze.hold(() => { routines!.start(); proactive.start(); }, () => { routines!.stop(); proactive.stop(); });
-  limitClock.start();
-  moveFreeze.hold(() => memoryUpkeep.start(), () => memoryUpkeep.stop());
-});
-
 // Tunnel requests have no peer address, which request-auth treats as proxied: a session is required, never loopback trust.
 const TUNNEL_SOCKET = process.env.OMB_TUNNEL_SOCKET?.trim() || null;
 let tunnelListener: ReturnType<typeof createServer> | null = null;
-if (TUNNEL_SOCKET) {
-  if (process.platform !== "win32") rmSync(TUNNEL_SOCKET, { force: true });
-  tunnelListener = createServer(gzipTunnelReplies(handleRequest));
-  upgrades.attach(tunnelListener, handleRequest);
-  tunnelListener.listen(TUNNEL_SOCKET, () => {
-    console.log(`openmausbot tunnel listener on ${TUNNEL_SOCKET}`);
-  });
-}
+let workspaceAccessTimer: NodeJS.Timeout | null = null;
 
 /** A root the runtime holds is the runtime's to account for at the next start: a line here, with Retry, would start the job a second time. */
 function noteTurnsCutByShutdown(): void {
@@ -15740,6 +15691,7 @@ function runtimeHoldsRoot(threadId: string): boolean {
   return coordinator.active().some((n) => !n.parentId && n.threadId === threadId && !ENDED.has(n.status));
 }
 
+// Registered before the bind so a signal during startup is still a graceful shutdown.
 const gracefulShutdown = createGracefulShutdown({
   cleanup: [
     () => {
@@ -15815,4 +15767,52 @@ const gracefulShutdown = createGracefulShutdown({
 
 for (const signal of ["SIGINT", "SIGTERM"] as const) {
   process.on(signal, gracefulShutdown);
+}
+
+// A supervised child must stay on the port its parent polls; an unpinned server walks to a free port.
+const bound = await bootServer({
+  server,
+  host: "127.0.0.1",
+  port: PORT,
+  webhookPort: WEBHOOK_PORT,
+  pinned: process.env.OMB_PORT_PINNED === "1" || DESKTOP_MANAGED,
+  assignPort: (candidatePort) => { PORT = candidatePort; },
+  onListening: companyRuntimeReady,
+  dataDir: DATA_DIR,
+  environmentId: ENVIRONMENT_ID,
+  sessions,
+  closeSessionStreams,
+  webhooks,
+  webhookPublicUrl: WEBHOOK_PUBLIC_URL,
+  webhookClaimRequest: () => { moveFreeze.assertTurns(); return workspaceMaintenance.request(); },
+});
+PORT = bound.port;
+WEBHOOK_PORT = bound.webhookPort;
+webhookIngress = bound.webhookIngress;
+SESSION_COOKIE = bound.sessionCookie;
+workspaceAccess = bound.workspaceAccess;
+workspaceAccessTimer = bound.workspaceAccessTimer;
+
+browserSweep.start(); moveFreeze.hold(() => appTriggers.start(), () => void appTriggers.stop()); startCloudHomeConnectedApps({ cloudHome: CLOUD_HOME !== null, dataDir: DATA_DIR, cloudGrant: CLOUD_ENV.OMB_CLOUD_CONNECTED_APPS_GRANT, apply: (access) => { composio.setManagedBrokerAccess(access); broadcast({ kind: "config", ...configStatus() }); } });
+void afterFirstEngineRead().then(() => { if (builtInBrowserEnabled(cfg)) chromeLauncher.start(); });
+followupsReady = true;
+drainQueuedSends();
+drainQueuedChannelSends();
+void cloudComputerPower.armRunning();
+startUpkeep({ bots: () => store.bots, retentionDays: () => threadEventLogRetentionDays(cfg), busy: threadBusy, openDirectHandoff: (threadId) => coordinator.activeDirect(threadId) });
+await enginesRead;
+if (!companyShutdown) {
+  // Only once every registry is initialized and the endpoint listens: earlier dispatch can hit uninitialized bindings.
+  moveFreeze.hold(() => { routines!.start(); proactive.start(); }, () => { routines!.stop(); proactive.stop(); });
+  limitClock.start();
+  moveFreeze.hold(() => memoryUpkeep.start(), () => memoryUpkeep.stop());
+}
+
+if (TUNNEL_SOCKET) {
+  if (process.platform !== "win32") rmSync(TUNNEL_SOCKET, { force: true });
+  tunnelListener = createServer(gzipTunnelReplies(handleRequest));
+  upgrades.attach(tunnelListener, handleRequest);
+  tunnelListener.listen(TUNNEL_SOCKET, () => {
+    console.log(`openmausbot tunnel listener on ${TUNNEL_SOCKET}`);
+  });
 }
