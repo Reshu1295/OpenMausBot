@@ -558,3 +558,25 @@ describe("the usage meta", () => {
     expect(cloudUsageSummary({ status: "none" } as never)).toBeNull();
   });
 });
+
+describe("Simple mode in the You menu", () => {
+  const noop = () => {};
+  const flips: boolean[] = [];
+  const build = (on: boolean, simple?: Parameters<typeof profileMenuItems>[0]["simple"]) => profileMenuItems({
+    phone: [], usage: false, update: null, account: null, ...(simple ? { simple } : {}),
+    simpleMode: { on, onToggle: () => flips.push(!on) },
+    onUsage: noop, onSettings: noop, onShortcuts: noop, onAbout: noop, onHelp: noop, onFeedback: noop, onAccount: noop,
+  });
+
+  it.each<[string, Parameters<typeof profileMenuItems>[0]["simple"]]>([["Advanced", undefined], ["Simple", { tools: [], places: [] }]])("sits right after Settings in %s mode, as an on/off item", (_mode, simple) => {
+    const items = build(simple !== undefined, simple);
+    const keys = items.map((item) => item.key);
+    expect(keys[keys.indexOf("settings") + 1]).toBe("simple-mode");
+    const toggle = items.find((item) => item.key === "simple-mode")!;
+    expect(toggle.label).toBe("Simple mode");
+    expect(toggle.checked).toBe(simple !== undefined);
+    flips.length = 0;
+    toggle.onSelect();
+    expect(flips).toEqual([simple === undefined]);
+  });
+});
