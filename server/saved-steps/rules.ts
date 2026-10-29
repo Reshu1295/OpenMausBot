@@ -3,6 +3,7 @@ import { elementPath, type SlimStructured, type WireElement } from "./driver-wir
 import type { RecordedCall, RequestJournal } from "./journal.ts";
 import { exactRequest, hasMomentWords, inRequest, requestKey } from "./key.ts";
 import { matchElement } from "./resolve.ts";
+import { namesFinalAction, namesSecret } from "./screen-words.ts";
 
 export type ActionTool = "click" | "double_click" | "right_click" | "type_text" | "set_value" | "press_key" | "scroll" | "launch_app" | "bring_to_front" | "hotkey";
 
@@ -19,7 +20,7 @@ export interface Recipe { id: string; key: string; request: string; steps: Recip
 export type Refusal =
   | "moment-words" | "several-turns" | "incomplete-journal" | "denied" | "tool-error" | "unknown-tool" | "pixel-or-drag" | "extra-arguments"
   | "unknown-target" | "stale-element" | "unlabelled-element" | "ambiguous-element" | "typed-text-not-in-request" | "url-not-in-request" | "no-steps" | "too-many-steps"
-  | "typing-appends" | "toggle-element" | "key-without-window" | "partial-tree";
+  | "typing-appends" | "toggle-element" | "key-without-window" | "partial-tree" | "final-action" | "secret-field" | "unreadable-field";
 
 const MAX_STEPS = 40;
 const ADDRESSING = new Set(["element_token", "element_index", "pid", "window_id", "session"]);
@@ -35,9 +36,11 @@ export const KEPT_ARGS: Record<ActionTool, readonly string[]> = {
   press_key: ["key", "modifiers", "delivery_mode", "scope"],
   scroll: ["direction", "amount", "by", "delivery_mode", "scope"],
   hotkey: ["keys", "delivery_mode", "scope"],
-  launch_app: ["bundle_id", "name", "urls", "creates_new_application_instance"],
+  launch_app: ["bundle_id", "name", "urls"],
   bring_to_front: [],
 };
+/** A second copy of the app would make every later step of a repeat find two apps by that name. */
+const DROPPED_ARGS: Partial<Record<ActionTool, ReadonlySet<string>>> = { launch_app: new Set(["creates_new_application_instance"]) };
 
 const isActionTool = (tool: string): tool is ActionTool => Object.hasOwn(KEPT_ARGS, tool);
 
@@ -49,6 +52,42 @@ const FLIPPING_TOOLS: ReadonlySet<ActionTool> = new Set<ActionTool>(["click", "d
 
 /** A click flips a toggle from whatever state it is in, and element values never leave the bridge, so that state is unknown. */
 export const flipsToggle = (tool: ActionTool, role: string): boolean => FLIPPING_TOOLS.has(tool) && TOGGLE_ROLE.test(role);
+
+/** Pickers, sliders, steppers and toggles always hold some value, and set_value chooses a new one outright; any other
+ * field may hold text someone typed, which set_value would replace. */
+const CHOOSER_ROLE = /pop ?up|menu ?button|slider|incrementor|stepper|date|time|color ?well|check ?box|switch|toggle|radio/i;
+export const holdsTypedText = (role: string): boolean => !CHOOSER_ROLE.test(role);
+
+const ACTIVATING: ReadonlySet<ActionTool> = new Set<ActionTool>(["click", "double_click", "right_click", "press_key"]);
+const SECURE_ROLE = /secure/i;
+const TEXT_INPUT_ROLE = /text ?field|text ?area|combo ?box|search ?field/i;
+const MENU_ROLE = /pop ?up|menu ?button/i;
+const RETURN_KEYS = new Set(["return", "enter", "kp_enter", "keypad_enter", "numpad_enter"]);
+const DELETE_KEYS = new Set(["delete", "backspace", "forwarddelete", "forward_delete", "del"]);
+const COMMAND_KEYS = new Set(["cmd", "command", "meta", "super", "ctrl", "control"]);
+
+function pressedKeys(tool: ActionTool, args: Record<string, unknown>): string[] {
+  const keys = tool === "hotkey" ? args.keys : tool === "press_key" ? [...(Array.isArray(args.modifiers) ? args.modifiers : []), args.key] : [];
+  return Array.isArray(keys) ? keys.filter((key): key is string => typeof key === "string").map((key) => key.toLowerCase()) : [];
+}
+
+export const pressesReturn = (tool: ActionTool, args: Record<string, unknown>): boolean => pressedKeys(tool, args).some((key) => RETURN_KEYS.has(key));
+const pathLabel = (part: string) => part.slice(part.indexOf(":") + 1);
+
+/** Security invariant: no saved step presses a final, can't-undo action (send, delete, buy, pay, post, submit, order,
+ * transfer, publish and their like, in any language this app ships) or touches a secret field. */
+export function unsafeStep({ tool, args, window, element }: Pick<RecipeStep, "tool" | "args" | "window" | "element">): "final-action" | "secret-field" | null {
+  if (element) {
+    if (SECURE_ROLE.test(element.role) || ((tool === "set_value" || TEXT_INPUT_ROLE.test(element.role)) && namesSecret(element.label))) return "secret-field";
+    if (ACTIVATING.has(tool) && [element.label, window?.title, ...element.path.map(pathLabel)].some(namesFinalAction)) return "final-action";
+    if (tool === "set_value" && MENU_ROLE.test(element.role) && typeof args.value === "string" && namesFinalAction(args.value)) return "final-action";
+  }
+  if (tool === "launch_app" && Array.isArray(args.urls) && args.urls.some((url) => typeof url === "string" && namesFinalAction(url))) return "final-action";
+  const keys = pressedKeys(tool, args);
+  if (keys.some((key) => DELETE_KEYS.has(key))) return "final-action";
+  if (keys.some((key) => RETURN_KEYS.has(key)) && (keys.some((key) => COMMAND_KEYS.has(key)) || namesFinalAction(window?.title))) return "final-action";
+  return null;
+}
 
 const CONTROL_CHARACTERS = /\p{Cc}/u;
 const CONTEXT_TOOLS = new Set(["get_accessibility_tree", "get_desktop_state"]);
@@ -185,6 +224,16 @@ export function buildRecipe(input: { request: string; journal: RequestJournal; i
   };
 
   const indexUnsafe = journal.calls.some((call) => CONTEXT_TOOLS.has(call.tool));
+  // Return presses a window's default button: it saves only into a window read whole that shows no final action.
+  const readWhole = new Set<number>();
+  const showsFinalAction = new Set<number>();
+  for (const { tool, result } of journal.calls) {
+    const data = result.structured;
+    if (tool !== "get_window_state" || data?.window_id === undefined) continue;
+    if (data.elements_complete === true) readWhole.add(data.window_id);
+    if (namesFinalAction(data.window_title) || (data.elements ?? []).some((element) => namesFinalAction(element.label))) showsFinalAction.add(data.window_id);
+  }
+  const returnSafeIn = (id: number | undefined) => id !== undefined && readWhole.has(id) && !showsFinalAction.has(id);
   const steps: RecipeStep[] = [];
   for (const call of journal.calls) {
     const { tool, arguments: args, result } = call;
@@ -201,7 +250,7 @@ export function buildRecipe(input: { request: string; journal: RequestJournal; i
 
     const kept: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(args)) {
-      if (ADDRESSING.has(key)) continue;
+      if (ADDRESSING.has(key) || DROPPED_ARGS[tool]?.has(key)) continue;
       if (!KEPT_ARGS[tool].includes(key)) return refuse("extra-arguments");
       kept[key] = value;
     }
@@ -216,6 +265,7 @@ export function buildRecipe(input: { request: string; journal: RequestJournal; i
     if (malformed) return refuse("unknown-target");
     if (!windowScoped(tool, args)) return refuse("unknown-target");
 
+    let keyWindow = windowId;
     if (ELEMENT_TOOLS.has(tool) || (tool === "press_key" && addressed)) {
       const found = resolveElement(args);
       if (typeof found === "string") return refuse(found);
@@ -234,8 +284,14 @@ export function buildRecipe(input: { request: string; journal: RequestJournal; i
       if (title === undefined) return refuse("unknown-target");
       step.window = { title };
       step.element = { role: element.role, label: element.label, path };
+      keyWindow = snapshot.windowId ?? windowId;
+      const unsafe = unsafeStep(step);
+      if (unsafe) return refuse(unsafe);
+      if (tool === "set_value" && holdsTypedText(element.role) && element.value_read !== true) return refuse("unreadable-field");
     } else if (tool === "launch_app") {
       if (addressed || pid !== undefined || windowId !== undefined) return refuse("unknown-target");
+      const unsafe = unsafeStep(step);
+      if (unsafe) return refuse(unsafe);
     } else {
       const app = appFor(pid);
       if (addressed || !app) return refuse("unknown-target");
@@ -245,7 +301,10 @@ export function buildRecipe(input: { request: string; journal: RequestJournal; i
         if (title === undefined) return refuse("unknown-target");
         step.window = { title };
       } else if (KEY_TOOLS.has(tool)) return refuse("key-without-window");
+      const unsafe = unsafeStep(step);
+      if (unsafe) return refuse(unsafe);
     }
+    if (pressesReturn(tool, args) && !returnSafeIn(keyWindow)) return refuse("final-action");
     steps.push(step);
   }
 

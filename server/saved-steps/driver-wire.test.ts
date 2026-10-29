@@ -9,8 +9,18 @@ describe("slimResponse", () => {
         elements: [{ element_index: 2, element_token: "s1-e2", role: "AXTextArea", label: "Document", value: "secret value",
           frame: { x: 1, y: 2, w: 3, h: 4 }, actions: ["AXPress"], parent_index: 1, depth: 2 }] } } });
     expect(slim).toEqual({ isError: false, structured: { pid: 4242, window_id: 7, app_name: "TextEdit", window_title: "Untitled",
-      elements: [{ element_index: 2, element_token: "s1-e2", role: "AXTextArea", label: "Document", parent_index: 1, depth: 2 }] } });
+      elements: [{ element_index: 2, element_token: "s1-e2", role: "AXTextArea", label: "Document", parent_index: 1, depth: 2, value_read: true }] } });
     expect(JSON.stringify(slim)).not.toMatch(/AAAA|secret/);
+  });
+
+  it("notes that the driver read what an element holds, an empty field included, never the text itself", () => {
+    const read = (element: Record<string, unknown>) => slimResponse({ id: 1, result: { content: [], structuredContent: {
+      elements: [{ element_index: 1, role: "AXTextField", label: "To", depth: 1, ...element }] } } }).structured?.elements?.[0]?.value_read;
+    expect(read({ value: "" })).toBe(true);
+    expect(read({ value: "ann@example.com" })).toBe(true);
+    expect(read({})).toBeUndefined();
+    expect(read({ value: null })).toBeUndefined();
+    expect(read({ value: 3 })).toBeUndefined();
   });
 
   it("flags RPC errors, isError and refusals", () => {

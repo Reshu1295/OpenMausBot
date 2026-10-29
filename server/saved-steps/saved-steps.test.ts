@@ -180,14 +180,23 @@ describe("SavedSteps.requestSettled", () => {
 
   it.each<[string, Partial<SendTurnInput>, Partial<ReplayRequest>]>([
     ["the bot asks before acting", { approvalMode: "ask" }, {}],
+    ["the bot approves on Auto", { approvalMode: "auto" }, {}],
     ["the person did not pick this computer", {}, { placePicked: false }],
     ["a step's tool is not selected for the bot", { toolScope: { deny: ["mcp:computer:set_value"] } }, {}],
-  ])("saves the steps without promising no AI next time when %s", async (_, input, request) => {
+  ])("saves nothing, and so nothing that could run later unseen, when the same words would still go to the AI: %s", async (_, input, request) => {
     await sentThrough(input, request);
     record(textEditJournal().calls);
     steps.requestSettled(settled());
-    expect(saved()?.steps).toHaveLength(2);
+    expect(saved()).toBeUndefined();
     expect(patches).toEqual([]);
+  });
+
+  it("saves nothing when the request's last turn sent no line of the person's to replay", async () => {
+    await sentThrough();
+    await steps.dispatch.sendTurn(engine, null, { threadId: "t1", botId: "b1", text: REQUEST, approvalMode: "full" }, async () => ({ turnId: "turn-1" }));
+    record(textEditJournal().calls);
+    steps.requestSettled(settled());
+    expect(saved()).toBeUndefined();
   });
 
   it("marks a replayed reply, touches its recipe and clears the quick model label", () => {
@@ -305,7 +314,8 @@ describe("SavedSteps.requestSettled", () => {
     expect(patches).toEqual([]);
   });
 
-  it("an allowed approval and a turn with no denials leave it saveable", () => {
+  it("an allowed approval and a turn with no denials leave it saveable", async () => {
+    await sentThrough();
     steps.observe({ type: "request.resolved", threadId: "t1", turnId: "x", requestId: "q1", behavior: "allow", source: "user" } as RuntimeEvent);
     record(textEditJournal().calls);
     steps.observe({ type: "turn.completed", threadId: "t1", turnId: "x", ok: true, denials: [] as string[] } as RuntimeEvent);
@@ -332,23 +342,28 @@ describe("SavedSteps.requestSettled", () => {
   const COMPUTER_LINES = [toolLine("mcp__computer__get_window_state", 10), toolLine("mcp__computer__click", 11), toolLine("mcp__computer__set_value", 12)];
 
   it.each(["Read", "Glob", "Grep", "LS", "ToolSearch", "TodoWrite", "WebSearch", "WebFetch", "mcp__agents__select_computer", "select_computer", "web_search"])(
-    "saves a computer run that also used %s", (tool) => {
+    "saves a computer run that also used %s", async (tool) => {
+    await sentThrough();
     record(textEditJournal().calls);
     steps.requestSettled(settled({ after: [toolLine(tool, 9), ...COMPUTER_LINES, REPLY] }));
     expect(saved()?.steps).toHaveLength(2);
   },
   );
 
-  it("saves a select_computer hand-off whose second turn did the computer work", () => {
+  it("saves nothing for a select_computer hand-off: the same words would start again without this computer", async () => {
+    await sentThrough({ integrations: {} });
+    await steps.dispatch.sendTurn(engine, null, { threadId: "t1", botId: "b1", text: REQUEST, approvalMode: "full" }, async () => ({ turnId: "turn-2" }));
     record(textEditJournal().calls.map((call) => ({ ...call, generation: "g2" })));
     steps.requestSettled(settled({ generations: new Set(["g1", "g2"]), after: [toolLine("mcp__agents__select_computer", 9), ...COMPUTER_LINES, REPLY] }));
-    expect(saved()?.steps).toHaveLength(2);
+    expect(saved()).toBeUndefined();
+    expect(patches).toEqual([]);
   });
 
   it.each([
     ["without their server prefix", ""],
     ["with a single-underscore server prefix", "computer_"],
-  ])("saves a run whose engine names the computer's tools %s", (_, prefix) => {
+  ])("saves a run whose engine names the computer's tools %s", async (_, prefix) => {
+    await sentThrough();
     record(textEditJournal().calls);
     const named = ["list_apps", "list_windows", "get_window_state", "click", "set_value"].map((name, index) => toolLine(`${prefix}${name}`, 20 + index));
     steps.requestSettled(settled({ after: [...named, REPLY] }));
@@ -368,14 +383,16 @@ describe("SavedSteps.requestSettled", () => {
     expect(patches).toEqual([]);
   });
 
-  it("a browser call leaves the request saveable", () => {
+  it("a browser call leaves the request saveable", async () => {
+    await sentThrough();
     steps.gateChecked({ botId: "b1", threadId: "t1", generation: "g1", kind: "browser" });
     record(textEditJournal().calls);
     steps.requestSettled(settled());
     expect(saved()?.steps).toHaveLength(2);
   });
 
-  it("saves a computer-only run beside rows that are not tool calls", () => {
+  it("saves a computer-only run beside rows that are not tool calls", async () => {
+    await sentThrough();
     record(textEditJournal().calls);
     const notice: Message = { id: "notice", at: 9, role: "bot", kind: "activity", tool: { name: "Bash", ok: true } };
     steps.requestSettled(settled({ after: [notice, ...COMPUTER_LINES, REPLY] }));
@@ -406,6 +423,7 @@ describe("SavedSteps.requestSettled", () => {
     expect(saved()).toBeUndefined();
     expect(patches).toEqual([]);
 
+    await sentThrough();
     record(textEditJournal().calls);
     steps.requestSettled(settled());
     expect(saved()?.steps).toHaveLength(2);
@@ -418,7 +436,8 @@ describe("SavedSteps.requestSettled", () => {
     expect(steps.journal.take("t1", new Set(["g1"]))).toBeNull();
   });
 
-  it("frees a request that ended without settling, so its calls never crowd out the next request's", () => {
+  it("frees a request that ended without settling, so its calls never crowd out the next request's", async () => {
+    await sentThrough();
     const leftover = { ...textEditJournal().calls[0]!, generation: "g0" };
     record(Array.from({ length: 400 }, () => leftover));
     steps.requestEnded("t1", new Set(["g0"]));
@@ -427,9 +446,10 @@ describe("SavedSteps.requestSettled", () => {
     expect(saved()?.steps).toHaveLength(2);
   });
 
-  it("keeps settling when the recipe cannot be written", () => {
+  it("keeps settling when the recipe cannot be written", async () => {
     writeFileSync(join(folder, "blocked"), "");
     steps = facade({ folder: (botId) => join(folder, "blocked", botId) });
+    await sentThrough();
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     record(textEditJournal().calls);
     expect(() => steps.requestSettled(settled())).not.toThrow();

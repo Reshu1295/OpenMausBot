@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Message } from "../store.ts";
 import { recordedWindowState, textEditJournal } from "../testing/saved-steps-fixtures.ts";
-import type { SlimResult } from "./driver-wire.ts";
+import type { SlimResult, SlimStructured, WireElement } from "./driver-wire.ts";
 import type { RecordedCall, RequestJournal } from "./journal.ts";
 import { buildRecipe, personTextRequest, recipeFitsRequest, stepLabel, type Recipe } from "./rules.ts";
 
@@ -198,6 +198,111 @@ describe("buildRecipe", () => {
     const calls = [...textEditJournal().calls, observation("launch_app", { structured: { pid: 4242, name: "Other", bundle_id: "x.other" } }), action("bring_to_front", { pid: 4242 })];
     const out = build({ ...textEditJournal(), calls });
     expect(out.ok && out.recipe.steps.at(-1)?.app).toEqual({ bundleId: "com.apple.TextEdit", name: "TextEdit" });
+  });
+
+  it("saves a launch without its new-copy flag, so a repeat finds the one copy it opened", () => {
+    const out = build(textEditJournal({ calls: [action("launch_app", { name: "TextEdit", creates_new_application_instance: true })] }));
+    if (!out.ok) throw new Error(out.reason);
+    expect(out.recipe.steps).toEqual([{ tool: "launch_app", args: { name: "TextEdit" } }]);
+  });
+
+  const row = (index: number, role: string, label: string, more: Partial<WireElement> = {}): WireElement =>
+    ({ element_index: index, element_token: `s1-e${index}`, role, label, parent_index: 0, depth: 1, ...more });
+  const shown = (rows: WireElement[], extra: Partial<SlimStructured> = {}) =>
+    stateCall({ ...recordedWindowState(1), elements: [...recordedWindowState(1).elements!, ...rows], ...extra });
+  const LISTED = textEditJournal().calls.slice(0, 2);
+
+  describe("final, can't-undo actions", () => {
+    it.each([
+      "Send", "Senden", "Envoyer", "Enviar", "Invia", "Wyślij", "Отправить", "Надіслати", "Gönder", "Gửi", "भेजें", "送信", "发送", "傳送",
+      "Delete", "Löschen", "Supprimer", "Usuń", "Удалить", "Sil", "Xóa", "削除", "删除", "Buy now", "Jetzt kaufen", "Acheter", "Kup teraz", "購入",
+      "Pay", "Bezahlen", "Pagar", "Оплатить", "Öde", "付款", "Publish", "Publier", "Pubblica", "公開", "Submit", "Absenden", "Place your order",
+      "Zahlungspflichtig bestellen", "Sipariş ver", "Đặt hàng", "注文を確定する", "下单", "Transfer", "Überweisen", "Przelej", "转账", "Don’t Save", "Empty Trash",
+    ])("never saves a click on %s", (label) => {
+      expect(bare([shown([row(4, "AXButton", label)]), action("click", { element_token: "s1-e4" })])).toEqual({ ok: false, reason: "final-action" });
+    });
+
+    it.each(["Save a Copy", "Open", "Inbox", "Sent", "Drafts", "Cancel", "OK", "Speichern", "Ouvrir", "保存"])("still saves a click on %s", (label) => {
+      expect(bare([shown([row(4, "AXButton", label)]), action("click", { element_token: "s1-e4" })]).ok).toBe(true);
+    });
+
+    it.each([
+      ["a double click", "double_click", {}],
+      ["a right click", "right_click", {}],
+      ["a key pressed on it", "press_key", { key: "space" }],
+    ])("never saves %s on a final action either", (_, tool, args) => {
+      expect(bare([shown([row(4, "AXButton", "Send")]), action(tool, { element_token: "s1-e4", ...args })])).toEqual({ ok: false, reason: "final-action" });
+    });
+
+    it("never saves a click inside a final action's button, nor in a window titled with one", () => {
+      const inside = [row(4, "AXButton", "Send message"), row(5, "AXStaticText", "Go", { parent_index: 4, depth: 2 })];
+      expect(bare([shown(inside), action("click", { element_token: "s1-e5" })])).toEqual({ ok: false, reason: "final-action" });
+      expect(bare([shown([], { window_title: "Confirm your purchase" }), action("click", { element_token: "s1-e3" })])).toEqual({ ok: false, reason: "final-action" });
+    });
+
+    it("never saves a pop-up choice that names a final action", () => {
+      const menu = shown([row(4, "AXPopUpButton", "Action")]);
+      expect(build(textEditJournal({ calls: [menu, action("set_value", { element_token: "s1-e4", value: "Delete" })] }), "choose Delete in Action"))
+        .toEqual({ ok: false, reason: "final-action" });
+      expect(build(textEditJournal({ calls: [menu, action("set_value", { element_token: "s1-e4", value: "Large" })] }), "choose Large in Action").ok).toBe(true);
+    });
+
+    it("never saves opening a link that names a final action", () => {
+      const open = (url: string) => build(textEditJournal({ calls: [action("launch_app", { name: "Safari", urls: [url] })] }), `Open ${url} in Safari`);
+      expect(open("https://example.com/unsubscribe?u=1")).toEqual({ ok: false, reason: "final-action" });
+      expect(open("https://example.com/news").ok).toBe(true);
+    });
+
+    it("saves Return pressed into a window read whole that shows no final action", () => {
+      expect(build(withCall(action("press_key", { key: "return", pid: 4242, window_id: 7 }))).ok).toBe(true);
+    });
+
+    it.each<[string, RecordedCall[]]>([
+      ["holds a send button", [...LISTED, shown([row(4, "AXButton", "Send")]), action("press_key", { key: "return", pid: 4242, window_id: 7 })]],
+      ["holds one in another language", [...LISTED, shown([row(4, "AXButton", "Отправить")]), action("press_key", { key: "return", element_token: "s1-e2" })]],
+      ["shows one only after the key", [...textEditJournal().calls.slice(0, 3), action("press_key", { key: "return", pid: 4242, window_id: 7 }), shown([row(4, "AXButton", "Submit")])]],
+      ["was never read", [...LISTED, action("press_key", { key: "return", pid: 4242, window_id: 7 })]],
+      ["was read only in part", [...LISTED, shown([], { elements_complete: undefined }), action("press_key", { key: "return", pid: 4242, window_id: 7 })]],
+    ])("never saves Return pressed into a window that %s", (_, calls) => {
+      expect(bare(calls)).toEqual({ ok: false, reason: "final-action" });
+    });
+
+    it.each<[string, Record<string, unknown>]>([
+      ["command-Return", { tool: "press_key", key: "return", modifiers: ["cmd"] }],
+      ["control-Enter", { tool: "hotkey", keys: ["ctrl", "enter"] }],
+      ["Delete", { tool: "press_key", key: "delete" }],
+      ["command-Backspace", { tool: "hotkey", keys: ["cmd", "backspace"] }],
+    ])("never saves %s, wherever it is pressed", (_, { tool, ...args }) => {
+      expect(build(withCall(action(tool as string, { ...args, pid: 4242, window_id: 7 })))).toEqual({ ok: false, reason: "final-action" });
+    });
+  });
+
+  describe("secret fields", () => {
+    const typed = (field: WireElement, value = "hunter2") =>
+      build(textEditJournal({ calls: [shown([field]), action("set_value", { element_token: "s1-e4", value })] }), `type ${value} in the field`);
+
+    it("never saves typing into a secure field, so the password is kept nowhere", () => {
+      expect(typed(row(4, "AXSecureTextField", "Password", { value_read: true }))).toEqual({ ok: false, reason: "secret-field" });
+      expect(typed(row(4, "AXSecureTextField", "Code"))).toEqual({ ok: false, reason: "secret-field" });
+      expect(bare([shown([row(4, "AXSecureTextField", "Password")]), action("click", { element_token: "s1-e4" })])).toEqual({ ok: false, reason: "secret-field" });
+    });
+
+    it.each(["Password", "Enter your password", "Passwort", "Mot de passe", "Contraseña", "Senha", "Hasło", "Пароль", "Şifre", "Mật khẩu", "पासवर्ड",
+      "パスワード", "密码", "密碼", "PIN", "Card number", "Verification code"])("never saves typing into a field labelled %s", (label) => {
+      expect(typed(row(4, "AXTextField", label, { value_read: true }))).toEqual({ ok: false, reason: "secret-field" });
+    });
+
+    it("still saves a click on a button whose label only looks like one", () => {
+      expect(bare([shown([row(4, "AXButton", "Pin")]), action("click", { element_token: "s1-e4" })]).ok).toBe(true);
+    });
+  });
+
+  it("never saves typing into a field the driver could not say it read, since a repeat could not tell it is empty", () => {
+    const { value_read: _read, ...unread } = recordedWindowState(1).elements![2]!;
+    const state = { ...recordedWindowState(1), elements: recordedWindowState(1).elements!.map((element) => (element.element_index === 2 ? unread : element)) };
+    expect(bare([stateCall(state), action("set_value", { element_token: "s1-e2", value: "hello world" })])).toEqual({ ok: false, reason: "unreadable-field" });
+    expect(build(textEditJournal({ calls: [shown([row(4, "AXPopUpButton", "Size")]), action("set_value", { element_token: "s1-e4", value: "Large" })] }), "set Size to Large").ok)
+      .toBe(true);
   });
 });
 

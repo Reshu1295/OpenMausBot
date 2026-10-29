@@ -5,6 +5,8 @@ export interface WireElement {
   label?: string;
   parent_index?: number;
   depth: number;
+  /** The driver reported what the element holds; what it holds never leaves the bridge. */
+  value_read?: true;
 }
 export interface WireApp { pid: number; name: string; bundle_id?: string; running?: boolean }
 export interface WireWindow { window_id: number; pid?: number; title: string; app_name?: string }
@@ -43,17 +45,22 @@ const APP_TYPES = { pid: "number", name: "string", bundle_id: "string", running:
 const WINDOW_TYPES = { window_id: "number", pid: "number", title: "string", app_name: "string" } as const;
 const TOP_TYPES = { pid: "number", window_id: "number", bundle_id: "string", name: "string", app_name: "string", window_title: "string" } as const;
 
-function slimList<T>(value: unknown, types: Record<string, "string" | "number" | "boolean">, required: readonly string[], max = Infinity): T[] | undefined {
+function slimList<T>(value: unknown, types: Record<string, "string" | "number" | "boolean">, required: readonly string[], max = Infinity, mark?: (raw: Rec, slim: Rec) => void): T[] | undefined {
   if (!Array.isArray(value)) return undefined;
   const items: Rec[] = [];
   for (const item of value) {
     if (items.length >= max) break;
     if (!isRec(item)) continue;
     const slim = pick(item, Object.keys(types), types);
+    mark?.(item, slim);
     if (required.every((key) => key in slim)) items.push(slim);
   }
   return items as T[];
 }
+
+const markValueRead = (raw: Rec, slim: Rec) => {
+  if (typeof raw.value === "string") slim.value_read = true;
+};
 
 const COUNTS = ["element_count", "total_element_count", "returned_element_count", "filtered_element_count"] as const;
 const hasText = (value: unknown) => typeof value === "string" && value.trim() !== "";
@@ -69,7 +76,7 @@ export const treeDegraded = (state: Record<string, unknown>) => state.degraded =
 
 function slimStructured(raw: Rec): SlimStructured {
   const out: SlimStructured = pick(raw, Object.keys(TOP_TYPES), TOP_TYPES);
-  const elements = slimList<WireElement>(raw.elements, ELEMENT_TYPES, ["element_index", "role", "depth"], MAX_ELEMENTS);
+  const elements = slimList<WireElement>(raw.elements, ELEMENT_TYPES, ["element_index", "role", "depth"], MAX_ELEMENTS, markValueRead);
   const apps = slimList<WireApp>(raw.apps, APP_TYPES, ["pid", "name"]);
   const windows = slimList<WireWindow>(raw.windows, WINDOW_TYPES, ["window_id", "title"]);
   if (elements) out.elements = elements;

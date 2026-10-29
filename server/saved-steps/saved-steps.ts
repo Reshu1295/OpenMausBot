@@ -101,9 +101,9 @@ export function createSavedSteps(deps: SavedStepsDeps): SavedSteps {
     }
     if (!enabled() || automated || !taken?.calls.length || !personTextRequest(request) || after.some((line) => line.role === "user") || !otherToolsHarmless(after)) return;
     const built = buildRecipe({ request: request.text ?? "", journal: taken, id: randomUUID(), now: now() });
-    if (!built.ok) return;
+    if (!built.ok || !dispatch.wouldReplay(threadId, built.recipe)) return;
     recipes.save(botId, built.recipe);
-    if (dispatch.wouldReplay(threadId, built.recipe)) deps.patchMessage(threadId, reply.id, { savedSteps: { recipeId: built.recipe.id, learned: true } });
+    deps.patchMessage(threadId, reply.id, { savedSteps: { recipeId: built.recipe.id, learned: true } });
   };
 
   return {

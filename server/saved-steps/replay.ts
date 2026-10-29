@@ -18,8 +18,8 @@ const stepSummary = (tool: string, label: string) => `${tool} on ${label}`;
 const text = (value: unknown) => (typeof value === "string" ? value : undefined);
 const keyList = (value: unknown) => (Array.isArray(value) && value.every((key) => typeof key === "string") ? value : undefined);
 
-function typedOrPressed({ tool, args }: RecipeStep): string | undefined {
-  if (tool === "set_value") return text(args.value);
+/** The keys a step presses. What a step types is never named: the person's words may hold a secret. */
+function pressed({ tool, args }: RecipeStep): string | undefined {
   if (tool === "hotkey") return keyList(args.keys)?.join("+");
   if (tool !== "press_key") return undefined;
   const key = text(args.key);
@@ -27,8 +27,8 @@ function typedOrPressed({ tool, args }: RecipeStep): string | undefined {
 }
 
 function approvalSummary(step: RecipeStep, label: string): string {
-  const typed = typedOrPressed(step);
-  return typed === undefined ? stepSummary(step.tool, label) : `${step.tool} ${JSON.stringify(typed)} on ${label}`;
+  const keys = pressed(step);
+  return keys === undefined ? stepSummary(step.tool, label) : `${step.tool} ${JSON.stringify(keys)} on ${label}`;
 }
 
 export async function runSteps(
@@ -66,7 +66,7 @@ export async function runSteps(
 const quoted = (label: string) => `“${label.length > LABEL_CHARS ? `${label.slice(0, LABEL_CHARS - 1).trimEnd()}…` : label}”`;
 
 function stepDone(step: RecipeStep): string {
-  const { tool, args, element, window } = step;
+  const { tool, element, window } = step;
   const target = element ? quoted(element.label) : stepLabel(step);
   const app = step.app?.name ?? step.app?.bundleId ?? "the app";
   switch (tool) {
@@ -76,9 +76,9 @@ function stepDone(step: RecipeStep): string {
     case "double_click": return `double-clicked ${target}`;
     case "right_click": return `right-clicked ${target}`;
     case "scroll": return `scrolled ${target}`;
-    case "set_value": return `set ${target} to ${quoted(text(args.value) ?? "")}`;
+    case "set_value": return `filled in ${target}`;
     case "press_key":
-    case "hotkey": return `pressed ${typedOrPressed(step) ?? tool}${element ? ` on ${target}` : window ? ` in ${quoted(window.title)}` : ""}`;
+    case "hotkey": return `pressed ${pressed(step) ?? tool}${element ? ` on ${target}` : window ? ` in ${quoted(window.title)}` : ""}`;
     default: return `${tool} on ${target}`;
   }
 }

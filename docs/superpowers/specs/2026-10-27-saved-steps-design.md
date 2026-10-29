@@ -84,9 +84,13 @@ if **all** hold:
   data context); no steering during the request; host computer;
 - each turn sent exactly the person's one line: several queued lines sent as
   one turn never save;
-- every computer call happened in one turn of the request. The journal is keyed
-  by the request, so a `select_computer` hand-off (whose first turn made no
-  computer calls) still saves (builder's call);
+- every computer call happened in one turn of the request, and that turn met
+  every replay condition in section 3 (setting, Full access, a place the person
+  picked, the steps' tools selected), so the same words would repeat the steps:
+  steps that could not run then are never kept, since they would wait unseen,
+  with no Forget, for a later change to let them run. A `select_computer`
+  hand-off never saves: the same words would start again without this
+  computer;
 - no denials, no tool error, no refusal anywhere in the journal, and no
   question the person answered during the request (a replay would reuse their
   answer without asking);
@@ -112,8 +116,26 @@ if **all** hold:
     unique in that snapshot, and that snapshot says `elements_complete`;
   - `set_value` text appears word for word (case-insensitive) in the request,
     equals its own trim and holds no control characters (a newline would press
-    Return);
-  - `launch_app` (its `urls`, if any, appear in the request), `bring_to_front`
+    Return); into a text field, only when the driver reported what the field
+    held (cua-driver 0.28.2's `value`, which the bridge notes as `value_read`
+    without keeping the text), since a repeat types only into an empty field;
+  - no final, can't-undo action (owner's decision): a click, double click,
+    right click or key press on an element whose label, an ancestor's label or
+    the window's title names one (send, delete, buy, pay, post, submit, place
+    an order, transfer, publish and their like, in every language the app
+    ships: `server/saved-steps/screen-words.ts`, and a test holds it to
+    `src/locales`), a pop-up choice that names one, a link that names one,
+    Delete or Backspace, command- or control-Return, and Return pressed into a
+    window whose tree names one anywhere in the request or was never read
+    whole (Return presses a window's default button). Such a request always
+    goes to the AI. A label matched wrongly only costs an AI run; a chat that
+    sends on Return with no send button on screen cannot be told apart;
+  - no step on a secret field: a secure text field, or a text field labelled
+    password, PIN, code or card number in any shipped language, so a password
+    in the request is never stored;
+  - `launch_app` (its `urls`, if any, appear in the request;
+    `creates_new_application_instance` is left out, or every later step of a
+    repeat would find two copies of the app), `bring_to_front`
     with the `pid` of the app it went to, and `hotkey` and `press_key` with the
     `pid` and the `window_id` they went to (sent to an app alone, a key lands
     in whichever of its windows is in front: "close the Invoice window" could
@@ -164,9 +186,8 @@ HELLO", but neither repeats the other's typing. The store drops such a recipe
 whose stored request does not hold its typed words.
 
 A recipe stores no reply. The saved bot reply is patched with
-`savedSteps: {recipeId, learned: true}` only when the turn that learned met
-every replay condition below (setting, Full access, a place the person picked,
-the steps' tools selected); otherwise the steps save without that promise.
+`savedSteps: {recipeId, learned: true}` whenever steps save, which is only when
+the turn that learned met every replay condition below.
 
 ### 3. Replaying (wrapper around `sendTurn`)
 
@@ -174,8 +195,8 @@ the steps' tools selected); otherwise the steps save without that promise.
 approval mode for this turn is Full access. In Ask, Auto or Edits the AI run
 was asked about (or reviewed) every host-computer call, reads included, and a
 replay cannot reproduce that faithfully, so those bots always use the AI.
-Recipes are still saved in any mode; they are used once the bot is on Full
-access. Full access is the default most people run (it approves on its own), so
+Steps are saved only from a Full access turn, for the same reason. Full access
+is the default most people run (it approves on its own), so
 the approval step below still emits `request.opened` per action for the
 decision log and the safety floor, but never shows a card.
 
@@ -208,7 +229,11 @@ For each step, in order:
    `get_window_state(pid, window_id, include_screenshot:false)` → the unique
    element with the same role, label and path. The answer must be for the
    window asked and say `elements_complete: true` (a cut tree could hide a
-   second match). Key steps find their window the same way. When no app,
+   second match). A `set_value` into a text field also needs the field to be
+   empty or to hold exactly the saved text already; anything else, or a field
+   whose text the driver does not report, fails the step without naming that
+   text, so a repeat never replaces what someone typed. Key steps find their
+   window the same way. When no app,
    window or element matches yet, the lookup runs again every 250 ms for up to
    3 s, since an earlier step's window or sheet may still be opening; a target
    that matches twice, a cut tree and a failed lookup never wait. No unique
@@ -216,7 +241,7 @@ For each step, in order:
 2. Ask exactly as an engine does: emit `request.opened` with
    `tool: "mcp__computer__<name>"`, `approvalScope: "local-computer"`,
    `allowSession: false`, through the normal handler, naming the target and
-   any text typed or keys pressed. Full access approves on its own, and the
+   any keys pressed, never the text typed (it may hold a secret). Full access approves on its own, and the
    decision log records it. A denial stops the replay and the reply says what
    was declined (no AI fallback).
 3. Call the tool through an in-process MCP client on the turn's own
@@ -271,11 +296,14 @@ kept and the AI does not start.
 
 - Bot reply chips (desktop renderer): "Saved these steps · next time no AI ·
   Forget" after learning; "Repeated saved steps · no AI · Forget" after a
-  replay. Forget calls `DELETE /api/bots/:botId/saved-steps/:recipeId`.
-- Settings → General: "Repeat computer tasks without AI" (default on), shown only
-  where the server can run saved steps (`features.savedStepsHere`: a Mac, never
-  Windows or a Cloud home). Off
-  stops both saving and replaying.
+  replay. Forget calls `DELETE /api/bots/:botId/saved-steps/:recipeId`, which
+  only the owner and admins may call, so only they see it. A reply says what
+  the steps did ("filled in “Document”"), never the text they typed.
+- Automatic, with no switch in Simple mode. Advanced mode's Settings → General
+  has "Repeat computer tasks without AI" (default on), shown only where the
+  server can run saved steps (`features.savedStepsHere`: a Mac, never Windows
+  or a Cloud home); `"features": {"savedSteps": false}` in `config.json` is the
+  same switch. Off stops both saving and replaying.
 
 ### 5. Policy check
 
@@ -321,10 +349,17 @@ new input route, no second binary, one permission identity. Update that doc's
   the "next time no AI" chip shows only when a replay could follow. Not done
   here: no real app has been driven by a replay yet; that smoke test is
   Omkar's, by hand, before merge.
+- Owner, 2026-10-29: saved steps never include a final, can't-undo action;
+  such a request always goes to the AI, automatically, with no new button,
+  setting or prompt.
+- 2026-10-29, after review: no step on a secret field is saved, and replies and
+  approvals never name typed text; `creates_new_application_instance` is not
+  saved; steps save only when the same words would repeat them; a repeat types
+  only into an empty field or one that already holds its text; no switch in
+  Simple mode, and Forget only for the owner and admins.
 - My calls: journal switched on only by the host mount; journal keyed by
-  request so a `select_computer` hand-off still saves; the replay registers as
-  the turn's engine for answers and Stop; fallback events remapped onto the
-  replay's turn id.
+  request; the replay registers as the turn's engine for answers and Stop;
+  fallback events remapped onto the replay's turn id.
 
 ## Left to the builder
 

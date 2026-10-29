@@ -67,6 +67,34 @@ describe("resolveStep", () => {
       .toEqual({ ok: true, args: { value: "hello world", pid: 4242, window_id: 7, element_token: "s3-e2" } });
   });
 
+  describe("typing into a field", () => {
+    const TYPE: RecipeStep = { ...CLICK_DOCUMENT, tool: "set_value", args: { value: "hello world" } };
+    const holding = (document: string) => caller(completeWindowState(windowState(3), document));
+
+    it.each(["", "hello world"])("types into a field that holds %j: empty, or already what it types", async (document) => {
+      expect(await resolveStep(TYPE, holding(document), signal)).toEqual({ ok: true, args: { value: "hello world", pid: 4242, window_id: 7, element_token: "s3-e2" } });
+    });
+
+    it("never replaces someone's text, and does not name it", async () => {
+      const out = await resolveStep(TYPE, holding("Dear Sam, the figures are attached"), signal);
+      expect(out).toEqual({ ok: false, error: '"Document" (AXTextArea) in Untitled already holds other text' });
+      expect(JSON.stringify(out)).not.toContain("Sam");
+    });
+
+    it("never types into a field whose text the driver did not report", async () => {
+      const tree = state();
+      const unread = { ...tree, elements: (tree.elements as Record<string, unknown>[]).map(({ value: _value, ...element }) => element) };
+      expect(await resolveStep(TYPE, caller(unread), signal)).toEqual({ ok: false, error: 'could not read what "Document" (AXTextArea) in Untitled holds' });
+    });
+
+    it("chooses in a pop-up whatever it shows now", async () => {
+      const POPUP: WireElement = { element_index: 4, element_token: "s2-e4", role: "AXPopUpButton", label: "Size", parent_index: 0, depth: 1 };
+      const choose: RecipeStep = { tool: "set_value", args: { value: "Large" }, app: TEXTEDIT, window: { title: "Untitled" }, element: { role: "AXPopUpButton", label: "Size", path: [] } };
+      const tree = state([...ELEMENTS, { ...POPUP, value: "Small" } as WireElement]);
+      expect(await resolveStep(choose, caller(tree), signal)).toEqual({ ok: true, args: { value: "Large", pid: 4242, window_id: 7, element_token: "s2-e4" } });
+    });
+  });
+
   it("refuses an answer that does not say it is complete", async () => {
     for (const answer of [windowState(2), state(ELEMENTS, { elements_complete: undefined }), state(ELEMENTS, { elements_complete: null })]) {
       expect(await resolveStep(CLICK_DOCUMENT, caller(answer), signal)).toEqual({ ok: false, error: "only part of Untitled could be read" });

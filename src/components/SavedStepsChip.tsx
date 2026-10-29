@@ -2,11 +2,13 @@ import { useRef, useState } from "react";
 import { Repeat } from "lucide-react";
 
 import { t } from "@/lib/i18n";
+import { useOwnerOrAdmin } from "@/lib/use-owner-or-admin";
 import { api, type Message } from "@/state/store";
 
 export function SavedStepsChip({ botId, message }: { botId: string; message: Message }) {
   const [status, setStatus] = useState<"idle" | "forgotten" | "failed">("idle");
   const inFlight = useRef(false);
+  const canForget = useOwnerOrAdmin() === true;
   const saved = message.savedSteps;
   if (!saved) return null;
 
@@ -26,7 +28,7 @@ export function SavedStepsChip({ botId, message }: { botId: string; message: Mes
         <span className="truncate">{t(saved.replayed ? "chat.savedSteps.replayed" : "chat.savedSteps.learned")}</span>
         {status === "forgotten"
           ? <span className="shrink-0">{t("chat.savedSteps.forgotten")}</span>
-          : <button type="button" onClick={forget} className="shrink-0 text-accent hover:underline" data-saved-steps-forget>{t("chat.savedSteps.forget")}</button>}
+          : canForget && <button type="button" onClick={forget} className="shrink-0 text-accent hover:underline" data-saved-steps-forget>{t("chat.savedSteps.forget")}</button>}
       </span>
       {status === "failed" && <span role="alert" className="text-[12px] text-danger">{t("chat.savedSteps.forgetFailed")}</span>}
     </div>

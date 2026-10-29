@@ -60,6 +60,7 @@ let answer: (event: Extract<RuntimeEvent, { type: "request.opened" }>) => Answer
 let failAt: string | undefined;
 let gateAt: string | undefined;
 let throwAt: string | undefined;
+let documentText: string;
 let slots: Map<string, ProviderInstance>;
 let engine: ReturnType<typeof engineStub>;
 let start: Mock<(input: SendTurnInput) => Promise<TurnStartResult>>;
@@ -83,7 +84,7 @@ function computer(): ComputerCaller {
       if (tool === gateAt) return { ok: false, error: CONTROL_BUSY, gate: true } satisfies CallOutcome;
       if (tool === "list_apps") return { ok: true, structured: { apps: [{ pid: 4242, name: "TextEdit", bundle_id: "com.apple.TextEdit", running: true }] } };
       if (tool === "list_windows") return { ok: true, structured: { windows: [{ window_id: 7, pid: 4242, title: "Untitled", app_name: "TextEdit" }] } };
-      if (tool === "get_window_state") return { ok: true, structured: completeWindowState(windowState(snapshot++)) };
+      if (tool === "get_window_state") return { ok: true, structured: completeWindowState(windowState(snapshot++), documentText) };
       if (OBSERVATIONS.has(tool)) throw new Error(`unexpected ${tool}`);
       acted.push(tool);
       return { ok: true, structured: {} };
@@ -108,6 +109,7 @@ beforeEach(() => {
   failAt = undefined;
   gateAt = undefined;
   throwAt = undefined;
+  documentText = "";
   stopped = false;
   engine = engineStub();
   slots = new Map([["t1", engine as ProviderInstance]]);
@@ -230,9 +232,10 @@ describe("SavedStepsDispatch.sendTurn", () => {
     expect(events.find((e) => e.type === "request.opened")).toMatchObject({
       requestType: "permission", tool: "mcp__computer__click", summary: `click on ${LABEL}`, approvalScope: "local-computer", allowSession: false, turnId,
     });
-    expect(events.filter((e) => e.type === "request.opened")[1]).toMatchObject({ tool: "mcp__computer__set_value", summary: `set_value "hello world" on ${LABEL}` });
+    expect(events.filter((e) => e.type === "request.opened")[1]).toMatchObject({ tool: "mcp__computer__set_value", summary: `set_value on ${LABEL}` });
     expect(events.find((e) => e.type === "request.resolved")).toMatchObject({ behavior: "allow", source: "user", approvalScope: "local-computer" });
-    expect(events.at(-2)).toMatchObject({ itemType: "assistant_text", text: "Done — repeated 2 saved steps: clicked “Document”, set “Document” to “hello world”." });
+    expect(events.at(-2)).toMatchObject({ itemType: "assistant_text", text: "Done — repeated 2 saved steps: clicked “Document”, filled in “Document”." });
+    expect(JSON.stringify(events)).not.toContain("hello world");
     expect(events.at(-1)).toMatchObject({ type: "turn.completed", ok: true, stopReason: "end_turn", provider: "claudeAgent", providerInstanceId: "claude" });
     expect(dispatch.replayed("t1", turnId)).toBe(RECIPE.id);
     expect(dispatch.replayed("t1", "another-turn")).toBeUndefined();
@@ -384,6 +387,28 @@ describe("SavedStepsDispatch.sendTurn", () => {
     expect(events.at(-2)).toMatchObject({ text: "Done by the AI." });
     expect(dispatch.take(ev("item.completed", "e1"))).toBe(false);
     expect(dispatch.replayed("t1", turnId)).toBeUndefined();
+  });
+
+  it.each(["", "hello world"])("types into a field that holds %j: empty, or already what the steps type", async (held) => {
+    documentText = held;
+    await dispatch.sendTurn(engine, REQ, INPUT, start);
+    await settled();
+    expect(acted).toEqual(["click", "set_value"]);
+    expect(start).not.toHaveBeenCalled();
+  });
+
+  it("never types over text a field holds: it stops there and hands the request to the AI, naming none of that text", async () => {
+    documentText = "Notes for Friday's meeting";
+    await dispatch.sendTurn(engine, REQ, INPUT, start);
+    await settled();
+    expect(acted).toEqual(["click"]);
+    expect(events.filter((e) => e.type === "request.opened").map((e) => "tool" in e && e.tool)).toEqual(["mcp__computer__click"]);
+    expect(recipes.forget).toHaveBeenCalledWith("b1", RECIPE.id);
+    expect(start).toHaveBeenCalledTimes(1);
+    const note = start.mock.calls[0]![0].text;
+    expect(note).toContain(`did steps 1–1 of 2 and failed at step 2 (set_value)`);
+    expect(note).toContain('already holds other text');
+    expect(`${note}${JSON.stringify(events)}`).not.toContain("Friday");
   });
 
   it("a control-gate refusal keeps the recipe and hands the request to the AI with the note", async () => {

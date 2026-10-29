@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 // Fake of `cua-driver mcp` for the saved-steps fixture: TextEdit's one window, answered in cua-driver 0.28.2's shapes
 // (a whole tree says elements_complete with matching counts and echoes the pid and window_id asked for; every app and
-// window carries its pid), with element tokens that go stale at the next get_window_state, as the real driver's do.
+// window carries its pid; a text element's `value` is what it holds), with element tokens that go stale at the next
+// get_window_state, as the real driver's do.
 // Env knobs:
-//   FAKE_CUA_STATE  JSON file holding the snapshot count, so the fixture's many driver processes agree on it
+//   FAKE_CUA_STATE  JSON file holding the snapshot count and the document's text, so the fixture's many driver processes agree on them
 //   FAKE_CUA_LOG    JSON-lines file each tools/call is appended to as {name, arguments} when it arrives
 //   FAKE_CUA_FAIL   path: the next set_value on a live element while it exists removes it and answers isError "Fixture failure."
 //   FAKE_CUA_HOLD   path: click and set_value wait while it exists before answering
@@ -73,32 +74,44 @@ const text = (message: string, structuredContent?: Record<string, unknown>): Too
   ({ content: [{ type: "text", text: message }], ...(structuredContent ? { structuredContent } : {}) });
 const refused = (message: string): ToolResult => ({ content: [{ type: "text", text: message }], isError: true });
 
-let snapshotInMemory = 0;
-function currentSnapshot(): number {
-  if (!stateFile) return snapshotInMemory;
+type FakeState = { snapshot: number; document: string };
+let stateInMemory: FakeState = { snapshot: 0, document: "" };
+function readState(): FakeState {
+  if (!stateFile) return stateInMemory;
   try {
-    const value: unknown = JSON.parse(readFileSync(stateFile, "utf8")).snapshot;
-    return typeof value === "number" && Number.isInteger(value) && value >= 0 ? value : 0;
+    const { snapshot, document } = JSON.parse(readFileSync(stateFile, "utf8")) as Record<string, unknown>;
+    return {
+      snapshot: typeof snapshot === "number" && Number.isInteger(snapshot) && snapshot >= 0 ? snapshot : 0,
+      document: typeof document === "string" ? document : "",
+    };
   } catch {
-    return 0;
+    return { snapshot: 0, document: "" };
   }
 }
-function nextSnapshot(): number {
-  const snapshot = currentSnapshot() + 1;
-  if (!stateFile) snapshotInMemory = snapshot;
-  else {
-    const partial = `${stateFile}.${process.pid}.tmp`;
-    writeFileSync(partial, JSON.stringify({ snapshot }));
-    renameSync(partial, stateFile);
+function writeState(state: FakeState): void {
+  if (!stateFile) {
+    stateInMemory = state;
+    return;
   }
-  return snapshot;
+  const partial = `${stateFile}.${process.pid}.tmp`;
+  writeFileSync(partial, JSON.stringify(state));
+  renameSync(partial, stateFile);
+}
+const currentSnapshot = () => readState().snapshot;
+function nextSnapshot(): number {
+  const state = readState();
+  writeState({ ...state, snapshot: state.snapshot + 1 });
+  return state.snapshot + 1;
 }
 
 function windowState(args: Args): ToolResult {
   const { pid, window_id: windowId } = args;
   if (pid !== DOCUMENT_WINDOW.pid || windowId !== DOCUMENT_WINDOW.window_id) return refused(`no window ${String(windowId)} for pid ${String(pid)}`);
   const snapshot = nextSnapshot();
-  const elements = ELEMENTS.map((element) => ({ ...element, element_token: `s${snapshot}-e${element.element_index}` }));
+  const { document } = readState();
+  const elements = ELEMENTS.map((element) => ({
+    ...element, element_token: `s${snapshot}-e${element.element_index}`, ...(element.role === "AXTextArea" ? { value: document } : {}),
+  }));
   const tree = elements.map((element) => `${"  ".repeat(element.depth)}- [${element.element_index}] ${element.role}${"label" in element ? ` "${element.label}"` : ""}`).join("\n");
   return text(tree, {
     pid, window_id: windowId, snapshot_id: `s${snapshot}`, app_name: TEXTEDIT.name, window_title: DOCUMENT_WINDOW.title, elements,
@@ -137,6 +150,7 @@ async function act(name: "click" | "set_value", args: Args): Promise<ToolResult>
     rmSync(failFile, { force: true });
     return refused("Fixture failure.");
   }
+  if (element.role === "AXTextArea") writeState({ ...readState(), document: args.value });
   return text(`Set ${described} to ${args.value.length} characters.`);
 }
 

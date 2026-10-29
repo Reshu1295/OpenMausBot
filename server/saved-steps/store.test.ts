@@ -34,7 +34,7 @@ describe("RecipeStore", () => {
     expect(store.find("b1", "open notes")!.id).toBe("r1");
     expect(store.find("b1", "other")).toBeUndefined();
     expect(store.find("b2", "open notes")).toBeUndefined();
-    expect(statSync(file()).mode & 0o777).toBe(0o600);
+    if (process.platform !== "win32") expect(statSync(file()).mode & 0o777).toBe(0o600);
   });
 
   it("replaces the recipe for the same key", () => {
@@ -210,6 +210,25 @@ describe("RecipeStore", () => {
     expect(store.find("b1", "type hi")).toBeUndefined();
     expect(store.find("b1", "tick")).toBeUndefined();
     expect(store.find("b1", "menu")!.id).toBe("menu");
+  });
+
+  it("drops steps that press a final action, touch a secret field or open a second copy of an app, and keeps the rest", () => {
+    mkdirSync(join(dir, "b1"));
+    const app = { name: "Mail" };
+    const withStep = (id: string, step: unknown): Recipe => ({ ...recipe(id, id), request: id, steps: [step as Recipe["steps"][number]] });
+    writeFileSync(file(), JSON.stringify({
+      version: 1,
+      recipes: [
+        withStep("send", { tool: "click", args: {}, app, window: { title: "New Message" }, element: { role: "AXButton", label: "Senden", path: [] } }),
+        withStep("in checkout", { tool: "click", args: {}, app, window: { title: "Checkout" }, element: { role: "AXButton", label: "Next", path: [] } }),
+        withStep("password", { tool: "click", args: {}, app, window: { title: "Sign in" }, element: { role: "AXSecureTextField", label: "Password", path: [] } }),
+        withStep("delete key", { tool: "press_key", args: { key: "delete" }, app, window: { title: "Inbox" } }),
+        withStep("second copy", { tool: "launch_app", args: { name: "Mail", creates_new_application_instance: true } }),
+        withStep("open mail", { tool: "launch_app", args: { name: "Mail" } }),
+      ],
+    }));
+    for (const dropped of ["send", "in checkout", "password", "delete key", "second copy"]) expect(store.find("b1", dropped), dropped).toBeUndefined();
+    expect(store.find("b1", "open mail")!.id).toBe("open mail");
   });
 
   it("refuses a bot id that is not a single folder name", () => {

@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Message } from "@/state/store";
 import { SavedStepsChip } from "./SavedStepsChip";
 
-const fixture = vi.hoisted(() => ({ values: [] as unknown[], index: 0, api: vi.fn() }));
+const fixture = vi.hoisted(() => ({ values: [] as unknown[], index: 0, api: vi.fn(), ownerOrAdmin: true as boolean | null }));
 vi.mock("react", async (original) => ({
   ...await original<typeof import("react")>(),
   useState: (initial: unknown) => {
@@ -14,6 +14,7 @@ vi.mock("react", async (original) => ({
   },
 }));
 vi.mock("@/state/store", () => ({ api: fixture.api }));
+vi.mock("@/lib/use-owner-or-admin", () => ({ useOwnerOrAdmin: () => fixture.ownerOrAdmin }));
 
 type Node = ReactElement<Record<string, unknown> & { children?: ReactNode }>;
 const nodes = (value: ReactNode): Node[] => Children.toArray(value).flatMap((child) => (isValidElement(child) ? [child as Node, ...nodes((child as Node).props.children)] : []));
@@ -30,12 +31,22 @@ function render(message: Message) {
   return { html, forget: all.find((node) => node.props["data-saved-steps-forget"] !== undefined), alert: all.find((node) => node.props.role === "alert") };
 }
 
-beforeEach(() => { fixture.values = []; fixture.api.mockReset().mockResolvedValue({ ok: true }); });
+beforeEach(() => { fixture.values = []; fixture.ownerOrAdmin = true; fixture.api.mockReset().mockResolvedValue({ ok: true }); });
 
 describe("the saved-steps chip under a reply", () => {
   it("says the steps were saved", () => expect(render(LEARNED).html).toContain("Saved these steps · next time no AI"));
   it("says a reply came from saved steps", () => expect(render({ ...REPLY, savedSteps: { recipeId: "r1", replayed: true } } as Message).html).toContain("Repeated saved steps · no AI"));
   it("draws nothing on other replies", () => expect(render(REPLY).html).toBe(""));
+
+  it.each<[string, boolean | null]>([["a person with the User role", false], ["someone whose role is not known yet", null]])(
+    "offers Forget only to the owner and admins, not to %s", (_, ownerOrAdmin) => {
+      fixture.ownerOrAdmin = ownerOrAdmin;
+      const view = render(LEARNED);
+      expect(view.html).toContain("Saved these steps · next time no AI");
+      expect(view.html).not.toContain("Forget");
+      expect(view.forget).toBeUndefined();
+    },
+  );
 
   it("Forget deletes the recipe and says so", async () => {
     const view = render(LEARNED);

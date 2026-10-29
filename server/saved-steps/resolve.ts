@@ -1,6 +1,6 @@
 import { setTimeout as delay } from "node:timers/promises";
 import { elementPath, treeDegraded, wholeTree, type WireElement } from "./driver-wire.ts";
-import { KEY_TOOLS, type AppIdentity, type ElementIdentity, type RecipeStep } from "./rules.ts";
+import { KEY_TOOLS, holdsTypedText, type AppIdentity, type ElementIdentity, type RecipeStep } from "./rules.ts";
 
 /** `gate`: the computer's control gate refused the call (a person holds it, another turn has it): the step was not tried. */
 export type CallOutcome = { ok: true; structured: Record<string, unknown> } | { ok: false; error: string; gate?: true };
@@ -94,6 +94,11 @@ export function matchElement(elements: unknown, element: ElementIdentity): Match
   return match.value.path === null ? NONE : { ok: true, value: match.value.live };
 }
 
+function heldValue(elements: unknown, index: number): string | undefined {
+  const live = Array.isArray(elements) ? elements.find((item) => isRecord(item) && item.element_index === index) : undefined;
+  return isRecord(live) && typeof live.value === "string" ? live.value : undefined;
+}
+
 const appName = (app: AppIdentity) => app.name || app.bundleId || "the app";
 const fail = (error: string): Resolved => ({ ok: false, error });
 const missing = (error: string): Resolved => ({ ok: false, error, missing: true });
@@ -139,10 +144,14 @@ export async function resolveStep(step: RecipeStep, caller: ComputerCaller, sign
   if (treeDegraded(tree)) return fail(`${window.title} could not be read reliably`);
   if (!wholeTree(tree)) return fail(`only part of ${window.title} could be read`);
   const found = matchElement(tree.elements, element);
-  if (!found.ok) {
-    const target = `"${element.label}" (${element.role}) in ${window.title}`;
-    return found.reason === "none" ? missing(`no ${target}`) : fail(`more than one ${target}`);
-  }
+  const target = `"${element.label}" (${element.role}) in ${window.title}`;
+  if (!found.ok) return found.reason === "none" ? missing(`no ${target}`) : fail(`more than one ${target}`);
   const { element_token: token, element_index: index } = found.value;
+  // Safety invariant: set_value replaces what a field holds, and a repeat never replaces someone's text.
+  if (step.tool === "set_value" && holdsTypedText(element.role)) {
+    const held = heldValue(tree.elements, index);
+    if (held === undefined) return fail(`could not read what ${target} holds`);
+    if (held !== "" && held !== step.args.value) return fail(`${target} already holds other text`);
+  }
   return { ok: true, args: token === undefined ? { ...args, element_index: index } : { ...args, element_token: token } };
 }

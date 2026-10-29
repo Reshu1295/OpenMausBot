@@ -224,7 +224,7 @@ readline.createInterface({input: process.stdin}).on("line", (line) => {
         expect(posts[0].auth).toBe("Bearer journal-fixture-token");
         expect(posts[0].body).toEqual({
           tool: "anything", arguments: { query: "x" },
-          result: { isError: false, structured: { pid: 7, elements: [{ element_index: 1, role: "AXButton", label: "Go", depth: 1 }] } },
+          result: { isError: false, structured: { pid: 7, elements: [{ element_index: 1, role: "AXButton", label: "Go", depth: 1, value_read: true }] } },
         });
         expect(first.message.result.structuredContent.pid).toBe(7);
 

@@ -17,6 +17,7 @@ person sends the same words again (design:
   the reply says what the steps did, marked `savedSteps.replayed`.
 - Stop during a replay ends the turn with no AI and keeps the steps.
 - Forget deletes the steps.
+- Approvals and replies name targets and keys, never the typed text.
 - A conversation that follows the bot's Auto place does not replay, though this
   computer is mounted at Full access and the bot has steps for those words.
 - With the switch off, the AI runs and nothing is saved, though steps exist.
@@ -36,7 +37,8 @@ The fixture runs on macOS. A Linux server never mounts this computer from this
 record, and Windows was not tried. The driver is
 `server/testing/fake-cua-driver.ts`: TextEdit's one window in cua-driver
 0.28.2's answer shapes, whose element tokens (`s<snapshot>-e<index>`) go stale
-at the next `get_window_state`. `FAKE_CUA_STATE` keeps the snapshot count
+at the next `get_window_state` and whose document reports what it holds as its
+`value`. `FAKE_CUA_STATE` keeps the snapshot count and the document's text
 across its processes, `FAKE_CUA_LOG` logs each call, the next `set_value` on a
 live element while `FAKE_CUA_FAIL` exists fails and removes it, and actions
 wait while `FAKE_CUA_HOLD` exists.
@@ -102,10 +104,11 @@ with `pnpm control:omb wait --bot $BOT_ID --task $T1 --timeout 300 --url $URL`
    `click {"pid":4242,"window_id":7,"element_token":"s2-e2"}`, the same three
    lookups, then
    `set_value {"value":"hello world","pid":4242,"window_id":7,"element_token":"s3-e2"}`.
-   The thread shows `mcp__computer__click` and `mcp__computer__set_value`, each
-   with an "approved … (full access)" row naming the target and the typed
-   text, and the reply
-   "Done — repeated 2 saved steps: clicked “Document”, set “Document” to “hello world”."
+   The document already holds "hello world" from round 1, which a repeat may
+   type again. The thread shows `mcp__computer__click` and
+   `mcp__computer__set_value`, each with an "approved … (full access)" row
+   naming the target and not the typed text, and the reply
+   "Done — repeated 2 saved steps: clicked “Document”, filled in “Document”."
    with `savedSteps: {recipeId: R, replayed: true}`.
 3. **Stop a live replay.** `touch "$SCRATCH/hold"`, send round 1's words, and
    once `cua-calls.jsonl` logs the new `click`, run
@@ -119,7 +122,7 @@ with `pnpm control:omb wait --bot $BOT_ID --task $T1 --timeout 300 --url $URL`
    `curl -s -X DELETE $URL/api/bots/$BOT_ID/saved-steps/R -H "origin: $URL"`
    prints `{"forgotten":true}`; the file's `recipes` is `[]`.
 5. **Learn again.** `rm "$SCRATCH/cua-state.json"` (the AI's script addresses
-   snapshot 1) and send round 1's words. `prompts.jsonl` has 2 lines; the reply
+   snapshot 1; the document is empty again) and send round 1's words. `prompts.jsonl` has 2 lines; the reply
    "Typed hello world into TextEdit again." has `learned: true` and a new
    recipe id. That second prompt rebuilds the conversation ("This conversation
    received an update outside your provider session…") and holds round 2's
@@ -175,7 +178,10 @@ merging `origin/main`), once, with the machine's one-minute load average near
 10: all eight rounds as stated, 40 driver calls and 5 engine prompts. A script
 asserted each round's statements above (34 checks) except round 5's rebuilt
 prompt, which was read from `prompts.jsonl`. The same recipe passed on
-2026-10-28 before the merge, at loads near 5 and 40.
+2026-10-28 before the merge, at loads near 5 and 40. Not run again after the
+review fixes of the same day (the reply's wording, the approval rows without
+typed text, the fake driver's document text); their tests are in
+`server/saved-steps` and `server/testing/fake-cua-driver.test.ts`.
 
 ## Limits
 
@@ -201,7 +207,12 @@ the AI; the cases that never save (an answered in-turn question, a
 side-effecting tool beside the computer calls, several queued lines sent as one
 turn, another computer in the request, a journal that lost the thread or went
 past its byte budget, `type_text`, a click on a toggle, a key press with no
-window, a tree that does not say it is complete, a server not on macOS); other
+window, a tree that does not say it is complete, a server not on macOS, a turn
+that would not replay (Ask, Auto, a place the person did not pick), a final
+action such as Send, Delete or Pay in any shipped language, Return into a
+window that shows one, a secret field, a field whose text the driver did not
+report); a repeat that stops rather than type over a field's text; Forget shown
+only to the owner and admins; other
 words with the same key not replaying typed text; a step's tool turned off in
 the bot's tool selection; the 3 s wait for a target an earlier step brings up;
 and the replayed turn reaching the next AI turn through the conversation. ACP

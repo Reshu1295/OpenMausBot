@@ -12,12 +12,19 @@ export function windowState(snapshot: number): SlimStructured {
   return { pid: 4242, app_name: "TextEdit", bundle_id: "com.apple.TextEdit", window_id: 7, window_title: "Untitled", elements };
 }
 
-/** A tree as the bridge records it when the driver read all of it. */
-export const recordedWindowState = (snapshot: number): SlimStructured => ({ ...windowState(snapshot), elements_complete: true });
+const isText = (element: WireElement) => element.role === "AXTextArea";
 
-export function completeWindowState(structured: SlimStructured): Record<string, unknown> {
-  const count = structured.elements?.length ?? 0;
-  return { ...structured, elements_complete: true, element_count: count, returned_element_count: count, total_element_count: count };
+/** A tree as the bridge records it when the driver read all of it: the document's text was reported, and not kept. */
+export function recordedWindowState(snapshot: number): SlimStructured {
+  const state = windowState(snapshot);
+  return { ...state, elements: state.elements?.map((element) => (isText(element) ? { ...element, value_read: true } : element)), elements_complete: true };
+}
+
+/** A whole tree as the driver answers it, its document holding `document`. */
+export function completeWindowState(structured: SlimStructured, document = ""): Record<string, unknown> {
+  const elements = structured.elements?.map(({ value_read: _read, ...element }) => (isText(element) ? { ...element, value: document } : element));
+  const count = elements?.length ?? 0;
+  return { ...structured, ...(elements ? { elements } : {}), elements_complete: true, element_count: count, returned_element_count: count, total_element_count: count };
 }
 
 const ok = (structured?: SlimStructured) => ({ isError: false, ...(structured ? { structured } : {}) });
