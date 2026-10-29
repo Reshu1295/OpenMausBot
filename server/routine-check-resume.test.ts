@@ -153,7 +153,7 @@ describe("routine check recovery", () => {
     const orphan = checks.pendingKeys()[0]!;
     expect(orphan).toBeDefined();
     manager.stop(); manager.start(); await drain();
-    await vi.advanceTimersByTimeAsync(5 * MINUTE); await drain();
+    await vi.advanceTimersByTimeAsync(40 * MINUTE); await drain();
     expect(manager.isTicking).toBe(false);
     await manager.tick(); await drain(); await manager.tick(); await drain();
     expect(released).toEqual([orphan]);
@@ -178,7 +178,7 @@ describe("routine check recovery", () => {
     const manager = h.make(checks);
     manager.update(h.routine.id, { deliver: "brief" }); manager.runNow(h.routine.id);
     await manager.tick(); await drain();
-    await vi.advanceTimersByTimeAsync(5 * MINUTE); await drain();
+    await vi.advanceTimersByTimeAsync(40 * MINUTE); await drain();
     expect(manager.isTicking).toBe(false);
     const backup = new WorkspaceBackupMaintenance();
     await backup.run(async () => {

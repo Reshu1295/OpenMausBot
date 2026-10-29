@@ -17,7 +17,7 @@ import { ownerOrAdmin, type RequestAuth } from "../request-auth.ts";
 import { awaitRoutineCheck } from "../routine-check-task.ts";
 import type { RoutineRun } from "../routines.ts";
 import type { BotRecord, Message, Store } from "../store.ts";
-import { answered, localDate, qualifies, validZone } from "./check-plan.ts";
+import { answered, BRIEF_HEADER_READ_LIMIT, BRIEF_REPLY_READ_LIMIT, localDate, qualifies, validZone } from "./check-plan.ts";
 import { parseWatchResult } from "./check-prompts.ts";
 import { briefCard, clockTime, DISMISS_ACTION, DRAFT_ACTION, prepCard, reminderCard, type BriefEmail, type BriefFacts, type BriefRow, type BuiltCard, type NeedRow } from "./brief-cards.ts";
 import { briefWords, type BriefWords } from "./brief-words.ts";
@@ -310,7 +310,7 @@ export function createBrief(deps: BriefDeps) {
     if (!missing.length) return;
     const session = deps.session();
     if (!session) return;
-    for (const row of missing.slice(0, 12)) {
+    for (const row of missing.slice(0, BRIEF_HEADER_READ_LIMIT)) {
       try {
         const header = await awaitRoutineCheck(session.message(row.messageId), signal);
         signal?.throwIfAborted();
@@ -432,7 +432,7 @@ export function createBrief(deps: BriefDeps) {
     const address = deps.address();
     const open = liveImportant(now()).filter((row) => row.needsReply);
     if (!session || !address || !open.length) return;
-    for (const row of open.slice(0, 10)) {
+    for (const row of open.slice(0, BRIEF_REPLY_READ_LIMIT)) {
       try {
         const messages = await awaitRoutineCheck(session.thread(row.threadId), signal);
         signal?.throwIfAborted();

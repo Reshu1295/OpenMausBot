@@ -6,16 +6,17 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
 
+import { flushDeciderLog } from "../decider/log.ts";
 import { writeFileAtomic } from "../atomic.ts";
-import { SourceError, type CalendarEvent, type ConnectedReads, type EmailHeader, type ReadApp, type ReadSession } from "../connected-reads.ts";
+import { GMAIL_PAGES, READ_TIMEOUT_MS, SourceError, type CalendarEvent, type ConnectedReads, type EmailHeader, type ReadApp, type ReadSession } from "../connected-reads.ts";
 import type { Routine, RoutineCheckResult, RoutineChecks, RoutineRun } from "../routines.ts";
 import { awaitRoutineCheck } from "../routine-check-task.ts";
 import type { CheckHold } from "../routine-check-pacing.ts";
 import {
-  clashes, emailSince, fingerprint, keepNewest, LOOKAHEAD_MS, mergeMeetings, nextMeetingDue, planMail, planMeetings, pruneMeetings, type MeetingRecord,
+  BRIEF_HEADER_READ_LIMIT, BRIEF_REPLY_READ_LIMIT, clashes, emailSince, fingerprint, keepNewest, LOOKAHEAD_MS, mergeMeetings, nextMeetingDue, planMail, planMeetings, pruneMeetings, type MeetingRecord,
 } from "./check-plan.ts";
 import { checkedPrompt, watchPrompt, type CheckItems } from "./check-prompts.ts";
-import type { InboxTriage } from "./inbox-triage.ts";
+import { INBOX_TRIAGE_BUDGET_MS, type InboxTriage } from "./inbox-triage.ts";
 
 const MINUTE = 60_000;
 const CHECK_MS = 15 * MINUTE;
@@ -285,7 +286,7 @@ export function createRoutineChecks(deps: RoutineChecksDeps): RoutineChecks & {
         const advanced = waiting || more ? undefined : at;
         const helpers = brief && deps.inbox?.ready() === true;
         if (helpers) report.helpersSort = true;
-        const picked = helpers && plan.batch.length ? await awaitRoutineCheck(deps.inbox!.triage(plan.batch, deps.dismissedFrom()), signal) : null;
+        const picked = helpers && plan.batch.length ? await awaitRoutineCheck(deps.inbox!.triage(plan.batch, deps.dismissedFrom(), signal), signal) : null;
         signal?.throwIfAborted();
         if (picked) {
           // Sorted with no AI turn: every email of the batch is judged, and the picks become brief rows.
@@ -363,6 +364,8 @@ export function createRoutineChecks(deps: RoutineChecksDeps): RoutineChecks & {
   }
 
   return {
+    timeoutMs: (2 + GMAIL_PAGES + BRIEF_HEADER_READ_LIMIT + BRIEF_REPLY_READ_LIMIT) * READ_TIMEOUT_MS + INBOX_TRIAGE_BUDGET_MS + MINUTE,
+    drain: () => flushDeciderLog(deps.dataDir),
     check, release, settled, commit,
     mayDraft(key, threadId, to) {
       const pending = ownerOf(key)?.[1];

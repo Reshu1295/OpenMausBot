@@ -31,7 +31,7 @@ import { cloneAttachments } from "./routine-attachments.ts";
 import { loadInstalledPackage, loadRoutine, loadRun } from "./routine-load.ts";
 import { sanitizeInput } from "./routine-input.ts";
 import { checkHold, CHECK_BOOT_HOLD_MS, type CheckHold } from "./routine-check-pacing.ts";
-import { runRoutineCheck } from "./routine-check-task.ts";
+import { runRoutineCheck, type RoutineCheckLifecycle } from "./routine-check-task.ts";
 import { resolveRoutineResultsThread, routineRunDefinition, type ResultsThreadAllocation } from "./routine-run-definition.ts";
 
 export type { RoutineContextAttachment, RoutineIntervalWindow, RoutineRunStatus, RoutineRunTrigger };
@@ -203,7 +203,7 @@ function routineRequestOwnerKey(owner: RoutineRequestOwner): string {
  * have something to do on time. */
 export interface RoutineCheckResult { run?: { prompt: string; key: string }; trouble?: string; wakeAt?: number }
 
-export interface RoutineChecks {
+export interface RoutineChecks extends RoutineCheckLifecycle {
   /** Runs a routine's checks. With `hold` they may do only what needs no AI, and their items wait.
    * After cancellation, no continuation may write ledger, report or workspace state. */
   check(routine: Routine, context: { manual: boolean; hold?: CheckHold; signal?: AbortSignal }): Promise<RoutineCheckResult>;

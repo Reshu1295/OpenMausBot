@@ -335,7 +335,7 @@ export interface ConnectedReads {
 }
 
 const GMAIL_PAGE = 50;
-const GMAIL_PAGES = 6;
+export const GMAIL_PAGES = 6;
 
 const appOf = (slug: string): ReadApp => (slug.startsWith("GMAIL_") ? "gmail" : "googlecalendar");
 

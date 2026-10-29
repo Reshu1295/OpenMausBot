@@ -5,6 +5,11 @@ import type { CheckHold } from "./routine-check-pacing.ts";
 
 const CHECK_TIMEOUT_MS = 2 * 60_000;
 
+export interface RoutineCheckLifecycle {
+  timeoutMs?: number;
+  drain?(): Promise<void>;
+}
+
 export async function runRoutineCheck(
   hook: RoutineChecks, routine: Routine, context: { manual: boolean; hold?: CheckHold },
   controller: AbortController, release: (key: string) => void,
@@ -16,7 +21,7 @@ export async function runRoutineCheck(
       abandoned = true;
       controller.abort();
       resolve({ trouble: "The checks timed out. Their result was discarded; try checking again." });
-    }, CHECK_TIMEOUT_MS);
+    }, hook.timeoutMs ?? CHECK_TIMEOUT_MS);
     timer.unref?.();
   });
   try {
@@ -27,6 +32,7 @@ export async function runRoutineCheck(
     return await Promise.race([work, deadline]);
   } finally {
     clearTimeout(timer!);
+    await hook.drain?.();
   }
 }
 
