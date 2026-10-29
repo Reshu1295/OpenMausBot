@@ -54,12 +54,12 @@ describe("one conversation's agents tools", () => {
     }
   }
 
-  it("lists a direct chat select_computer and a room none, and both the skill tools while authoring is on", async () => {
+  it("lists a direct chat select_computer and the wait tools and a room none, and both the skill tools while authoring is on", async () => {
     const names = async (conversation: AgentsConversation) =>
       (JSON.parse((await everyTurn(conversation))[0]!.wire) as { tools: Array<{ name: string }> }).tools.map((tool) => tool.name);
     const chat = await names(CHAT), room = await names(ROOM);
-    expect(chat).toContain("select_computer");
-    expect(room).not.toContain("select_computer");
+    expect(chat).toEqual(expect.arrayContaining(["select_computer", "wait_until", "list_waits", "cancel_wait"]));
+    for (const tool of ["select_computer", "wait_until", "list_waits", "cancel_wait"]) expect(room).not.toContain(tool);
     for (const tools of [chat, room]) expect(tools).toEqual(expect.arrayContaining(["skills_list", "skill_manage"]));
     expect(await names({ ...CHAT, host: { ...HOST, skillAuthoring: false } })).not.toContain("skill_manage");
   });
