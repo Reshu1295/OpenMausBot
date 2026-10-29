@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { WAIT_KINDS } from "../../shared/waits.ts";
 import type { NewWait, WaitRecord } from "../waits.ts";
-import { createWaitRoutes, findWaitPeer, hostWaitRefusal, parseWaitRequest, waitSourceRefusal, WAIT_MESSAGES } from "./waits.ts";
+import { createWaitRoutes, findWaitPeer, hostWaitRefusal, isNetworkPath, parseWaitRequest, waitSourceRefusal, WAIT_MESSAGES } from "./waits.ts";
 import { PASS } from "./table.ts";
 
 const HOME = "/home/maus";
@@ -112,6 +112,15 @@ describe("the waits route", () => {
     waits.create.mockClear();
     expect(await call("POST", "/api/internal/waits", body)).toMatchObject({ status: 400, payload: { error } });
     expect(waits.create).not.toHaveBeenCalled();
+  });
+  it("refuses a network path with either slash, mixed or percent-encoded, before anything checks it", async () => {
+    waits.create.mockClear();
+    const error = "path must be on this computer: a network path (\\\\server\\share or //server/share) is never checked.";
+    for (const path of ["\\\\host\\share\\x", "//host/share/x", "\\/host/share", "/\\host\\share", "\\\\?\\UNC\\host\\share\\x", " \\\\host\\share", "%5C%5Chost%5Cshare", "%2f%2fhost/share", "/%2Fhost/share", "%255C%255Chost"]) {
+      expect(await call("POST", "/api/internal/waits", { ...FILE_WAIT, path }), path).toMatchObject({ status: 400, payload: { error } });
+    }
+    expect(waits.create).not.toHaveBeenCalled();
+    for (const path of ["/srv/share/x", "~/a//b", "C:\\Users\\maus\\r.txt", "/a/%2F/b"]) expect(isNetworkPath(path), path).toBe(false);
   });
   it("treats null as absent and a body that is not an object as an error", async () => {
     expect(parseWaitRequest({ ...FILE_WAIT, text: null, hours: null }, HOME)).toMatchObject({ ok: true, request: { hours: 24 } });

@@ -40,6 +40,18 @@ const FIELD_KINDS = {
 type WaitField = keyof typeof FIELD_KINDS;
 const FIELDS = Object.keys(FIELD_KINDS) as WaitField[];
 
+/**
+ * `\\host\share` or `//host/share`, with either slash, mixed or percent-encoded (`%5C`, `%2F`, `%255C`): a network path.
+ * Windows would sign in to that host to check it, sending it the person's password hash.
+ */
+export function isNetworkPath(path: string): boolean {
+  let plain = path.trim();
+  for (let round = 0; round < 4 && /%(?:25|5c|2f)/i.test(plain); round++) {
+    plain = plain.replace(/%(25|5c|2f)/gi, (_, hex: string) => String.fromCharCode(parseInt(hex, 16)));
+  }
+  return /^[\\/]{2}/.test(plain);
+}
+
 const isRecord = (value: unknown): value is Record<string, unknown> => Boolean(value) && typeof value === "object" && !Array.isArray(value);
 const absent = (value: unknown) => value === undefined || value === null;
 const joinWords = (words: readonly string[]) => (words.length < 2 ? words.join("") : `${words.slice(0, -1).join(", ")} and ${words.at(-1)}`);
@@ -80,6 +92,7 @@ export function parseWaitRequest(body: unknown, home: string): { ok: true; reque
   }
   if (needed.includes("path")) {
     const raw = body.path;
+    if (typeof raw === "string" && isNetworkPath(raw)) return fail("path must be on this computer: a network path (\\\\server\\share or //server/share) is never checked.");
     const path = typeof raw === "string" && raw.length >= 1 && raw.length <= 1024 ? expandHome(raw, home) : "";
     if (!path || !isAbsolute(path)) return fail("path must be a full path or start with ~.");
     request.path = path;
