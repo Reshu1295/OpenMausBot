@@ -317,6 +317,7 @@ export class RoutineManager {
   private startupLaunchId: string | undefined;
   private ticking = false;
   private closing = false;
+  private scheduler = { active: true };
   private ownerNotices: RoutineOwnerNotice[] = [];
   private readonly failureFacts = new Map<string, RoutineFailureFacts>();
   /** Saves are refused while set, so an empty state never overwrites an unreadable file. */
@@ -324,6 +325,7 @@ export class RoutineManager {
   private frozenPending = false;
   private readonly bootedAt: number;
   private readonly checking = new Set<string>();
+  private readonly checkReleases = new Set<string>();
 
   constructor(options: RoutineManagerOptions) {
     this.options = options;
@@ -945,11 +947,14 @@ export class RoutineManager {
     return { ...schedule, at: limitResetOccurrence(this.options.limitResetAt?.(schedule.engine) ?? null, last) };
   }
 
-  get isTicking(): boolean { return this.ticking; }
+  get isTicking(): boolean { return this.ticking || this.checking.size > 0; }
   private tickInBackground(): void { this.tick().catch((error) => console.error("routines: a scheduler pass failed", error)); }
 
   start() {
     if (this.closing || this.timer) return;
+    if (!this.scheduler.active) this.scheduler = { active: true };
+    for (const key of this.checkReleases) this.options.checks?.release(key);
+    this.checkReleases.clear();
     if (!this.startupRunsQueued) this.startupRunsQueued = this.queueStartupRuns();
     this.tickInBackground();
     this.timer = setInterval(() => this.tickInBackground(), 10_000);
@@ -957,6 +962,7 @@ export class RoutineManager {
   }
 
   stop() {
+    this.scheduler.active = false;
     if (this.timer) clearInterval(this.timer);
     this.timer = null;
   }
@@ -1005,7 +1011,8 @@ export class RoutineManager {
   }
 
   async tick(): Promise<void> {
-    if (this.closing || this.ticking) return;
+    const scheduler = this.scheduler;
+    if (this.closing || !scheduler.active || this.ticking) return;
     this.ticking = true;
     try {
       const now = this.now();
@@ -1014,7 +1021,7 @@ export class RoutineManager {
           activeMs(run, now) < run.timeoutMinutes * 60_000) continue;
         await this.stopRun(run, `Stopped after reaching the ${run.timeoutMinutes}-minute run limit`, "limit-reached");
       }
-      const isDue = (routine: Routine) => !this.closing && routine.enabled && this.targetState(routine) !== "missing" && (!routine.checks
+      const isDue = (routine: Routine) => !this.closing && scheduler.active && routine.enabled && this.targetState(routine) !== "missing" && (!routine.checks
         ? routine.nextRunAt != null && routine.nextRunAt <= now
         : now >= this.bootedAt + CHECK_BOOT_HOLD_MS && [routine.nextRunAt, routine.wakeAt].some((at) => at != null && at <= now));
       // An unanswered wait gives way to its routine's next occurrence, which would otherwise be skipped behind it.
@@ -1083,7 +1090,7 @@ export class RoutineManager {
 
       // Oldest first, by id: a rollback across awaits can replace the run objects.
       for (const id of this.runs.map((run) => run.id)) {
-        if (this.closing) return;
+        if (this.closing || !scheduler.active) return;
         const run = this.runs.find((candidate) => candidate.id === id);
         if (!run || run.status !== "queued" || (run.retryAt ?? 0) > now) continue;
         const triggerSource = run.triggerSource ?? (run.manual ? "manual" : "schedule");
@@ -1197,7 +1204,8 @@ export class RoutineManager {
    * Nothing new leaves no run behind a scheduled check, and a quiet completed one behind a manual check. */
   private async runChecks(routineId: string, hold: CheckHold | undefined, manual?: string): Promise<void> {
     const hook = this.options.checks, key = manual ?? routineId, routine = this.routines.find((candidate) => candidate.id === routineId);
-    if (this.closing || !hook || !routine || this.checking.has(key)) return;
+    const scheduler = this.scheduler;
+    if (this.closing || !scheduler.active || !hook || !routine || this.checking.has(key)) return;
     const revision = routine.updatedAt;
     this.checking.add(key);
     let result: RoutineCheckResult;
@@ -1211,12 +1219,12 @@ export class RoutineManager {
     }
     const current = this.routines.find((candidate) => candidate.id === routineId);
     const queued = manual === undefined ? undefined : this.runs.find((run) => run.id === manual && run.status === "queued");
-    if (this.closing || !current?.checks || (manual === undefined ? !current.enabled : !queued)) {
-      if (result.run) hook.release(result.run.key);
+    if (this.closing || !scheduler.active || !current?.checks || (manual === undefined ? !current.enabled : !queued)) {
+      if (result.run) this.releaseCheck(result.run.key);
       return;
     }
     if (current.updatedAt !== revision) {
-      if (result.run) hook.release(result.run.key);
+      if (result.run) this.releaseCheck(result.run.key);
       return this.runChecks(routineId, hold, manual);
     }
     const allocations: ResultsThreadAllocation[] = [];
@@ -1239,13 +1247,18 @@ export class RoutineManager {
         }
       }, () => this.discardResultsThreads(allocations));
     } catch (error) {
-      if (result.run) hook.release(result.run.key);
+      if (result.run) this.releaseCheck(result.run.key);
       return console.error(`routines: could not save the checks of ${routineId}`, error);
     }
     this.emitRoutine(current);
     if (queued && !result.run && result.trouble) this.failRun(queued, result.trouble);
     else if (run ?? queued) this.emitRun((run ?? queued)!);
-    if (run) queueMicrotask(() => this.tickInBackground());
+    if (run) queueMicrotask(() => { if (scheduler.active) this.tickInBackground(); });
+  }
+
+  private releaseCheck(key: string): void {
+    if (!this.scheduler.active && !this.closing) this.checkReleases.add(key);
+    else this.options.checks?.release(key);
   }
 
   handleRuntimeEvent(event: RuntimeEvent): RoutineRun | null {
