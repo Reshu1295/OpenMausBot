@@ -173,7 +173,6 @@ export function createRoutineChecks(deps: RoutineChecksDeps): RoutineChecks & {
     const [routineId, pending] = owner;
     changed(routineId);
     const entry = of(routineId);
-    if (pending.replies.length) deps.sorted?.(routineId, pending.replies.length);
     if (pending.mailCursor !== undefined) entry.mailCursor = Math.max(entry.mailCursor ?? 0, pending.mailCursor);
     if (pending.runsCursor !== undefined) entry.runsCursor = Math.max(entry.runsCursor ?? 0, pending.runsCursor);
     entry.judged = keepNewest([...new Set([...(entry.judged ?? []), ...pending.mail])], MAX_JUDGED);
@@ -185,6 +184,7 @@ export function createRoutineChecks(deps: RoutineChecksDeps): RoutineChecks & {
     }
     delete entry.pending![key];
     save();
+    if (pending.replies.length) deps.sorted?.(routineId, pending.replies.length);
   }
 
   /** A read that failed counts toward its app's failure streak, so the brief says so once and reads back off. */
@@ -228,6 +228,7 @@ export function createRoutineChecks(deps: RoutineChecksDeps): RoutineChecks & {
     const pending: Omit<Pending, "at"> = { mail: [], prep: [], replies: [] };
     const held = new Set(Object.values(entry.pending ?? {}).flatMap((one) => [...one.mail, ...one.prep]));
     let wakeAt: number | undefined;
+    let sortedCount = 0;
     const apps = checks.includes("calendar") || checks.includes("mail") ? await awaitRoutineCheck(deps.reads.connected().catch(() => null), signal) : null;
     signal?.throwIfAborted();
     const session = deps.reads.session();
@@ -235,12 +236,12 @@ export function createRoutineChecks(deps: RoutineChecksDeps): RoutineChecks & {
     const readable = (app: ReadApp): boolean => apps?.[app] === true && deps.mayRead(routine.botId, app) && !trouble.some((one) => one.app === app) &&
       (context.manual || !readsBackOff(entry, app));
     if (readable("gmail") && entry.address === undefined) {
-      try { const address = await awaitRoutineCheck(session.address(), signal); signal?.throwIfAborted(); entry.address = address; } catch (error) { signal?.throwIfAborted(); trouble.push(failed(entry, "gmail", error)); }
+      try { const address = await awaitRoutineCheck(session.address(signal), signal); signal?.throwIfAborted(); entry.address = address; } catch (error) { signal?.throwIfAborted(); trouble.push(failed(entry, "gmail", error)); }
     }
 
     if (checks.includes("calendar") && readable("googlecalendar")) {
       try {
-        const meetings = mergeMeetings(await awaitRoutineCheck(session.events(at - 60 * MINUTE, at + LOOKAHEAD_MS), signal), entry.address);
+        const meetings = mergeMeetings(await awaitRoutineCheck(session.events(at - 60 * MINUTE, at + LOOKAHEAD_MS, signal), signal), entry.address);
         signal?.throwIfAborted();
         succeeded(entry, "googlecalendar");
         entry.meetings = pruneMeetings(entry.meetings ?? {}, at);
@@ -277,7 +278,7 @@ export function createRoutineChecks(deps: RoutineChecksDeps): RoutineChecks & {
     if (checks.includes("mail") && readable("gmail")) {
       try {
         const since = emailSince({ now: at, emailCursor: entry.mailCursor });
-        const { emails, more } = await awaitRoutineCheck(session.emails(since, MAIL_READ_LIMIT), signal);
+        const { emails, more } = await awaitRoutineCheck(session.emails(since, MAIL_READ_LIMIT, signal), signal);
         signal?.throwIfAborted();
         succeeded(entry, "gmail");
         const judged = new Set([...(entry.judged ?? []), ...held]);
@@ -295,7 +296,7 @@ export function createRoutineChecks(deps: RoutineChecksDeps): RoutineChecks & {
             return email ? [{ email, why: pick.why, needsReply: pick.needsReply }] : [];
           });
           entry.judged = keepNewest([...new Set([...(entry.judged ?? []), ...plan.batch.map((email) => email.id), ...plan.quiet.map((email) => email.id)])], MAX_JUDGED);
-          if (plan.batch.length) deps.sorted?.(routine.id, plan.batch.length);
+          sortedCount = plan.batch.length;
           // Mail an earlier run still holds keeps the cursor back, so a failed run's mail is read again.
           const heldMail = Object.values(entry.pending ?? {}).some((one) => one.mail.length > 0);
           if (advanced !== undefined && !heldMail) entry.mailCursor = advanced;
@@ -350,6 +351,7 @@ export function createRoutineChecks(deps: RoutineChecksDeps): RoutineChecks & {
     state.routines[routine.id] = entry;
     if (run) handed.set(run.key, { mail: items.mail, prep: items.prep.map(({ key: meeting, event }) => ({ key: meeting, event })) });
     save();
+    if (sortedCount) deps.sorted?.(routine.id, sortedCount);
     if (brief) await awaitRoutineCheck(Promise.resolve(deps.report(report)), signal);
     signal?.throwIfAborted();
     const sentence = troubleSentence(trouble);

@@ -312,7 +312,7 @@ export function createBrief(deps: BriefDeps) {
     if (!session) return;
     for (const row of missing.slice(0, BRIEF_HEADER_READ_LIMIT)) {
       try {
-        const header = await awaitRoutineCheck(session.message(row.messageId), signal);
+        const header = await awaitRoutineCheck(session.message(row.messageId, signal), signal);
         signal?.throwIfAborted();
         if (header) headers.set(row.messageId, header);
         else state.important = state.important.filter((one) => one.messageId !== row.messageId);
@@ -434,7 +434,7 @@ export function createBrief(deps: BriefDeps) {
     if (!session || !address || !open.length) return;
     for (const row of open.slice(0, BRIEF_REPLY_READ_LIMIT)) {
       try {
-        const messages = await awaitRoutineCheck(session.thread(row.threadId), signal);
+        const messages = await awaitRoutineCheck(session.thread(row.threadId, signal), signal);
         signal?.throwIfAborted();
         if (answered({ at: row.at }, messages, address)) state.important = state.important.filter((one) => one.messageId !== row.messageId);
       } catch {

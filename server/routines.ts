@@ -31,7 +31,7 @@ import { cloneAttachments } from "./routine-attachments.ts";
 import { loadInstalledPackage, loadRoutine, loadRun } from "./routine-load.ts";
 import { sanitizeInput } from "./routine-input.ts";
 import { checkHold, CHECK_BOOT_HOLD_MS, type CheckHold } from "./routine-check-pacing.ts";
-import { runRoutineCheck, type RoutineCheckLifecycle } from "./routine-check-task.ts";
+import { RoutineCheckDrainTimeoutError, runRoutineCheck, type RoutineCheckLifecycle } from "./routine-check-task.ts";
 import { resolveRoutineResultsThread, routineRunDefinition, type ResultsThreadAllocation } from "./routine-run-definition.ts";
 
 export type { RoutineContextAttachment, RoutineIntervalWindow, RoutineRunStatus, RoutineRunTrigger };
@@ -328,6 +328,7 @@ export class RoutineManager {
   private frozenPending = false;
   private readonly bootedAt: number;
   private readonly checking = new Map<string, AbortController>();
+  private readonly checkDrains = new Set<Promise<void>>();
   private readonly checkReleases = new Set<string>();
 
   constructor(options: RoutineManagerOptions) {
@@ -950,7 +951,7 @@ export class RoutineManager {
     return { ...schedule, at: limitResetOccurrence(this.options.limitResetAt?.(schedule.engine) ?? null, last) };
   }
 
-  get isTicking(): boolean { return this.ticking || this.checking.size > 0; }
+  get isTicking(): boolean { return this.ticking || this.checking.size > 0 || this.checkDrains.size > 0; }
   private tickInBackground(): void { this.tick().catch((error) => console.error("routines: a scheduler pass failed", error)); }
 
   start() {
@@ -1207,16 +1208,15 @@ export class RoutineManager {
   private async runChecks(routineId: string, hold: CheckHold | undefined, manual?: string): Promise<void> {
     const hook = this.options.checks, key = routineId, routine = this.routines.find((candidate) => candidate.id === routineId);
     const scheduler = this.scheduler;
-    if (this.closing || !scheduler.active || !hook || !routine || this.checking.has(key)) return;
-    const revision = routine.updatedAt;
-    const controller = new AbortController();
+    if (this.closing || !scheduler.active || !hook || !routine || this.checking.has(key) || this.checkDrains.size) return;
+    const revision = routine.updatedAt, controller = new AbortController();
     this.checking.set(key, controller);
     let result: RoutineCheckResult;
     try {
-      result = await runRoutineCheck(hook, cloneRoutine(routine), { manual: manual !== undefined, ...(hold ? { hold } : {}) }, controller, (key) => this.releaseCheck(key));
+      result = await runRoutineCheck(hook, cloneRoutine(routine), { manual: manual !== undefined, ...(hold ? { hold } : {}) }, controller, (key) => this.releaseCheck(key), this.checkDrains);
     } catch (error) {
       if (!controller.signal.aborted) console.error(`routines: the checks of ${routineId} failed`, error);
-      result = { trouble: "The checks could not run; they try again at the next check." };
+      result = { trouble: error instanceof RoutineCheckDrainTimeoutError ? error.message : "The checks could not run; they try again at the next check." };
     } finally {
       this.checking.delete(key);
     }
@@ -1261,7 +1261,7 @@ export class RoutineManager {
   }
 
   private recoverCheckReleases(): void {
-    if (this.checking.size) return;
+    if (this.checking.size || this.checkDrains.size) return;
     const owned = new Set(this.runs.map((run) => run.checkKey));
     for (const key of this.options.checks?.pendingKeys?.() ?? []) if (!owned.has(key)) this.checkReleases.add(key);
     for (const key of this.checkReleases) this.options.checks?.release(key);

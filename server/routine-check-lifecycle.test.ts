@@ -9,6 +9,7 @@ import { DECIDER_LOG_DIR, flushDeciderLog } from "./decider/log.ts";
 import { createExtractor } from "./extractor/index.ts";
 import { createInboxTriage } from "./host/inbox-triage.ts";
 import { createRoutineChecks } from "./host/routine-checks.ts";
+import { createMoveFreeze } from "./move-freeze.ts";
 import { RoutineManager } from "./routines.ts";
 import { WorkspaceBackupMaintenance } from "./workspace-backup-maintenance.ts";
 
@@ -162,4 +163,71 @@ it.each(["decision", "extraction"] as const)("does not start the %s transport wh
   controller.abort();
   await pending;
   expect(requests).toBe(0);
+});
+
+it.each((["address", "calendars", "events", "emails"] as const).flatMap((stage) =>
+  (["stop", "freeze", "timeout"] as const).map((cancel) => ({ stage, cancel })),
+))("aborts the in-flight $stage relay on $cancel", async ({ stage, cancel }) => {
+  vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+  const { dir, now } = fixture();
+  const entered = deferred(), released = deferred();
+  const requests: string[] = [];
+  let inFlight: AbortSignal | undefined;
+  let pendingRead: Promise<unknown> | undefined;
+  const reads = createConnectedReads({
+    connected: async () => ({ gmail: true, googlecalendar: true }),
+    relay: async (payload, _session, signal) => {
+      const request = payload as { method: string; params: { arguments: { tools: Array<{ tool_slug: string; arguments: { page_token?: string } }> } } };
+      if (request.method === "initialize") return { status: 200, bytes: new TextEncoder().encode("{}"), transportSessionId: "synthetic" };
+      if (request.method !== "tools/call") return { status: 202, bytes: new Uint8Array() };
+      const tool = request.params.arguments.tools[0]!;
+      requests.push(tool.tool_slug);
+      const blocked = stage === "address" ? tool.tool_slug === "GMAIL_GET_PROFILE"
+        : stage === "calendars" ? tool.tool_slug === "GOOGLECALENDAR_LIST_CALENDARS"
+        : stage === "events" ? tool.tool_slug === "GOOGLECALENDAR_EVENTS_LIST"
+        : tool.tool_slug === "GMAIL_FETCH_EMAILS" && tool.arguments.page_token === "2";
+      if (blocked) {
+        inFlight = signal; entered.resolve();
+        pendingRead = new Promise<void>((resolve, reject) => {
+          const aborted = () => reject(signal.reason);
+          signal.addEventListener("abort", aborted, { once: true });
+          void released.promise.then(() => { signal.removeEventListener("abort", aborted); resolve(); });
+        });
+        await pendingRead;
+      }
+      const data = tool.tool_slug === "GMAIL_GET_PROFILE" ? { emailAddress: "owner@fixture.test" }
+        : tool.tool_slug === "GOOGLECALENDAR_LIST_CALENDARS" ? { items: [{ id: "primary", primary: true }] }
+        : tool.tool_slug === "GOOGLECALENDAR_EVENTS_LIST" ? { items: [] }
+        : { messages: [], nextPageToken: String(Number(tool.arguments.page_token ?? 1) + 1) };
+      const text = JSON.stringify({ successful: true, data: { results: [{ tool_slug: tool.tool_slug, response: { successful: true, data } }] } });
+      return { status: 200, bytes: new TextEncoder().encode(JSON.stringify({ jsonrpc: "2.0", id: "omb-check-call", result: { content: [{ type: "text", text }] } })) };
+    },
+  });
+  const checks = createRoutineChecks({ dataDir: dir, reads, now: () => now, mayRead: () => true, fenced: () => true,
+    timeZone: () => "UTC", runs: () => [], dismissedFrom: () => [], report() { throw new Error("late report"); } });
+  const manager = new RoutineManager({ file: join(dir, "routines.json"), now: () => now, checks: { ...checks, timeoutMs: 100 }, botState: () => "ready",
+    createTask: () => { throw new Error("late task"); }, startTurn: async () => {} });
+  cleanups.push(() => manager.close());
+  try {
+    const routine = manager.create({ name: "Read", prompt: "Check", botId: "bot", checks: ["calendar", "mail"],
+      schedule: { type: "interval", everyMinutes: 15, anchorAt: now + 900_000 } });
+    manager.runNow(routine.id); await manager.tick(); await entered.promise;
+    const before = requests.length;
+    if (cancel === "timeout") await vi.advanceTimersByTimeAsync(101);
+    else if (cancel === "stop") manager.stop();
+    else {
+      const freeze = createMoveFreeze({ dataDir: dir });
+      freeze.hold(() => manager.start(), () => manager.stop());
+      freeze.freeze("fixture-cloud");
+    }
+    await drain();
+    expect(inFlight?.aborted, cancel).toBe(true);
+    released.resolve(); await pendingRead?.catch(() => undefined); await drain();
+    expect(requests, cancel).toHaveLength(before);
+    expect(checks.pendingKeys()).toEqual([]);
+    expect(manager.isTicking).toBe(false);
+  } finally {
+    released.resolve(); await pendingRead?.catch(() => undefined); await drain();
+    manager.close();
+  }
 });

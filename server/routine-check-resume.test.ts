@@ -189,4 +189,53 @@ describe("routine check recovery", () => {
       expect(reports).toBe(0);
     }, { idle: () => !manager.isTicking, pause: () => manager.stop(), resume: () => manager.start(), flush: async () => {} });
   });
+
+  it.each(["hung", "completed"] as const)("finishes a %s check while a hung drain stays busy and blocks backup", async (state) => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    const work = deferred<RoutineCheckResult>(), writes = deferred<void>();
+    let calls = 0;
+    const released: string[] = [];
+    if (state === "completed") work.resolve({ run: { key: "discarded", prompt: "Mail" } });
+    const h = fixture({ check: () => { calls++; return work.promise; }, drain: () => writes.promise, release: (key) => { released.push(key); }, settled() {} });
+    h.manager.runNow(h.routine.id); await h.manager.tick(); await drain();
+    try {
+      await vi.advanceTimersByTimeAsync(5 * MINUTE); await drain();
+      expect(h.manager.listRuns()[0]).toMatchObject({ status: "failed", error: expect.stringMatching(/still draining/i) });
+      expect(h.manager.listRoutines()[0].checkTrouble).toMatch(/still draining/i);
+      expect(h.manager.isTicking).toBe(true);
+      expect(released).toEqual(state === "completed" ? ["discarded"] : []);
+      const backup = new WorkspaceBackupMaintenance();
+      const hooks = { idle: () => !h.manager.isTicking, pause: () => h.manager.stop(), resume() {}, flush: async () => {} };
+      await expect(backup.run(async () => "backup", hooks)).rejects.toMatchObject({ status: 409 });
+      h.advance(15 * MINUTE); await h.manager.tick(); await drain();
+      expect(calls).toBe(1);
+      writes.resolve(); await drain();
+      expect(h.manager.isTicking).toBe(false);
+      expect(vi.getTimerCount()).toBe(0);
+      await backup.run(async () => {
+        const before = readFileSync(join(h.dir, "routines.json"), "utf8");
+        work.resolve({ run: { key: "late", prompt: "Late mail" } }); await drain();
+        expect(readFileSync(join(h.dir, "routines.json"), "utf8")).toBe(before);
+        expect(h.tasks()).toBe(0);
+      }, hooks);
+    } finally { work.resolve({}); writes.resolve(); await drain(); }
+  });
+
+  it("waits for a normal drain before delivering a check and clears both deadlines", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    const writes = deferred<void>();
+    const h = fixture({ check: async () => ({ run: { key: "kept", prompt: "Mail" } }), drain: () => writes.promise, release() {}, settled() {} });
+    try {
+      h.manager.runNow(h.routine.id); await h.manager.tick(); await drain();
+      expect(h.manager.listRuns()[0].status).toBe("queued");
+      expect(h.manager.isTicking).toBe(true);
+      expect(h.tasks()).toBe(0);
+      writes.resolve(); await drain();
+      expect(h.manager.listRuns()[0]).toMatchObject({ status: "running", checkKey: "kept" });
+      expect(h.manager.isTicking).toBe(false);
+      expect(h.tasks()).toBe(1);
+      expect(vi.getTimerCount()).toBe(0);
+    } finally { writes.resolve(); await drain(); }
+  });
+
 });

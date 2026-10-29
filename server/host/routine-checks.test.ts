@@ -11,7 +11,7 @@ const MINUTE = 60_000;
 const dirs: string[] = [];
 afterEach(() => { for (const dir of dirs.splice(0)) rmSync(dir, { recursive: true, force: true }); });
 
-function setup(options: { fenced?: boolean; may?: (app: ReadApp) => boolean } = {}) {
+function setup(options: { fenced?: boolean; may?: (app: ReadApp) => boolean; helpers?: boolean } = {}) {
   const dir = mkdtempSync(join(tmpdir(), "omb-routine-checks-"));
   dirs.push(dir);
   let now = Date.parse("2026-10-22T08:00:00Z");
@@ -37,10 +37,15 @@ function setup(options: { fenced?: boolean; may?: (app: ReadApp) => boolean } = 
     }),
   };
   const sorted: Array<[string, number]> = [];
+  const sortedJudged: string[][] = [];
   const checks = createRoutineChecks({
     dataDir: dir, reads, now: () => now, mayRead: (_bot, app) => options.may?.(app) ?? true, fenced: () => options.fenced ?? true,
     timeZone: () => "UTC", runs: () => runs, dismissedFrom: () => [], report: (report) => { reports.push(report); },
-    sorted: (routineId, count) => sorted.push([routineId, count]),
+    sorted: (routineId, count) => {
+      sorted.push([routineId, count]);
+      sortedJudged.push(JSON.parse(readFileSync(join(dir, CHECKS_FILE), "utf8")).routines[routineId].judged ?? []);
+    },
+    ...(options.helpers ? { inbox: { ready: () => true, triage: async () => [] } } : {}),
   });
   const routine = (extra: Partial<Routine> = {}): Routine => ({
     id: "watch", name: "Keep an eye on my day", prompt: "Check my day.", target: "bot", botId: "chief", runOn: "maus", enabled: true,
@@ -58,7 +63,7 @@ function setup(options: { fenced?: boolean; may?: (app: ReadApp) => boolean } = 
     events.push(event);
     return event;
   };
-  return { checks, reads, routine, mail, meeting, failing, calls, runs, reports, inbox, sorted, advance: (ms: number) => { now += ms; }, now: () => now, file: join(dir, CHECKS_FILE) };
+  return { checks, reads, routine, mail, meeting, failing, calls, runs, reports, inbox, sorted, sortedJudged, advance: (ms: number) => { now += ms; }, now: () => now, file: join(dir, CHECKS_FILE) };
 }
 
 const run = (key: string, status: RoutineRun["status"], deliver?: "brief"): RoutineRun => ({
@@ -89,6 +94,34 @@ describe("a routine's checks", () => {
     expect(s.checks.pendingKeys()).toEqual([]);
     expect(JSON.parse(readFileSync(s.file, "utf8")).routines.watch.judged).toEqual(["a"]);
   });
+  it.each(["abort", "revision"] as const)("counts helper-sorted mail only after committing through a %s change", async (change) => {
+    const s = setup({ helpers: true });
+    s.mail("held", 10);
+    const first = await s.checks.check(s.routine({ deliver: undefined, checks: ["mail"] }), { manual: false });
+    s.mail("fresh", 1);
+    const controller = new AbortController();
+    let interrupted = false;
+    const routine = s.routine({ checks: ["mail", "runs"] });
+    Object.defineProperty(routine, "createdAt", { get() {
+      if (!interrupted) {
+        interrupted = true;
+        if (change === "abort") controller.abort();
+        else s.checks.release(first.run!.key);
+      }
+      return s.now() - 60 * MINUTE;
+    } });
+    const pending = s.checks.check(routine, { manual: false, signal: controller.signal });
+    if (change === "abort") {
+      await expect(pending).rejects.toMatchObject({ name: "AbortError" });
+      expect(s.sorted).toEqual([]);
+    } else {
+      await pending;
+      expect(s.sorted).toEqual([["watch", 2]]);
+      expect(s.sortedJudged).toEqual([["fresh", "held"]]);
+      expect(JSON.parse(readFileSync(s.file, "utf8")).routines.watch.judged).toEqual(["fresh", "held"]);
+    }
+  });
+
   it("nothing new means no run, and the brief still hears what needs no AI", async () => {
     const s = setup();
     const result = await s.checks.check(s.routine(), { manual: false });
@@ -204,6 +237,7 @@ describe("a routine's checks", () => {
     const { run: second } = await s.checks.check(s.routine({ checks: ["mail"] }), { manual: false });
     s.checks.commit(second!.key);
     expect(s.sorted).toEqual([["watch", 2]]);
+    expect(s.sortedJudged).toEqual([["a", "b"]]);
   });
 
   it("a draft may answer only one of its run's threads, to that thread's sender, once", async () => {

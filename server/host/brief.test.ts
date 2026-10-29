@@ -74,10 +74,11 @@ describe("the brief", () => {
     const controller = new AbortController();
     let open!: () => void;
     const gate = new Promise<void>((resolve) => { open = resolve; });
+    let readSignal: AbortSignal | undefined;
     const session: ReadSession = {
       address: async () => "me@x.test", events: async () => [], emails: async () => ({ emails: [], more: false }),
-      thread: async () => { await gate; return [{ id: "answer", at: s.now(), from: "me@x.test" }]; },
-      message: async () => { await gate; return { ...email, subject: "Late changed subject" }; },
+      thread: async (_id, signal) => { readSignal = signal; await gate; return [{ id: "answer", at: s.now(), from: "me@x.test" }]; },
+      message: async (_id, signal) => { readSignal = signal; await gate; return { ...email, subject: "Late changed subject" }; },
     };
     if (read === "message") { current = session; s.restart(); }
     const pending = s.brief.report({ routine: {} as never, at: s.now(), signal: controller.signal,
@@ -88,7 +89,7 @@ describe("the brief", () => {
     let rejected = false;
     const outcome = pending.catch((error: unknown) => { rejected = true; return error; });
     await new Promise<void>((resolve) => setImmediate(resolve));
-    try { expect(rejected).toBe(true); } finally { open(); }
+    try { expect(rejected).toBe(true); expect(readSignal).toBe(controller.signal); } finally { open(); }
     expect(await outcome).toMatchObject({ name: "AbortError" });
     expect(JSON.stringify(s.rows())).toBe(before);
     expect(s.shown()).toContain("Q3 numbers");
