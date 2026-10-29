@@ -284,7 +284,7 @@ describe("CloudWelcome", () => {
     render();
     await vi.waitFor(() => expect(text()).toContain("Welcome to Studio Cloud"));
     const folders = host.querySelector('[data-welcome-files="folders"]')!;
-    expect(folders.textContent).toContain("Bots on Studio Cloud use the files on this computer by themselves while it's awake and OpenMausBot is open. There's nothing to set up.");
+    expect(folders.textContent).toContain("Bots on Studio Cloud use the files on this computer by themselves while it's awake and MausBot is open. There's nothing to set up.");
     expect(folders.querySelector("button")).toBeNull();
   });
 
