@@ -6,6 +6,7 @@ import { reloadProviderInstances } from "./harness/provider-reload.ts";
 import { ProviderRegistry } from "./harness/registry.ts";
 import { makeFakeDriver } from "./testing/fake-driver.ts";
 import { changedInstanceIds, engineLaunches } from "./config.ts";
+import { TurnStops } from "./turn-outcome.ts";
 
 // Runs the real cleanup functions sliced from index.ts: importing index.ts would start a server.
 const source = readFileSync(new URL("./index.ts", import.meta.url), "utf8");
@@ -332,7 +333,7 @@ function reloadFixture() {
     cancelDirectTurnDispatch: (_botId: string, threadId: string) => log.push(`cancel:${threadId}`),
     cancelGroupTurnOperations: (_groupId: string, threadId: string, outcome: { status: string; detail: string; byHarness?: boolean }) =>
       log.push(`room-stop:${threadId}:${outcome.status}:${outcome.detail}:${outcome.byHarness === true}`),
-    liveTurnByThread: new Map(),
+    liveTurnByThread: new Map(), turnStops: new TurnStops(),
     stoppedTurnText: (threadId: string, _turnId: string | undefined, cause: string) => `${cause} (${threadId})`,
     stoppedTurnOutcome: ({ reason }: { reason: string }) => reason,
     stopScreenPoller() {}, releaseLocalVmThread() {}, releaseTurnResources() {}, endForeignTurns() {}, vpsThreadEnded() {},

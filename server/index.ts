@@ -12174,7 +12174,10 @@ async function reloadProviders(before: Record<string, unknown>) {
   // Those engines' processes are about to die: revoke before the first await.
   revokeEngineCapabilities(changed);
   for (const id of changed) providerAuthSessions.clearInstance(id);
-  for (const task of direct) cancelDirectTurnDispatch(task.botId, task.threadId);
+  for (const task of direct) {
+    turnStops.stopping(task.threadId, liveTurnByThread.get(task.threadId), cause);
+    cancelDirectTurnDispatch(task.botId, task.threadId);
+  }
   for (const [threadId] of rooms) {
     const group = store.groupByThread(threadId);
     if (group) cancelGroupTurnOperations(group.id, threadId, { status: "stopped", detail: stoppedTurnOutcome({ reason: cause, activities: [] }), byHarness: true });

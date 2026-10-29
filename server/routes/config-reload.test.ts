@@ -5,6 +5,8 @@ import ts from "typescript";
 import { expect, it, vi } from "vitest";
 import { changedInstanceIds, engineLaunches, instanceConfigs, loadConfig, saveConfig, syncCredentialEnv } from "../config.ts";
 import type { InstanceConfigMap } from "../contracts.ts";
+import { ProviderTurnGenerationRegistry } from "../turn-dispatch-guard.ts";
+import { stoppedTurnOutcome, TurnStops } from "../turn-outcome.ts";
 import { EventBus } from "../harness/bus.ts";
 import { reloadProviderInstances } from "../harness/provider-reload.ts";
 import { ProviderRegistry } from "../harness/registry.ts";
@@ -246,6 +248,93 @@ it("instance PATCH clears only its successful pending config reload and preserve
     expect.soft(create).toHaveBeenCalledTimes(2);
   } finally {
     dispose.mockResolvedValue();
+    await registry.disposeAll();
+    vi.restoreAllMocks();
+  }
+});
+
+it("provider reload preserves its cause when disposal completes the turn before returning", async () => {
+  const configs = { compat: { driver: "openai-compat", environment: { OPENAI_COMPAT_API_KEY: "new-key" } } };
+  const before = engineLaunches({ compat: { driver: "openai-compat", environment: { OPENAI_COMPAT_API_KEY: "old-key" } } });
+  const fake = makeFakeDriver({ kind: "openai-compat" });
+  const registry = new ProviderRegistry([fake.driver]);
+  await registry.load(configs);
+  const old = registry.get("compat")!;
+  const emit = fake.created.get("compat")!.emit;
+  const bus = new EventBus(async () => {});
+  bus.attach([old]);
+  const turnStops = new TurnStops();
+  const turnId = "reload-turn";
+  const threadId = "reload-thread";
+  const generation = "reload-generation";
+  const owner = { generation };
+  const outcomes: Array<{ ok: boolean; text: string }> = [];
+  const directFollowupTurns = new ProviderTurnGenerationRegistry<{ ok: boolean; text: string }>();
+  directFollowupTurns.bind(threadId, generation, turnId);
+  let enterDisposal!: () => void;
+  const disposing = new Promise<void>(resolve => { enterDisposal = resolve; });
+  let endCli!: () => void;
+  const cliEnded = new Promise<void>(resolve => { endCli = resolve; });
+  const dispose = vi.spyOn(old, "dispose").mockImplementation(async () => {
+    enterDisposal();
+    await cliEnded;
+    emit({ eventId: "reload-completed", createdAt: "2026-10-29T00:00:00.000Z", type: "turn.completed", provider: "openai-compat", threadId, turnId, ok: false, stopReason: "interrupted" });
+  });
+  const releaseTurnResources = vi.fn();
+  const store = {
+    bots: [{ id: "helper" }],
+    tasks: () => [{ threadId }],
+    botByThread: () => ({ id: "helper" }),
+    messagesFor: () => [], activePath: () => [],
+    taskByThread: () => ({ threadId }), appendMessage() {}, setTaskActivity() {},
+  };
+  const context = vm.createContext({
+    providerConfigs: () => configs, registry, bus, reloadProviderInstances, changedInstanceIds, engineLaunches,
+    providerInstancesChanging: new Set<string>(), pendingProviderReloads: new Set<string>(), providerFleetReloading: false,
+    store, groupSpeakers: new Map(), decorateHostedProvider: undefined,
+    threadBusy: () => true, threadEngineId: () => "compat",
+    turnResourceOwners: new Map([[threadId, owner]]), liveTurnByThread: new Map([[threadId, turnId]]),
+    turnStops, stoppedTurnOutcome, directFollowupTurns,
+    shouldIgnoreProviderEvent: () => false,
+    watchdog: { settle() {} }, revokeInternalCapabilityForProviderEvent() {},
+    unansweredApprovals: { annotate: (_threadId: string, _turnId: string, text: string) => text },
+    settleDirectCoordination: (_generation: string, outcome: { ok: boolean; text: string }) => { outcomes.push(outcome); },
+    settleDirectFollowup: (_generation: string, outcome?: { ok: boolean; text: string }) => {
+      if (outcome && !outcomes.length) outcomes.push(outcome);
+    },
+    cancelDirectTurnDispatch() {}, revokeEngineCapabilities() {}, providerAuthSessions: { clearInstance() {} },
+    stopScreenPoller() {}, releaseLocalVmThread() {}, releaseTurnResources, endForeignTurns() {}, vpsThreadEnded() {},
+    closeOpenApprovals() {}, directTurnBots: new Map(), runningTurnEngines: new Map(), routines: undefined,
+    failedTurnTool: (name: string) => ({ name, ok: false }), drainQueuedSends() {},
+  });
+  const stoppedText = source.statements.find(node => ts.isFunctionDeclaration(node) && node.name?.text === "stoppedTurnText");
+  const terminalSubscriber = source.statements.find(node => ts.isExpressionStatement(node)
+    && ts.isCallExpression(node.expression) && node.expression.expression.getText(source) === "bus.subscribe"
+    && node.getText(source).includes("turnStops.note(event)"));
+  if (!stoppedText || !terminalSubscriber) throw new Error("Turn outcome consumer not found");
+  vm.runInContext(reloadCode + ts.transpileModule(stoppedText.getText(source) + "\n" + terminalSubscriber.getText(source), {
+    compilerOptions: { target: ts.ScriptTarget.ESNext },
+  }).outputText, context);
+  const reloading = context.reloadProviders(before);
+  try {
+    await disposing;
+    expect(outcomes).toEqual([]);
+    expect(releaseTurnResources).not.toHaveBeenCalled();
+    expect(registry.get("compat")).toBe(old);
+    endCli();
+    await reloading;
+    expect(outcomes).toEqual([{
+      ok: false,
+      text: "Turn interrupted — provider settings changed. No tool calls were seen before it stopped.",
+    }]);
+    expect(registry.get("compat")).not.toBe(old);
+    expect(releaseTurnResources).toHaveBeenCalledWith(owner);
+  } finally {
+    endCli();
+    await reloading;
+    dispose.mockResolvedValue();
+    bus.detachAll();
+    await bus.flush();
     await registry.disposeAll();
     vi.restoreAllMocks();
   }
