@@ -31,6 +31,7 @@ import { cloneAttachments } from "./routine-attachments.ts";
 import { loadInstalledPackage, loadRoutine, loadRun } from "./routine-load.ts";
 import { sanitizeInput } from "./routine-input.ts";
 import { checkHold, CHECK_BOOT_HOLD_MS, type CheckHold } from "./routine-check-pacing.ts";
+import { runRoutineCheck } from "./routine-check-task.ts";
 import { resolveRoutineResultsThread, routineRunDefinition, type ResultsThreadAllocation } from "./routine-run-definition.ts";
 
 export type { RoutineContextAttachment, RoutineIntervalWindow, RoutineRunStatus, RoutineRunTrigger };
@@ -203,8 +204,10 @@ function routineRequestOwnerKey(owner: RoutineRequestOwner): string {
 export interface RoutineCheckResult { run?: { prompt: string; key: string }; trouble?: string; wakeAt?: number }
 
 export interface RoutineChecks {
-  /** Runs a routine's checks. With `hold` they may do only what needs no AI, and their items wait. */
-  check(routine: Routine, context: { manual: boolean; hold?: CheckHold }): Promise<RoutineCheckResult>;
+  /** Runs a routine's checks. With `hold` they may do only what needs no AI, and their items wait.
+   * After cancellation, no continuation may write ledger, report or workspace state. */
+  check(routine: Routine, context: { manual: boolean; hold?: CheckHold; signal?: AbortSignal }): Promise<RoutineCheckResult>;
+  pendingKeys?(): string[];
   /** Items handed to a run that was never queued. */
   release(key: string): void;
   /** A run holding checked items ended. Called again on later changes to that run. */
@@ -324,7 +327,7 @@ export class RoutineManager {
   private unreadable = false;
   private frozenPending = false;
   private readonly bootedAt: number;
-  private readonly checking = new Set<string>();
+  private readonly checking = new Map<string, AbortController>();
   private readonly checkReleases = new Set<string>();
 
   constructor(options: RoutineManagerOptions) {
@@ -953,8 +956,7 @@ export class RoutineManager {
   start() {
     if (this.closing || this.timer) return;
     if (!this.scheduler.active) this.scheduler = { active: true };
-    for (const key of this.checkReleases) this.options.checks?.release(key);
-    this.checkReleases.clear();
+    this.recoverCheckReleases();
     if (!this.startupRunsQueued) this.startupRunsQueued = this.queueStartupRuns();
     this.tickInBackground();
     this.timer = setInterval(() => this.tickInBackground(), 10_000);
@@ -963,6 +965,7 @@ export class RoutineManager {
 
   stop() {
     this.scheduler.active = false;
+    for (const controller of this.checking.values()) controller.abort();
     if (this.timer) clearInterval(this.timer);
     this.timer = null;
   }
@@ -1015,6 +1018,7 @@ export class RoutineManager {
     if (this.closing || !scheduler.active || this.ticking) return;
     this.ticking = true;
     try {
+      this.recoverCheckReleases();
       const now = this.now();
       for (const run of this.runs) {
         if (!["running", "waiting"].includes(run.status) || run.startedAt == null || run.timeoutMinutes == null ||
@@ -1040,8 +1044,6 @@ export class RoutineManager {
             // A routine with checks never misses: however late, one check reads everything since the last.
             if (routine.checks) {
               if (!this.checking.has(routine.id)) checks.push({ id: routine.id, hold: checkHold(this.runs, routine.id, now) });
-              if (routine.nextRunAt != null && routine.nextRunAt <= now) this.advancePastOccurrence(routine, now, routine.nextRunAt);
-              delete routine.wakeAt;
               continue;
             }
             const pendingAt = routine.nextRunAt!;
@@ -1097,7 +1099,7 @@ export class RoutineManager {
         const definition = triggerSource === "schedule"
           ? this.routines.find((routine) => routine.id === run.routineId)
           : undefined;
-        if (definition?.schedule.type === "interval") {
+        if (definition?.schedule.type === "interval" && !run.checkKey) {
           const latest = latestIntervalOccurrence(definition.schedule, now);
           if (latest !== null && latest > run.scheduledFor) {
             run.scheduledFor = latest;
@@ -1203,16 +1205,17 @@ export class RoutineManager {
   /** Runs a routine's checks: what needs the AI becomes one run, or fills `manual`, the queued run the person started.
    * Nothing new leaves no run behind a scheduled check, and a quiet completed one behind a manual check. */
   private async runChecks(routineId: string, hold: CheckHold | undefined, manual?: string): Promise<void> {
-    const hook = this.options.checks, key = manual ?? routineId, routine = this.routines.find((candidate) => candidate.id === routineId);
+    const hook = this.options.checks, key = routineId, routine = this.routines.find((candidate) => candidate.id === routineId);
     const scheduler = this.scheduler;
     if (this.closing || !scheduler.active || !hook || !routine || this.checking.has(key)) return;
     const revision = routine.updatedAt;
-    this.checking.add(key);
+    const controller = new AbortController();
+    this.checking.set(key, controller);
     let result: RoutineCheckResult;
     try {
-      result = await hook.check(cloneRoutine(routine), { manual: manual !== undefined, ...(hold ? { hold } : {}) });
+      result = await runRoutineCheck(hook, cloneRoutine(routine), { manual: manual !== undefined, ...(hold ? { hold } : {}) }, controller, (key) => this.releaseCheck(key));
     } catch (error) {
-      console.error(`routines: the checks of ${routineId} failed`, error);
+      if (!controller.signal.aborted) console.error(`routines: the checks of ${routineId} failed`, error);
       result = { trouble: "The checks could not run; they try again at the next check." };
     } finally {
       this.checking.delete(key);
@@ -1231,6 +1234,7 @@ export class RoutineManager {
     let run: RoutineRun | undefined;
     try {
       this.commitMutation(() => {
+        if (manual === undefined && current.nextRunAt != null && current.nextRunAt <= this.now()) this.advancePastOccurrence(current, this.now(), current.nextRunAt);
         for (const field of ["wakeAt", "checkTrouble"] as const) delete current[field];
         Object.assign(current, result.wakeAt === undefined ? {} : { wakeAt: result.wakeAt }, result.trouble ? { checkTrouble: result.trouble.slice(0, 300) } : {},
           result.trouble || result.run ? {} : { checkedAt: this.now() });
@@ -1256,7 +1260,16 @@ export class RoutineManager {
     if (run) queueMicrotask(() => { if (scheduler.active) this.tickInBackground(); });
   }
 
+  private recoverCheckReleases(): void {
+    if (this.checking.size) return;
+    const owned = new Set(this.runs.map((run) => run.checkKey));
+    for (const key of this.options.checks?.pendingKeys?.() ?? []) if (!owned.has(key)) this.checkReleases.add(key);
+    for (const key of this.checkReleases) this.options.checks?.release(key);
+    this.checkReleases.clear();
+  }
+
   private releaseCheck(key: string): void {
+    if (this.options.checks?.pendingKeys && !this.options.checks.pendingKeys().includes(key)) return;
     if (!this.scheduler.active && !this.closing) this.checkReleases.add(key);
     else this.options.checks?.release(key);
   }

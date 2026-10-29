@@ -58,7 +58,7 @@ function setup(options: { fenced?: boolean; may?: (app: ReadApp) => boolean } = 
     events.push(event);
     return event;
   };
-  return { checks, routine, mail, meeting, failing, calls, runs, reports, inbox, sorted, advance: (ms: number) => { now += ms; }, now: () => now, file: join(dir, CHECKS_FILE) };
+  return { checks, reads, routine, mail, meeting, failing, calls, runs, reports, inbox, sorted, advance: (ms: number) => { now += ms; }, now: () => now, file: join(dir, CHECKS_FILE) };
 }
 
 const run = (key: string, status: RoutineRun["status"], deliver?: "brief"): RoutineRun => ({
@@ -67,6 +67,28 @@ const run = (key: string, status: RoutineRun["status"], deliver?: "brief"): Rout
 });
 
 describe("a routine's checks", () => {
+  it("does not restore a pending batch settled while another check reads", async () => {
+    const s = setup();
+    s.mail("a", 5);
+    const first = await s.checks.check(s.routine(), { manual: false });
+    let open!: () => void;
+    const gate = new Promise<void>((resolve) => { open = resolve; });
+    const routine = s.routine({ checks: ["mail"] });
+    const controller = new AbortController();
+    controller.abort();
+    await expect(s.checks.check(routine, { manual: false, signal: controller.signal })).rejects.toMatchObject({ name: "AbortError" });
+    expect(s.checks.pendingKeys()).toEqual([first.run!.key]);
+    const reads = s.reads;
+    const session = reads.session;
+    reads.session = () => ({ ...session(), emails: async (...args) => { await gate; return session().emails(...args); } });
+    const pending = s.checks.check(routine, { manual: false });
+    await new Promise<void>((resolve) => setImmediate(resolve));
+    s.checks.commit(first.run!.key);
+    open();
+    expect((await pending).run).toBeUndefined();
+    expect(s.checks.pendingKeys()).toEqual([]);
+    expect(JSON.parse(readFileSync(s.file, "utf8")).routines.watch.judged).toEqual(["a"]);
+  });
   it("nothing new means no run, and the brief still hears what needs no AI", async () => {
     const s = setup();
     const result = await s.checks.check(s.routine(), { manual: false });
