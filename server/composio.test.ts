@@ -336,8 +336,10 @@ beforeAll(async () => {
         items: [
           { slug: "github", connected_account: { id: "ca_github", status: "ACTIVE" } },
           { slug: "gmail", is_no_auth: true },
-          { slug: "slack" },
-          { slug: "unconnected", connected_account: null },
+          ...(url.searchParams.has("toolkits") ? [
+            { slug: "slack" },
+            { slug: "unconnected", connected_account: null },
+          ] : []),
         ],
         next_cursor: url.searchParams.has("toolkits") ? undefined : "toolkits-page-2",
       };
@@ -1013,13 +1015,15 @@ describe.sequential("Composio Sessions", () => {
     }
   });
 
-  it("does not mount a granted bot's bridge when the service inventory is unavailable", async () => {
+  it("mounts a granted bot's bridge without service hints when inventory is unavailable", async () => {
     setManagedBrokerAccess({ url: origin + "/broker", token: "b".repeat(64) });
     try {
-      await expect(mcpIntegration({}, {
+      const integration = await mcpIntegration({}, {
         harnessUrl: "http://127.0.0.1:1", commsToken: "fixture", botId: "bot", threadId: "thread",
         connectorTools: { bland: { tools: "*" } },
-      })).rejects.toThrow(/invalid broker token/);
+      });
+      expect(integration?.env[CONNECTOR_ALLOWED_TOOLS_ENV]).toBe(JSON.stringify({ bland: { tools: "*" } }));
+      expect(integration?.env[CONNECTOR_SERVICE_SLUGS_ENV]).toBeUndefined();
     } finally {
       setManagedBrokerAccess(null);
     }

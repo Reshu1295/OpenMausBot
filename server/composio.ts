@@ -56,11 +56,11 @@ interface AccountLinkRequest {
 }
 
 const connectedAccountResponseSchema = z.object({
-  id: z.string().optional(),
+  id: z.string().regex(/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/),
   alias: z.string().nullable().optional(),
   status: z.string().optional(),
   updated_at: z.string().optional(),
-  toolkit: z.object({ slug: z.string().optional() }).optional(),
+  toolkit: z.object({ slug: z.string().regex(/^[A-Za-z0-9][A-Za-z0-9_-]*$/) }),
 });
 type ConnectedAccountResponse = z.infer<typeof connectedAccountResponseSchema>;
 
@@ -78,6 +78,16 @@ type ToolkitItem = z.infer<typeof toolkitItemSchema>;
 const toolkitPageSchema = z.object({
   items: z.array(toolkitItemSchema).optional(),
   next_cursor: z.string().nullable().optional(),
+});
+
+const toolkitInventoryPageSchema = toolkitPageSchema.extend({
+  items: z.array(toolkitItemSchema.extend({
+    slug: z.string().regex(/^[A-Za-z0-9][A-Za-z0-9_-]*$/),
+    connected_account: z.object({
+      id: z.string().regex(/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/),
+      status: z.string().optional(),
+    }).nullable().optional(),
+  }).refine((item) => item.is_no_auth === true || item.connected_account != null)),
 });
 
 const connectorServiceSchema = z.object({
@@ -251,7 +261,7 @@ export async function mcpIntegration(
   }
   const serviceSlugs = context.connectorTools === undefined
     ? undefined
-    : serializeConnectorServiceSlugs(await connectedServiceSlugs(cfg, context.as));
+    : await connectedServiceSlugs(cfg, context.as).then(serializeConnectorServiceSlugs).catch(() => undefined);
   if (serviceSlugs?.oversized) {
     console.warn(
       `[composio] connector service slugs for bot ${context.botId} exceed ${CONNECTOR_SERVICE_SLUGS_MAX_BYTES} bytes;`
@@ -386,7 +396,7 @@ async function listSessionToolkits(
       { headers: projectHeaders(apiKey), signal: AbortSignal.timeout(15_000) },
     );
     if (!response.ok) throw new Error(await responseError(response, `Composio toolkits: HTTP ${response.status}`));
-    const body = toolkitPageSchema.required({ items: true }).parse(await response.json());
+    const body = toolkitInventoryPageSchema.parse(await response.json());
     toolkits.push(...body.items);
     const next = body.next_cursor || undefined;
     if (!next) return toolkits;

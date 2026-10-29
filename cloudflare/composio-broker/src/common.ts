@@ -143,11 +143,11 @@ export function composioRequest(env: Env, path: string, init?: RequestInit) {
 }
 
 const connectedAccountResponseSchema = z.object({
-  id: z.string().optional(),
+  id: z.string().regex(/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/),
   alias: z.string().nullable().optional(),
   status: z.string().optional(),
   updated_at: z.string().optional(),
-  toolkit: z.object({ slug: z.string().optional() }).optional(),
+  toolkit: z.object({ slug: z.string().regex(/^[A-Za-z0-9][A-Za-z0-9_-]*$/) }),
 });
 export type ConnectedAccountResponse = z.infer<typeof connectedAccountResponseSchema>;
 const connectedAccountsPageSchema = z.object({

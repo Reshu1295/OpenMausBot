@@ -14637,7 +14637,17 @@ const handleRequest = async (req: IncomingMessage, res: ServerResponse) => {
         }
         if (call.kind === "tools") {
           // Real connected-service slugs, so an underscored service (bland_ai) is not captured by a plain-prefix grant (bland).
-          serviceSlugs = await composio.connectedServiceSlugs(cfg, actor.access);
+          try {
+            serviceSlugs = await composio.connectedServiceSlugs(cfg, actor.access);
+          } catch {
+            res.writeHead(200, { "content-type": "application/json", "cache-control": "no-store" });
+            return res.end(JSON.stringify({
+              jsonrpc: "2.0", id: (body as { id?: unknown }).id ?? null,
+              result: { isError: true, content: [{ type: "text", text:
+                "Connected-app authorization could not be verified because account discovery is unavailable or incomplete. Nothing was run. Try again when discovery is available.",
+              }] },
+            }));
+          }
           requireActiveInternalCapability();
           currentSender = store.bot(internalCapability.botId);
           if (!currentSender || currentSender.composio === false || !composio.configured(cfg)) return json(res, 403, { error: "connected apps are no longer enabled for this bot" });

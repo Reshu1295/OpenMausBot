@@ -81,6 +81,9 @@ beforeAll(async () => {
       }
       return res.end(JSON.stringify({ jsonrpc: "2.0", id: body.id, result: { content: [{ type: "text", text: "relay-ok" }] } }));
     }
+    if (req.url?.startsWith("/api/connected_accounts?")) {
+      return res.end(JSON.stringify({ items: [{ id: "fixture-account", toolkit: { slug: "gmail" }, status: "ACTIVE" }] }));
+    }
     return res.end(JSON.stringify({ items: [{ slug: "gmail", connected_account: { id: "fixture-account", status: "ACTIVE" } }] }));
   });
   await new Promise<void>(resolve => broker.listen(0, "127.0.0.1", resolve));
