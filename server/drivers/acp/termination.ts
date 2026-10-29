@@ -2,7 +2,7 @@ import type { AcpSession } from "./turn-state.ts";
 
 import { captureCliTree, killCliTree } from "../../procs.ts";
 
-export async function confirmAcpTermination(session: AcpSession, close: () => Promise<boolean>, failed: () => void): Promise<boolean> {
+export async function confirmAcpTermination(session: AcpSession, close: () => Promise<boolean>, failed: () => void, closeTimeoutMs?: number): Promise<boolean> {
   const { child, host } = session;
   captureCliTree(child);
   let onExit!: () => void;
@@ -11,9 +11,13 @@ export async function confirmAcpTermination(session: AcpSession, close: () => Pr
     if (child.exitCode !== null || child.signalCode !== null) onExit();
     else child.once("exit", onExit);
   });
+  let timer: ReturnType<typeof setTimeout> | undefined;
   try {
-    if (await Promise.race([close(), exited])) return true;
+    if (await Promise.race([close(), exited, new Promise<false>((resolve) => {
+      if (closeTimeoutMs !== undefined) timer = setTimeout(() => resolve(false), closeTimeoutMs);
+    })])) return true;
   } finally {
+    clearTimeout(timer);
     child.removeListener("exit", onExit);
   }
   host.draining = true;

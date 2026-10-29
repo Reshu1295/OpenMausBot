@@ -491,6 +491,84 @@ describe("ACP threads sharing one agent process", () => {
     }
   });
 
+  it("bounds Stop while a prompt-stall session/close is already pending", async () => {
+    const previous = process.env.OPENMAUS_ACP_PROMPT_IDLE_TIMEOUT_MS;
+    process.env.OPENMAUS_ACP_PROMPT_IDLE_TIMEOUT_MS = "100000";
+    const gateDir = mkdtempSync(join(tmpdir(), "omb-acp-pending-close-"));
+    scratches.push(gateDir);
+    const f = await fixture({}, { FAKE_ACP_HANG_ON: "HANG", FAKE_ACP_SESSION_CLOSE_GATE: join(gateDir, "release") });
+    const kill = procs.killCliTree;
+    let running: Promise<{ turnId: string }> | undefined;
+    try {
+      await f.run("thread-idle");
+      vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+      running = f.instance.adapter.sendTurn({ threadId: "thread-active", text: "HANG", cwd: f.scratch, approvalMode: "full" });
+      await vi.waitFor(() => expect(f.methods().filter(method => method === "session/prompt")).toHaveLength(2));
+      await vi.advanceTimersByTimeAsync(100_001);
+      await vi.waitFor(() => expect(f.methods().filter(method => method === "session/close")).toHaveLength(1));
+      expect(f.instance.adapter.hasSession("thread-active")).toBe(true);
+      expect(f.recorder.events.filter(event => event.type === "turn.completed" && event.threadId === "thread-active")).toHaveLength(0);
+      await f.instance.adapter.interruptTurn("thread-active");
+      await vi.advanceTimersByTimeAsync(10_001);
+      vi.useRealTimers();
+      await vi.waitFor(() => expect(f.instance.adapter.hasSession("thread-active")).toBe(false));
+      const child = f.spawned[0]!;
+      expect(child.exitCode !== null || child.signalCode !== null).toBe(true);
+      expect(f.recorder.events.find(event => event.type === "turn.completed" && event.threadId === "thread-active")).toMatchObject({ ok: true, stopReason: "cancelled" });
+      expect(f.methods().filter(method => method === "session/close")).toHaveLength(1);
+      expect(f.recorder.events.filter(event => event.type === "turn.completed" && event.threadId === "thread-active")).toHaveLength(1);
+    } finally {
+      vi.useRealTimers();
+      await Promise.all(f.spawned.map(child => kill(child, 0)));
+      await running;
+      if (previous === undefined) delete process.env.OPENMAUS_ACP_PROMPT_IDLE_TIMEOUT_MS;
+      else process.env.OPENMAUS_ACP_PROMPT_IDLE_TIMEOUT_MS = previous;
+    }
+  });
+
+  it.each(["dispose", "stopAll"] as const)("bounds %s while a prompt-stall session/close is already pending and retries a failed kill", async (action) => {
+    const previous = process.env.OPENMAUS_ACP_PROMPT_IDLE_TIMEOUT_MS;
+    process.env.OPENMAUS_ACP_PROMPT_IDLE_TIMEOUT_MS = "100000";
+    const gateDir = mkdtempSync(join(tmpdir(), "omb-acp-pending-close-"));
+    scratches.push(gateDir);
+    const f = await fixture({}, { FAKE_ACP_HANG_ON: "HANG", FAKE_ACP_SESSION_CLOSE_GATE: join(gateDir, "release") });
+    const kill = procs.killCliTree;
+    let running: Promise<{ turnId: string }> | undefined;
+    let closing: Promise<unknown> | undefined;
+    let fallbackAllowed = false;
+    const killing = vi.spyOn(procs, "killCliTree").mockImplementation(target => fallbackAllowed ? kill(target, 0) : Promise.resolve(false));
+    try {
+      await f.run("thread-idle");
+      vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+      running = f.instance.adapter.sendTurn({ threadId: "thread-active", text: "HANG", cwd: f.scratch, approvalMode: "full" });
+      await vi.waitFor(() => expect(f.methods().filter(method => method === "session/prompt")).toHaveLength(2));
+      await vi.advanceTimersByTimeAsync(100_001);
+      await vi.waitFor(() => expect(f.methods().filter(method => method === "session/close")).toHaveLength(1));
+      closing = (action === "dispose" ? f.instance.dispose() : f.instance.adapter.stopAll()).catch(error => error);
+      await vi.advanceTimersByTimeAsync(5_000);
+      expect(f.instance.adapter.hasSession("thread-active")).toBe(true);
+      expect(f.recorder.events.filter(event => event.type === "turn.completed" && event.threadId === "thread-active")).toHaveLength(0);
+      const child = f.spawned[0]!;
+      expect(child.exitCode === null && child.signalCode === null).toBe(true);
+      fallbackAllowed = true;
+      await vi.advanceTimersByTimeAsync(1_000);
+      vi.useRealTimers();
+      await vi.waitFor(() => expect(f.instance.adapter.hasSession("thread-active")).toBe(false));
+      expect(child.exitCode !== null || child.signalCode !== null).toBe(true);
+      await closing;
+      expect(f.methods().filter(method => method === "session/close")).toHaveLength(1);
+      expect(f.recorder.events.filter(event => event.type === "turn.completed" && event.threadId === "thread-active")).toHaveLength(1);
+    } finally {
+      vi.useRealTimers();
+      killing.mockRestore();
+      await Promise.all(f.spawned.map(child => kill(child, 0)));
+      await closing;
+      await running;
+      if (previous === undefined) delete process.env.OPENMAUS_ACP_PROMPT_IDLE_TIMEOUT_MS;
+      else process.env.OPENMAUS_ACP_PROMPT_IDLE_TIMEOUT_MS = previous;
+    }
+  });
+
   it.each(["dispose", "stopAll"] as const)("bounds failed %s and retains execution for a later Stop", async (action) => {
     const f = await fixture({ shareProcess: false }, { FAKE_ACP_HANG_ON: "HANG", FAKE_ACP_IGNORE_CANCEL: "1" });
     const running = f.run("thread-a", { text: "HANG" });

@@ -441,7 +441,7 @@ export function createAcpDriver(support: AcpSupport): ProviderDriver<AcpConfig> 
         }, () => {
           if (current) emit({ ...base(threadId, current.turnId), type: "runtime.error",
             message: `${support.displayName} session process could not be ended` });
-        });
+        }, why === "stop" || why === "cancel-timeout" ? 5_000 : undefined);
       };
       // A shared process holding closed sessions gives their memory back only by exiting: once none of its sessions has
       // run a turn for a while, it ends and each thread's next turn loads its session in a new one.
