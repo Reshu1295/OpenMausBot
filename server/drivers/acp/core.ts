@@ -372,7 +372,7 @@ export function createAcpDriver(support: AcpSupport): ProviderDriver<AcpConfig> 
         if (disposing) throw new Error(`${support.displayName} is shutting down`);
       };
       interface Turn {
-        stop: () => void;
+        stop: () => Promise<void>;
         interrupt: () => void;
         turnId: string;
         asks: Map<string, AcpAskFinish>;
@@ -427,25 +427,30 @@ export function createAcpDriver(support: AcpSupport): ProviderDriver<AcpConfig> 
       };
       // A session that ignores session/cancel goes on working, and EOF on stdin does not stop it either. Only a confirmed
       // session/close or the end of its process stops it, and ending a shared process ends the other sessions' turns too.
-      const endUncancelled = async (threadId: string, session: AcpSession): Promise<boolean> => {
-        const { host } = session;
-        closeSession(threadId, "cancel-timeout");
-        if (host.links.size && await session.closeConfirmed) return true;
-        for (const link of host.links) {
-          const other = sessions.get(link.threadId);
-          if (other?.host !== host) continue;
-          const running = other.current;
-          closeSession(link.threadId, "cancel-timeout");
-          if (running) {
-            emit({ ...base(link.threadId, running.turnId), type: "runtime.error",
-              message: `${support.displayName} was restarted because a session sharing its process ignored Stop` });
-            settle(link.threadId, other, false, "exit_before_result");
-          }
+      const endUnconfirmed = async (threadId: string, session: AcpSession, why = "cancel-timeout"): Promise<boolean> => {
+        const { host, child, current } = session;
+        if (current) {
+          current.state.cancelling = true;
+          if (current.interruptTimer) clearTimeout(current.interruptTimer);
         }
-        if (await killCliTree(host.child)) return true;
-        if (session.current) emit({ ...base(threadId, session.current.turnId), type: "runtime.error",
-          message: `${support.displayName} ignored Stop and its process could not be ended` });
-        return false;
+        let onExit!: () => void;
+        const exited = new Promise<true>((resolve) => {
+          onExit = () => resolve(true);
+          if (child.exitCode !== null || child.signalCode !== null) onExit();
+          else child.once("exit", onExit);
+        });
+        try {
+          void closeSession(threadId, why);
+          if (await Promise.race([session.closeConfirmed ?? Promise.resolve(false), exited])) return true;
+          host.draining = true;
+          if (await killCliTree(child)) return true;
+          if (current) emit({ ...base(threadId, current.turnId), type: "runtime.error",
+            message: `${support.displayName} session process could not be ended` });
+          await exited;
+          return false;
+        } finally {
+          child.removeListener("exit", onExit);
+        }
       };
       // A shared process holding closed sessions gives their memory back only by exiting: once none of its sessions has
       // run a turn for a while, it ends and each thread's next turn loads its session in a new one.
@@ -1200,21 +1205,25 @@ export function createAcpDriver(support: AcpSupport): ProviderDriver<AcpConfig> 
           receiveModelVariants,
         };
 
+        const stop = async () => {
+          state.stopped = true;
+          const ended = await endUnconfirmed(threadId, session, "stop");
+          settle(threadId, session, ended, ended ? "cancelled" : "stop_failed");
+        };
         const interrupt = () => {
           state.stopped = true;
           if (session.sessionId) {
             session.acp.send({ jsonrpc: "2.0", method: "session/cancel", params: { sessionId: session.sessionId } });
             if (current.interruptTimer) clearTimeout(current.interruptTimer);
             current.interruptTimer = setTimeout(() => {
-              state.cancelling = true;
-              void endUncancelled(threadId, session).then((ended) => settle(threadId, session, ended, ended ? "cancelled" : "stop_failed"));
+              void endUnconfirmed(threadId, session).then((ended) => settle(threadId, session, ended, ended ? "cancelled" : "stop_failed"));
             }, 5_000);
             current.interruptTimer.unref?.();
           } else {
-            closeSession(threadId, "stop");
+            void stop();
           }
         };
-        active.set(threadId, { stop: () => { state.stopped = true; closeSession(threadId, "stop"); }, interrupt, turnId, asks });
+        active.set(threadId, { stop, interrupt, turnId, asks });
         if (retryOf === undefined) emit({ ...base(threadId, turnId), type: "turn.started" });
         session.current = current;
 
@@ -1588,7 +1597,7 @@ export function createAcpDriver(support: AcpSupport): ProviderDriver<AcpConfig> 
               // Never replay an accepted prompt (it may have run tools); evict before listeners start the next turn.
               if (!needsAuth && !accountError && ((e as any)?.acpPromptStall === true || (e as any)?.acpUsageLimit === true || (e as any)?.acpSessionFailure === true
                   || code === "upstream_outage") && session.child.exitCode === null && !session.closing) {
-                closeSession(threadId, (e as any)?.acpPromptStall === true ? "prompt-stall" : "rpc-failure");
+                await endUnconfirmed(threadId, session, (e as any)?.acpPromptStall === true ? "prompt-stall" : "rpc-failure");
               } else if (approvalUnconfirmed && session.child.exitCode === null && !session.closing) {
                 closeSession(threadId, "approval-unconfirmed");
               } else if (staleProcess && !state.promptSent && session.child.exitCode === null && !session.closing) {
@@ -1724,11 +1733,12 @@ export function createAcpDriver(support: AcpSupport): ProviderDriver<AcpConfig> 
           hasSession: (threadId) => active.has(threadId),
           enginePid: (threadId) => (active.has(threadId) ? sessions.get(threadId)?.child.pid : undefined),
           stopAll: async () => {
-            for (const { stop } of active.values()) stop();
+            const pending = Array.from(active.values(), ({ stop }) => stop());
             for (const threadId of Array.from(sessions.keys())) closeSession(threadId, "stopAll");
             for (const [threadId, children] of retiring) {
               for (const child of children) void retireChild(threadId, child);
             }
+            await Promise.all(pending);
           },
           onEvent: (listener) => {
             listeners.add(listener);
@@ -1739,14 +1749,12 @@ export function createAcpDriver(support: AcpSupport): ProviderDriver<AcpConfig> 
           disposing = true;
           await deviceSignIn?.dispose();
           const disposingSessions = Array.from(sessions);
-          for (const { stop } of active.values()) stop();
-          for (const [threadId, session] of disposingSessions) {
-            closeSession(threadId, "dispose");
-            settle(threadId, session, true, "cancelled");
-          }
+          const pending = Array.from(active.values(), ({ stop }) => stop());
+          for (const [threadId] of disposingSessions) closeSession(threadId, "dispose");
           for (const [threadId, children] of retiring) {
             for (const child of children) void retireChild(threadId, child);
           }
+          await Promise.all(pending);
           listeners.clear();
         },
       };

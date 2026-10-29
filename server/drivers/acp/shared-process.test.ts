@@ -1,5 +1,5 @@
 import type { ChildProcess } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -221,6 +221,84 @@ describe("ACP threads sharing one agent process", () => {
     }
   });
 
+  it.each([
+    ["owns its process", false, ""],
+    ["shares a process without session/close", true, ""],
+    ["shares a process that rejects session/close", true, "error"],
+  ])("ends execution before reporting a prompt timeout when the session %s", async (_, shareProcess, close) => {
+    const previous = process.env.OPENMAUS_ACP_PROMPT_IDLE_TIMEOUT_MS;
+    process.env.OPENMAUS_ACP_PROMPT_IDLE_TIMEOUT_MS = "100";
+    try {
+      const f = await fixture({ shareProcess }, { FAKE_ACP_HANG_ON: "HANG", FAKE_ACP_SESSION_CLOSE: close });
+      if (shareProcess) await f.run("thread-b");
+      let endedAtCompletion = false;
+      f.instance.adapter.onEvent((event) => {
+        if (event.type === "turn.completed" && event.threadId === "thread-a") {
+          const [child] = f.spawned;
+          endedAtCompletion = child!.exitCode !== null || child!.signalCode !== null;
+        }
+      });
+      expect((await f.run("thread-a", { text: "HANG" })).done).toMatchObject({ ok: false, stopReason: "rpc_error" });
+      expect(endedAtCompletion).toBe(true);
+      expect((await f.run("thread-a")).done).toMatchObject({ ok: true });
+      expect(f.spawned).toHaveLength(2);
+    } finally {
+      if (previous === undefined) delete process.env.OPENMAUS_ACP_PROMPT_IDLE_TIMEOUT_MS;
+      else process.env.OPENMAUS_ACP_PROMPT_IDLE_TIMEOUT_MS = previous;
+    }
+  });
+
+  it("holds a timed-out turn until session/close is confirmed without ending the other sessions", async () => {
+    const previous = process.env.OPENMAUS_ACP_PROMPT_IDLE_TIMEOUT_MS;
+    process.env.OPENMAUS_ACP_PROMPT_IDLE_TIMEOUT_MS = "100";
+    try {
+      const gateDir = mkdtempSync(join(tmpdir(), "omb-acp-close-"));
+      scratches.push(gateDir);
+      const gate = join(gateDir, "release");
+      const f = await fixture({}, { FAKE_ACP_HANG_ON: "HANG", FAKE_ACP_SESSION_CLOSE_GATE: gate });
+      await f.run("thread-b");
+      const running = f.run("thread-a", { text: "HANG" });
+      await vi.waitFor(() => expect(f.methods()).toContain("session/close"));
+      expect(f.recorder.events.some((event) => event.type === "turn.completed" && event.threadId === "thread-a")).toBe(false);
+      expect(f.instance.adapter.hasSession("thread-a")).toBe(true);
+      writeFileSync(gate, "close");
+      expect((await running).done).toMatchObject({ ok: false, stopReason: "rpc_error" });
+      expect(f.spawned[0]!.exitCode).toBeNull();
+      expect(f.spawned[0]!.signalCode).toBeNull();
+      expect((await f.run("thread-b")).done).toMatchObject({ ok: true });
+    } finally {
+      if (previous === undefined) delete process.env.OPENMAUS_ACP_PROMPT_IDLE_TIMEOUT_MS;
+      else process.env.OPENMAUS_ACP_PROMPT_IDLE_TIMEOUT_MS = previous;
+    }
+  });
+
+  it.each(["dispose", "stopAll"] as const)("keeps turns active until %s has ended their shared process", async (action) => {
+    const f = await fixture({}, { FAKE_ACP_HANG_ON: "HANG" });
+    const running = f.run("thread-a", { text: "HANG" });
+    await vi.waitFor(() => expect(f.methods()).toContain("session/prompt"));
+    let release!: () => void;
+    let entered!: () => void;
+    const gate = new Promise<void>((resolve) => { release = resolve; });
+    const killing = new Promise<void>((resolve) => { entered = resolve; });
+    const kill = procs.killCliTree;
+    vi.spyOn(procs, "killCliTree").mockImplementation(async (child) => {
+      entered();
+      await gate;
+      return kill(child, 0);
+    });
+    const closing = action === "dispose" ? f.instance.dispose() : f.instance.adapter.stopAll();
+    try {
+      await killing;
+      await new Promise<void>((resolve) => setImmediate(resolve));
+      expect(f.recorder.events.some((event) => event.type === "turn.completed")).toBe(false);
+      expect(f.instance.adapter.hasSession("thread-a")).toBe(true);
+    } finally {
+      release();
+      await closing;
+      await running;
+    }
+  });
+
   it("fails every running turn when the shared process dies", async () => {
     const f = await fixture({}, { FAKE_ACP_MODE: "crash-in-prompt" });
     const results = await Promise.all([f.run("thread-a"), f.run("thread-b")]);
@@ -249,14 +327,17 @@ describe("ACP threads sharing one agent process", () => {
       const [child] = f.spawned;
       // A listener may start the next turn synchronously on the turn.completed of the turn this Stop ends.
       let next: Promise<{ turnId: string }> | undefined;
+      let endedAtCompletion = false;
       f.instance.adapter.onEvent((event) => {
         if (event.type !== "turn.completed" || event.threadId !== "thread-a" || next) return;
+        endedAtCompletion = child!.exitCode !== null || child!.signalCode !== null;
         next = f.instance.adapter.sendTurn({ threadId: "thread-a", text: "fixture", cwd: join(f.scratch, "thread-a"), approvalMode: "full" });
       });
       await f.instance.adapter.interruptTurn("thread-b");
       expect((await stopped).done).toMatchObject({ ok: true, stopReason: "cancelled" });
       expect(child!.exitCode !== null || child!.signalCode !== null).toBe(true);
       expect((await other).done).toMatchObject({ ok: false });
+      expect(endedAtCompletion).toBe(true);
       const { turnId } = await next!;
       expect(await f.recorder.until((event) => event.type === "turn.completed" && event.turnId === turnId)).toMatchObject({ ok: true });
       expect(f.spawned).toHaveLength(2);
@@ -304,7 +385,7 @@ describe("ACP threads sharing one agent process", () => {
       expect(child!.exitCode !== null || child!.signalCode !== null).toBe(true);
     });
 
-    it("fails the turn when Stop could not end the process", async () => {
+    it("keeps the turn active after a failed kill until the process exits", async () => {
       const f = await fixture({ shareProcess: false }, { FAKE_ACP_HANG_ON: "HANG", FAKE_ACP_IGNORE_CANCEL: "1" });
       const stopped = f.run("thread-a", { text: "HANG" });
       await promptsSent(f, 1);
@@ -317,9 +398,12 @@ describe("ACP threads sharing one agent process", () => {
         return false;
       });
       await f.instance.adapter.interruptTurn("thread-a");
-      const { done, events } = await stopped;
-      expect(done).toMatchObject({ ok: false });
-      expect(events.some((event) => event.type === "runtime.error" && /could not be ended/.test(event.message))).toBe(true);
+      await f.recorder.until((event) => event.type === "runtime.error" && /could not be ended/.test(event.message));
+      await new Promise<void>((resolve) => setImmediate(resolve));
+      expect(f.instance.adapter.hasSession("thread-a")).toBe(true);
+      expect(f.recorder.events.some((event) => event.type === "turn.completed")).toBe(false);
+      await kill(child!, 0);
+      expect((await stopped).done).toMatchObject({ ok: false });
     });
   });
 
