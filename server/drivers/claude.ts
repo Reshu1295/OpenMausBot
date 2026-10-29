@@ -125,8 +125,8 @@ function claudeEnvironment(
     env.CLAUDE_CONFIG_DIR = resolveClaudeConfigDir(configDir, env);
     // Subscription OAuth always comes from this account's own login, never the parent's.
     stripCredentialEnv(env, CLAUDE_ACCOUNT_ENV_KEYS);
-    for (const key of CLAUDE_ACCOUNT_ENV_KEYS) {
-      if (!key.startsWith("CLAUDE_CODE_OAUTH_") && !key.endsWith("_FILE_DESCRIPTOR") && Object.hasOwn(instanceEnvironment, key)) env[key] = instanceEnvironment[key];
+    for (const [key, value] of Object.entries(instanceEnvironment)) {
+      if (CLAUDE_ACCOUNT_ENV_KEYS.some(name => name === key.toUpperCase() && !name.startsWith("CLAUDE_CODE_OAUTH_") && !name.endsWith("_FILE_DESCRIPTOR"))) env[key] = value;
     }
   } else if (env.CLAUDE_CONFIG_DIR) {
     env.CLAUDE_CONFIG_DIR = resolveClaudeConfigDir(undefined, env);
@@ -135,7 +135,7 @@ function claudeEnvironment(
   stripWorkspaceCredentialEnv(env);
   // An inherited ANTHROPIC_API_KEY would flip a subscription login to pay-as-you-go.
   stripCredentialEnv(env, ["ANTHROPIC_API_KEY"]);
-  if (instanceEnvironment.ANTHROPIC_API_KEY) env.ANTHROPIC_API_KEY = instanceEnvironment.ANTHROPIC_API_KEY;
+  for (const [key, value] of Object.entries(instanceEnvironment)) if (key.toUpperCase() === "ANTHROPIC_API_KEY" && value) env[key] = value;
   applyClaudeInject(env, model);
   return env;
 }
@@ -165,7 +165,7 @@ export function readClaudeAuthSettings(
   env: NodeJS.ProcessEnv,
   instanceEnvironment: NodeJS.ProcessEnv = {},
 ): { env?: Record<string, string>; apiKeyHelper?: string } {
-  if (CLAUDE_ACCOUNT_ENV_KEYS.some((key) => instanceEnvironment[key])) return {};
+  if (Object.entries(instanceEnvironment).some(([key, value]) => value && CLAUDE_ACCOUNT_ENV_KEYS.some(name => name === key.toUpperCase()))) return {};
   try {
     const settings = JSON.parse(readFileSync(join(resolveClaudeConfigDir(undefined, env), "settings.json"), "utf8"));
     const authEnv: Record<string, string> = {};

@@ -280,7 +280,7 @@ export const MuseCodeDriver: ProviderDriver<MuseConfig> = {
       const env: Record<string, string | undefined> = { ...process.env, ...input.environment, PATH: augmentedPath(), MUSE_NO_AUTO_UPDATE: "1" };
       stripCredentialEnv(env, [...PROVIDER_CREDENTIAL_ENV, ...WORKSPACE_CREDENTIAL_ENV]);
       stripControlPlaneEnv(env);
-      if (input.environment.META_API_KEY) env.META_API_KEY = input.environment.META_API_KEY;
+      for (const [key, value] of Object.entries(input.environment)) if (key.toUpperCase() === "META_API_KEY" && value) env[key] = value;
       return env;
     };
 
