@@ -132,14 +132,14 @@ function PlaceMenu({ place, top, onClose }: { place: RailPlace; top: number; onC
     onKeyDown={(event) => { if (event.key === "Escape") { event.stopPropagation(); onClose(); } }}>
     <div className="flex items-center gap-2 px-2 pt-1">
       <PlaceMark place={place} size={22} />
-      <span className="min-w-0 flex-1 truncate text-[13px] font-semibold text-ink">{name}</span>
+      <span className="min-w-0 flex-1 truncate text-ui font-semibold text-ink">{name}</span>
     </div>
-    <p className="px-2 pt-1 text-[12px] text-ink-secondary">{t("placeLook.title")}</p>
+    <p className="px-2 pt-1 text-small text-ink-secondary">{t("placeLook.title")}</p>
     <div className="px-2 pb-1.5 pt-0.5">
       <SwatchRadios value={pending ?? paint.swatch} onChange={choose} label={t("placeLook.aria", { name })} disabled={Boolean(paint.locked)} offset="menu" none />
     </div>
-    {note && <p data-rail-menu-note className="px-2 pb-1 text-[12px] text-ink-secondary">{note}</p>}
-    {outcome === "failed" && <p role="alert" className="px-2 pb-1 text-[12px] text-danger-text">{t("placeLook.failed")}</p>}
+    {note && <p data-rail-menu-note className="px-2 pb-1 text-small text-ink-secondary">{note}</p>}
+    {outcome === "failed" && <p role="alert" className="px-2 pb-1 text-small text-danger-text">{t("placeLook.failed")}</p>}
   </div>;
 }
 
@@ -153,7 +153,7 @@ function MorePlaces({ places, canPair, onOpen, onMenu, onClose }: { places: Rail
       <Search size={14} aria-hidden="true" className="shrink-0 text-ink-secondary" />
       <input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("rail.search")} aria-label={t("rail.search")}
         onKeyDown={(event) => { if (event.key === "Enter" && found[0] && placeActs(found[0], canPair)) { onOpen(found[0]); onClose(); } }}
-        className="w-full bg-transparent text-[13px] text-ink outline-none placeholder:text-ink-tertiary" />
+        className="w-full bg-transparent text-ui text-ink outline-none placeholder:text-ink-tertiary" />
     </label>
     <ul className="max-h-72 overflow-y-auto">
       {found.map((place) => <li key={place.id}>
@@ -164,7 +164,7 @@ function MorePlaces({ places, canPair, onOpen, onMenu, onClose }: { places: Rail
         </button>
       </li>)}
     </ul>
-    {found.length === 0 && <p className="px-2 py-1.5 text-[12px] text-ink-tertiary">{t("rail.noMatch")}</p>}
+    {found.length === 0 && <p className="px-2 py-1.5 text-small text-ink-tertiary">{t("rail.noMatch")}</p>}
   </div>;
 }
 
