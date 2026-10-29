@@ -8,6 +8,7 @@ import { AccountMoveStatus, useAccountMoveLine } from "./AccountMove";
 import { CloudUsageCard } from "./CloudUsageMeter";
 import { endCloudHowTo, useWorkspacePlace, type WorkspacePlace } from "./DesktopWorkspaceSwitcher";
 import { SidebarConnectApps } from "./SidebarConnectApps";
+import { SidebarPlanUsage } from "./SidebarPlanUsage";
 import { SidebarBottomButtons, SidebarFooterNav } from "./SidebarFooterNav";
 import { phoneSettingsAction, SidebarPhoneButton } from "./SidebarPhoneButton";
 import { SidebarProfileMenu, useSimpleAccount, type ArchivedBots } from "./SidebarProfileMenu";
@@ -35,6 +36,7 @@ function SimpleSidebarFooter({ owner, archived }: { owner: string | null; archiv
   return (
     <div ref={footer} data-sidebar-footer="simple" className="px-4 pb-4 pt-2">
       <CloudUsageCard />
+      <SidebarPlanUsage />
       <SidebarPlaceStatus place={place} className="mb-2 px-1" />
       <AccountMoveStatus kind={move.kind} retry={move.retry} onOpen={openAccount} className="ps-1" />
       <div className="flex items-center gap-2 not-first:mt-2">
@@ -70,6 +72,7 @@ export function SidebarFooter({ density, simple = false, owner = null, archived,
       ) : (
         <>
           <CloudUsageCard />
+          <SidebarPlanUsage />
           <div className="flex items-center gap-1 not-first:mt-3">
             <div className="min-w-0 flex-1">
               <SidebarProfileMenu />
