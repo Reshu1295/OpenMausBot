@@ -64,7 +64,7 @@ describe("pending assistant answers", () => {
     expect(f.lines(inbox)[0]!.inbox!.answers).toEqual([expect.objectContaining({ by: "person", text: "I am busy tomorrow." })]);
   });
 
-  it.each(["done", "answered at origin", "forgotten", "deleted", "reassigned", "new starter", "stopped"])("silently drops a result when its inbox item is %s", async (change) => {
+  it.each(["done", "answered at origin", "forgotten", "deleted", "reassigned", "new starter", "archived", "stopped"])("silently drops a result when its inbox item is %s", async (change) => {
     const { f, inbox, complete } = await pending();
     const row = f.lines(inbox)[0]!;
     if (change === "done") expect(f.team.inbox.markDone(key(MARCO.email), row.id)).toBe("done");
@@ -73,6 +73,7 @@ describe("pending assistant answers", () => {
     else if (change === "deleted") f.deleteThread(inbox);
     else if (change === "reassigned") f.bots.find((bot) => bot.id === "marcos-chief")!.reportsTo = PHILIPP.email;
     else if (change === "new starter") f.starters.set(inbox, key(PHILIPP.email));
+    else if (change === "archived") Object.assign(f.bots.find((bot) => bot.id === "marcos-chief")!.tasks.find((task) => task.threadId === inbox)!, { archivedAt: Date.now() });
     else f.team.stop();
     await complete();
     expect(f.continued).toEqual([]);

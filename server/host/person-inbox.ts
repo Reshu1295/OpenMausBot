@@ -318,7 +318,8 @@ export function createPersonInbox(deps: PersonInboxDeps) {
       console.warn(`person inbox: the assistant could not answer: ${error instanceof Error ? error.message : String(error)}`);
     }
     if (stopped || !items.includes(item) || item.answered || item.done || settled(item)
-      || !deps.person(item.person) || personOf(item.threadId) !== item.person || deps.starters.get(item.threadId) !== item.person) return;
+      || !deps.person(item.person) || personOf(item.threadId) !== item.person || !isHomeOf(item.threadId, item.person)
+      || deps.starters.get(item.threadId) !== item.person) return;
     if (answer && answerItem(item, answer, "assistant").status === 200) {
       if (line(item)?.inbox?.answers?.at(-1)?.by !== "assistant") return;
       notifyItem(item, `${delivery.title} · your assistant answered`, delivery.notify, `${delivery.text} → ${answer}`);
