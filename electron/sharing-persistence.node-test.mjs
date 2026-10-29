@@ -38,8 +38,8 @@ function fixture(t) {
     },
   };
   t.after(() => { for (const controller of controllers) controller.close(); fs.rmSync(dir, { recursive: true, force: true }); });
-  return { file, summaries, connects, polls, polled: polled.promise,
-    make() { const controller = createComputerSharing(options); controllers.push(controller); return controller; },
+  return { file, env, summaries, connects, polls, polled: polled.promise,
+    make(overrides = {}) { const controller = createComputerSharing({ ...options, ...overrides }); controllers.push(controller); return controller; },
     saved: () => JSON.parse(fs.readFileSync(file, "utf8")),
     block: () => fs.mkdirSync(`${file}.tmp`),
     unblock: () => fs.rmdirSync(`${file}.tmp`),
@@ -64,6 +64,7 @@ test("a failed Pause save stops active sharing and reports that the pause is not
   assert.equal(sharing.lendingToCloud(), false);
   assert.equal(f.saved().automatic.paused, false);
   assert.match(f.summaries.at(-1).pauseError, /not saved/i);
+  assert.match(f.summaries.at(-1).pauseError, /next start will stay paused/i);
   assert.deepEqual(f.summaries.at(-1).clouds, ["Fixture"]);
 });
 
@@ -141,6 +142,72 @@ test("lending stays paused when restart protection cannot be reserved, until Res
   await sharing.resume();
   assert.equal(sharing.paused(), false);
   assert.equal(f.summaries.at(-1).pauseError, undefined);
+});
+
+test("a failed Pause save without restart protection warns that restarting can resume lending", async t => {
+  const f = fixture(t);
+  const mkdir = fs.mkdirSync;
+  const blocked = t.mock.method(fs, "mkdirSync", (...args) => {
+    if (args[0] === `${f.file}.lending-session`) throw Object.assign(new Error("disk full"), { code: "ENOSPC" });
+    return mkdir(...args);
+  });
+  const sharing = f.make();
+  sharing.start();
+  f.block();
+  sharing.pause();
+  const error = f.summaries.at(-1).pauseError;
+  assert.equal(sharing.paused(), true);
+  assert.equal(f.saved().automatic.paused, false);
+  assert.equal(fs.existsSync(`${f.file}.lending-session`), false);
+  sharing.close();
+  f.unblock();
+  blocked.mock.restore();
+  const restarted = f.make();
+  restarted.start();
+  await f.polled;
+  assert.equal(restarted.paused(), false);
+  assert.equal(f.connects.length, 1);
+  assert.match(error, /restart.*(?:can|may).*resume lending/i);
+  assert.match(error, /retry saving pause/i);
+  assert.doesNotMatch(error, /next start will stay paused/i);
+});
+
+test("crash recovery exposes Resume when the first own Cloud is restored after start", async t => {
+  const f = fixture(t);
+  fs.writeFileSync(f.file, JSON.stringify({ version: 1, records: {}, automatic: { paused: false } }));
+  fs.mkdirSync(`${f.file}.lending-session`);
+  let own = [], tray = null;
+  class Tray {
+    constructor() { tray = this; }
+    setToolTip(value) { this.tooltip = value; }
+    setTitle() {}
+    setContextMenu(value) { this.menu = value; }
+    isDestroyed() { return false; }
+    on() {}
+    destroy() { tray = null; }
+  }
+  const indicator = createLendingIndicator({ Tray, Menu: { buildFromTemplate: items => items }, nativeImage: { createFromPath: () => ({ resize: () => ({}) }) },
+    iconPath: "fixture.png", onPause() {}, onResume() {}, onActivity() {} });
+  t.after(() => indicator.destroy());
+  const sharing = f.make({ ownClouds: () => own, onChange: summary => { f.summaries.push(summary); indicator.update(summary); } });
+  sharing.start();
+  assert.equal(tray, null);
+  own = [f.env];
+  sharing.cloudChanged();
+  await sharing.screenChanged();
+  assert.equal(sharing.paused(), true);
+  assert.deepEqual(f.connects, []);
+  assert.deepEqual(f.summaries.at(-1).clouds, ["Fixture"]);
+  assert.ok(tray, "Paused lending needs a tray after Cloud restoration");
+  assert.match(tray.tooltip, /previous session/i);
+  assert.ok(tray.menu.some(item => item.label === "Retry saving pause"));
+  assert.ok(tray.menu.some(item => item.label === "Resume"));
+  own = [{ ...f.env, name: "Renamed" }];
+  sharing.cloudChanged();
+  assert.deepEqual(f.summaries.at(-1).clouds, ["Renamed"]);
+  own = [];
+  sharing.cloudChanged();
+  assert.equal(tray, null);
 });
 
 test("Resume stays paused if its save fails and can be retried", async t => {

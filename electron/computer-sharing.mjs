@@ -667,7 +667,7 @@ export function createComputerSharing({ file, fetch: fetchImpl, environments, cu
       if (records[env.id]?.enabled !== true) throw new Error("Lending to My Cloud did not start.");
     },
     paused: () => paused,
-    /** Every Cloud of the person's own stops using this computer, across restarts too, until resume(). */
+    /** Stops every Cloud of the person's own; pauseError reports when the pause could not be saved. */
     pause() {
       if (closed) return;
       paused = true;
@@ -677,7 +677,11 @@ export function createComputerSharing({ file, fetch: fetchImpl, environments, cu
         status.set(env.id, { connected: false, problem: "paused" });
       }
       try { store(records); pauseError = undefined; }
-      catch { pauseError = "Pause is not saved. Sharing is stopped now. Retry saving pause before quitting; the next start will stay paused for review."; }
+      catch {
+        pauseError = sessionGuarded
+          ? "Pause is not saved. Sharing is stopped now. Retry saving pause before quitting; the next start will stay paused for review."
+          : "Pause is not saved. Sharing is stopped now. A restart can resume lending. Retry saving pause before quitting.";
+      }
       changed();
     },
     resume() {
@@ -733,6 +737,7 @@ export function createComputerSharing({ file, fetch: fetchImpl, environments, cu
         else if (verdict.pause) { if (running.has(env.id)) { disconnect(env, grant, true); status.set(env.id, { connected: false, problem: "paused" }); changed(); } }
         else if (!running.has(env.id) && !automatic.has(env.id) && validRecord(grant)) run(env, grant);
       }
+      changed();
       void lendAutomatically();
     },
     close() {
