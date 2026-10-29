@@ -159,7 +159,7 @@ function ActivityLine({ row, current, focused, onJump }: { row: ActivityRow; cur
       onClick={onJump}
       aria-current={focused || undefined}
       data-activity-focused={focused ? "" : undefined}
-      className={cn("flex w-full items-start gap-3 border-b border-hairline/20 px-4 py-2 text-left hover:bg-raised/60", focused && "bg-raised/60")}
+      className={cn("flex w-full items-start gap-3 border-b border-hairline px-4 py-2 text-left hover:bg-raised/60", focused && "bg-raised/60")}
       title={current ? row.tool : t("activity.panel.openOtherTask", { tool: row.tool })}
     >
       <span className="mt-[2px] shrink-0 tabular-nums text-[11px] text-ink-secondary">{formatActivityTime(row.at)}</span>
