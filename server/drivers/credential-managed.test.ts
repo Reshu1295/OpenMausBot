@@ -8,6 +8,7 @@ import { CodexDriver } from "./codex.ts";
 
 const cli = fileURLToPath(new URL("../testing/fake-codex-app-server.ts", import.meta.url));
 afterEach(() => { vi.unstubAllEnvs(); });
+let receipts = 0;
 const companyKeys = (env: Record<string, string>) => Object.fromEntries(Object.entries(env).filter(([key]) => key.toUpperCase() === "OPENMAUSBOT_COMPANY_API_KEY"));
 
 it.each([
@@ -19,7 +20,7 @@ it.each([
   vi.stubEnv("OPENMAUSBOT_COMPANY_API_KEY", "inherited-company-key");
   vi.stubEnv("Openmausbot_Company_Api_Key", "inherited-mixed-key");
   for (const reversed of [false, true]) {
-    const receipt = join(homedir(), `managed-${name}-${Object.keys(grants).length}-${reversed}.json`);
+    const receipt = join(homedir(), `managed-${++receipts}.json`);
     const instance = await CodexDriver.create({
       instanceId: "managed-selection", displayName: "Fixture", enabled: true,
       environment: {
