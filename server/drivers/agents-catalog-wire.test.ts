@@ -66,7 +66,7 @@ function profiles(): Record<string, Profile> {
 }
 
 const PROFILES = profiles();
-const CHIEF_ONLY_TOOLS = ["create_bot", "list_team_setup", "list_team_library", "propose_team_setup", "propose_bot_deletion", "manage_room", "retry_thread"];
+const CHIEF_ONLY_TOOLS = ["create_bot", "list_team_setup", "list_team_library", "propose_team_setup", "propose_bot_deletion", "manage_room", "retry_thread", "set_thread_model", "get_thread_model"];
 const CHIEF_TARGET_TOOLS = ["propose_profile", "propose_model"];
 const CHIEF_PROFILE_TARGET = " A Chief of Staff may pass for_bot_id (from list_bots) for a requested change to another bot in its section.";
 const TEAMWORK_TOOLS = ["list_room_targets", "coordinate_bots", "assignment_status", "list_bots", "list_rooms", "list_threads", "close_thread", "start_thread", "post_to_room"];
@@ -79,14 +79,14 @@ const FULL = "skills+shared+voice+escalations+x+team";
 
 /** Bytes when the budget was last set; a profile may move at most 2% either way (lower it to lock in a win). */
 const BUDGET_BASELINE: Record<string, number> = {
-  "default": 54959,
-  "voice": 55740,
-  "shared": 57059,
-  "shared+voice": 57840,
-  "skills": 57778,
-  "skills+voice": 58559,
-  "skills+shared": 59878,
-  "skills+shared+voice": 60659,
+  "default": 58328,
+  "voice": 59109,
+  "shared": 60428,
+  "shared+voice": 61209,
+  "skills": 61147,
+  "skills+voice": 61928,
+  "skills+shared": 63247,
+  "skills+shared+voice": 64028,
   "non-chief": 46055,
   "voice+non-chief": 46821,
   "shared+non-chief": 48113,
@@ -95,16 +95,16 @@ const BUDGET_BASELINE: Record<string, number> = {
   "skills+voice+non-chief": 49583,
   "skills+shared+non-chief": 50876,
   "skills+shared+voice+non-chief": 51641,
-  "skills+shared+voice+cloud-home": 59740,
+  "skills+shared+voice+cloud-home": 63109,
   "skills+shared+voice+non-chief+cloud-home": 50741,
-  "default+legacy-switches": 54959,
-  "default+mausbot": 55610,
-  "skills+shared+voice+mausbot": 61310,
-  "skills+shared+voice+escalations": 61489,
-  "skills+shared+voice+escalations+x": 65328,
-  "skills+shared+voice+escalations+x+team": 65960,
-  "default+handoff": 53747,
-  "default+room": 48473,
+  "default+legacy-switches": 58328,
+  "default+mausbot": 58979,
+  "skills+shared+voice+mausbot": 64679,
+  "skills+shared+voice+escalations": 64858,
+  "skills+shared+voice+escalations+x": 68697,
+  "skills+shared+voice+escalations+x+team": 69329,
+  "default+handoff": 57116,
+  "default+room": 50771,
   "non-chief+room": 39416,
 };
 

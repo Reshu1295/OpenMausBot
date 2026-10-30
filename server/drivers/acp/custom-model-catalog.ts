@@ -181,7 +181,10 @@ export async function discoverAcpModels(
     if (modelOption.options.length > MAX_MODELS) throw new Error("The ACP model catalog exceeded the discovery limit.");
     const mark = discovery.custom ? { custom: true } : {};
     const { passthrough } = discovery;
-    const options: ModelCatalog["options"] = passthrough ? [{ ...passthrough, ...mark }] : [];
+    const defaultVariants = acpVariantOption(initial)?.options;
+    const options: ModelCatalog["options"] = passthrough
+      ? [{ ...passthrough, ...mark, ...(defaultVariants?.length ? { variants: defaultVariants } : {}) }]
+      : [];
     for (const model of modelOption.options) {
       if (model.id === passthrough?.id) continue;
       if (failure) throw failure;
