@@ -73,9 +73,9 @@ describe("quota switch", () => {
   const thread = () => store.projectBotForTask(bot.id, bot.threadId)!;
   /** A person's turn as startTurn admits it: a root of the job runtime, and
    * the thread's request record naming the message it answers. */
-  const begin = (threadId = bot.threadId, record: Partial<QuotaRequest> = {}) => {
+  const begin = (threadId = bot.threadId, record: Partial<QuotaRequest> = {}, capacity?: "person") => {
     const id = `g${++turns}`;
-    coordinator.beginTurn({ id, address: { botId: bot.id, threadId }, brief: "asked", level: "ask", origin: { kind: "user", request: "asked" } });
+    coordinator.beginTurn({ id, address: { botId: bot.id, threadId }, brief: "asked", level: "ask", origin: { kind: "user", request: "asked" }, ...(capacity ? { capacity } : {}) });
     requests.set(threadId, { generations: new Set([id]), turnId: `turn-${id}`, origin: { kind: "user", request: "asked" }, ...record });
     return { id, event: { threadId, turnId: `turn-${id}`, ok: false, stopReason: "quota" } };
   };
@@ -214,6 +214,26 @@ describe("quota switch", () => {
       expect(notices()).toContainEqual({ name: "notice: continuing on Codex after hitting the usage limit", ok: true });
       expect(told).toEqual([{ botId: bot.id, from: defaultSelection(), facts: { scope: "engine", backup: CODEX } }]);
       expect(moves, "so it goes back once the limit resets").toEqual([{ threadId: bot.threadId, from: defaultSelection(), to: CODEX }]);
+    });
+
+    it("resends the person's message with the main-chat slot its root reserved", async () => {
+      const messageId = said("how's the weather");
+      const turn = begin(bot.threadId, { messageId }, "person");
+      coordinator.endTurn(turn.id, { ok: false, text: QUOTA });
+      await ranOut(turn);
+
+      expect(resend).toHaveBeenCalledTimes(1);
+      expect(resend.mock.calls[0]![5], "the person's main chat keeps its reserved slot").toBe("person");
+    });
+
+    it("resends an ordinary root's message with no capacity of its own", async () => {
+      const messageId = said("how's the weather");
+      const turn = begin(bot.threadId, { messageId });
+      coordinator.endTurn(turn.id, { ok: false, text: QUOTA });
+      await ranOut(turn);
+
+      expect(resend).toHaveBeenCalledTimes(1);
+      expect(resend.mock.calls[0]![5]).toBeUndefined();
     });
 
     it("goes by the engine's own limit flag and its reset when it gives them", async () => {
