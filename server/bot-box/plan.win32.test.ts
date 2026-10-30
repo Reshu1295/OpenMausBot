@@ -30,6 +30,7 @@ it("keeps the box image's system mount sources literal on Windows", () => {
     { kind: "ro", source: "/opt", target: "/opt", optional: true },
     { kind: "ro", source: "/var/lib", target: "/var/lib", optional: true },
     { kind: "ro", source: "D:\\app", target: "D:\\app" },
+    { kind: "ro", source: "D:\\data\\.openmausbot\\bots\\b1\\SOUL.md", target: "D:\\data\\.openmausbot\\bots\\b1\\SOUL.md", optional: true },
   ]);
 });
 
