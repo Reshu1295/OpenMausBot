@@ -113,3 +113,20 @@ describe("Team dialog with an input method", () => {
     expect(onClose).toHaveBeenCalledOnce();
   });
 });
+
+describe("composing keys stay inside the dialog", () => {
+  // The phone sidebar drawer closes on any Escape that reaches document.
+  it.each(composing)("does not let the $name Escape reach document", ({ init }) => {
+    const outside = vi.fn();
+    document.addEventListener("keydown", outside);
+    try {
+      flushSync(() => root.render(createElement(NewRoomPanel, { onClose: vi.fn() })));
+      for (const input of document.querySelectorAll<HTMLInputElement>("input")) press(input, "Escape", init);
+      flushSync(() => root.render(createElement(TeamDialog, { section: "Research", rename: true, onClose: vi.fn() })));
+      press(document.querySelector<HTMLInputElement>('[role="dialog"] input')!, "Escape", init);
+      expect(outside).not.toHaveBeenCalled();
+    } finally {
+      document.removeEventListener("keydown", outside);
+    }
+  });
+});

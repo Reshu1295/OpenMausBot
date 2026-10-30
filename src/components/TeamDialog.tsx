@@ -69,7 +69,7 @@ export function TeamDialog({ section, rename = false, onClose, onRenamed }: {
       <div ref={dialog} role="dialog" aria-modal="true" aria-labelledby="team-dialog-title"
         className="max-h-[90vh] w-full max-w-[430px] overflow-y-auto rounded-2xl border border-hairline/50 bg-panel p-5 text-ink shadow-2xl"
         onKeyDown={(event) => {
-          if (imeComposing(event.nativeEvent)) return;
+          if (imeComposing(event.nativeEvent)) { event.stopPropagation(); return; }
           if (event.key === "Escape" && !saving) { event.stopPropagation(); onClose(); }
           if (event.key === "Tab") {
             const controls = dialog.current?.querySelectorAll<HTMLElement>("input:enabled, button:enabled");
