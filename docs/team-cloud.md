@@ -215,7 +215,7 @@ Search, SSE (live and replayed), attachments, notifications, usage traces, routi
 through the same check, a deleted private chat included. Incidents and escalations from a private chat go to its person,
 never into a Chief's thread; work handed on from a private chat runs in a thread of that same person's, and nothing
 from a private chat is handed into a room or posted in one; a conversation a bot opens from a shared chat is the
-team's, never the last speaker's; `retry_thread`, `close_thread` and `session_read` reach only what the turn may read;
+team's, never the last speaker's; `retry_thread`, `close_thread` and `session_search` reading a message reach only what the turn may read;
 and team memory is never published from a private chat. Then the memory system prompt
 (the turn's layer, plus the team's notes read-only), recall (`buildRecall.memoryIds`: the layer and the team's), recent
 work, `session_search` (memory of the layer and the team's; conversations the turn may read), memory writes
@@ -341,6 +341,13 @@ inbox is unread.
 
 An ask in the person's own private chat, where they are, stays only there. The Admins' asks (a bot nobody owns) are not
 anyone's inbox. A member without any bot of their own gets the notification where it was written, as before.
+
+**A teammate's question.** Work handed on that needs the person asks them with a card: a decision with a few set
+answers through the bot's question tool, the bot's own choices as buttons, and anything else as a card with a reply field
+in place of its `NEEDS INPUT:` line (docs/runtime-contract.md). Its copy reaches their inbox with the same buttons, and
+the conversation that handed the work on gets no chip about it when that conversation is the inbox itself. A line the
+person types while the bot waits on its own question card answers that card, as a tap would, and so does a reply to the
+card or to its copy.
 
 **Answering is replying.** A reply to a line (the chat's Reply) goes back as the table says, and the inbox's bot takes no
 turn for it; the line records the answer and a "Told Philipp" chip follows it. A bot that asked carries on: its

@@ -9,7 +9,8 @@
 //     sign-ins bound into it, so no other audience's transcripts are there;
 //   - put back inside that empty folder: this turn's working folder, the bot's own folder (workspaces/<bot>) and what the
 //     caller names (the turn's permission socket, a read-only file the command line points at); and, read-only, the
-//     engines OpenMausBot installed there, whole, since npm's bin links point into the prefix by relative paths;
+//     bot's own SOUL.md (bots/<bot>/SOUL.md, which it may read but never write) and the engines OpenMausBot installed
+//     there, whole, since npm's bin links point into the prefix by relative paths;
 //   - a private /proc (its own PID namespace: other turns' processes do not exist for it), /dev, /tmp and /run;
 //   - a network namespace with loopback only. Two loopback ports inside are bridged to unix sockets bound in from outside:
 //     the egress gate (every connection to the internet goes through it) and the harness gate (only /api/internal/
@@ -243,7 +244,8 @@ export function planBox(setup: BoxSetup, request: BoxRequest): BoxPlan {
     if (source) mounts.push({ kind: mutate.has("engines-rw") ? "bind" : "ro", source, target: engines, optional: true });
   }
   const explicitReadOnly = new Set(request.ro ?? []);
-  for (const path of [...explicitReadOnly, ...argvPaths(request.args)]) {
+  const ownSoul = botId && ID.test(botId) ? [join(dataDir, "bots", botId, "SOUL.md")] : [];
+  for (const path of [...explicitReadOnly, ...argvPaths(request.args), ...ownSoul]) {
     const source = optionalSource(path);
     if (!source) continue;
     if (under(dataDir, source) || (under(source, dataDir) && !under(source, approvedPath(path)))) continue;
