@@ -3,7 +3,7 @@ import { spawnSync } from "node:child_process";
 import { chmodSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { test } from "node:test";
 
 import { serverChildLaunch } from "./server-child-launch.mjs";
@@ -72,6 +72,7 @@ function stage(t, indexSource = REPORTING_INDEX) {
   t.after(() => rmSync(dir, { recursive: true, force: true }));
   mkdirSync(path.join(dir, "server"));
   copyFileSync(bootstrapSource, path.join(dir, "server", "desktop-entry.mjs"));
+  copyFileSync(fileURLToPath(new URL("./node-system-proxy.mjs", import.meta.url)), path.join(dir, "server", "node-system-proxy.mjs"));
   writeFileSync(path.join(dir, "server", "index.js"), indexSource);
   return dir;
 }
@@ -104,6 +105,22 @@ function runEntry(dir, cacheRoot, extraEnv = {}) {
   const line = result.stdout.trim().split("\n").filter(Boolean).at(-1);
   return { status: result.status, stderr: result.stderr, report: line ? JSON.parse(line) : null };
 }
+
+test("bootstrap leaves queued desktop capabilities for the server listener", (t) => {
+  const dir = stage(t, `process.parentPort.on("message", ({ data }) => console.log(data.type));`);
+  const preload = path.join(dir, "parent.mjs");
+  writeFileSync(preload, `
+    const listeners = [];
+    let queued = true;
+    Object.defineProperty(process, "parentPort", { value: { on(_event, listener) {
+      listeners.push(listener);
+      if (queued) { queued = false; queueMicrotask(() => listeners.forEach(fn => fn({ data: { type: "openmausbot:desktop-mutation-token" } }))); }
+    } } });
+  `);
+  const result = spawnSync(process.execPath, ["--import", pathToFileURL(preload).href, path.join(dir, "server", "desktop-entry.mjs")], { encoding: "utf8", timeout: 20_000 });
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /openmausbot:desktop-mutation-token/);
+});
 
 const cacheFiles = (cacheRoot) =>
   readdirSync(cacheRoot)

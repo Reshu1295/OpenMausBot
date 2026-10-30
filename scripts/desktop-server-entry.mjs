@@ -5,6 +5,11 @@
 import module from "node:module";
 import { lstatSync, readdirSync, rmSync, utimesSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
+import { createSystemProxyApplier } from "./node-system-proxy.mjs";
+
+const applySystemProxy = createSystemProxyApplier();
+try { applySystemProxy(JSON.parse(process.env.OMB_SYSTEM_PROXY || "null")); } catch {}
+delete process.env.OMB_SYSTEM_PROXY;
 
 const cacheRoot = process.env.OMB_SERVER_COMPILE_CACHE;
 // Engine CLIs, MCP servers and terminals the server spawns must not inherit
@@ -21,6 +26,9 @@ if (cacheRoot) {
 }
 
 await import("./index.js");
+process.parentPort?.on("message", ({ data }) => {
+  if (data?.type === "openmausbot:system-proxy") applySystemProxy(data.proxy);
+});
 
 // Node writes new entries when the process exits normally; a crash or a
 // Windows kill skips that, so write them once the server is up. Then drop
