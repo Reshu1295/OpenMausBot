@@ -23,6 +23,7 @@ const KIND_LOOK: Record<NotifyKind, { Icon: LucideIcon; className: string; statu
   "routine-deferred": { Icon: RotateCcw, className: "text-accent-text", status: "notifications.status.deferred" },
   spend: { Icon: Wallet, className: "text-accent-text", status: "notifications.status.spend" },
   brief: { Icon: Newspaper, className: "text-accent-text", status: "notifications.status.brief" },
+  wait: { Icon: CheckCircle2, className: "text-success", status: "notifications.status.done" },
   notice: { Icon: Info, className: "text-accent-text", status: "notifications.status.notice" },
 };
 
