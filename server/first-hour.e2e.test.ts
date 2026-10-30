@@ -19,8 +19,13 @@ import { freePortBlock } from "./testing/ports.ts";
 const SERVER_DIR = dirname(fileURLToPath(import.meta.url));
 const HOST = "omb-t-0f1e2d3c4b5a.fly.dev";
 const MACHINE = "7d2c9e4a-1b3f-4a6e-8c5d-0e9f8a7b6c51";
-const ZONE = "America/New_York";
-const MINUTE = 60_000;
+const MINUTE = 60_000, HOUR = 60 * MINUTE, DAY = 24 * HOUR;
+/** The person's zone: a whole-hour one where it is now between 6:55 and 7:55, so on every run the home's next due time is
+ * the morning brief's 7:50 wake (the watch's hourly check comes later) and its read below is exact. */
+const ZONE = ((localFrom: number) => {
+  const hours = Array.from({ length: 24 }, (_, index) => index - 12).find((offset) => (((Date.now() + offset * HOUR - localFrom) % DAY) + DAY) % DAY < HOUR)!;
+  return hours === 0 ? "UTC" : `Etc/GMT${hours > 0 ? "-" : "+"}${Math.abs(hours)}`;
+})(6 * HOUR + 55 * MINUTE);
 const LOOK_REPLY = "This week: Tue 10:00 Standup with Ada.\nNeeds you: Ada: Q3 numbers, due Friday. Draft ready in Gmail.\nDates and amounts: the AWS bill, $412, due Nov 3.\nI could sort your inbox every morning before 8. Want that?";
 const FIRST_REPLY = "On it: I'll keep your inbox and meetings in order.";
 const SEND = "GMAIL_SEND_EMAIL", DELETE = "GMAIL_DELETE_MESSAGE", DRAFT = "GMAIL_CREATE_EMAIL_DRAFT";
@@ -212,12 +217,11 @@ await import(${JSON.stringify(pathToFileURL(join(SERVER_DIR, "testing", "fake-cl
   it("keeps the brief on from the start, at 8:00 in the person's zone: a sleeping Cloud wakes for it", async () => {
     const routines = (await api("GET", "/api/routines")).routines as any[];
     expect(routines.filter((routine) => routine.botId === chief.id && routine.deliver === "brief" && routine.enabled)).toHaveLength(1);
-    // The next 7:50 in the person's zone: the earliest the home may sleep to is never later than it.
-    let wake = Date.now() - (Date.now() % MINUTE);
+    // Today's 7:50 in the person's zone, to the second: the home sleeps until then and no later.
+    let wake = Date.now() - (Date.now() % MINUTE) - HOUR;
     while (localClock(wake + MORNING_WAKE_EARLY_MS) !== "08:00") wake += MINUTE;
     const power = await signed("/api/cloud/power");
-    expect(power.nextDueAt).not.toBeNull();
-    expect(power.nextDueAt).toBeLessThanOrEqual(wake);
+    expect(power.nextDueAt).toBe(wake);
   });
 
   it("reports each milestone's time and what the Chief really did to the Admin, as times and counts only", async () => {

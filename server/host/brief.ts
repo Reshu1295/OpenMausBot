@@ -182,10 +182,11 @@ export function createBrief(deps: BriefDeps) {
 
   const timeZone = (): string | undefined => validZone(state.timeZone) ?? deps.hostTimeZone();
   const today = (): string => localDate(now(), timeZone());
-  /** The person's local midnight, to the minute. */
+  /** The person's local midnight, exactly: the walk back starts on a whole minute, as every zone's offset is whole minutes,
+   * so a time built on it (the morning wake) carries none of the current second. */
   const dayStart = (): number => {
-    const zone = timeZone(), day = today();
-    let start = now();
+    const zone = timeZone(), at = now(), day = localDate(at, zone);
+    let start = at - (at % MINUTE);
     while (localDate(start - HOUR, zone) === day) start -= HOUR;
     while (localDate(start - MINUTE, zone) === day) start -= MINUTE;
     return start;
