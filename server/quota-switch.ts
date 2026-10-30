@@ -50,7 +50,7 @@ export interface QuotaSwitchDeps {
   busy: (botId: string, threadId: string) => boolean;
   request: (threadId: string) => QuotaRequest | undefined;
   /** A line spoken on a Live call is resent as spoken, so its words stay out of the log. */
-  resend: (botId: string, threadId: string, message: Message, replyTo: Message | undefined, spoken: { via?: "call"; callId?: string }) => Promise<unknown>;
+  resend: (botId: string, threadId: string, message: Message, replyTo: Message | undefined, spoken: { via?: "call"; callId?: string }, capacity?: "person") => Promise<unknown>;
   enabled?: () => boolean;
   after?: (ms: number, run: () => void) => { cancel(): void };
 }
@@ -167,7 +167,8 @@ export function createQuotaSwitch(deps: QuotaSwitchDeps): QuotaSwitch {
     }
     deps.takeover?.moved(botId, threadId, before.modelSelection, checked.selection, resetsAt);
     const name = engine.instanceId === current.instanceId ? `${nameOf(engine)} ${checked.selection.model}` : nameOf(engine);
-    const held = heldBy(botId, threadId, rootOf(threadId, request));
+    const rootId = rootOf(threadId, request);
+    const held = heldBy(botId, threadId, rootId);
     const original = held ? undefined : resendable(store, threadId, request.messageId);
     if (held === "card") notice(threadId, `switched to ${name}. Your request waits on a card above and continues on ${name} once you act on it.`, true);
     else if (held === "runtime") notice(threadId, `switched to ${name}. Your request is still under way here and continues on ${name}.`, true);
@@ -179,7 +180,7 @@ export function createQuotaSwitch(deps: QuotaSwitchDeps): QuotaSwitch {
     } else {
       notice(threadId, `continuing on ${name} after hitting the usage limit`, true);
       try {
-        await deps.resend(botId, threadId, original, original.replyToId ? store.messagesFor(threadId).find((message) => message.id === original.replyToId) : undefined, spokenLineFields(original.via, original.callId));
+        await deps.resend(botId, threadId, original, original.replyToId ? store.messagesFor(threadId).find((message) => message.id === original.replyToId) : undefined, spokenLineFields(original.via, original.callId), (rootId ? coordinator.node(rootId) : undefined)?.capacity);
       } catch (error) {
         if (store.taskByThread(botId, threadId)) notice(threadId, `could not continue on ${name} — ${(error instanceof Error ? error.message : String(error)).slice(0, 200)}`, false);
       }
@@ -313,7 +314,8 @@ export function createQuotaSwitch(deps: QuotaSwitchDeps): QuotaSwitch {
     } else {
       notice(threadId, `continuing on ${chosen.name} after hitting quota`, true);
       try {
-        await deps.resend(botId, threadId, original, original.replyToId ? store.messagesFor(threadId).find((message) => message.id === original.replyToId) : undefined, spokenLineFields(original.via, original.callId));
+        const root = card.quotaSwitch!.rootId ? coordinator.node(card.quotaSwitch!.rootId) : undefined;
+        await deps.resend(botId, threadId, original, original.replyToId ? store.messagesFor(threadId).find((message) => message.id === original.replyToId) : undefined, spokenLineFields(original.via, original.callId), root?.capacity);
       } catch (error) {
         if (store.taskByThread(botId, threadId)) {
           notice(threadId, `could not continue on ${chosen.name} — ${(error instanceof Error ? error.message : String(error)).slice(0, 200)}`, false);
