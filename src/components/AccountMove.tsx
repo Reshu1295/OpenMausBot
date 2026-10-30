@@ -44,12 +44,12 @@ export function moveMenuItems(line: AccountMoveLine | null, { retrying = false, 
   if (!line) return [];
   if (line.kind === "failed") {
     const title = failingWhy(line, unanswered);
-    if (!line.retry) return [{ key: "cloud-move", label: t("sidebar.account.moveNeedsYou"), title, icon: <CloudAlert size={16} className="text-warning" />, onSelect: onOpen }];
+    if (!line.retry) return [{ key: "cloud-move", label: t("sidebar.account.moveNeedsYou"), title, icon: <CloudAlert size={16} className="text-warning-text" />, onSelect: onOpen }];
     return [{
       key: "cloud-move",
       label: t("sidebar.account.moveRetry"),
       title,
-      icon: retrying ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} className="text-warning" />,
+      icon: retrying ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} className="text-warning-text" />,
       disabled: retrying,
       keepOpen: true,
       onSelect: onRetry,
@@ -138,7 +138,7 @@ export function AccountMoveStatus({ kind, retry = null, onOpen, className }: { k
   const words = accountMoveWords(kind);
   if (!words) return null;
   const Icon = kind === "failed" ? CloudAlert : CloudUpload;
-  const look = cn("flex min-w-0 items-center gap-1.5 text-start text-[12px] leading-4", kind === "failed" ? "font-medium text-warning" : "text-ink-secondary");
+  const look = cn("flex min-w-0 items-center gap-1.5 text-start text-[12px] leading-4", kind === "failed" ? "font-medium text-warning-text" : "text-ink-secondary");
   const body = <>
     <Icon size={13} aria-hidden="true" className="shrink-0" />
     <span className="truncate">{words}</span>
