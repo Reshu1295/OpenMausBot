@@ -199,3 +199,27 @@ The fixture also holds the Boat readiness response: the execution stays busy,
 `wait` cannot report it settled, and Stop prevents dispatch when the response
 arrives. Readiness is part of generation-owned setup, not an untracked wait
 before turn admission.
+
+## Keyless web search
+
+API runtimes and Pi receive the agents `web_search` tool when their tool
+selection permits it. This includes local models using an OpenAI-compatible
+connection. Connections with `tools: false` do not receive it. Other engines
+keep their native search tools. An unknown ACP engine does not opt in.
+
+The tool sends public queries to DuckDuckGo's HTML service without credentials.
+It returns titles, links and snippets as untrusted data. It does not fetch result
+pages. A blocked or rate-limited search returns an error, not invented results.
+The request has a 15-second deadline and a 1 MiB response limit. DNS answers
+must all pass the existing public-address classification. The connection pins
+one checked address and refuses redirects, cookies and environment proxies.
+
+Run the local HTTP fixtures without contacting DuckDuckGo:
+
+```sh
+pnpm exec vitest run server/web-search.test.ts server/routes/web-search.test.ts server/drivers/agents-web-tools.test.ts
+```
+
+These fixtures check parsing, bounds, blocked destinations, redirects,
+cancellation, tool grants and revocation. The full `server/index.test.ts` also
+checks internal authentication and refuses the fallback on a native engine.

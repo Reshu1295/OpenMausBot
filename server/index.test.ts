@@ -1885,6 +1885,20 @@ describe("harness HTTP API", () => {
     }
   });
 
+  it("refuses unauthenticated search and search on an engine with native tools", async () => {
+    const target = (await api("POST", "/api/bots")).body.bot;
+    try {
+      const call = async (token?: string) => fetch(`${BASE}/api/internal/web/search`, { method: "POST", headers: { "content-type": "application/json", ...(token ? { authorization: `Bearer ${token}` } : {}) }, body: JSON.stringify({ query: "fixture" }) });
+      expect((await call()).status).toBe(401);
+      const token = await mintTestCapability(BASE, target.id, target.threadId);
+      const response = await call(token);
+      expect(response.status).toBe(403);
+      expect((await response.json() as { error: string }).error).toMatch(/engine or tool selection/);
+    } finally {
+      await api("DELETE", `/api/bots/${target.id}`);
+    }
+  });
+
   it("protects a team-goal lead and pauses the routine when its room is deleted", async () => {
     const [lead, other] = await Promise.all([api("POST", "/api/bots"), api("POST", "/api/bots")]).then(
       (created) => created.map((response) => response.body.bot),
