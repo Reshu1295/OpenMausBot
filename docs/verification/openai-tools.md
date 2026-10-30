@@ -213,6 +213,11 @@ The same settings are `webSearch.searxngUrl` and `webSearch.braveApiKey` in
 SearXNG takes priority. With neither configured, the tool is absent.
 A failed SearXNG request never falls back to Brave.
 
+OMB stores Brave result text in conversation history and keeps it for as long as
+that history. Choose a Brave API plan with **storage rights** that permit this
+retention. See Brave's [storage FAQ](https://brave.com/search/api/#faq) and
+[API terms](https://api-dashboard.search.brave.com/terms-of-service).
+
 Enable `json` in `search.formats` in the instance's `settings.yml`.
 SearXNG's [Search API](https://docs.searxng.org/dev/search_api.html) uses
 `/search?format=json`; a disabled format returns HTTP 403.

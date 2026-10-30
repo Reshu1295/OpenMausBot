@@ -26,3 +26,11 @@ it("preserves a saved key when saving only the URL and hides raw server errors",
   expect(host.textContent).not.toContain("synthetic-secret-must-not-display");
   expect(JSON.parse(fixture.api.mock.calls[0][1].body)).toEqual({ webSearch: { searxngUrl: "https://search.example" } });
 });
+
+it("explains Brave result retention and storage rights with a terms link", () => {
+  expect(host.textContent).toContain("OMB stores Brave results for as long as conversation history.");
+  expect(host.textContent).toContain("Choose a Brave API plan with storage rights that permit this retention.");
+  const terms = host.querySelector<HTMLAnchorElement>("a")!;
+  expect(terms.textContent).toBe("Brave API terms");
+  expect(terms.href).toBe("https://api-dashboard.search.brave.com/terms-of-service");
+});

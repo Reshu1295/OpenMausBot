@@ -1,4 +1,4 @@
-import { createServer, request as httpRequest, type RequestOptions, type Server } from "node:http";
+import { createServer, request as httpRequest, type OutgoingHttpHeaders, type RequestOptions, type Server } from "node:http";
 import type { request as httpsRequest } from "node:https";
 import type { AddressInfo, LookupFunction } from "node:net";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -13,8 +13,8 @@ afterEach(async () => {
     server.closeAllConnections(); server.close(error => error ? reject(error) : resolve());
   })));
 });
-async function fixture(body: string | Buffer = JSON.stringify({ results: [hit], web: { results: [hit] } }), status = 200, type = "application/json") {
-  const server = createServer((_req, res) => { res.writeHead(status, { "content-type": type, location: "http://127.0.0.1/private" }); res.end(body); });
+async function fixture(body: string | Buffer = JSON.stringify({ results: [hit], web: { results: [hit] } }), status = 200, type = "application/json", headers: OutgoingHttpHeaders = {}) {
+  const server = createServer((_req, res) => { res.writeHead(status, { "content-type": type, location: "http://127.0.0.1/private", ...headers }); res.end(body); });
   servers.push(server); await new Promise<void>(resolve => server.listen(0, "127.0.0.1", resolve));
   const targets: URL[] = []; const settings: RequestOptions[] = [];
   const request = ((url: URL, options: RequestOptions, listener: Parameters<typeof httpRequest>[2]) => {
@@ -60,10 +60,55 @@ describe("configured JSON web search", () => {
     expect(f.targets).toHaveLength(0);
     expect(await searchWeb({ searxngUrl: "https://private.local" }, "test", 5, undefined, { ...f.options, resolve: async () => [{ address: "127.0.0.1", family: 4 }] })).toHaveLength(1);
   });
-  it.each([302, 202, 429, 503])("refuses HTTP %s without redirects", async status => {
+  it.each([302, 202, 503])("refuses HTTP %s without redirects", async status => {
     const f = await fixture("{}", status);
     await expect(searchWeb(brave, "test", 5, undefined, f.options)).rejects.toThrow("unavailable");
     expect(f.targets).toHaveLength(1);
+  });
+  it.each([401, 403, 429])("reports Brave HTTP %s without exposing the key or body or retrying", async status => {
+    const f = await fixture(`key=${brave.braveApiKey}; synthetic-response-secret`, status, "text/html");
+    const message = await searchWeb(brave, "test", 5, undefined, f.options).catch((error: Error) => error.message);
+    expect(message).toBe(status === 429
+      ? "Brave quota or rate limit reached. Try again later or check your Brave API plan."
+      : "The Brave key was rejected. Check your Brave Search API key.");
+    expect(message).not.toContain(brave.braveApiKey);
+    expect(message).not.toContain("synthetic-response-secret");
+    expect(f.targets).toHaveLength(1);
+  });
+  it.each([
+    [{ "retry-after": "12", "x-ratelimit-reset": "1, 300" }, 12],
+    [{ "retry-after": "HTTP-date" }, 60],
+    [{ "x-ratelimit-remaining": "0, 10", "x-ratelimit-reset": "1, 300" }, 1],
+    [{ "x-ratelimit-remaining": "1, 0", "x-ratelimit-reset": "1, 300" }, 300],
+    [{ "x-ratelimit-remaining": "0, 0", "x-ratelimit-reset": "1, 300" }, 300],
+    [{ "x-ratelimit-reset": "1, 300" }, 300],
+    [{ "retry-after": "synthetic-header-secret", "x-ratelimit-reset": "5" }, 5],
+  ] satisfies Array<[OutgoingHttpHeaders, number]>)("provides a safe Brave retry delay from %j", async (headers: OutgoingHttpHeaders, seconds) => {
+    const dated = headers["retry-after"] === "HTTP-date";
+    if (dated) headers = { ...headers, "retry-after": new Date(Date.now() + 60_000).toUTCString() };
+    const f = await fixture("synthetic-response-secret", 429, "text/plain", headers);
+    const message = await searchWeb(brave, "test", 5, undefined, f.options).catch((error: Error) => error.message);
+    if (dated) {
+      expect(message).toMatch(/Brave quota or rate limit reached\. Retry after (59|60) seconds\./);
+    } else expect(message).toBe(`Brave quota or rate limit reached. Retry after ${seconds} seconds.`);
+    expect(f.targets).toHaveLength(1);
+  });
+  it.each([
+    { "retry-after": brave.braveApiKey, "x-ratelimit-reset": "synthetic-header-secret" },
+    { "retry-after": "Invalid Date" },
+    { "retry-after": "-1", "x-ratelimit-reset": "1, Infinity" },
+    { "retry-after": "9".repeat(1000), "x-ratelimit-reset": "-2" },
+  ])("does not reflect invalid Brave retry headers %j", async headers => {
+    const f = await fixture("synthetic-response-secret", 429, "application/json", headers);
+    const message = await searchWeb(brave, "test", 5, undefined, f.options).catch((error: Error) => error.message);
+    expect(message).toBe("Brave quota or rate limit reached. Try again later or check your Brave API plan.");
+    expect(f.targets).toHaveLength(1);
+  });
+  it("keeps SearXNG rate failures generic without retrying or falling back to Brave", async () => {
+    const f = await fixture("synthetic-response-secret", 429, "application/json", { "retry-after": "12" });
+    await expect(searchWeb({ ...searxng, searxngUrl: "https://search.local" }, "test", 5, undefined, f.options)).rejects.toThrow("Web search is unavailable");
+    expect(f.targets).toHaveLength(1);
+    expect(f.settings[0].headers).not.toHaveProperty("X-Subscription-Token");
   });
   it("skips missing, relative, executable, credential-bearing and duplicate URLs without inventing hits", () => {
     const rows = [undefined, "", "/relative", "javascript:alert(1)", "data:text/html,x", "https://name:secret@example.com/", "http://[invalid", hit.url, hit.url].map(url => ({ ...hit, url }));

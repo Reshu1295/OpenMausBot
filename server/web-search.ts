@@ -1,5 +1,5 @@
 import { request as httpsRequest } from "node:https";
-import { request as httpRequest } from "node:http";
+import { request as httpRequest, type IncomingHttpHeaders } from "node:http";
 import { BlockList, isIP, type LookupFunction } from "node:net";
 import { resolveTarget } from "./browser/egress/gate.ts";
 import { addressClass, ownAddresses } from "./browser/egress/policy.ts";
@@ -48,6 +48,25 @@ export interface WebSearchOptions {
   maxBytes?: number;
 }
 
+function braveRetrySeconds(headers: IncomingHttpHeaders): number | undefined {
+  const seconds = (value: string) => /^\d{1,10}$/.test(value.trim()) ? Number(value.trim()) : undefined;
+  const after = headers["retry-after"];
+  if (typeof after === "string") {
+    const delay = seconds(after);
+    if (delay !== undefined) return delay;
+    const date = new Date(after.length === 29 ? after : "");
+    if (Number.isFinite(date.getTime()) && date.toUTCString() === after) return Math.max(0, Math.ceil((date.getTime() - Date.now()) / 1000));
+  }
+  const reset = headers["x-ratelimit-reset"];
+  if (typeof reset !== "string" || reset.length > 256) return undefined;
+  const resets = reset.split(",").map(seconds);
+  if (resets.some(value => value === undefined)) return undefined;
+  const remaining = headers["x-ratelimit-remaining"];
+  const quotas = typeof remaining === "string" && remaining.length <= 256 ? remaining.split(",").map(seconds) : [];
+  const exhausted = resets.filter((_value, index) => quotas.length !== resets.length || quotas.some(value => value === undefined) || quotas[index] === 0);
+  return exhausted.length ? Math.max(...exhausted as number[]) : undefined;
+}
+
 export async function searchWeb(config: WebSearchConfig | undefined, query: string, limit = 5, signal?: AbortSignal, options: WebSearchOptions = {}): Promise<WebSearchHit[]> {
   const backend = configuredWebSearch(config);
   if (!backend) throw new Error("Configure SearXNG or Brave Search before using web search.");
@@ -90,6 +109,14 @@ export async function searchWeb(config: WebSearchConfig | undefined, query: stri
         headers: { "user-agent": "OpenMausBot/1.0 (web search)", accept: "application/json", "accept-encoding": "identity", ...(backend === "brave" ? { "X-Subscription-Token": config!.braveApiKey! } : {}) },
       }, response => {
         response.on("error", () => reject(new Error("Web search response was interrupted.")));
+        if (backend === "brave" && (response.statusCode === 401 || response.statusCode === 403 || response.statusCode === 429)) {
+          const delay = response.statusCode === 429 ? braveRetrySeconds(response.headers) : undefined;
+          reject(new Error(response.statusCode === 429
+            ? `Brave quota or rate limit reached. ${delay === undefined ? "Try again later or check your Brave API plan." : `Retry after ${delay} seconds.`}`
+            : "The Brave key was rejected. Check your Brave Search API key."));
+          response.destroy();
+          return;
+        }
         const contentType = response.headers["content-type"] ?? "";
         const parts = contentType.toLowerCase().split(";").map(part => part.trim());
         if (response.statusCode !== 200 || parts[0] !== "application/json" || parts.slice(1).some(part => { const [name, value] = part.split("=").map(value => value.trim()); return name === "charset" && value !== "utf-8" && value !== '"utf-8"'; }) ||

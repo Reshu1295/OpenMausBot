@@ -23,7 +23,7 @@ export function WebSearchSettings() {
   };
   return <section className="mt-4 flex flex-col gap-2">
     <h3 className="text-[13px] font-medium text-ink">{t("settings.webSearch.title")}</h3>
-    <p className="text-[12px] text-ink-secondary">{t("settings.webSearch.help")}</p>
+    <p className="text-[12px] text-ink-secondary">{t("settings.webSearch.help")} <a className="underline" href="https://api-dashboard.search.brave.com/terms-of-service" target="_blank" rel="noreferrer">{t("settings.webSearch.terms")}</a></p>
     <label className="text-[13px]">{t("settings.webSearch.url")}<input className="ml-2 rounded border border-hairline bg-inset p-2" value={url} disabled={busy} onChange={event => { setUrl(event.target.value); setDirty(true); }} /></label>
     <label className="text-[13px]">{t("settings.webSearch.key")}<input className="ml-2 rounded border border-hairline bg-inset p-2" type="password" autoComplete="new-password" value={key} disabled={busy} onChange={event => setKey(event.target.value)} /></label>
     <div className="flex gap-2"><button disabled={busy} onClick={() => void save()}>{t("settings.webSearch.save")}</button>
