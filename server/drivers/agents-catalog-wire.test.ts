@@ -62,6 +62,8 @@ function profiles(): Record<string, Profile> {
   // A turn that cannot pick its computer: a hand-off, a routine or webhook run, a continuation. A room's turn is one too.
   all["default+handoff"] = { env: { ...all.default!.env, OMB_COMPUTER_SELECTION: "0" } };
   for (const name of ["default", "non-chief"]) all[`${name}+room`] = { env: { ...all[name]!.env, OMB_COMPUTER_SELECTION: "0", OMB_ROOM: "1" } };
+  all["default+search"] = { env: { ...all.default!.env, OMB_WEB_SEARCH: "1" } };
+  all["skills+shared+voice+escalations+x+team+search"] = { env: { ...all["skills+shared+voice+escalations+x+team"]!.env, OMB_WEB_SEARCH: "1" } };
   return all;
 }
 
@@ -75,11 +77,13 @@ const MAUSBOT_TOOLS = ["list_unread_notifications", "mark_notifications_read"];
 const MAUSBOT_ADDS = 0.02;
 const RESEARCH_TOOLS = ["x_search", "research_search", "research_endpoint", "research_call"];
 /** The fullest profile, checked in whole; every other one is pinned by tool names, bytes and sha256. */
-const FULL = "skills+shared+voice+escalations+x+team";
+const FULL = "skills+shared+voice+escalations+x+team+search";
 
 /** Bytes when the budget was last set; a profile may move at most 2% either way (lower it to lock in a win). */
 const BUDGET_BASELINE: Record<string, number> = {
   "default": 54959,
+  "default+search": 56701,
+  "skills+shared+voice+escalations+x+team+search": 67702,
   "voice": 55740,
   "shared": 57059,
   "shared+voice": 57840,
@@ -248,10 +252,15 @@ describe("agents proxy tools/list golden", () => {
 
   it("mounts message_person only on a Team Cloud, and adds nothing else", () => {
     const names = (wire: string) => toolsOf(wire).map((tool) => tool.name);
-    expect(names(wires[FULL]!).filter((tool) => tool !== "message_person")).toEqual(names(wires["skills+shared+voice+escalations+x"]!));
+    expect(names(wires["skills+shared+voice+escalations+x+team"]!).filter((tool) => tool !== "message_person")).toEqual(names(wires["skills+shared+voice+escalations+x"]!));
     for (const [name, profile] of Object.entries(PROFILES)) {
       expect(names(wires[name]!).includes("message_person"), name).toBe(profile.env.OMB_TEAM_PEOPLE === "1");
     }
+  });
+
+  it("adds configured search only with its harness switch", () => {
+    for (const [name, profile] of Object.entries(PROFILES)) expect(toolsOf(wires[name]!).some(tool => tool.name === "web_search"), name).toBe(profile.env.OMB_WEB_SEARCH === "1");
+    expect(toolsOf(wires["default+search"]!).filter(tool => tool.name !== "web_search")).toEqual(toolsOf(wires.default!));
   });
 
   it("ignores the switches that once picked a catalog profile", () => {
