@@ -1,11 +1,12 @@
 import { createHmac } from "node:crypto";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { createConnection } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { listenWebhookIngress, MAX_WEBHOOK_BODY_BYTES, type WebhookIngress } from "./webhook-ingress.ts";
-import { WebhookManager } from "./webhooks.ts";
+import { WEBHOOK_KEY_FILE, WebhookManager } from "./webhooks.ts";
 
 let dir: string;
 let manager: WebhookManager;
@@ -74,7 +75,7 @@ describe("signed GitHub webhook ingress", () => {
   it.each(["", "sha1=" + "a".repeat(40), "sha256=bad", "sha256=" + "0".repeat(64)])("rejects signature %j even with a bearer secret", async (value) => {
     expect((await send(body, { "x-hub-signature-256": value, authorization: `Bearer ${secret}` })).status).toBe(401);
     expect(queued).toHaveLength(0);
-    expect(manager.listAttempts()).toMatchObject([{ outcome: "rejected", statusCode: 401 }]);
+    expect(manager.listAttempts()).toEqual([]);
   });
 
   it("rejects changed bodies and unknown endpoints before parsing JSON", async () => {
@@ -136,4 +137,98 @@ describe("signed GitHub webhook ingress", () => {
     expect((await send()).status).toBe(401);
     expect(queued).toHaveLength(0);
   });
+
+  async function seedAcceptedHistory() {
+    expect((await send()).status).toBe(202);
+    await new Promise<void>((resolve) => ingress.server.close(() => resolve()));
+    const path = join(dir, "webhooks.json");
+    const saved = JSON.parse(readFileSync(path, "utf8"));
+    for (let i = 0; i < 1999; i++) {
+      saved.attempts.push({ id: `seed-${i}`, webhookId: id, receivedAt: Date.now(), outcome: "rejected", statusCode: 429 });
+    }
+    writeFileSync(path, JSON.stringify(saved));
+    manager = loadManager();
+    ingress = await listenWebhookIngress(manager, { port: 0 });
+    return { path, before: readFileSync(path, "utf8"), attempts: manager.listAttempts() };
+  }
+
+  it.each(["", "sha256=bad", "sha256=" + "0".repeat(64)])("does not persist or evict accepted history for oversized bodies with signature %j", async (value) => {
+    const { path, before, attempts } = await seedAcceptedHistory();
+    for (let i = 0; i < 3; i++) {
+      const response = await send("x".repeat(MAX_WEBHOOK_BODY_BYTES + 1), { "x-hub-signature-256": value });
+      expect([401, 413]).toContain(response.status);
+      await response.arrayBuffer();
+    }
+    expect(readFileSync(path, "utf8")).toBe(before);
+    expect(manager.listAttempts()).toEqual(attempts);
+    expect(queued).toHaveLength(1);
+    expect(await (await send()).json()).toMatchObject({ duplicate: true, runId: "run-1" });
+  });
+
+  it.each(["", "sha256=" + "0".repeat(64)])("does not persist or evict accepted history for truncated bodies with signature %j", async (value) => {
+    const { path, before, attempts } = await seedAcceptedHistory();
+    await new Promise<void>((resolve, reject) => {
+      const socket = createConnection(ingress.port, "127.0.0.1", () => socket.end(
+        `POST /hooks/${endpointId}/github HTTP/1.1\r\nHost: localhost\r\nX-GitHub-Event: pull_request\r\nX-GitHub-Delivery: truncated\r\nX-Hub-Signature-256: ${value}\r\nContent-Length: 1000\r\nConnection: close\r\n\r\n{`,
+      ));
+      socket.on("data", () => {});
+      socket.on("error", reject);
+      socket.on("close", () => resolve());
+    });
+    expect(readFileSync(path, "utf8")).toBe(before);
+    expect(manager.listAttempts()).toEqual(attempts);
+    expect(queued).toHaveLength(1);
+  });
+
+  it("does not evict accepted history for unauthenticated malformed JSON", async () => {
+    const { path, before, attempts } = await seedAcceptedHistory();
+    expect((await send("{", { "x-hub-signature-256": signature(body) })).status).toBe(401);
+    expect(readFileSync(path, "utf8")).toBe(before);
+    expect(manager.listAttempts()).toEqual(attempts);
+  });
+
+  it("uses GitHub delivery metadata for authenticated parse rejections", async () => {
+    expect((await send("{", { "idempotency-key": "wrong-generic-id", "x-webhook-id": "wrong-webhook-id", "x-github-delivery": "gh-parse-1" })).status).toBe(400);
+    expect(manager.listAttempts()).toMatchObject([{ statusCode: 400, deliveryId: "gh-parse-1", eventName: "pull_request" }]);
+    const response = await fetch(`${ingress.baseUrl}/hooks/${endpointId}`, {
+      method: "POST",
+      headers: { authorization: `Bearer ${secret}`, "content-type": "application/json", "idempotency-key": "generic-parse-1", "x-github-delivery": "gh-parse-2" },
+      body: "{",
+    });
+    expect(response.status).toBe(400);
+    expect(manager.listAttempts().at(-1)).toMatchObject({ statusCode: 400, deliveryId: "generic-parse-1" });
+  });
+
+  it.each(["legacy", "missing key", "corrupt seal"])("gives the owner a bounded recovery diagnostic for a %s secret", async (failure) => {
+    await new Promise<void>((resolve) => ingress.server.close(() => resolve()));
+    const path = join(dir, "webhooks.json");
+    const saved = JSON.parse(readFileSync(path, "utf8"));
+    if (failure === "legacy") delete saved.webhooks[0].sealedSecret;
+    else if (failure === "missing key") rmSync(join(dir, WEBHOOK_KEY_FILE));
+    else saved.webhooks[0].sealedSecret = "invalid";
+    writeFileSync(path, JSON.stringify(saved));
+    manager = loadManager();
+    ingress = await listenWebhookIngress(manager, { port: 0 });
+    const before = readFileSync(path, "utf8");
+    for (let i = 0; i < 20; i++) {
+      const response = await send();
+      expect(response.status).toBe(401);
+      expect(await response.text()).toBe('{"error":"Invalid webhook URL or secret"}');
+    }
+    const attempts = manager.listAttempts();
+    expect(attempts).toHaveLength(1);
+    expect(attempts[0]?.reason).toMatch(/replace.*address/i);
+    expect(attempts[0]?.reason).toMatch(/GitHub.*Secret/);
+    expect(attempts[0]?.reason).toContain("20 requests");
+    expect(attempts[0]?.reason!.length).toBeLessThan(500);
+    expect(JSON.stringify(attempts)).not.toContain(secret);
+    expect(JSON.stringify(attempts)).not.toContain(saved.webhooks[0].secretHash);
+    expect(readFileSync(path, "utf8")).toBe(before);
+    expect(queued).toHaveLength(0);
+    expect(manager.authorize(endpointId, secret)).toBe(true);
+    const rotated = manager.rotateSecret(id)!;
+    secret = rotated.secret;
+    expect((await send()).status).toBe(202);
+  });
+
 });

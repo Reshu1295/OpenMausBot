@@ -62,10 +62,12 @@ Use a repository webhook when the catalog does not offer the event you need:
 1. Ask the bot to create a webhook automation for the work.
    Include the repository, action, and branch conditions in its instructions.
    For example: "Review acme/widgets PRs only when action is opened and the base branch is main. Stop for other events."
-2. Open the automation under **Automations** and copy its endpoint and secret.
-   The bot can also retrieve them with `trigger_info` and `include_address`.
+2. In your own chat, ask the owning bot for setup details with `trigger_info` and `include_address`.
+   Use the private result's `githubUrl` for the signed endpoint.
+   Get the secret separately from its `bearer` field; keep it only in GitHub's **Secret** field.
+   Do not append `/github` to **Copy address** or the result's `url`; those may contain the secret.
 3. In the GitHub repository, open **Settings → Webhooks → Add webhook**.
-4. Set **Payload URL** to the endpoint followed by `/github`, such as `https://bots.example.com/hooks/wh_example/github`.
+4. Set **Payload URL** to `githubUrl`, such as `https://bots.example.com/hooks/wh_example/github`.
 5. Set **Content type** to `application/json` and **Secret** to the automation's secret.
    Keep SSL verification enabled.
 6. Select the events you need, such as **Pull requests**, **Issues**, **Pushes**, **Releases**, or **Workflow runs**.

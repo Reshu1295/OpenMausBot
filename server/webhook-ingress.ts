@@ -103,16 +103,26 @@ export function createWebhookIngressHandler(manager: WebhookManager, claimReques
     if (!match) return json(res, 404, { error: "Unknown webhook endpoint" });
     if (req.method !== "POST") return json(res, 405, { error: "Webhooks accept POST requests" });
 
+    const github = match[2] === "github";
+    const metadata = {
+      contentType: header(req, "content-type"),
+      eventName: github ? header(req, "x-github-event")?.trim() : eventName(req),
+      deliveryId: github ? header(req, "x-github-delivery")?.trim() : deliveryId(req),
+    };
+    let authenticated = false;
     let release: (() => void) | undefined;
     try {
       release = claimRequest?.();
-      const github = match[2] === "github";
       let secret = "";
       let raw: Buffer | undefined;
+      let secretUnavailable = false;
       if (github) {
-        if (header(req, "x-github-delivery")?.trim() && header(req, "x-github-event")?.trim()) {
+        const signature = header(req, "x-hub-signature-256");
+        if (metadata.deliveryId && metadata.eventName && signature && /^sha256=[a-f0-9]{64}$/.test(signature)) {
           raw = await readRawBody(req);
-          secret = manager.githubSecret(match[1], header(req, "x-hub-signature-256"), raw) ?? "";
+          const verified = manager.githubSecret(match[1], signature, raw);
+          if (verified && "secret" in verified) secret = verified.secret;
+          secretUnavailable = Boolean(verified && "unavailable" in verified);
         }
       } else {
         try {
@@ -121,34 +131,26 @@ export function createWebhookIngressHandler(manager: WebhookManager, claimReques
         }
       }
       if (!manager.authorize(match[1], secret)) {
-        manager.recordUnauthorized(match[1], {
-          contentType: header(req, "content-type"),
-          eventName: github ? header(req, "x-github-event") : eventName(req),
-          deliveryId: github ? header(req, "x-github-delivery") : deliveryId(req),
-        });
+        if (!github || secretUnavailable) manager.recordUnauthorized(match[1], metadata, secretUnavailable);
         return json(res, 401, { error: "Invalid webhook URL or secret" });
       }
+      authenticated = true;
       raw ??= await readRawBody(req);
       const contentType = header(req, "content-type")?.split(";")[0]?.trim().toLowerCase() ?? "text/plain";
       const payload = parsePayload(raw.toString("utf8"), contentType);
       const result = await manager.receive(match[1], secret, {
+        ...metadata,
         payload,
         contentType,
-        eventName: github ? header(req, "x-github-event")?.trim() : eventName(req),
         userAgent: header(req, "user-agent"),
-        deliveryId: github ? header(req, "x-github-delivery")?.trim() : deliveryId(req),
       });
       return json(res, 202, { accepted: true, ...result });
     } catch (error) {
       const parsedError = statusErrorSchema.safeParse(error);
       const status = parsedError.success ? parsedError.data.status ?? 500 : 500;
       const message = error instanceof Error ? error.message : String(error);
-      if (status === 400 || status === 413) {
-        manager.recordRejected(match[1], status, message, {
-          contentType: header(req, "content-type"),
-          eventName: eventName(req),
-          deliveryId: deliveryId(req),
-        });
+      if (authenticated && (status === 400 || status === 413)) {
+        manager.recordRejected(match[1], status, message, metadata);
       }
       return json(res, status, { error: message });
     } finally {
