@@ -46,6 +46,35 @@ describe("ready-made bots gallery", () => {
     expect(host.textContent).toContain("Includes a paused routine");
   });
 
+  it("gives every card the same parts: role, two-line description, one Try line, and a one-line footer with its category", () => {
+    render();
+    for (const bot of READY_BOTS) {
+      const card = host.querySelector(`[data-ready-bot="${bot.id}"]`)!;
+      expect(card.querySelector("[data-ready-bot-role]")!.textContent).toBe(bot.title);
+      const description = card.querySelector("[data-ready-bot-description]")!;
+      expect(description.className).toContain("line-clamp-2");
+      expect(description.getAttribute("title")).toBe(bot.description);
+      const tryLine = card.querySelector("[data-ready-bot-try]")!;
+      expect(tryLine.className).toContain("truncate");
+      expect(tryLine.getAttribute("title")).toContain(bot.tryAsking[0]!);
+      const footer = card.querySelector("[data-ready-bot-footer]")!;
+      expect(footer.children[0]!.textContent, bot.id).toMatch(/^(Everyday|Work|Writing|Design|Sales|Personal)$/);
+    }
+  });
+
+  it("puts apps and the routine on the one footer line, and a bot without apps still has its footer", () => {
+    render();
+    const withBoth = READY_BOTS.find((bot) => bot.apps.length > 0 && bot.routines?.length)!;
+    const footer = host.querySelector(`[data-ready-bot="${withBoth.id}"] [data-ready-bot-footer]`)!;
+    expect(footer.textContent).toContain("Works with");
+    expect(footer.textContent).toContain("Routine");
+    expect(footer.querySelector('[title="Includes a paused routine"]')).not.toBeNull();
+    const plain = READY_BOTS.find((bot) => bot.apps.length === 0 && !bot.routines?.length)!;
+    const plainFooter = host.querySelector(`[data-ready-bot="${plain.id}"] [data-ready-bot-footer]`)!;
+    expect(plainFooter.children).toHaveLength(1);
+    expect(host.querySelector(`[data-ready-bot="${plain.id}"] [data-ready-bot-role]`)!.textContent).not.toContain("·");
+  });
+
   it("narrows to a category and back to all", () => {
     render();
     flushSync(() => button("Design").click());

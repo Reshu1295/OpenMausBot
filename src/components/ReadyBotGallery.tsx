@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import { Plus } from "lucide-react";
+import { Clock3, Plus } from "lucide-react";
 import { MausAvatar } from "./Avatar";
 import { NewBotDialog } from "./lazy-screens";
 import { READY_BOT_CATEGORIES, READY_BOTS, matchesReadyBot, type ReadyBotCategory } from "@/lib/ready-bots";
@@ -49,25 +49,33 @@ export function ReadyBotGallery({ search, onDialog, onAdded }: {
       </button>)}
     </div>
     <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
-      {visible.map((bot) => <article key={bot.id} data-ready-bot={bot.id} className="flex flex-col rounded-2xl border border-hairline/40 bg-card p-4">
-        <div className="flex items-center gap-3">
-          <MausAvatar color={bot.look.color} bodyId={bot.look.mascotBody} size={40} animated={false} label={bot.name} />
-          <div className="min-w-0 flex-1">
-            <h4 className="truncate text-[14px] font-medium text-ink">{bot.name}</h4>
-            <p className="truncate text-[12px] text-ink-secondary">{bot.title} · {t(CATEGORY_KEYS[bot.category])}</p>
+      {visible.map((bot) => {
+        const apps = bot.apps.map((app) => APP_LABELS[app] ?? app).join(", ");
+        const tryPrompt = t("readyBots.try", { prompt: bot.tryAsking[0]! });
+        // One layout for every card: header, two lines of description, one Try line, and a one-line footer at the bottom.
+        return <article key={bot.id} data-ready-bot={bot.id} className="flex flex-col rounded-2xl border border-hairline/40 bg-card p-4">
+          <div className="flex items-center gap-3">
+            <MausAvatar color={bot.look.color} bodyId={bot.look.mascotBody} size={40} animated={false} label={bot.name} />
+            <div className="min-w-0 flex-1">
+              <h4 className="truncate text-[14px] font-medium text-ink">{bot.name}</h4>
+              <p data-ready-bot-role className="truncate text-[12px] text-ink-secondary" title={bot.title}>{bot.title}</p>
+            </div>
+            <button type="button" onClick={() => open(bot.id)} aria-label={t("readyBots.addAria", { name: bot.name, title: bot.title })}
+              className="flex h-8 shrink-0 items-center gap-1 rounded-full bg-raised px-3 text-[13px] font-medium text-ink hover:bg-raised-hover focus-visible:outline-2 focus-visible:outline-accent">
+              <Plus size={14} aria-hidden="true" />{t("readyBots.add")}
+            </button>
           </div>
-          <button type="button" onClick={() => open(bot.id)} aria-label={t("readyBots.addAria", { name: bot.name, title: bot.title })}
-            className="flex h-8 shrink-0 items-center gap-1 rounded-full bg-raised px-3 text-[13px] font-medium text-ink hover:bg-raised-hover focus-visible:outline-2 focus-visible:outline-accent">
-            <Plus size={14} aria-hidden="true" />{t("readyBots.add")}
-          </button>
-        </div>
-        <p className="mt-3 text-[13px] leading-[1.45] text-ink-secondary">{bot.description}</p>
-        <p className="mt-2 text-[12px] italic text-ink-tertiary">{t("readyBots.try", { prompt: bot.tryAsking[0]! })}</p>
-        {(bot.apps.length > 0 || bot.routines?.length) && <p className="mt-auto pt-2 text-[12px] text-ink-tertiary">
-          {[bot.apps.length > 0 && t("readyBots.worksWith", { apps: bot.apps.map((app) => APP_LABELS[app] ?? app).join(", ") }),
-            bot.routines?.length && t("readyBots.pausedRoutine")].filter(Boolean).join(" · ")}
-        </p>}
-      </article>)}
+          <p data-ready-bot-description title={bot.description} className="mt-3 line-clamp-2 min-h-[2.9em] text-[13px] leading-[1.45] text-ink-secondary">{bot.description}</p>
+          <p data-ready-bot-try title={tryPrompt} className="mt-2 truncate text-[12px] italic text-ink-tertiary">{tryPrompt}</p>
+          <div data-ready-bot-footer className="mt-auto flex min-w-0 items-center gap-2 pt-3 text-[12px] text-ink-tertiary">
+            <span className="shrink-0 rounded-full bg-raised/70 px-2 py-0.5 text-[11px] font-medium text-ink-secondary">{t(CATEGORY_KEYS[bot.category])}</span>
+            {apps && <span className="min-w-0 truncate" title={t("readyBots.worksWith", { apps })}>{t("readyBots.worksWith", { apps })}</span>}
+            {bot.routines?.length ? <span className="ms-auto flex shrink-0 items-center gap-1" title={t("readyBots.pausedRoutine")}>
+              <Clock3 size={12} aria-hidden="true" /><span aria-hidden="true">{t("readyBots.routine")}</span><span className="sr-only">{t("readyBots.pausedRoutine")}</span>
+            </span> : null}
+          </div>
+        </article>;
+      })}
     </div>
     {adding && createPortal(<NewBotDialog readyBotId={adding} onClose={() => open(null)} onCreated={(bot) => { onDialog(false); onAdded(bot); }} />, document.body)}
   </section>;
