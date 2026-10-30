@@ -18,8 +18,8 @@ let host: HTMLElement;
 const onDialog = vi.fn();
 const onAdded = vi.fn();
 
-function render(search = "") {
-  flushSync(() => root.render(createElement(ReadyBotGallery, { search, onDialog, onAdded })));
+function render(search = "", stats?: Record<string, { stars?: number; installs?: number }>) {
+  flushSync(() => root.render(createElement(ReadyBotGallery, { search, onDialog, onAdded, ...(stats ? { stats } : {}) })));
 }
 const cards = () => [...host.querySelectorAll("[data-ready-bot]")].map((card) => card.getAttribute("data-ready-bot"));
 const button = (name: string) => [...host.querySelectorAll("button")].find((candidate) =>
@@ -73,6 +73,20 @@ describe("ready-made bots gallery", () => {
     const plainFooter = host.querySelector(`[data-ready-bot="${plain.id}"] [data-ready-bot-footer]`)!;
     expect(plainFooter.children).toHaveLength(1);
     expect(host.querySelector(`[data-ready-bot="${plain.id}"] [data-ready-bot-role]`)!.textContent).not.toContain("·");
+  });
+
+  it("shows stars and Used by only for templates the community catalog has numbers for", () => {
+    render();
+    expect(host.querySelector("[data-ready-bot-signals]")).toBeNull();
+    render("", { assistant: { stars: 128, installs: 2400 }, inbox: { installs: 31 } });
+    const assistant = host.querySelector('[data-ready-bot="assistant"] [data-ready-bot-signals]')!;
+    expect(assistant.textContent).toContain("128");
+    expect(assistant.textContent).toContain("128 stars from the community");
+    expect(assistant.textContent).toMatch(/2\.4K/i);
+    expect(assistant.textContent).toContain("Used by 2400");
+    const inbox = host.querySelector('[data-ready-bot="inbox"] [data-ready-bot-signals]')!;
+    expect(inbox.textContent).toBe("31Used by 31");
+    expect(host.querySelector('[data-ready-bot="scout"] [data-ready-bot-signals]')).toBeNull();
   });
 
   it("narrows to a category and back to all", () => {

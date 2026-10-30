@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import { Clock3, Plus } from "lucide-react";
+import { Clock3, Plus, Star, UsersRound } from "lucide-react";
 import { MausAvatar } from "./Avatar";
 import { NewBotDialog } from "./lazy-screens";
 import { READY_BOT_CATEGORIES, READY_BOTS, matchesReadyBot, type ReadyBotCategory } from "@/lib/ready-bots";
@@ -8,6 +8,7 @@ import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
 import type { LocaleKey } from "@/locales";
 import { useStore, type Bot } from "@/state/store";
+import type { TemplateStats } from "@/lib/team-catalog";
 
 const APP_LABELS: Record<string, string> = {
   gmail: "Gmail", github: "GitHub", discord: "Discord", slack: "Slack", googlecalendar: "Google Calendar",
@@ -19,8 +20,30 @@ const CATEGORY_KEYS: Record<ReadyBotCategory, LocaleKey> = {
   design: "readyBots.category.design", sales: "readyBots.category.sales", personal: "readyBots.category.personal",
 };
 
-export function ReadyBotGallery({ search, onDialog, onAdded }: {
+const compact = new Intl.NumberFormat(undefined, { notation: "compact", maximumFractionDigits: 1 });
+
+/** Stars and "Used by", only when the community catalog publishes them for this template: never a placeholder number. */
+const hasSignals = (stats?: TemplateStats): boolean => Boolean(stats && (stats.stars !== undefined || stats.installs !== undefined));
+
+function CommunitySignals({ stats }: { stats?: TemplateStats }) {
+  if (!stats || !hasSignals(stats)) return null;
+  const { stars, installs } = stats;
+  return <span data-ready-bot-signals className="flex shrink-0 items-center gap-1.5">
+    {stars !== undefined && <span className="flex items-center gap-0.5" title={t("readyBots.stars", { count: String(stars) })}>
+      <Star size={12} aria-hidden="true" className="fill-current text-warning" /><span aria-hidden="true">{compact.format(stars)}</span>
+      <span className="sr-only">{t("readyBots.stars", { count: String(stars) })}</span>
+    </span>}
+    {installs !== undefined && <span className="flex items-center gap-0.5" title={t("readyBots.usedBy", { count: String(installs) })}>
+      <UsersRound size={12} aria-hidden="true" /><span aria-hidden="true">{compact.format(installs)}</span>
+      <span className="sr-only">{t("readyBots.usedBy", { count: String(installs) })}</span>
+    </span>}
+  </span>;
+}
+
+export function ReadyBotGallery({ search, onDialog, onAdded, stats }: {
   search: string;
+  /** Community signals by template id, from the community catalog when it publishes them. */
+  stats?: Record<string, TemplateStats>;
   /** The New bot dialog is open over Templates, so Templates must leave its keys alone. */
   onDialog: (open: boolean) => void;
   onAdded: (bot: Bot) => void;
@@ -70,9 +93,12 @@ export function ReadyBotGallery({ search, onDialog, onAdded }: {
           <div data-ready-bot-footer className="mt-auto flex min-w-0 items-center gap-2 pt-3 text-[12px] text-ink-tertiary">
             <span className="shrink-0 rounded-full bg-raised/70 px-2 py-0.5 text-[11px] font-medium text-ink-secondary">{t(CATEGORY_KEYS[bot.category])}</span>
             {apps && <span className="min-w-0 truncate" title={t("readyBots.worksWith", { apps })}>{t("readyBots.worksWith", { apps })}</span>}
-            {bot.routines?.length ? <span className="ms-auto flex shrink-0 items-center gap-1" title={t("readyBots.pausedRoutine")}>
-              <Clock3 size={12} aria-hidden="true" /><span aria-hidden="true">{t("readyBots.routine")}</span><span className="sr-only">{t("readyBots.pausedRoutine")}</span>
-            </span> : null}
+            {(hasSignals(stats?.[bot.id]) || Boolean(bot.routines?.length)) && <span className="ms-auto flex shrink-0 items-center gap-2">
+              <CommunitySignals stats={stats?.[bot.id]} />
+              {bot.routines?.length ? <span className="flex shrink-0 items-center gap-1" title={t("readyBots.pausedRoutine")}>
+                <Clock3 size={12} aria-hidden="true" /><span aria-hidden="true">{t("readyBots.routine")}</span><span className="sr-only">{t("readyBots.pausedRoutine")}</span>
+              </span> : null}
+            </span>}
           </div>
         </article>;
       })}
