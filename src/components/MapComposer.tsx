@@ -10,6 +10,7 @@ import { useShowThreads } from "@/lib/thread-preferences";
 import { MentionMenu, type MentionChoice } from "./MentionMenu";
 import { MentionTextarea } from "./MentionTextarea";
 import { useMenuMotion } from "./MenuMotion";
+import { IconButton } from "./ui/IconButton";
 
 /** Message bots from the Team map: tag bots, a team or @everyone; each tagged bot gets it as a normal message in its own chat. */
 export function MapComposer({ bots, teams, onTagged, onSent }: {
@@ -86,7 +87,7 @@ export function MapComposer({ bots, teams, onTagged, onSent }: {
   return <>
     <div className="pointer-events-none absolute inset-x-0 bottom-5 z-30 flex justify-center px-4">
       <div className="pointer-events-auto w-full max-w-[620px]">
-        {sent && names.length > 0 && <p role="status" className="mb-2 flex flex-wrap items-center gap-x-1 gap-y-0.5 rounded-xl bg-panel/95 px-3 py-1.5 text-[12px] text-ink-secondary shadow-sm ring-1 ring-hairline/50">
+        {sent && names.length > 0 && <p role="status" className="mb-2 flex flex-wrap items-center gap-x-1 gap-y-0.5 rounded-xl bg-panel/95 px-3 py-1.5 text-small text-ink-secondary shadow-sm ring-1 ring-hairline">
           <span>{t("mapComposer.sentTo")}</span>
           {shownNames.map((bot, index) => <span key={bot.id}>
             <button className="font-medium text-ink underline-offset-2 hover:underline" onClick={() => openBot(dispatch, bot, showThreads)}>{bot.name}</button>
@@ -100,7 +101,7 @@ export function MapComposer({ bots, teams, onTagged, onSent }: {
             onPick={pick} onHighlight={setHighlight} />
           <MentionTextarea inputRef={inputRef} peers={[...visible, ...teams.map((team) => ({ name: team.name }))]} everyone
             aria-label={t("mapComposer.label")} placeholder={t("mapComposer.placeholder")} dir="auto" rows={1} value={text}
-            className="block max-h-[9rem] min-h-6 w-full resize-none overflow-y-auto bg-transparent px-1 py-1 text-[15px] leading-6 placeholder:text-ink-secondary focus:outline-none"
+            className="block max-h-[9rem] min-h-6 w-full resize-none overflow-y-auto bg-transparent px-1 py-1 text-body leading-6 placeholder:text-ink-secondary focus:outline-none"
             onChange={(event) => { setText(event.target.value); setCaret(event.target.selectionStart ?? event.target.value.length); setDismissedAt(null); }}
             onKeyUp={(event) => setCaret((event.target as HTMLTextAreaElement).selectionStart ?? 0)}
             onClick={(event) => setCaret((event.target as HTMLTextAreaElement).selectionStart ?? 0)}
@@ -117,13 +118,12 @@ export function MapComposer({ bots, teams, onTagged, onSent }: {
               }
               if (sendsMessage(event.nativeEvent, sendKey)) { event.preventDefault(); send(); }
             }} />
-          <button onClick={send} disabled={!canSend} aria-label={t("mapComposer.send")}
-            title={!canSend ? t("mapComposer.tagHint") : targets.botIds.length === 1 ? t("mapComposer.sendToOne") : t("mapComposer.sendTo", { count: targets.botIds.length })}
+          <IconButton label={t("mapComposer.send")} tooltip={!canSend ? t("mapComposer.tagHint") : targets.botIds.length === 1 ? t("mapComposer.sendToOne") : t("mapComposer.sendTo", { count: targets.botIds.length })} onClick={send} disabled={!canSend}
             className={cn("mb-0.5 flex size-8 shrink-0 items-center justify-center rounded-full text-white transition-opacity", canSend ? "bg-accent hover:brightness-110" : "bg-ink-secondary/30")}>
             <ArrowUp size={16} />
-          </button>
+          </IconButton>
         </div>
-        {(hint || targets.botIds.length > 0) && <p className="mt-1.5 px-3 text-[11px] text-ink-secondary">
+        {(hint || targets.botIds.length > 0) && <p className="mt-1.5 px-3 text-caption text-ink-secondary">
           {hint ?? (targets.botIds.length === 1 ? t("mapComposer.willSendOne") : t("mapComposer.willSend", { count: targets.botIds.length }))}
         </p>}
       </div>

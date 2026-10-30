@@ -10,6 +10,7 @@ import { t } from "@/lib/i18n";
 import { AddCloudFlow } from "./cloud-buy/AddCloudFlow";
 import { NewOrganization } from "./cloud-buy/NewOrganization";
 import { BackLink, Heading } from "./cloud-buy/parts";
+import { Button } from "./ui/Button";
 
 /** A server's pairing link, pasted here: main checks it and asks "Connect to <host>?" itself, then opens it. The sheet
  * stays open when the person cancels, and says so when the link isn't one. `connect`: a server of theirs that signed in
@@ -36,24 +37,24 @@ export function OwnServerLink({ onBack, onConnected, connect = null }: { onBack:
   return <form data-place-add={connect ? "connect-server" : "own-server"} onSubmit={(event) => void submit(event)} className="flex flex-col gap-4 px-[30px] pb-[26px] pt-7">
     {onBack && <div><BackLink label={t("rail.back")} onClick={onBack} /></div>}
     <Heading title={connect ? t("rail.connectTitle", { name: connect.name }) : t("rail.own")} sub={t(connect ? "rail.connectPasteLede" : "rail.pasteLede")} />
-    <label className="flex flex-col gap-1.5 text-[13px] font-medium text-ink">{t("rail.paste")}
+    <label className="flex flex-col gap-1.5 text-ui font-medium text-ink">{t("rail.paste")}
       <input data-autofocus data-own-server-link value={link} disabled={busy} onChange={(event) => { setLink(event.target.value); setFailed(false); }}
         placeholder="https://" autoCapitalize="none" autoCorrect="off" autoComplete="off" spellCheck={false} aria-invalid={failed || undefined}
-        className="w-full rounded-lg border border-hairline/40 bg-inset px-3 py-2 text-[14px] font-normal text-ink outline-none focus:border-accent/50" />
+        className="w-full rounded-lg border border-hairline bg-inset px-3 py-2 text-label font-normal text-ink outline-none focus:border-accent/50" />
     </label>
-    {failed && <p role="alert" className="text-[13px] text-danger">{t("rail.linkFailed")}</p>}
-    <div><button type="submit" disabled={busy || !link.trim()} className="ui-button ui-button-primary inline-flex items-center gap-2">
+    {failed && <p role="alert" className="text-ui text-danger-text">{t("rail.linkFailed")}</p>}
+    <div><Button variant="primary" type="submit" disabled={busy || !link.trim()} className="inline-flex items-center gap-2">
       {busy && <Loader2 size={14} className="animate-spin" aria-hidden="true" />}{t("rail.connect")}
-    </button></div>
+    </Button></div>
   </form>;
 }
 
 function Choice({ icon, title, sub, onClick, kind }: { icon: ReactNode; title: string; sub: string; onClick: () => void; kind: string }) {
   return <button type="button" data-place-add-choice={kind} onClick={onClick}
-    className="flex min-w-0 flex-1 flex-col items-start gap-2 rounded-2xl border border-hairline bg-card p-5 text-start transition-colors hover:border-accent/60 hover:bg-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus">
+    className="flex min-w-0 flex-1 flex-col items-start gap-2 rounded-2xl border border-edge bg-card p-5 text-start transition-colors hover:border-accent/60 hover:bg-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus">
     <span aria-hidden="true" className="grid size-9 place-items-center rounded-[10px] bg-accent/12 text-accent-text">{icon}</span>
-    <span className="text-[15px] font-semibold text-ink">{title}</span>
-    <span className="text-[13px] leading-snug text-ink-secondary">{sub}</span>
+    <span className="text-body font-semibold text-ink">{title}</span>
+    <span className="text-ui leading-snug text-ink-secondary">{sub}</span>
   </button>;
 }
 
@@ -82,7 +83,7 @@ export function RailSheet({ wide = false, focusKey, onClose, children }: { wide?
   }, [focusKey]);
   return <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4 sm:p-6" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
     <div ref={sheet} role="dialog" aria-modal="true" aria-labelledby="cloud-add-title" data-place-add-sheet tabIndex={-1}
-      className={cn("animate-pop-in relative max-h-full w-full overflow-y-auto overscroll-contain rounded-2xl border border-hairline/70 bg-panel shadow-2xl outline-none", wide ? "max-w-[900px]" : "max-w-[560px]")}>
+      className={cn("animate-pop-in relative max-h-full w-full overflow-y-auto overscroll-contain rounded-2xl border border-edge bg-panel shadow-2xl outline-none", wide ? "max-w-[900px]" : "max-w-[560px]")}>
       <button type="button" onClick={onClose} aria-label={t("cloudAdd.close")} className="ui-icon-button absolute end-3.5 top-3.5 z-10"><X size={18} /></button>
       {children}
     </div>

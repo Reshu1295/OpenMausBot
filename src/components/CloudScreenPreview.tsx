@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Loader2, Maximize2, Monitor } from "lucide-react";
 
 import { t } from "@/lib/i18n";
+import { Button } from "./ui/Button";
 
 export function CloudScreenPreview({ src, name, error, starting, opening, disabled, refreshing = false, retry = 0, onOpen, onRetry }: {
   src: string | null;
@@ -41,7 +42,7 @@ export function CloudScreenPreview({ src, name, error, starting, opening, disabl
             className={`h-full w-full object-contain transition group-hover:brightness-75 ${visible ? "" : "invisible"}`}
           />
           {visible && (
-            <span className="absolute right-2 top-2 flex items-center gap-1 rounded-md bg-black/70 px-2 py-1 text-[11px] font-medium text-white">
+            <span className="absolute right-2 top-2 flex items-center gap-1 rounded-md bg-black/70 px-2 py-1 text-caption font-medium text-white">
               {opening ? <Loader2 size={12} className="animate-spin" /> : <Maximize2 size={12} />}
               {opening ? t("computer.preview.connecting") : t("computer.open")}
             </span>
@@ -49,24 +50,24 @@ export function CloudScreenPreview({ src, name, error, starting, opening, disabl
         </button>
       )}
       {!visible && !problem && (
-        <div role="status" className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-6 text-center text-[12px] text-ink-secondary">
+        <div role="status" className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-6 text-center text-small text-ink-secondary">
           <Loader2 size={18} className="animate-spin" />
           {starting ? t("computer.phase.starting") : t("computer.preview.connectingScreen")}
         </div>
       )}
       {visible && refreshing && !problem && (
-        <div role="status" className="absolute bottom-2 left-2 flex items-center gap-1 rounded-md bg-black/70 px-2 py-1 text-[11px] text-white">
+        <div role="status" className="absolute bottom-2 left-2 flex items-center gap-1 rounded-md bg-black/70 px-2 py-1 text-caption text-white">
           <Loader2 size={12} className="animate-spin" />
           {t("computer.preview.connectingScreen")}
         </div>
       )}
       {problem && (
-        <div role="alert" className={`absolute inset-x-0 flex flex-col items-center justify-center gap-2 bg-card/95 p-4 text-center text-[12px] text-ink-secondary ${visible ? "bottom-0" : "inset-y-0"}`}>
+        <div role="alert" className={`absolute inset-x-0 flex flex-col items-center justify-center gap-2 bg-card/95 p-4 text-center text-small text-ink-secondary ${visible ? "bottom-0" : "inset-y-0"}`}>
           {!visible && <Monitor size={22} />}
           <span>{visible ? t("computer.preview.paused") : t("computer.preview.cantConnect")} {problem}</span>
-          <button type="button" onClick={() => onRetry(!visible)} className="rounded-md bg-control px-3 py-1.5 text-ink hover:bg-raised-hover">
+          <Button onClick={() => onRetry(!visible)} className="font-normal">
             {t("computer.preview.retry")}
-          </button>
+          </Button>
         </div>
       )}
     </div>

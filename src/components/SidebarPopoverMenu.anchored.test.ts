@@ -114,7 +114,7 @@ describe("the anchored menu in a document", () => {
     const support = [...menu.querySelectorAll('[role="menuitem"]')].find((node) => node.textContent?.includes("Help and support"))!;
     expect(support.getAttribute("aria-haspopup")).toBe("menu");
     expect(support.querySelector("svg")).not.toBeNull();
-    expect(menu.querySelector('[role="menuitem"]')!.className).toContain("text-[14px]");
+    expect(menu.querySelector('[role="menuitem"]')!.className).toContain("text-label");
   });
 
   it("opens from the keyboard on the first item and walks the items", async () => {
@@ -126,6 +126,14 @@ describe("the anchored menu in a document", () => {
     expect(document.activeElement).toBe(rows[3]);
     await key(rows[3]!, "ArrowDown");
     expect(document.activeElement).toBe(rows[0]);
+  });
+
+  it("jumps to an item by the letter it starts with", async () => {
+    await key(trigger(), "ArrowUp");
+    await flush();
+    const rows = [...sheet()!.querySelectorAll<HTMLElement>('[role="menuitem"]')];
+    await key(rows[0]!, "s");
+    expect(document.activeElement).toBe(rows[2]);
   });
 
   it("opens the submenu with the inline end arrow and closes only it with Escape", async () => {

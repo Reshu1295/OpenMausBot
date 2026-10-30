@@ -54,12 +54,12 @@ export function MiniMonth({ anchor, onSelect }: MiniMonthProps) {
   return (
     <section aria-label="Mini calendar" className="select-none px-3 py-3">
       <div className="mb-2 flex items-center justify-between px-1">
-        <div className="text-[13px] font-semibold text-ink">{monthLabel}</div>
+        <div className="text-ui font-semibold text-ink">{monthLabel}</div>
         <div className="flex items-center gap-0.5">
           <button
             type="button"
             onClick={() => setVisibleMonth((month) => moveMonth(month, -1))}
-            className="flex size-7 items-center justify-center rounded-full text-ink-secondary transition-colors hover:bg-raised hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+            className="flex size-7 items-center justify-center rounded-full text-ink-secondary transition-colors hover:bg-raised hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/60"
             aria-label="Previous month"
           >
             <ChevronLeft size={15} aria-hidden="true" />
@@ -67,7 +67,7 @@ export function MiniMonth({ anchor, onSelect }: MiniMonthProps) {
           <button
             type="button"
             onClick={() => setVisibleMonth((month) => moveMonth(month, 1))}
-            className="flex size-7 items-center justify-center rounded-full text-ink-secondary transition-colors hover:bg-raised hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+            className="flex size-7 items-center justify-center rounded-full text-ink-secondary transition-colors hover:bg-raised hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/60"
             aria-label="Next month"
           >
             <ChevronRight size={15} aria-hidden="true" />
@@ -79,7 +79,7 @@ export function MiniMonth({ anchor, onSelect }: MiniMonthProps) {
         {WEEKDAY_LABELS.map((label, index) => (
           <div
             key={`${label}-${index}`}
-            className="flex h-6 items-center justify-center text-[9px] font-semibold uppercase tracking-[0.08em] text-ink-tertiary"
+            className="flex h-6 items-center justify-center text-caption font-semibold uppercase tracking-[0.08em] text-ink-tertiary"
           >
             {label}
           </div>
@@ -106,14 +106,14 @@ export function MiniMonth({ anchor, onSelect }: MiniMonthProps) {
               aria-label={label}
               aria-current={isToday ? "date" : undefined}
               aria-pressed={isSelected}
-              className="group flex h-7 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+              className="group flex h-7 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/60"
             >
               <span
-                className={`flex size-6 items-center justify-center rounded-full text-[11px] transition-colors ${
+                className={`flex size-6 items-center justify-center rounded-full text-caption transition-colors ${
                   isSelected
                     ? "bg-accent font-semibold text-white shadow-sm"
                     : isToday
-                      ? "font-semibold text-accent group-hover:bg-accent/12"
+                      ? "font-semibold text-accent-text group-hover:bg-accent/12"
                       : isOutsideMonth
                         ? "text-ink-tertiary group-hover:bg-raised group-hover:text-ink"
                         : "text-ink group-hover:bg-raised"

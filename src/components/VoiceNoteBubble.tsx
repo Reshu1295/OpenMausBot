@@ -7,6 +7,7 @@ import { t } from "@/lib/i18n";
 import { isLiveCallRunning, useLiveMedia } from "@/lib/live-call-media";
 import { speaker } from "@/lib/tts";
 import { cn } from "@/lib/cn";
+import { IconButton } from "./ui/IconButton";
 
 export interface VoiceNoteAttachment {
   kind: "audio";
@@ -106,16 +107,13 @@ export function VoiceNoteBubble({
             giveBackVoice();
           }}
         />
-        <button
-          type="button"
+        <IconButton label={playing ? t("chat.voiceNote.pause") : onLiveCall ? t("chat.voiceNote.onLiveCall") : t("chat.voiceNote.play")}
           onClick={toggle}
           disabled={onLiveCall && !playing}
-          aria-label={playing ? t("chat.voiceNote.pause") : onLiveCall ? t("chat.voiceNote.onLiveCall") : t("chat.voiceNote.play")}
-          title={playing ? t("chat.voiceNote.pause") : onLiveCall ? t("chat.voiceNote.onLiveCall") : t("chat.voiceNote.play")}
           className="flex size-7 shrink-0 items-center justify-center rounded-full bg-accent text-white transition-opacity hover:opacity-90 disabled:opacity-40"
         >
           {playing ? <Pause size={13} className="fill-current" /> : <Play size={13} className="translate-x-px fill-current" />}
-        </button>
+        </IconButton>
         <input
           type="range"
           aria-label={t("chat.voiceNote.seek")}
@@ -127,7 +125,7 @@ export function VoiceNoteBubble({
           disabled={!duration}
           className="h-1 flex-1 accent-accent"
         />
-        <span className="shrink-0 text-[11px] tabular-nums text-ink-secondary">
+        <span className="shrink-0 text-caption tabular-nums text-ink-secondary">
           {clock(time)} / {duration === null ? "--:--" : clock(duration)}
         </span>
       </div>
@@ -138,13 +136,13 @@ export function VoiceNoteBubble({
             onClick={() => setTranscriptOpen((open) => !open)}
             data-test-voice-note-transcript=""
             aria-expanded={transcriptOpen}
-            className="mt-1 flex items-center gap-0.5 self-start text-[12px] text-ink-secondary transition-colors hover:text-ink"
+            className="mt-1 flex items-center gap-0.5 self-start text-small text-ink-secondary transition-colors hover:text-ink"
           >
             <ChevronRight size={12} aria-hidden="true" className={cn("transition-transform duration-150", transcriptOpen && "rotate-90")} />
             {t("chat.voiceNote.transcript")}
           </button>
           {transcriptOpen && (
-            <p className="mt-1 whitespace-pre-wrap text-[13px] leading-snug text-ink">{transcript}</p>
+            <p className="mt-1 whitespace-pre-wrap text-ui leading-snug text-ink">{transcript}</p>
           )}
         </>
       )}

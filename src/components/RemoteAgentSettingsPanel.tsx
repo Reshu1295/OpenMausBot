@@ -10,6 +10,7 @@ import { BotAvatar } from "./Avatar";
 import { imageAttachmentFromFile } from "@/lib/composer-attachments";
 import { botAvatarUrlFromStoredPath } from "../../shared/bot-avatar";
 import { BOT_PROFILE_LIMITS } from "../../shared/bot-profile";
+import { Button } from "./ui/Button";
 
 type RemoteProfilePatch = Partial<
   Pick<Bot, "name" | "title" | "description" | "avatarUrl" | "avatarCrop" | "voice" | "speakReplies" | "notifications">
@@ -76,7 +77,7 @@ export function RemoteAgentSettingsPanel({ bot, overlay = false }: {
 
   return (
     <aside className={cn(
-      "animate-panel-in absolute inset-0 z-40 flex h-full min-w-0 flex-col border-l border-hairline/40 bg-panel",
+      "animate-panel-in absolute inset-0 z-40 flex h-full min-w-0 flex-col border-l border-hairline bg-panel",
       overlay ? "md:left-auto md:w-[400px] md:shadow-2xl" : "md:relative md:z-20 md:w-[400px] md:shrink-0",
     )}>
       <div {...dragProps} className={cn("flex items-center justify-between px-4 py-3", padClass)}>
@@ -87,7 +88,7 @@ export function RemoteAgentSettingsPanel({ bot, overlay = false }: {
         >
           <ChevronLeft size={18} />
         </button>
-        <span className="text-[15px] font-semibold text-ink">Remote agent settings</span>
+        <span className="text-body font-semibold text-ink">Remote agent settings</span>
         <button
           onClick={close}
           aria-label="Close remote agent settings"
@@ -104,20 +105,20 @@ export function RemoteAgentSettingsPanel({ bot, overlay = false }: {
               <BotAvatar bot={bot} state="idle" size={64} motion="none" motionKey={0} animated={false} />
               <div className="flex gap-2">
                 <input ref={avatarInput} type="file" accept="image/png,image/jpeg,image/gif,image/webp" className="sr-only" onChange={(event) => void uploadAvatar(event.target.files?.[0])} />
-                <button type="button" disabled={uploading || saving} onClick={() => avatarInput.current?.click()} className="flex items-center gap-1.5 rounded-lg bg-control px-3 py-2 text-[13px] text-ink hover:bg-raised-hover disabled:opacity-50">
+                <Button size="lg" disabled={uploading || saving} onClick={() => avatarInput.current?.click()} className="flex gap-1.5 px-3 font-normal">
                   {uploading ? <Loader2 size={14} className="animate-spin" /> : <ImagePlus size={14} />} Avatar
-                </button>
-                {bot.avatarUrl && <button type="button" disabled={saving} onClick={() => void patch({ avatarUrl: null, avatarCrop: "mascot" })} aria-label="Remove custom avatar" className="flex size-9 items-center justify-center rounded-lg text-ink-secondary hover:bg-control hover:text-danger"><Trash2 size={14} /></button>}
+                </Button>
+                {bot.avatarUrl && <button type="button" disabled={saving} onClick={() => void patch({ avatarUrl: null, avatarCrop: "mascot" })} aria-label="Remove custom avatar" className="flex size-9 items-center justify-center rounded-lg text-ink-secondary hover:bg-control hover:text-danger-text"><Trash2 size={14} /></button>}
               </div>
             </div>
-            <label className="block text-[12px] font-medium text-ink-secondary">Name
-              <input key={bot.id} defaultValue={bot.name} maxLength={BOT_PROFILE_LIMITS.name} onBlur={(event) => { const name = event.currentTarget.value.trim(); if (name && name !== bot.name) void patch({ name }); }} className="mt-1 w-full rounded-lg bg-inset px-3 py-2 text-[14px] text-ink focus:outline-none focus:ring-1 focus:ring-accent" />
+            <label className="block text-small font-medium text-ink-secondary">Name
+              <input key={bot.id} defaultValue={bot.name} maxLength={BOT_PROFILE_LIMITS.name} onBlur={(event) => { const name = event.currentTarget.value.trim(); if (name && name !== bot.name) void patch({ name }); }} className="mt-1 w-full rounded-lg bg-inset px-3 py-2 text-label text-ink focus:outline-none focus:ring-1 focus:ring-focus" />
             </label>
-            <label className="mt-3 block text-[12px] font-medium text-ink-secondary">Title
-              <input key={bot.id} defaultValue={bot.title ?? ""} maxLength={BOT_PROFILE_LIMITS.title} onBlur={(event) => { if (event.currentTarget.value !== (bot.title ?? "")) void patch({ title: event.currentTarget.value }); }} className="mt-1 w-full rounded-lg bg-inset px-3 py-2 text-[14px] text-ink focus:outline-none focus:ring-1 focus:ring-accent" />
+            <label className="mt-3 block text-small font-medium text-ink-secondary">Title
+              <input key={bot.id} defaultValue={bot.title ?? ""} maxLength={BOT_PROFILE_LIMITS.title} onBlur={(event) => { if (event.currentTarget.value !== (bot.title ?? "")) void patch({ title: event.currentTarget.value }); }} className="mt-1 w-full rounded-lg bg-inset px-3 py-2 text-label text-ink focus:outline-none focus:ring-1 focus:ring-focus" />
             </label>
-            <label className="mt-3 block text-[12px] font-medium text-ink-secondary">Description
-              <textarea key={bot.id} defaultValue={bot.description ?? ""} maxLength={BOT_PROFILE_LIMITS.description} rows={4} onBlur={(event) => { if (event.currentTarget.value !== (bot.description ?? "")) void patch({ description: event.currentTarget.value }); }} className="mt-1 w-full resize-y rounded-lg bg-inset px-3 py-2 text-[13px] leading-relaxed text-ink focus:outline-none focus:ring-1 focus:ring-accent" />
+            <label className="mt-3 block text-small font-medium text-ink-secondary">Description
+              <textarea key={bot.id} defaultValue={bot.description ?? ""} maxLength={BOT_PROFILE_LIMITS.description} rows={4} onBlur={(event) => { if (event.currentTarget.value !== (bot.description ?? "")) void patch({ description: event.currentTarget.value }); }} className="mt-1 w-full resize-y rounded-lg bg-inset px-3 py-2 text-ui leading-relaxed text-ink focus:outline-none focus:ring-1 focus:ring-focus" />
             </label>
           </div>
 
@@ -131,8 +132,8 @@ export function RemoteAgentSettingsPanel({ bot, overlay = false }: {
             <div className="flex min-w-0 items-start gap-3">
               <Bell size={16} className="mt-0.5 shrink-0 text-ink-secondary" />
               <div>
-                <div className="text-[15px] font-medium text-ink">Notifications</div>
-                <div className="mt-0.5 text-[12px] leading-relaxed text-ink-secondary">
+                <div className="text-body font-medium text-ink">Notifications</div>
+                <div className="mt-0.5 text-small leading-relaxed text-ink-secondary">
                   Enable completion and attention notifications for this agent on the host and paired clients.
                 </div>
               </div>
@@ -145,7 +146,7 @@ export function RemoteAgentSettingsPanel({ bot, overlay = false }: {
             />
           </div>
 
-          {error ? <div role="alert" className="text-[12px] text-danger">{error}</div> : null}
+          {error ? <div role="alert" className="text-small text-danger-text">{error}</div> : null}
         </div>
       </div>
     </aside>

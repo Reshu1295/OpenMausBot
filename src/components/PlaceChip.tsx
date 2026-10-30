@@ -54,7 +54,7 @@ export function usePlaceMenuItem({ bot, task, disabled = false, onPin }: {
   const off = effective === "off";
   const botDefault = bot.computer ?? "auto";
   const followsAuto = botDefault === "auto";
-  const check = <Check size={14} className="text-accent" aria-hidden="true" />;
+  const check = <Check size={14} className="text-accent-text" aria-hidden="true" />;
   const choose = (surface: Place | null) => { if (surface !== (task?.surface ?? null)) onPin(surface); };
   return {
     key: "place",
@@ -139,7 +139,7 @@ export function PlaceChip({ bot, task, live, disabled = false, onPin }: {
         onClick={() => setOpen((value) => !value)}
         className={cn(
           "relative flex size-8 shrink-0 items-center justify-center rounded-full text-ink-secondary hover:bg-control hover:text-ink",
-          pinned && "text-accent hover:text-accent",
+          pinned && "text-accent-text hover:text-accent-text",
           (disabled || off) && "cursor-not-allowed opacity-45 hover:bg-transparent",
         )}
       >
@@ -159,12 +159,12 @@ export function PlaceChip({ bot, task, live, disabled = false, onPin }: {
             >
               <PlaceIcon place={botDefault} size={16} className="mt-px shrink-0 text-ink-secondary" aria-hidden="true" />
               <span className="min-w-0 flex-1">
-                <span className="block text-[14px] leading-[18px] text-ink">{followsAuto ? t("place.auto") : t("place.followBot")}</span>
-                <span className="block text-[12px] leading-4 text-ink-secondary">
+                <span className="block text-label leading-[18px] text-ink">{followsAuto ? t("place.auto") : t("place.followBot")}</span>
+                <span className="block text-small leading-4 text-ink-secondary">
                   {followsAuto ? t("place.autoDetail") : t("place.followBotDetail", { place: t(placeLabelKey(botDefault)) })}
                 </span>
               </span>
-              {!pinned && <Check size={14} className="mt-0.5 shrink-0 text-accent" aria-hidden="true" />}
+              {!pinned && <Check size={14} className="mt-0.5 shrink-0 text-accent-text" aria-hidden="true" />}
             </button>
             {PLACES.filter((place) => placeOffered(place, state.config)).map((place) => {
               const selected = task?.surface === place;
@@ -183,10 +183,10 @@ export function PlaceChip({ bot, task, live, disabled = false, onPin }: {
                 >
                   <PlaceIcon place={place} size={16} className="mt-px shrink-0 text-ink-secondary" aria-hidden="true" />
                   <span className="min-w-0 flex-1">
-                    <span className="block text-[14px] leading-[18px] text-ink">{t(placeLabelKey(place))}</span>
-                    <span className="block text-[12px] leading-4 text-ink-secondary">{detail}</span>
+                    <span className="block text-label leading-[18px] text-ink">{t(placeLabelKey(place))}</span>
+                    <span className="block text-small leading-4 text-ink-secondary">{detail}</span>
                   </span>
-                  {selected && <Check size={14} className="mt-0.5 shrink-0 text-accent" aria-hidden="true" />}
+                  {selected && <Check size={14} className="mt-0.5 shrink-0 text-accent-text" aria-hidden="true" />}
                 </button>
               );
             })}

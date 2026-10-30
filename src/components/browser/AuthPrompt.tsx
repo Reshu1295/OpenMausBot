@@ -1,5 +1,6 @@
 import { LockKeyhole } from "lucide-react";
 import type { FormEvent } from "react";
+import { Button } from "../ui/Button";
 
 /**
  * A site's HTTP sign-in (basic or digest), which a page cannot draw itself. Security: the password goes only to that
@@ -20,14 +21,14 @@ export function AuthPrompt({ origin, realm, onAnswer }: {
     password.value = "";
   };
   return (
-    <form role="dialog" aria-label="Sign in to this site" onSubmit={submit} className="absolute inset-x-3 top-3 z-20 mx-auto flex max-w-sm flex-col gap-2.5 rounded-xl border border-hairline/60 bg-card p-4 text-ink shadow-xl">
-      <div className="flex items-center gap-2 text-[13px] font-medium"><LockKeyhole size={14} aria-hidden="true" />Sign in</div>
-      <p className="break-words text-[12px] text-ink-secondary">{origin}{realm ? ` asks for “${realm}”` : ""}</p>
-      <input name="username" aria-label="Username" autoComplete="off" spellCheck={false} maxLength={1024} placeholder="Username" className="rounded-lg bg-inset px-3 py-2 text-[13px] outline-none focus:ring-1 focus:ring-accent" />
-      <input name="password" type="password" aria-label="Password" autoComplete="new-password" maxLength={1024} placeholder="Password" className="rounded-lg bg-inset px-3 py-2 text-[13px] outline-none focus:ring-1 focus:ring-accent" />
+    <form role="dialog" aria-label="Sign in to this site" onSubmit={submit} className="popover-surface absolute inset-x-3 top-3 z-20 mx-auto flex max-w-sm flex-col gap-2.5 rounded-xl border border-hairline bg-menu p-4 text-ink shadow-xl">
+      <div className="flex items-center gap-2 text-ui font-medium"><LockKeyhole size={14} aria-hidden="true" />Sign in</div>
+      <p className="break-words text-small text-ink-secondary">{origin}{realm ? ` asks for “${realm}”` : ""}</p>
+      <input name="username" aria-label="Username" autoComplete="off" spellCheck={false} maxLength={1024} placeholder="Username" className="rounded-lg bg-inset px-3 py-2 text-ui outline-none focus:ring-1 focus:ring-focus" />
+      <input name="password" type="password" aria-label="Password" autoComplete="new-password" maxLength={1024} placeholder="Password" className="rounded-lg bg-inset px-3 py-2 text-ui outline-none focus:ring-1 focus:ring-focus" />
       <div className="flex justify-end gap-2">
-        <button type="button" onClick={() => onAnswer(null)} className="rounded-lg px-3 py-1.5 text-[12px] text-ink-secondary hover:bg-inset">Cancel</button>
-        <button type="submit" className="rounded-lg bg-accent px-3 py-1.5 text-[12px] text-accent-ink">Sign in</button>
+        <button type="button" onClick={() => onAnswer(null)} className="rounded-lg px-3 py-1.5 text-small text-ink-secondary hover:bg-inset">Cancel</button>
+        <Button variant="primary" type="submit" className="text-small">Sign in</Button>
       </div>
     </form>
   );

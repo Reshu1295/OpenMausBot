@@ -41,7 +41,7 @@ export function RoomBulletin({ group, remoteClient }: { group: Group; remoteClie
   return (
     <div className="w-full px-5">
       {bulletin.open ? (
-        <div className="mb-1 rounded-lg border border-hairline/40 bg-panel p-2">
+        <div className="mb-1 rounded-lg border border-hairline bg-panel p-2">
           <textarea
             autoFocus
             dir="auto"
@@ -52,7 +52,7 @@ export function RoomBulletin({ group, remoteClient }: { group: Group; remoteClie
             aria-label={t("room.bulletin.label")}
             placeholder={t("room.bulletin.placeholder")}
             rows={4}
-            className="w-full resize-none bg-transparent text-[13px] leading-relaxed text-ink placeholder:text-ink-secondary focus:outline-none"
+            className="w-full resize-none bg-transparent text-ui leading-relaxed text-ink placeholder:text-ink-secondary focus:outline-none"
           />
         </div>
       ) : (
@@ -63,7 +63,7 @@ export function RoomBulletin({ group, remoteClient }: { group: Group; remoteClie
           title={t("room.bulletin.title")}
         >
           <Pin size={12} className="shrink-0 text-ink-secondary" />
-          <span dir="auto" className={cn("truncate text-[13px]", group.bulletin ? "text-ink-secondary" : "text-ink-tertiary")}>
+          <span dir="auto" className={cn("truncate text-ui", group.bulletin ? "text-ink-secondary" : "text-ink-tertiary")}>
             {group.bulletin.split("\n")[0] || (remoteClient ? t("room.bulletin.none") : t("room.bulletin.add"))}
           </span>
         </button>

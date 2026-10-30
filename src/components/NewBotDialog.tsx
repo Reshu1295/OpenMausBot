@@ -32,6 +32,7 @@ import { LocalComputerAutoWarning } from "./LocalComputerAutoWarning";
 import { SharePresetDialog } from "./SharePresetDialog";
 import { SettingRow } from "./SettingsPrimitives";
 import { Select } from "./Select";
+import { Button } from "./ui/Button";
 
 const SECTIONS = ["Identity", "Soul", "Skills", "Memory", "Routines", "Access", "Model", "Permissions", "Voice & alerts"] as const;
 type Section = typeof SECTIONS[number];
@@ -151,15 +152,15 @@ export function NewBotDialog({ defaultsMode = false, onClose, onCreated, readyBo
   const title = defaultsMode ? t("newBot.defaults") : t("sidebar.newBot");
   return <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/60 p-3 sm:p-5" hidden={!defaultsMode && parent.state.appSettingsOpen}>
     <div ref={dialog} role="dialog" aria-modal="true" aria-label={title} aria-busy={saving} tabIndex={-1}
-      className="flex h-[min(760px,94dvh)] w-full max-w-[900px] flex-col overflow-hidden rounded-2xl border border-hairline/50 bg-panel shadow-2xl outline-none">
-      <div className="flex shrink-0 items-center justify-between border-b border-hairline/40 px-5 py-4">
-        <h2 className="text-[17px] font-semibold text-ink">{title}</h2>
+      className="flex h-[min(760px,94dvh)] w-full max-w-[900px] flex-col overflow-hidden rounded-2xl border border-hairline bg-panel shadow-2xl outline-none">
+      <div className="flex shrink-0 items-center justify-between border-b border-hairline px-5 py-4">
+        <h2 className="text-title font-semibold text-ink">{title}</h2>
         <button type="button" onClick={() => closeRef.current()} aria-label={t("common.close")}
           className="flex size-8 shrink-0 items-center justify-center rounded-lg text-ink-secondary hover:bg-control hover:text-ink disabled:opacity-40"><X size={18} className="pointer-events-none" /></button>
       </div>
         {team && !defaultsMode && teamName && <SharedInTeam team={teamName} />}
         {choosesVisibility && (
-          <div className="flex flex-wrap items-center gap-2 px-5 pt-3 text-[13px] text-ink-secondary" data-new-bot-visibility>
+          <div className="flex flex-wrap items-center gap-2 px-5 pt-3 text-ui text-ink-secondary" data-new-bot-visibility>
             <label className="flex items-center gap-2">
               {t("botSettings.visibility.title")}
               <Select size="sm"
@@ -179,18 +180,18 @@ export function NewBotDialog({ defaultsMode = false, onClose, onCreated, readyBo
                 onChange={(event) => setPeople(event.target.value)}
                 placeholder={t("botSettings.visibility.peoplePlaceholder")}
                 aria-label={t("botSettings.visibility.peopleLabel")}
-                className="min-w-[16rem] flex-1 rounded-lg border border-hairline/40 bg-inset px-3 py-1.5 text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none"
+                className="min-w-[16rem] flex-1 rounded-lg border border-hairline bg-inset px-3 py-1.5 text-ui text-ink placeholder:text-ink-secondary focus:outline-none"
               />
             )}
           </div>
         )}
       <div className="flex min-h-0 flex-1 flex-col sm:flex-row">
-        <nav aria-label={t("newBot.sections")} className="flex shrink-0 gap-1 overflow-x-auto border-b border-hairline/40 p-2 sm:w-40 sm:flex-col sm:border-b-0 sm:border-r">
+        <nav aria-label={t("newBot.sections")} className="flex shrink-0 gap-1 overflow-x-auto border-b border-hairline p-2 sm:w-40 sm:flex-col sm:border-b-0 sm:border-r">
           {sections.map(label => <button key={label} type="button" onClick={() => setActive(label)} aria-current={active === label ? "page" : undefined}
-            className={cn("shrink-0 rounded-lg px-3 py-2 text-left text-[13px]", active === label ? "bg-control text-ink" : "text-ink-secondary hover:bg-control/50")}>{t(SECTION_KEYS[label])}</button>)}
+            className={cn("shrink-0 rounded-lg px-3 py-2 text-left text-ui", active === label ? "bg-control text-ink" : "text-ink-secondary hover:bg-control/50")}>{t(SECTION_KEYS[label])}</button>)}
         </nav>
         <div className="min-h-0 min-w-0 flex-1 overflow-y-auto p-4 sm:p-5">
-          {!ready && !error && <div role="status" className="flex items-center gap-2 text-[13px] text-ink-secondary"><Loader2 size={16} className="animate-spin" />{t("newBot.loading")}</div>}
+          {!ready && !error && <div role="status" className="flex items-center gap-2 text-ui text-ink-secondary"><Loader2 size={16} className="animate-spin" />{t("newBot.loading")}</div>}
           {ready && <fieldset disabled={saving} className="min-w-0">
             <BotEditorStore value={scopedStore}><BotEditorContext.Provider value={{ request: draft.request, draft: true, uploadAvatar: draft.uploadAvatar }}>
               <DraftSection active={active} draft={draft} defaultsMode={defaultsMode}
@@ -199,13 +200,13 @@ export function NewBotDialog({ defaultsMode = false, onClose, onCreated, readyBo
           </fieldset>}
         </div>
       </div>
-      {error && <p role="alert" className="max-h-24 overflow-y-auto border-t border-hairline/40 px-5 py-3 text-[13px] text-danger">{error}</p>}
-      <div className="flex shrink-0 justify-end gap-2 border-t border-hairline/40 px-5 py-3">
-        <button type="button" onClick={() => closeRef.current()} className="rounded-lg px-4 py-2 text-[13px] text-ink-secondary hover:bg-control">{t("common.cancel")}</button>
-        <button type="button" disabled={!ready || saving || (!defaultsMode && !bot.name.trim())} onClick={() => void save()}
-          className="ui-button-primary flex items-center gap-2 rounded-lg bg-accent px-5 py-2 text-[13px] font-medium text-white hover:brightness-110 disabled:opacity-40">
+      {error && <p role="alert" className="max-h-24 overflow-y-auto border-t border-hairline px-5 py-3 text-ui text-danger-text">{error}</p>}
+      <div className="flex shrink-0 justify-end gap-2 border-t border-hairline px-5 py-3">
+        <Button variant="ghost" size="lg" onClick={() => closeRef.current()} className="font-normal">{t("common.cancel")}</Button>
+        <Button variant="primary" size="lg" disabled={!ready || saving || (!defaultsMode && !bot.name.trim())} onClick={() => void save()}
+          className="flex gap-2 px-5">
           {saving && <Loader2 size={15} className="animate-spin" />}{t(defaultsMode ? "newBot.saveDefaults" : "newBot.create")}
-        </button>
+        </Button>
       </div>
       <LocalComputerAutoWarning open={warning === "local"} onCancel={() => setWarning(null)} onConfirm={() => { draft.consent.acknowledgeLocalAuto = true; setWarning(null); void save(); }} />
     </div>
@@ -214,10 +215,10 @@ export function NewBotDialog({ defaultsMode = false, onClose, onCreated, readyBo
 
 function SharedInTeam({ team }: { team: string }) {
   const bridge = typeof window === "undefined" ? undefined : window.ogb?.workspaces;
-  return <div data-new-bot-shared className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-hairline/40 bg-raised/30 px-5 py-2.5 text-[13px] text-ink-secondary">
+  return <div data-new-bot-shared className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-hairline bg-raised/30 px-5 py-2.5 text-ui text-ink-secondary">
     <span>{t("newBot.sharedWith", { team })}</span>
     {bridge
-      ? <button type="button" onClick={() => void openServerMenu(bridge).catch(() => {})} className="font-medium text-accent hover:underline">{t("newBot.justForYou")}</button>
+      ? <button type="button" onClick={() => void openServerMenu(bridge).catch(() => {})} className="font-medium text-accent-text hover:underline">{t("newBot.justForYou")}</button>
       : <span>{t("newBot.justForYou").replace(/\s*→$/, "")}</span>}
   </div>;
 }
@@ -232,16 +233,16 @@ function DraftSection({ active, draft, defaultsMode, owner }: { active: Section;
     <StartingRole draft={draft} defaultsMode={defaultsMode} />
     <IdentitySection bot={bot} patch={derived.patch} activeState={derived.activeState} mascotMotion={null}
       namePlaceholder={defaultsMode ? t("newBot.randomName") : undefined} />
-    <label className="block text-[13px] text-ink-secondary">{t("newBot.team")}
+    <label className="block text-ui text-ink-secondary">{t("newBot.team")}
       <Select size="lg" className="mt-1.5 w-full" value={bot.section ?? ""} onChange={event => draft.patch({ section: event.target.value })}>
         <option value="">{t("teamSettings.general")}</option>{[...new Set([...(state.sections ?? []), ...state.bots.map(bot => bot.section ?? "")])].filter(Boolean).map(name => <option key={name}>{name}</option>)}
       </Select>
     </label>
-    {owner && team && <label className="block text-[13px] text-ink-secondary" data-new-bot-reports-to>{t("newBot.reportsTo")}
+    {owner && team && <label className="block text-ui text-ink-secondary" data-new-bot-reports-to>{t("newBot.reportsTo")}
       <Select size="lg" className="mt-1.5 w-full" value={owner.value ?? ""} onChange={event => owner.choose(event.target.value)}>
         {team.people.map(person => <option key={person.email} value={person.email}>{person.you ? t("owner.you", { name: person.name }) : person.name}</option>)}
       </Select>
-      <span className="mt-1 block text-[12px]">{t("owner.pickHint")}</span>
+      <span className="mt-1 block text-small">{t("owner.pickHint")}</span>
     </label>}
   </div>;
   if (active === "Soul") return <SoulSection bot={bot} patch={derived.patch} />;
@@ -306,7 +307,7 @@ function StartingRole({ draft, defaultsMode }: { draft: BotCreationDraft; defaul
   };
   const roles = BOT_ROLES.map(role => <option key={role.id} value={role.id}>{role.title}</option>);
   return <div>
-    <label className="block text-[13px] text-ink-secondary">{t("newBot.startingRole")}
+    <label className="block text-ui text-ink-secondary">{t("newBot.startingRole")}
       <Select size="lg" className="mt-1.5 w-full" value={draft.preset ? `preset:${draft.preset.id}` : ""} onChange={event => void choose(event.target.value)}>
         <option value="">{t("newBot.customSettings")}</option>
         {presetGroups(presets).map(group => <optgroup key={group.label} label={group.label}>
@@ -315,12 +316,12 @@ function StartingRole({ draft, defaultsMode }: { draft: BotCreationDraft; defaul
         {presets.length ? <optgroup label={t("newBot.builtInRoles")}>{roles}</optgroup> : roles}
       </Select>
     </label>
-    {chosen && <div className="mt-2 space-y-1 rounded-lg bg-card px-3 py-2.5 text-[13px] text-ink-secondary" data-new-bot-preset>
+    {chosen && <div className="mt-2 space-y-1 rounded-lg bg-card px-3 py-2.5 text-ui text-ink-secondary" data-new-bot-preset>
       {presetSummaryLines(chosen).map((line, index) => <p key={index} className="break-words">{line}</p>)}
-      {chosen.source === "file" && <button type="button" onClick={() => void remove(chosen)}
-        className="mt-1 rounded-md px-2 py-1 text-[12px] text-ink-secondary hover:bg-control hover:text-ink">{t("newBot.presetRemove")}</button>}
+      {chosen.source === "file" && <Button variant="ghost" size="md" onClick={() => void remove(chosen)}
+        className="mt-1 text-small font-normal">{t("newBot.presetRemove")}</Button>}
     </div>}
-    {error && <p role="alert" className="mt-2 text-[13px] text-danger">{error}</p>}
+    {error && <p role="alert" className="mt-2 text-ui text-danger-text">{error}</p>}
   </div>;
 }
 
@@ -342,10 +343,10 @@ function DraftMemory({ draft }: { draft: BotCreationDraft }) {
 function DraftRoutines({ draft }: { draft: BotCreationDraft }) {
   const [editing, setEditing] = useState<Routine | "new" | null>(null);
   return <div className="space-y-3">
-    <button type="button" className="rounded-lg bg-accent px-3 py-2 text-[13px] text-white" onClick={() => setEditing("new")}>{t("computer.routines.create")}</button>
+    <Button variant="primary" size="lg" className="px-3" onClick={() => setEditing("new")}>{t("computer.routines.create")}</Button>
     {draft.routines.map(routine => <div key={routine.id} className="flex items-center gap-2 rounded-lg bg-card p-3">
-      <button type="button" className="min-w-0 flex-1 text-left text-[13px]" onClick={() => setEditing(routine)}>{routine.name}</button>
-      <label className="flex items-center gap-1.5 text-[12px] text-ink-secondary"><input type="checkbox" checked={routine.enabled} onChange={event => draft.setRoutineEnabled(routine.id, event.target.checked)} />{t("newBot.enabled")}</label>
+      <button type="button" className="min-w-0 flex-1 text-left text-ui" onClick={() => setEditing(routine)}>{routine.name}</button>
+      <label className="flex items-center gap-1.5 text-small text-ink-secondary"><input type="checkbox" checked={routine.enabled} onChange={event => draft.setRoutineEnabled(routine.id, event.target.checked)} />{t("newBot.enabled")}</label>
       <button type="button" aria-label={t("newBot.removeRoutine", { name: routine.name })} onClick={() => draft.removeRoutine(routine.id)} className="rounded p-1.5 hover:bg-control"><Trash2 size={15} /></button>
     </div>)}
     {editing && <RoutineEditor routine={editing === "new" ? undefined : editing} bots={[draft.bot]} lockedBotId={draft.id} onClose={() => setEditing(null)} />}
@@ -358,8 +359,8 @@ export function DefaultBotSettings() {
 
     const content = <>
       <div className="flex shrink-0 gap-2">
-        <button type="button" onClick={() => setSharing(true)} className="cursor-pointer rounded-lg px-3 py-1.5 text-[13px] text-ink-secondary hover:bg-control hover:text-ink">{t("newBot.sharePreset")}</button>
-        <button type="button" onClick={() => setOpen(true)} className="cursor-pointer rounded-lg bg-control px-3 py-1.5 text-[13px] text-ink hover:bg-raised-hover">{t("newBot.edit")}</button>
+        <Button variant="ghost" onClick={() => setSharing(true)} className="font-normal">{t("newBot.sharePreset")}</Button>
+        <Button onClick={() => setOpen(true)} className="font-normal">{t("newBot.edit")}</Button>
       </div>
       {open && <NewBotDialog defaultsMode onClose={() => setOpen(false)} />}
       {sharing && <SharePresetDialog onClose={() => setSharing(false)} />}

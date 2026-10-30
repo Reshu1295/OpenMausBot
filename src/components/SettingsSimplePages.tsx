@@ -31,6 +31,7 @@ import { NotificationRows } from "./NotificationSettingsRows";
 import { useServerUpdateItem } from "./SidebarProfileMenu";
 import { AdvancedModeRow, BrowserProfilesRow, ColorUserBubblesRow, LanguageRow, ReplayTourRow, SendKeyRow, UpdatesRow } from "./AppSettingsRows";
 import { ThemeRow } from "./ThemeRow";
+import { Button } from "./ui/Button";
 
 export type SimpleDisclosureId = "ai-more" | "ai-keys" | "computer-elsewhere" | "billing-limits";
 
@@ -66,7 +67,7 @@ export function SimpleGeneralPage({ has, peopleOpen, onLooks }: { has: Has; peop
             <LanguageRow simple />
             <SendKeyRow simple />
             <SettingRow title={t("settings.simple.looks.title")}>
-              <button type="button" className="ui-button" onClick={onLooks}>{t("settings.simple.looks.change")}</button>
+              <Button onClick={onLooks}>{t("settings.simple.looks.change")}</Button>
             </SettingRow>
           </SettingsRows>
         </SettingsGroup>
@@ -99,7 +100,7 @@ export function SimpleGeneralPage({ has, peopleOpen, onLooks }: { has: Has; peop
 export function SimpleLooksPage({ onBack }: { onBack: () => void }) {
   return (
     <>
-      <div><button type="button" className="ui-button" onClick={onBack}>{t("settings.simple.looks.back")}</button></div>
+      <div><Button onClick={onBack}>{t("settings.simple.looks.back")}</Button></div>
       <div data-settings-block="looks"><SkinPicker /></div>
     </>
   );
@@ -183,7 +184,7 @@ function ServerUpdatesRow() {
       : entry.phase === "checking" ? t("common.checking") : t("settings.updates.check");
   return (
     <SettingRow title={versionTitle()} subtitle={status}>
-      <button type="button" className="ui-button" disabled={entry.item.disabled} onClick={entry.item.onSelect}>{action}</button>
+      <Button disabled={entry.item.disabled} onClick={entry.item.onSelect}>{action}</Button>
     </SettingRow>
   );
 }

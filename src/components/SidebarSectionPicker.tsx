@@ -5,6 +5,7 @@ import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
 import { useHeldMenuMotion } from "./MenuMotion";
 import { MENU_HEADING, MENU_ITEM, MENU_ITEM_SEPARATOR, MENU_SHEET } from "./menu-recipe";
+import { Button } from "./ui/Button";
 
 /** "Move to context": the sidebar sections in use, a field for a new one, and "remove from context". */
 export function SectionPicker({
@@ -81,7 +82,7 @@ export function SectionPicker({
               )}
             >
               <span className="truncate">{section}</span>
-              {section === sectionCurrent && <Check size={14} className="shrink-0 text-accent" />}
+              {section === sectionCurrent && <Check size={14} className="shrink-0 text-accent-text" />}
             </button>
           ))}
         </div>
@@ -101,22 +102,22 @@ export function SectionPicker({
           onChange={(e) => setName(e.target.value)}
           placeholder={t("sidebar.section.newContext")}
           aria-label={t("sidebar.section.newContextAria")}
-          className="w-full rounded-md bg-ink/[0.05] px-2 py-1.5 text-[13px] text-ink placeholder:text-ink-tertiary focus:outline-none"
+          className="w-full rounded-md bg-ink/[0.05] px-2 py-1.5 text-ui text-ink placeholder:text-ink-tertiary focus:outline-none"
         />
-        <button
+        <Button size="md" variant="primary"
           type="submit"
           disabled={!trimmed || trimmed.length > 60}
-          className="ui-button ui-button-md ui-button-primary shrink-0"
+          className="shrink-0"
         >
           {t("common.add")}
-        </button>
+        </Button>
       </form>
       {sectionCurrent && (
         <>
           <div role="separator" className={MENU_ITEM_SEPARATOR} />
           <button
             onClick={() => assign("")}
-            className={cn(MENU_ITEM, "text-danger hover:bg-menu-hover")}
+            className={cn(MENU_ITEM, "text-danger-text hover:bg-menu-hover")}
           >
             <FolderMinus size={16} />
             {t("sidebar.section.removeFromContext")}

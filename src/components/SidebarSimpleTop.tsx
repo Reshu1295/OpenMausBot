@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
 import { ELEVATED_CONTROL, ELEVATED_HOVER, ELEVATED_TINT } from "./elevated";
+import { IconButton } from "./ui/IconButton";
 
 /** Keyboard focus on a Simple row or tile: the focus ring drawn inside its edge. */
 export const SIMPLE_ROW_FOCUS = "focus-visible:outline-2 focus-visible:-outline-offset-2! focus-visible:outline-focus";
@@ -17,7 +18,7 @@ export const SIMPLE_TOP_BUTTON = `${SIMPLE_TOP} ${ELEVATED_CONTROL} ${ELEVATED_H
 export const SIMPLE_TOP_TOGGLE = `${SIMPLE_TOP} ${ELEVATED_CONTROL} ${ELEVATED_TINT} ${SIMPLE_TOP_FOCUS}`;
 
 /** The round control at either end of the phone bot list's top row. */
-export const PHONE_TOP_BUTTON = "flex size-10 shrink-0 items-center justify-center rounded-full border border-hairline bg-card text-ink hover:bg-raised focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus";
+export const PHONE_TOP_BUTTON = "flex size-10 shrink-0 items-center justify-center rounded-full border border-edge bg-card text-ink hover:bg-raised focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus";
 
 export const SIMPLE_RAIL_BUTTON = "flex size-9 shrink-0 items-center justify-center rounded-xl text-ink-secondary hover:bg-raised/60 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus";
 
@@ -54,13 +55,10 @@ export function SidebarEdgeToggle({ collapsed, onToggle, style, anchorRef, shown
   const Arrow = collapsed ? ChevronRight : ChevronLeft;
   const pinned = edge !== null;
   const button = (
-    <button
-      type="button"
+    <IconButton label={t(collapsed ? "sidebar.density.expand" : "sidebar.density.collapseAria")} tooltip={t(collapsed ? "sidebar.density.expand" : "sidebar.density.collapse")}
       data-sidebar-edge-toggle
       onClick={onToggle}
-      aria-label={t(collapsed ? "sidebar.density.expand" : "sidebar.density.collapseAria")}
       aria-expanded={!collapsed}
-      title={t(collapsed ? "sidebar.density.expand" : "sidebar.density.collapse")}
       style={pinned ? { ...style, left: edge.left, top: edge.top + 14 } : style}
       onPointerEnter={() => onHover?.(true)}
       onPointerLeave={() => onHover?.(false)}
@@ -68,29 +66,26 @@ export function SidebarEdgeToggle({ collapsed, onToggle, style, anchorRef, shown
         pinned ? "fixed" : "absolute -right-[14px]",
         shown ? "opacity-100" : "pointer-events-none opacity-0 focus-visible:pointer-events-auto focus-visible:opacity-100 touch:pointer-events-auto touch:opacity-100",
         "transition-opacity duration-150",
-        "top-[14px] z-30 hidden h-8 w-[14px] items-center justify-center rounded-r-[4px] border border-l-0 border-hairline/50 bg-panel text-ink-tertiary shadow-[1px_0_2px_rgb(0_0_0/0.06)] hover:bg-raised hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus md:flex",
+        "top-[14px] z-30 hidden h-8 w-[14px] items-center justify-center rounded-r-[4px] border border-l-0 border-hairline bg-panel text-ink-tertiary shadow-[1px_0_2px_color-mix(in_srgb,var(--color-shadow)_6%,transparent)] hover:bg-raised hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus md:flex",
       )}
     >
       <Arrow size={12} strokeWidth={2.25} aria-hidden="true" />
-    </button>
+    </IconButton>
   );
   return pinned ? createPortal(button, document.body) : button;
 }
 
 export function SidebarSearchToggle({ open, onToggle, ref }: { open: boolean; onToggle: () => void; ref?: Ref<HTMLButtonElement> }) {
   return (
-    <button
+    <IconButton label={t("sidebar.searchAria")}
       ref={ref}
-      type="button"
       data-sidebar-search-toggle
       onClick={onToggle}
-      aria-label={t("sidebar.searchAria")}
       aria-expanded={open}
-      title={t("sidebar.searchAria")}
       className={SIMPLE_TOP_BUTTON}
     >
       <Search size={18} strokeWidth={1.5} aria-hidden="true" />
-    </button>
+    </IconButton>
   );
 }
 
@@ -110,17 +105,14 @@ export function SidebarSearchPill({ query, onQuery, onClose }: { query: string; 
           }}
           placeholder={t("sidebar.searchAria")}
           aria-label={t("sidebar.searchAria")}
-          className="min-w-0 flex-1 bg-transparent text-[13px] text-ink placeholder:text-ink-tertiary focus:outline-none"
+          className="min-w-0 flex-1 bg-transparent text-ui text-ink placeholder:text-ink-tertiary focus:outline-none"
         />
-        <button
-          type="button"
+        <IconButton label={t("sidebar.searchClose")}
           onClick={onClose}
-          aria-label={t("sidebar.searchClose")}
-          title={t("sidebar.searchClose")}
           className="flex size-6 shrink-0 items-center justify-center rounded-full text-ink-tertiary hover:bg-raised hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-focus"
         >
           <X size={14} aria-hidden="true" />
-        </button>
+        </IconButton>
       </div>
     </div>
   );

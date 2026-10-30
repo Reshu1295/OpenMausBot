@@ -4,6 +4,7 @@ import { requestMessageFile, useLocalFileSave, type MessageAttachmentContext } f
 import { TableDialog } from "./RichTable";
 import { readTableResponse } from "./TableFilePreview";
 import { t } from "@/lib/i18n";
+import { IconButton } from "./ui/IconButton";
 
 export const HTML_PREVIEW_MAX_BYTES = 2 * 1024 * 1024;
 
@@ -23,7 +24,7 @@ export function HtmlFileButton({ path, name, message }: { path: string; name: st
   const [open, setOpen] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null);
   return <>
-    <button ref={trigger} type="button" className="table-action" title={t("html.preview", { name })} aria-label={t("html.preview", { name })} onClick={() => setOpen(true)}><Eye size={14} /></button>
+    <IconButton label={t("html.preview", { name })} ref={trigger} className="table-action" onClick={() => setOpen(true)}><Eye size={14} /></IconButton>
     {open && <TableDialog title={name} returnFocus={trigger.current} onClose={() => setOpen(false)}><HtmlFileContent key={`${message.threadId}:${message.messageId}:${path}`} path={path} name={name} message={message} /></TableDialog>}
   </>;
 }
@@ -49,21 +50,21 @@ function HtmlFileContent({ path, name, message }: { path: string; name: string; 
     })();
     return () => controller.abort();
   }, [path, message.threadId, message.messageId, attempt]);
-  if (error) return <div className="p-8 text-center text-sm"><p role="alert" className="mb-3 text-ink-secondary">{t(error === "size" ? "html.tooLarge" : "html.loadFailed")}</p><button type="button" className="rounded-lg border border-hairline px-3 py-2 hover:bg-raised" onClick={() => setAttempt(attempt + 1)}>{t("chat.retry")}</button></div>;
-  if (source === null) return <div role="status" className="flex items-center justify-center gap-2 p-12 text-sm text-ink-secondary"><LoaderCircle size={16} className="animate-spin" />{t("html.loading")}</div>;
+  if (error) return <div className="p-8 text-center text-label"><p role="alert" className="mb-3 text-ink-secondary">{t(error === "size" ? "html.tooLarge" : "html.loadFailed")}</p><button type="button" className="rounded-lg border border-edge px-3 py-2 hover:bg-raised" onClick={() => setAttempt(attempt + 1)}>{t("chat.retry")}</button></div>;
+  if (source === null) return <div role="status" className="flex items-center justify-center gap-2 p-12 text-label text-ink-secondary"><LoaderCircle size={16} className="animate-spin" />{t("html.loading")}</div>;
   return <div className="flex flex-col gap-2">
     <div className="flex items-center justify-end gap-1">
-      <button type="button" className="table-action" aria-pressed={showSource} aria-label={t(showSource ? "html.rendered" : "html.source")} title={t(showSource ? "html.rendered" : "html.source")} onClick={() => setShowSource(!showSource)}>{showSource ? <Eye size={14} /> : <Code2 size={14} />}</button>
-      <button type="button" className="table-action" aria-label={t("html.reload")} title={t("html.reload")} onClick={() => setAttempt(attempt + 1)}><RotateCcw size={14} /></button>
-      <button type="button" className="table-action" aria-label={t("attach.saveAria", { name })} title={t("attach.saveAria", { name })} disabled={save.state === "saving"} onClick={() => void save.save()}><Download size={14} /></button>
+      <IconButton label={t(showSource ? "html.rendered" : "html.source")} className="table-action" aria-pressed={showSource} onClick={() => setShowSource(!showSource)}>{showSource ? <Eye size={14} /> : <Code2 size={14} />}</IconButton>
+      <IconButton label={t("html.reload")} className="table-action" onClick={() => setAttempt(attempt + 1)}><RotateCcw size={14} /></IconButton>
+      <IconButton label={t("attach.saveAria", { name })} className="table-action" disabled={save.state === "saving"} onClick={() => void save.save()}><Download size={14} /></IconButton>
     </div>
-    {save.state === "failed" && <p role="alert" className="text-end text-[12px] text-danger">{save.reason}</p>}
+    {save.state === "failed" && <p role="alert" className="text-end text-small text-danger-text">{save.reason}</p>}
     {showSource
-      ? <pre className="h-[72dvh] overflow-auto rounded-lg border border-hairline/40 bg-inset p-3 text-[12px] leading-5 whitespace-pre-wrap break-words text-ink">{source}</pre>
+      ? <pre className="h-[72dvh] overflow-auto rounded-lg border border-hairline bg-inset p-3 text-small leading-5 whitespace-pre-wrap break-words text-ink">{source}</pre>
       : <HtmlPreviewFrame source={source} name={name} />}
   </div>;
 }
 
 export function HtmlPreviewFrame({ source, name }: { source: string; name: string }) {
-  return <iframe sandbox="" referrerPolicy="no-referrer" srcDoc={htmlPreviewDocument(source)} title={t("html.frameTitle", { name })} className="h-[72dvh] w-full rounded-lg border border-hairline/40 bg-white" />;
+  return <iframe sandbox="" referrerPolicy="no-referrer" srcDoc={htmlPreviewDocument(source)} title={t("html.frameTitle", { name })} className="h-[72dvh] w-full rounded-lg border border-hairline bg-white" />;
 }

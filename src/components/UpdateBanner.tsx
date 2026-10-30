@@ -4,9 +4,10 @@ import { useUpdaterState } from "@/lib/updater";
 import { t } from "@/lib/i18n";
 import { productName } from "../lib/brand";
 import { NoticeToast } from "./NoticeCard";
+import { Button } from "./ui/Button";
+import { IconButton } from "./ui/IconButton";
 
-const primaryAction =
-  "flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-accent py-1.5 text-[13px] font-medium text-white transition-colors disabled:cursor-default disabled:bg-control disabled:text-ink-secondary";
+const primaryAction = "flex flex-1 gap-1.5 disabled:cursor-default";
 
 // electron-updater surfaces failures as a whole HTTP dump (status line, every header, stack trace).
 function friendlyError(message?: string): string {
@@ -94,30 +95,29 @@ export function UpdateBanner({ sidebarIndicator = false }: UpdateBannerProps) {
             : friendlyError(s.message);
 
   return (
-    <div className="animate-panel-in fixed bottom-4 left-4 z-50 w-[300px] rounded-xl border border-hairline/40 bg-panel p-3.5 shadow-2xl shadow-black/50">
+    <div className="popover-surface animate-panel-in fixed bottom-4 left-4 z-50 w-[300px] rounded-xl border border-hairline bg-menu p-3.5 shadow-2xl shadow-shadow/50">
       <div className="flex items-start gap-2.5">
-        <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-accent/15 text-accent">
+        <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-accent/15 text-accent-text">
           <Sparkles size={14} />
         </span>
         <div className="min-w-0 flex-1">
-          <div className="text-[14px] font-semibold text-ink">{title}</div>
-          <div className="mt-0.5 text-[13px] text-ink-secondary" title={subtitle}>
+          <div className="text-label font-semibold text-ink">{title}</div>
+          <div className="mt-0.5 text-ui text-ink-secondary" title={subtitle}>
             {subtitle}
           </div>
         </div>
         {!installing && (
-          <button
+          <IconButton label="Dismiss"
             onClick={() => setDismissed(key)}
             className="shrink-0 rounded-md p-1 text-ink-secondary hover:bg-control hover:text-ink"
-            title="Dismiss"
           >
             <X size={14} />
-          </button>
+          </IconButton>
         )}
       </div>
 
       {s.status === "handed-off" && s.command && (
-        <code className="mt-2.5 block overflow-x-auto rounded-lg bg-control px-2 py-1.5 font-mono text-[12px] whitespace-pre text-ink-secondary">
+        <code className="mt-2.5 block overflow-x-auto rounded-lg bg-control px-2 py-1.5 font-mono text-small whitespace-pre text-ink-secondary">
           {s.command}
         </code>
       )}
@@ -126,7 +126,7 @@ export function UpdateBanner({ sidebarIndicator = false }: UpdateBannerProps) {
         <div className="mt-2.5 flex gap-2">
           <button
             disabled
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-control py-1.5 text-[13px] font-medium text-ink-secondary"
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-control py-1.5 text-ui font-medium text-ink-secondary"
           >
             <Loader2 size={13} className="animate-spin" /> {handoff ? "Opening…" : "Restarting…"}
           </button>
@@ -136,7 +136,8 @@ export function UpdateBanner({ sidebarIndicator = false }: UpdateBannerProps) {
       {!installing && (
         <div className="mt-2.5 flex gap-2">
           {s.status === "downloaded" && (
-            <button
+            <Button
+              variant="primary"
               onClick={() => {
                 setPending("install");
                 void updater.install();
@@ -157,7 +158,7 @@ export function UpdateBanner({ sidebarIndicator = false }: UpdateBannerProps) {
                   <RefreshCw size={13} /> Restart to update
                 </>
               )}
-            </button>
+            </Button>
           )}
           {s.status === "error" && s.retryable !== false && (
             <button
@@ -166,7 +167,7 @@ export function UpdateBanner({ sidebarIndicator = false }: UpdateBannerProps) {
                 void updater.check();
               }}
               disabled={pending !== null}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-control py-1.5 text-[13px] text-ink hover:bg-raised-hover disabled:text-ink-secondary disabled:hover:bg-control"
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-control py-1.5 text-ui text-ink hover:bg-raised-hover disabled:text-ink-secondary disabled:hover:bg-control"
             >
               {pending === "check" ? (
                 <>
@@ -177,13 +178,13 @@ export function UpdateBanner({ sidebarIndicator = false }: UpdateBannerProps) {
               )}
             </button>
           )}
-          <button
+          <Button variant="ghost"
             onClick={() => setDismissed(key)}
             disabled={pending !== null}
-            className="rounded-lg px-3 py-1.5 text-[13px] text-ink-secondary hover:bg-control hover:text-ink disabled:opacity-50 disabled:hover:bg-transparent"
+            className="disabled:hover:bg-transparent font-normal"
           >
             {s.status === "handed-off" || s.retryable === false ? "Dismiss" : "Later"}
-          </button>
+          </Button>
         </div>
       )}
     </div>

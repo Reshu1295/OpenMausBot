@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Check, Copy, X } from "lucide-react";
 import { useCopyFeedback } from "@/lib/copy-text";
 import { t } from "@/lib/i18n";
+import { Button } from "./ui/Button";
 
 export const addressPreview = (value: string): string => {
   if (value.length <= 3) return "…";
@@ -17,23 +18,23 @@ export function ConnectionDetail({ label, value }: { label: string; value: strin
   return (
     <div className="flex items-center gap-3 rounded-lg bg-inset px-3 py-2">
       <div className="min-w-0 flex-1">
-        <div className="text-[11px] font-medium uppercase tracking-wide text-ink-secondary">{label}</div>
-        <div className="mt-0.5 truncate font-mono text-[12px] text-ink">
+        <div className="text-caption font-medium uppercase tracking-wide text-ink-secondary">{label}</div>
+        <div className="mt-0.5 truncate font-mono text-small text-ink">
           {revealed ? value : addressPreview(value)}
         </div>
       </div>
-      <button
+      <Button variant="ghost" size="sm"
         onClick={() => setRevealed((current) => !current)}
-        className="shrink-0 rounded px-2 py-1 text-[11px] text-ink-secondary hover:bg-control hover:text-ink"
+        className="shrink-0 text-caption font-normal"
       >
         {revealed ? "Hide" : "Reveal"}
-      </button>
+      </Button>
       <button
         onClick={copy}
         aria-label={copyState === "failed" ? t("common.copyFailed") : `Copy ${label}`}
         className="shrink-0 rounded p-1.5 text-ink-secondary hover:bg-control hover:text-ink"
       >
-        {copyState === "copied" ? <Check size={13} className="text-success" /> : copyState === "failed" ? <X size={13} className="text-danger" /> : <Copy size={13} />}
+        {copyState === "copied" ? <Check size={13} className="text-success" /> : copyState === "failed" ? <X size={13} className="text-danger-text" /> : <Copy size={13} />}
       </button>
     </div>
   );

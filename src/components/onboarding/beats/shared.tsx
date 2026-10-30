@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { cn } from "@/lib/cn";
 import type { MausMotion, MausState } from "@/lib/mascot";
+import { Button } from "../../ui/Button";
 
 export interface BeatProps {
   onNext: () => void;
@@ -10,7 +11,7 @@ export interface BeatProps {
 }
 
 export const inputClass =
-  "w-full rounded-lg border border-hairline/40 bg-inset px-3 py-2.5 text-[15px] text-ink placeholder:text-ink-secondary focus:outline-none";
+  "w-full rounded-lg border border-hairline bg-inset px-3 py-2.5 text-body text-ink placeholder:text-ink-secondary focus:outline-none";
 
 export function staggerIndex(i: number): CSSProperties {
   return { "--i": i } as CSSProperties;
@@ -22,16 +23,15 @@ export function PrimaryButton({
   ...rest
 }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
-    <button
+    <Button
+      variant="primary"
+      size="lg"
       data-primary=""
       {...rest}
-      className={cn(
-        "w-full shrink-0 rounded-lg bg-accent py-2.5 text-[15px] font-medium text-white transition-[transform,opacity] duration-150 active:scale-[0.98] disabled:opacity-40",
-        className,
-      )}
+      className={cn("min-h-10 w-full shrink-0 text-body transition-[transform,opacity] duration-150 active:scale-[0.98]", className)}
     >
       {children}
-    </button>
+    </Button>
   );
 }
 
@@ -43,7 +43,7 @@ export function QuietButton({
   return (
     <button
       {...rest}
-      className={cn("text-[12px] text-ink-secondary transition-colors hover:text-ink", className)}
+      className={cn("text-small text-ink-secondary transition-colors hover:text-ink", className)}
     >
       {children}
     </button>

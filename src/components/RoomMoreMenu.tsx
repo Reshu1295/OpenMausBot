@@ -74,7 +74,7 @@ function useRoomMoreItems(group: Group): { items: SidebarMenuItem[]; on: boolean
       icon: <Copy size={16} />,
       disabled: !hasMessages,
       keepOpen: true,
-      trailing: copyStatus && <span role="status" className="text-[11px] text-ink-secondary">{t(copyStatus === "copied" ? "chat.export.copied" : "chat.export.copyFailed")}</span>,
+      trailing: copyStatus && <span role="status" className="text-caption text-ink-secondary">{t(copyStatus === "copied" ? "chat.export.copied" : "chat.export.copyFailed")}</span>,
       onSelect: () => { void copyTranscriptToClipboard(transcript()).then((ok) => setCopyStatus(ok ? "copied" : "failed")); },
     },
     {
@@ -111,7 +111,7 @@ function useRoomMoreItems(group: Group): { items: SidebarMenuItem[]; on: boolean
       label: t("chat.usage.menu"),
       icon: <Gauge size={16} />,
       keepOpen: true,
-      trailing: <span title={usage.title} data-testid="group-usage-chip" className="tabular-nums text-[12px] text-ink-secondary">{usage.short}</span>,
+      trailing: <span title={usage.title} data-testid="group-usage-chip" className="tabular-nums text-small text-ink-secondary">{usage.short}</span>,
       onSelect: () => {},
     } satisfies SidebarMenuItem] : []),
   ];
@@ -131,8 +131,8 @@ function RoundRoomMoreMenu({ group }: { group: Group }) {
           data-testid="room-more"
           className={cn(
             "flex size-8 items-center justify-center rounded-full bg-raised/50 transition-colors hover:bg-raised",
-            "max-md:size-9 max-md:border max-md:border-hairline max-md:bg-card",
-            open || on ? "text-accent" : "text-ink",
+            "max-md:size-9 max-md:border max-md:border-edge max-md:bg-card",
+            open || on ? "text-accent-text" : "text-ink",
           )}
         >
           <MoreHorizontal size={16} />

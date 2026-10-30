@@ -10,6 +10,9 @@ import { useWebPanels } from "@/lib/web-panel-preferences";
 import { isAppOrigin } from "@/lib/web-panels";
 import { useStore } from "@/state/store";
 
+import { Button } from "./ui/Button";
+import { IconButton } from "./ui/IconButton";
+
 const LOAD_TIMEOUT_MS = 10_000;
 
 export function WebPanelPage() {
@@ -35,30 +38,28 @@ export function WebPanelPage() {
 
   return (
     <main className="flex min-w-0 flex-1 flex-col bg-app" aria-label={panel.name}>
-      <header className="flex items-center gap-2 border-b border-hairline/40 px-4 py-2.5">
+      <header className="flex items-center gap-2 border-b border-hairline px-4 py-2.5">
         <Globe size={16} className="shrink-0 text-ink-secondary" />
-        <h1 className="min-w-0 flex-1 truncate text-[14px] font-semibold text-ink" title={panel.url}>{panel.name}</h1>
-        <button
-          type="button"
+        <h1 className="min-w-0 flex-1 truncate text-label font-semibold text-ink" title={panel.url}>{panel.name}</h1>
+        <IconButton
+          label={t("webPanels.page.reload")}
           className="ui-icon-button shrink-0"
-          aria-label={t("webPanels.page.reload")}
-          title={t("webPanels.page.reload")}
           onClick={() => setReloads((n) => n + 1)}
         >
           <RotateCw size={16} />
-        </button>
-        <button type="button" className="ui-button" onClick={openInBrowser}>
+        </IconButton>
+        <Button onClick={openInBrowser}>
           <ExternalLink size={14} />
           {t("webPanels.page.openInBrowser")}
-        </button>
+        </Button>
       </header>
       {status === "failed" || isAppOrigin(panel.url, window.location.origin) ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-3 p-6 text-center">
-          <p className="text-[14px] font-medium text-ink">{t("webPanels.page.cantEmbed")}</p>
-          <p className="max-w-sm text-[13px] text-ink-secondary">{t("webPanels.page.cantEmbedBody")}</p>
-          <button type="button" className="ui-button ui-button-primary" onClick={openInBrowser}>
+          <p className="text-label font-medium text-ink">{t("webPanels.page.cantEmbed")}</p>
+          <p className="max-w-sm text-ui text-ink-secondary">{t("webPanels.page.cantEmbedBody")}</p>
+          <Button variant="primary" onClick={openInBrowser}>
             {t("webPanels.page.openInBrowser")}
-          </button>
+          </Button>
         </div>
       ) : (
         <iframe

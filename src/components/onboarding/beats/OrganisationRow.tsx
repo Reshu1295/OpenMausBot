@@ -5,8 +5,9 @@ import { productName } from "@/lib/brand";
 import { t } from "@/lib/i18n";
 import { companyModelCount, DEFAULT_ADMIN_ORIGIN } from "@/lib/onboarding";
 import { staggerIndex } from "./shared";
+import { Button } from "../../ui/Button";
 
-const linkClass = "w-fit text-[12px] text-ink-secondary underline-offset-2 transition-colors hover:text-ink hover:underline";
+const linkClass = "w-fit text-small text-ink-secondary underline-offset-2 transition-colors hover:text-ink hover:underline";
 
 export function OrganisationRow({
   bridge,
@@ -86,7 +87,7 @@ export function OrganisationRow({
   if (connection.status === "signed-out") {
     body = (
       <>
-        <p className="text-[13px] leading-snug text-ink-secondary">
+        <p className="text-ui leading-snug text-ink-secondary">
           <span className="font-medium text-ink">{t("onboarding.org.title", { app: productName() })}</span>{" "}
           {t("onboarding.org.body")}
         </p>
@@ -96,21 +97,20 @@ export function OrganisationRow({
       </>
     );
     action = (
-      <button
-        type="button"
+      <Button variant="primary"
         disabled={busy}
         onClick={() => void perform(() => bridge.begin({ portalOrigin: DEFAULT_ADMIN_ORIGIN }))}
-        className="shrink-0 rounded-lg bg-accent px-3 py-1.5 text-[13px] font-medium text-white transition-[filter] hover:brightness-110 disabled:opacity-50"
+        className="shrink-0 transition-[filter]"
       >
         {busy ? t("organization.working") : t("onboarding.org.signIn")}
-      </button>
+      </Button>
     );
   } else if (connection.status === "connecting") {
     body = (
       <>
-        <p role="status" className="text-[13px] font-medium text-ink">{t("onboarding.org.finish")}</p>
+        <p role="status" className="text-ui font-medium text-ink">{t("onboarding.org.finish")}</p>
         {connection.enrollment && (
-          <p className="text-[12px] text-ink-secondary">
+          <p className="text-small text-ink-secondary">
             {t("onboarding.org.finishHelp")}{" "}
             <code dir="ltr" className="select-all rounded bg-inset px-1.5 py-0.5 tracking-widest text-ink">
               {connection.enrollment.userCode}
@@ -120,20 +120,19 @@ export function OrganisationRow({
       </>
     );
     action = (
-      <button
-        type="button"
+      <Button variant="ghost" size="md"
         disabled={busy}
         onClick={() => void perform(() => bridge.cancelEnrollment())}
-        className="shrink-0 rounded-md px-2 py-1 text-[12px] text-ink-secondary transition-colors hover:bg-raised hover:text-ink disabled:opacity-50"
+        className="shrink-0 text-small font-normal"
       >
         {t("organization.cancel")}
-      </button>
+      </Button>
     );
   } else if (connection.status === "connected") {
     body = (
       <>
-        <p className="truncate text-[13px] font-medium text-ink">{t("onboarding.org.connected", { organization: name ?? "" })}</p>
-        <p className="text-[12px] text-ink-secondary">
+        <p className="truncate text-ui font-medium text-ink">{t("onboarding.org.connected", { organization: name ?? "" })}</p>
+        <p className="text-small text-ink-secondary">
           {count > 0 ? t("onboarding.org.models", { count }) : t("organization.noModels")}
         </p>
       </>
@@ -142,7 +141,7 @@ export function OrganisationRow({
   } else {
     body = (
       <>
-        {name && <p className="truncate text-[13px] font-medium text-ink">{name}</p>}
+        {name && <p className="truncate text-ui font-medium text-ink">{name}</p>}
         <button type="button" onClick={onOpenSettings} className={linkClass}>
           {t("onboarding.org.manage")}
         </button>
@@ -152,16 +151,16 @@ export function OrganisationRow({
 
   return (
     <div
-      className="animate-rise mt-4 flex items-center gap-3 rounded-xl border border-hairline/40 bg-card px-3.5 py-3"
+      className="animate-rise mt-4 flex items-center gap-3 rounded-xl border border-hairline bg-card px-3.5 py-3"
       style={staggerIndex(1)}
     >
       <Building2 size={18} className="shrink-0 text-ink-secondary" aria-hidden="true" />
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         {body}
         {connection.message && (
-          <p role="status" className="text-[12px] text-ink-secondary">{connection.message}</p>
+          <p role="status" className="text-small text-ink-secondary">{connection.message}</p>
         )}
-        {failed && <p role="alert" className="text-[12px] text-danger">{t("organization.actionFailed")}</p>}
+        {failed && <p role="alert" className="text-small text-danger-text">{t("organization.actionFailed")}</p>}
       </div>
       {action}
     </div>

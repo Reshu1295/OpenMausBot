@@ -10,6 +10,7 @@ import { BotAvatar } from "./Avatar";
 import { VoiceSettings } from "./VoiceSettings";
 import { useBotSettingsDerived } from "./bot-settings/useBotSettingsDerived";
 import { openBotSettings } from "./bot-panel/panel-link";
+import { Button } from "./ui/Button";
 
 const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex="-1"])';
@@ -115,10 +116,10 @@ export function VoiceSetupDialog({
           <div className="flex min-w-0 items-center gap-3.5">
             <BotAvatar bot={bot} state={ready ? "happy" : "listening"} size={44} />
             <div className="min-w-0">
-              <h2 id={titleId} className="truncate text-[20px] font-semibold tracking-[-0.01em] text-ink">
+              <h2 id={titleId} className="truncate text-display font-semibold tracking-[-0.01em] text-ink">
                 {t("call.voiceSetup.title", { name: bot.name })}
               </h2>
-              <p id={subtitleId} className="mt-0.5 text-[13px] text-ink-secondary">
+              <p id={subtitleId} className="mt-0.5 text-ui text-ink-secondary">
                 {t("call.voiceSetup.subtitle")}
               </p>
             </div>
@@ -137,7 +138,7 @@ export function VoiceSetupDialog({
           {state.config?.tts ? (
             <VoiceSettings bot={bot} onPatch={patch} />
           ) : (
-            <div className="flex items-center justify-center gap-2 py-12 text-[13px] text-ink-secondary">
+            <div className="flex items-center justify-center gap-2 py-12 text-ui text-ink-secondary">
               <Loader2 size={14} className="animate-spin" aria-hidden="true" />
               {t("call.voiceSetup.loading")}
             </div>
@@ -149,28 +150,27 @@ export function VoiceSetupDialog({
           {ready && (
             <div className="mx-6 mb-4 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-2xl border border-success/30 bg-success/10 px-4 py-3 sm:mx-7">
               <CheckCircle2 size={17} className="shrink-0 text-success" aria-hidden="true" />
-              <span className="min-w-0 flex-1 text-[13px] font-medium text-ink">
+              <span className="min-w-0 flex-1 text-ui font-medium text-ink">
                 {t("call.voiceSetup.ready", { name: callName })}
               </span>
-              <button
-                type="button"
+              <Button variant="primary" size="lg"
                 data-voice-setup-start
                 onClick={onStartCall}
-                className="flex shrink-0 items-center gap-1.5 rounded-xl bg-accent px-3.5 py-2 text-[13px] font-medium text-accent-ink hover:brightness-110"
+                className="flex shrink-0 gap-1.5 rounded-xl"
               >
                 <Phone size={14} aria-hidden="true" />
                 {t("call.voiceSetup.startCall")}
-              </button>
+              </Button>
             </div>
           )}
         </div>
 
-        <footer className="flex items-center border-t border-hairline/30 px-6 py-3.5 sm:px-7">
+        <footer className="flex items-center border-t border-hairline px-6 py-3.5 sm:px-7">
           <button
             type="button"
             data-voice-setup-all-settings
             onClick={openAllSettings}
-            className="inline-flex items-center gap-1 rounded-md text-[13px] font-medium text-accent-text underline-offset-2 hover:underline"
+            className="inline-flex items-center gap-1 rounded-md text-ui font-medium text-accent-text underline-offset-2 hover:underline"
           >
             {t("call.voiceSetup.allSettings")}
             <ChevronRight size={14} aria-hidden="true" />

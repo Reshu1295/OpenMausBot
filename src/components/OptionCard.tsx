@@ -6,6 +6,7 @@ import { t } from "@/lib/i18n";
 import { isPersistentQuestionCard, parseChoices } from "../../shared/ask-question";
 import { ASK_QUIET_BUTTON, AskCard, AskChoices, AskReply, AskSettledLine, returnFocusToComposer, settledAnswer } from "./AskCard";
 import { ExpandableText } from "./ExpandableText";
+import { IconButton } from "./ui/IconButton";
 
 const MAX_CHOICES = 6;
 
@@ -68,9 +69,9 @@ export function OptionCard({
         ariaLabel={card.title}
         tone={picked === undefined ? "closed" : "done"}
         action={dismiss && (
-          <button type="button" onClick={dismiss} aria-label={t("onboarding.card.dismiss")} title={t("onboarding.card.dismiss")} className={cn(ASK_QUIET_BUTTON, "w-7 px-0")}>
+          <IconButton label={t("onboarding.card.dismiss")} onClick={dismiss} className={cn(ASK_QUIET_BUTTON, "w-7 px-0")}>
             <X size={14} />
-          </button>
+          </IconButton>
         )}
       >
         {closed ? t("question.status.closed") : picked ? settledAnswer(picked, options) : <span>{card.title} · {t("question.status.answered")}</span>}
@@ -82,7 +83,7 @@ export function OptionCard({
     <AskCard
       ariaLabel={card.title}
       title={card.title}
-      explanation={card.subtitle ? <ExpandableText text={card.subtitle} className="text-[14px] leading-5 text-ink-secondary" /> : undefined}
+      explanation={card.subtitle ? <ExpandableText text={card.subtitle} className="text-label leading-5 text-ink-secondary" /> : undefined}
       onDismiss={dismiss}
       dismissLabel={t("onboarding.card.dismiss")}
     >

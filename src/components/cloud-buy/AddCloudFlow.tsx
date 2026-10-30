@@ -14,7 +14,8 @@ import { t } from "@/lib/i18n";
 import { placeInitials } from "@/lib/places";
 import { SwatchRadios } from "../SwatchRadios";
 import { ChooseScreen } from "./ChooseScreen";
-import { BackLink, Checklist, FIELD, Heading, PRIMARY_WIDE, ProgressBar } from "./parts";
+import { BackLink, Checklist, FIELD, Heading, ProgressBar } from "./parts";
+import { Button } from "../ui/Button";
 
 const POLL_MS = 3_000;
 const STOP_LINE: Record<Exclude<AddCloudStop, "one">, Parameters<typeof t>[0]> = {
@@ -29,25 +30,25 @@ function NameScreen({ plan, name, color, busy, suggested, onName, onColor, onBac
   return <form data-cloud-add="extra-name" className="flex flex-col gap-4 px-[30px] pb-[26px] pt-7" onSubmit={(event) => { event.preventDefault(); onContinue(); }}>
     <div><BackLink label={t("cloudBuy.back")} onClick={onBack} /></div>
     <Heading title={t("cloudBuy.extra.nameTitle")} sub={t("cloudBuy.extra.nameSub")} />
-    <label className="flex flex-col gap-1.5 text-[13px] font-medium text-ink">{t("cloudBuy.setup.name")}
+    <label className="flex flex-col gap-1.5 text-ui font-medium text-ink">{t("cloudBuy.setup.name")}
       <input data-autofocus value={name} maxLength={CLOUD_LIST_NAME_LIMIT} placeholder={suggested} disabled={busy} onChange={(event) => onName(event.target.value)} className={FIELD} />
     </label>
     <div className="flex flex-col gap-1.5">
-      <span aria-hidden="true" className="text-[13px] font-medium text-ink">{t("cloudBuy.setup.color")}</span>
+      <span aria-hidden="true" className="text-ui font-medium text-ink">{t("cloudBuy.setup.color")}</span>
       <SwatchRadios value={color} onChange={onColor} label={t("cloudBuy.setup.color")} disabled={busy} />
     </div>
-    <div className="flex items-center gap-3 rounded-xl border border-hairline/70 bg-card/70 px-4 py-3">
-      <span aria-hidden="true" className={cn("grid size-10 shrink-0 place-items-center rounded-full text-[14px] font-semibold", color === "slate" ? "bg-raised text-ink" : "text-white")}
+    <div className="flex items-center gap-3 rounded-xl border border-edge bg-card/70 px-4 py-3">
+      <span aria-hidden="true" className={cn("grid size-10 shrink-0 place-items-center rounded-full text-label font-semibold", color === "slate" ? "bg-raised text-ink" : "text-white")}
         style={color === "slate" ? undefined : { background: swatchFill(color) }}>{placeInitials(shown)}</span>
       <span className="min-w-0">
-        <span className="block truncate text-[14px] font-semibold text-ink">{shown}</span>
-        <span className="block text-[13px] text-ink-secondary">{t("cloudBuy.pay.planPaid", { plan: offerPlanLabel(plan), price: usd(plan.amount / 100) })}</span>
+        <span className="block truncate text-label font-semibold text-ink">{shown}</span>
+        <span className="block text-ui text-ink-secondary">{t("cloudBuy.pay.planPaid", { plan: offerPlanLabel(plan), price: usd(plan.amount / 100) })}</span>
       </span>
     </div>
-    <p className="text-[13px] leading-relaxed text-ink-secondary">{t("cloudBuy.card.paid", { price: usd(plan.amount / 100) })}</p>
-    <button type="submit" className={PRIMARY_WIDE} disabled={busy}>
+    <p className="text-ui leading-relaxed text-ink-secondary">{t("cloudBuy.card.paid", { price: usd(plan.amount / 100) })}</p>
+    <Button variant="primary" pill size="lg" type="submit" className="w-full" disabled={busy}>
       {busy && <Loader2 size={15} className="animate-spin motion-reduce:animate-none" aria-hidden="true" />}{t("cloudBuy.extra.continue")}
-    </button>
+    </Button>
   </form>;
 }
 
@@ -57,14 +58,14 @@ function Stop({ reason, home, busy, interest, onInterest, onClose }: {
   return <div data-cloud-add={`extra-${reason}`} className="flex flex-col gap-4 px-[30px] pb-[26px] pt-7">
     {reason === "one"
       ? <Heading title={t("cloudBuy.one.title")} sub={t("cloudBuy.one.sub", { name: home ?? t("cloudSetup.myCloud") })} />
-      : <><Heading title={t("cloudAdd.title")} /><p role="status" className="text-[14px] leading-relaxed text-ink">{t(STOP_LINE[reason])}</p></>}
+      : <><Heading title={t("cloudAdd.title")} /><p role="status" className="text-label leading-relaxed text-ink">{t(STOP_LINE[reason])}</p></>}
     <div className="flex flex-wrap items-center justify-end gap-2">
-      {reason === "one" && interest !== "sent" && <button type="button" className="ui-button" disabled={busy} onClick={onInterest}>{t("cloudBuy.one.email")}</button>}
-      <button type="button" data-autofocus className="ui-button ui-button-primary" onClick={onClose}>{t("cloudAdd.close")}</button>
+      {reason === "one" && interest !== "sent" && <Button disabled={busy} onClick={onInterest}>{t("cloudBuy.one.email")}</Button>}
+      <Button variant="primary" data-autofocus onClick={onClose}>{t("cloudAdd.close")}</Button>
     </div>
-    <div aria-live="polite" className="text-[13px] empty:-mt-4">
+    <div aria-live="polite" className="text-ui empty:-mt-4">
       {interest === "sent" && <p className="text-ink-secondary">{t("cloudBuy.one.thanks")}</p>}
-      {interest === "failed" && <p role="alert" className="text-danger">{t("cloudBuy.one.failed")}</p>}
+      {interest === "failed" && <p role="alert" className="text-danger-text">{t("cloudBuy.one.failed")}</p>}
     </div>
   </div>;
 }
@@ -128,14 +129,14 @@ export function AddCloudFlow({ onClose, onFirstCloud, onWide = () => {}, onBack 
     switch (screen.kind) {
       case "checking": case "first": return <div data-cloud-add="extra-checking" className="flex flex-col gap-4 px-[30px] pb-[26px] pt-7">
         <Heading title={t("cloudAdd.title")} />
-        <p role="status" className="flex items-center gap-2 text-[13px] text-ink-secondary"><Loader2 size={14} className="animate-spin motion-reduce:animate-none" aria-hidden="true" />{t("cloudAdd.checking")}</p>
+        <p role="status" className="flex items-center gap-2 text-ui text-ink-secondary"><Loader2 size={14} className="animate-spin motion-reduce:animate-none" aria-hidden="true" />{t("cloudAdd.checking")}</p>
       </div>;
       case "unreachable": case "error": return <div data-cloud-add={`extra-${screen.kind}`} className="flex flex-col gap-4 px-[30px] pb-[26px] pt-7">
         <Heading title={t("cloudAdd.title")} />
-        <p role="alert" className="text-[14px] leading-relaxed text-ink">{t(screen.kind === "error" ? "cloudAdd.failed" : "cloudAdd.unreachable")}</p>
+        <p role="alert" className="text-label leading-relaxed text-ink">{t(screen.kind === "error" ? "cloudAdd.failed" : "cloudAdd.unreachable")}</p>
         <div className="flex flex-wrap items-center justify-end gap-2">
-          <button type="button" className="ui-button" onClick={onClose}>{t("cloudAdd.close")}</button>
-          <button type="button" data-autofocus className="ui-button ui-button-primary" onClick={() => { setFailed(false); setView(undefined); void read(); }}>{t("cloudAdd.tryAgain")}</button>
+          <Button onClick={onClose}>{t("cloudAdd.close")}</Button>
+          <Button variant="primary" data-autofocus onClick={() => { setFailed(false); setView(undefined); void read(); }}>{t("cloudAdd.tryAgain")}</Button>
         </div>
       </div>;
       case "stop": return <Stop reason={screen.reason} home={screen.home} busy={busy} interest={interest} onClose={onClose}
@@ -157,30 +158,30 @@ export function AddCloudFlow({ onClose, onFirstCloud, onWide = () => {}, onBack 
           <button type="button" data-autofocus className={screen.late ? "ui-button ui-button-primary" : "ui-button"} disabled={busy}
             onClick={() => act(async () => { if (!(await bridge?.reopen())) setNote("pay-failed"); }, () => setNote("pay-failed"))}>
             <ExternalLink size={14} aria-hidden="true" />{t("cloudAdd.reopenCheckout")}</button>
-          <button type="button" className="ui-button" disabled={busy}
+          <Button disabled={busy}
             onClick={() => act(async () => setNote((await bridge?.copyLink()) ? "copied" : "pay-failed"), () => setNote("pay-failed"))}>
-            <Copy size={14} aria-hidden="true" />{t("cloudBuy.pay.copy")}</button>
+            <Copy size={14} aria-hidden="true" />{t("cloudBuy.pay.copy")}</Button>
         </div>}
-        <div aria-live="polite" className="text-[13px] empty:-mt-4">
+        <div aria-live="polite" className="text-ui empty:-mt-4">
           {note === "copied" && <p className="text-ink-secondary">{t("cloudBuy.pay.copied")}</p>}
-          {note === "pay-failed" && <p role="alert" className="text-danger">{t("cloudBuy.pay.failed")}</p>}
+          {note === "pay-failed" && <p role="alert" className="text-danger-text">{t("cloudBuy.pay.failed")}</p>}
         </div>
       </div>;
       case "starting": return <div data-cloud-add="extra-starting" className="flex flex-col gap-4 px-[30px] pb-[26px] pt-7">
         <Heading title={t("cloudBuy.extra.setupTitle", { name: screen.adding.name })} sub={t("cloudBuy.extra.setupSub")} />
         <ProgressBar value={screen.adding.progress ?? 0} label={t("cloudBuy.setup.progress")} />
-        <div className="flex justify-end"><button type="button" data-autofocus className="ui-button" onClick={onClose}>{t("cloudAdd.close")}</button></div>
+        <div className="flex justify-end"><Button data-autofocus onClick={onClose}>{t("cloudAdd.close")}</Button></div>
       </div>;
       case "ready": return <div data-cloud-add="extra-ready" className="flex flex-col gap-4 px-[30px] pb-[26px] pt-7">
         <Heading title={t("cloudBuy.ready.title", { name: screen.adding.name })} sub={t("cloudBuy.extra.readySub")} />
-        <button type="button" data-autofocus className={PRIMARY_WIDE} disabled={busy}
-          onClick={() => act(async () => { await bridge?.open(); onClose(); }, () => setNote("open-failed"))}>{t("cloudBuy.setup.open", { name: screen.adding.name })}</button>
-        {note === "open-failed" && <p role="alert" className="text-[13px] text-danger">{t("cloudBuy.openFailed", { name: screen.adding.name })}</p>}
+        <Button variant="primary" pill size="lg" data-autofocus className="w-full" disabled={busy}
+          onClick={() => act(async () => { await bridge?.open(); onClose(); }, () => setNote("open-failed"))}>{t("cloudBuy.setup.open", { name: screen.adding.name })}</Button>
+        {note === "open-failed" && <p role="alert" className="text-ui text-danger-text">{t("cloudBuy.openFailed", { name: screen.adding.name })}</p>}
       </div>;
       case "problem": return <div data-cloud-add="extra-problem" className="flex flex-col gap-4 px-[30px] pb-[26px] pt-7">
         <Heading title={t("cloudAdd.title")} />
-        <p role="alert" className="text-[14px] leading-relaxed text-ink">{t("cloudBuy.extra.problem", { name: screen.adding.name })}</p>
-        <div className="flex justify-end"><button type="button" data-autofocus className="ui-button ui-button-primary" onClick={onClose}>{t("cloudAdd.close")}</button></div>
+        <p role="alert" className="text-label leading-relaxed text-ink">{t("cloudBuy.extra.problem", { name: screen.adding.name })}</p>
+        <div className="flex justify-end"><Button variant="primary" data-autofocus onClick={onClose}>{t("cloudAdd.close")}</Button></div>
       </div>;
     }
   })();

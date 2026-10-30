@@ -16,7 +16,7 @@ const ICONS: Record<Exclude<TraceToolIcon, "app">, LucideIcon> = {
   data: Database, mcp: Plug, tool: Wrench,
 };
 
-const BOX = "flex size-6 shrink-0 items-center justify-center rounded-md border border-hairline/50 bg-raised";
+const BOX = "flex size-6 shrink-0 items-center justify-center rounded-md border border-hairline bg-raised";
 
 let cards: ReadonlyMap<string, ToolkitCard> | null = null;
 
@@ -52,7 +52,7 @@ export function ToolIcon({ icon, app, catalog, error = false }: { icon: TraceToo
   const Icon = icon === "app" ? Blocks : ICONS[icon];
   return (
     <span className={BOX} aria-hidden>
-      <Icon size={13} className={error ? "text-danger" : icon === "browser" || icon === "web" ? "text-accent" : "trace-tool-ink"} />
+      <Icon size={13} className={error ? "text-danger-text" : icon === "browser" || icon === "web" ? "text-accent-text" : "trace-tool-ink"} />
     </span>
   );
 }
@@ -74,7 +74,7 @@ export function TurnAvatar({ bot, name }: { bot: Bot | undefined; name: string }
     );
   }
   return (
-    <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-raised text-[11px] font-semibold text-ink-secondary" aria-hidden>
+    <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-raised text-caption font-semibold text-ink-secondary" aria-hidden>
       {(name || "?").slice(0, 1).toUpperCase()}
     </span>
   );

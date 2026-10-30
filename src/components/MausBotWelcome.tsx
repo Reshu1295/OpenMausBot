@@ -12,11 +12,13 @@ import { firstReplyPending } from "@/lib/corner-popup";
 import { launchDialogShown, markLaunchDialog } from "@/lib/launch-dialogs";
 import { welcomeDue, welcomeFinishedThisLaunch, type WelcomeViewer } from "@/lib/onboarding";
 import { useStore, type Bot } from "@/state/store";
+import { useModalDialog } from "@/hooks/use-modal-dialog";
 import { BOT_PROFILE_LIMITS } from "../../shared/bot-profile";
 import { BotAvatar } from "./Avatar";
 import { useAvatarImage } from "./avatar-editing";
 import { MausBotCustomize } from "./MausBotCustomize";
 import { usePrefersReducedMotion } from "./mascot-clock";
+import { Button } from "./ui/Button";
 
 const LOOK = ["name", "color", "mascotBody", "avatarUrl", "avatarCrop", "avatarZoom", "avatarFocusX", "avatarFocusY"] as const;
 export type WelcomeDraft = Pick<Bot, (typeof LOOK)[number]>;
@@ -99,7 +101,6 @@ export function MausBotWelcomeCard({ bot, onClose }: { bot: Bot; onClose: () => 
   const preview: Bot = { ...bot, ...draft, name };
   const edit = (patch: Partial<WelcomeDraft>) => setDraft((current) => ({ ...current, ...patch }));
   const image = useAvatarImage(preview, edit);
-  useEffect(() => { dialogRef.current?.focus(); }, []);
   useEffect(() => { if (editing) nameRef.current?.focus(); }, [editing]);
 
   const recede = () => {
@@ -128,6 +129,11 @@ export function MausBotWelcomeCard({ bot, onClose }: { bot: Bot; onClose: () => 
     onClose();
   };
 
+  // Escape inside the open picture editor closes only the editor.
+  useModalDialog(dialogRef, () => {
+    if (editing && panelRef.current?.contains(document.activeElement)) { setEditing(false); pictureRef.current?.focus(); } else dismiss();
+  });
+
   const drop = (event: DragEvent) => {
     const file = event.dataTransfer.files?.[0];
     if (!file) return;
@@ -145,12 +151,7 @@ export function MausBotWelcomeCard({ bot, onClose }: { bot: Bot; onClose: () => 
         aria-labelledby="mausbot-welcome-title"
         tabIndex={-1}
         style={{ outline: "none" }}
-        onKeyDown={(event) => {
-          if (event.key !== "Escape") return;
-          event.preventDefault();
-          if (editing && panelRef.current?.contains(event.target as Node)) { setEditing(false); pictureRef.current?.focus(); } else dismiss();
-        }}
-        className={cn("animate-pop-in w-full max-w-[460px] rounded-2xl px-6 pb-5 pt-5", advanced ? "border border-hairline/50 bg-panel shadow-2xl" : "ui-modal border-0")}
+        className={cn("animate-pop-in w-full max-w-[460px] rounded-2xl px-6 pb-5 pt-5", advanced ? "border border-hairline bg-panel shadow-2xl" : "ui-modal border-0")}
       >
         <div className="flex flex-col items-center text-center">
           <button
@@ -166,15 +167,15 @@ export function MausBotWelcomeCard({ bot, onClose }: { bot: Bot; onClose: () => 
             className="group relative rounded-full p-1 transition-transform duration-200 ease-out hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
           >
             <span className="pointer-events-none absolute inset-1 rounded-full ring-0 ring-accent/35 transition-[box-shadow] duration-200 group-hover:ring-2 group-focus-visible:ring-2" aria-hidden="true" />
-            <span ref={avatarRef} data-mausbot-welcome-avatar="" className="block drop-shadow-[0_10px_24px_rgba(0,0,0,0.22)]">
+            <span ref={avatarRef} data-mausbot-welcome-avatar="" className="block drop-shadow-[0_10px_24px_color-mix(in_srgb,var(--color-shadow)_22%,transparent)]">
               <BotAvatar bot={preview} size={96} label={name} motion="arrive" />
             </span>
-            <span aria-hidden="true" className="absolute bottom-2 right-2 flex size-7 items-center justify-center rounded-full border border-hairline/60 bg-panel text-ink-secondary shadow-sm transition-colors group-hover:text-ink">
+            <span aria-hidden="true" className="absolute bottom-2 right-2 flex size-7 items-center justify-center rounded-full border border-hairline bg-panel text-ink-secondary shadow-sm transition-colors group-hover:text-ink">
               <Pencil size={13} />
             </span>
           </button>
-          <h2 id="mausbot-welcome-title" className={cn("mt-3 text-ink", advanced ? "text-[20px] font-semibold" : "text-[17px] font-medium leading-6 tracking-[-0.008em]")}>{t("mausbotWelcome.title", { name })}</h2>
-          <ul className="mt-3 space-y-1.5 text-left text-[14px] leading-snug text-ink-secondary">
+          <h2 id="mausbot-welcome-title" className={cn("mt-3 text-ink", advanced ? "text-display font-semibold" : "text-title font-medium leading-6 tracking-[-0.008em]")}>{t("mausbotWelcome.title", { name })}</h2>
+          <ul className="mt-3 space-y-1.5 text-left text-label leading-snug text-ink-secondary">
             {([[Sparkles, "mausbotWelcome.line.helper"], [BookOpen, "mausbotWelcome.line.knows"], [Wand2, "mausbotWelcome.line.setup"], [Crown, "mausbotWelcome.line.powers"]] as const).map(([Icon, key]) => (
               <li key={key} className="flex items-start gap-2.5"><Icon size={15} className="mt-0.5 shrink-0 text-ink-tertiary" aria-hidden="true" />{t(key)}</li>
             ))}
@@ -198,14 +199,14 @@ export function MausBotWelcomeCard({ bot, onClose }: { bot: Bot; onClose: () => 
         </div>
 
         <div className={cn("mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:items-center", advanced ? "sm:justify-between" : "sm:justify-end")}>
-          <button type="button" data-mausbot-welcome-later="" onClick={() => choose(false)} title={t("mausbotWelcome.notNowHint", { name })}
-            className={advanced ? "rounded-full px-3 py-2 text-[13px] text-ink-secondary hover:bg-raised-hover hover:text-ink" : "ui-button ui-button-pill"}>
+          <Button variant={advanced ? "ghost" : "secondary"} size={advanced ? "lg" : undefined} pill={!advanced} data-mausbot-welcome-later="" onClick={() => choose(false)} title={t("mausbotWelcome.notNowHint", { name })}
+            className={advanced ? "rounded-full px-3 font-normal" : undefined}>
             {t("mausbotWelcome.notNow")}
-          </button>
-          <button type="button" data-mausbot-welcome-add="" onClick={() => choose(true)}
-            className={advanced ? "rounded-full bg-accent px-5 py-2.5 text-[14px] font-medium text-accent-ink hover:brightness-110" : "ui-button ui-button-pill ui-button-primary"}>
+          </Button>
+          <Button variant="primary" pill data-mausbot-welcome-add="" onClick={() => choose(true)}
+            className={advanced ? "min-h-10 px-5 font-medium" : undefined}>
             {t("mausbotWelcome.add", { name })}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

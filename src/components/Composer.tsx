@@ -89,8 +89,9 @@ import {
   type ComposerSlashCommand,
 } from "@/lib/composer-commands";
 import { useSlashSkills } from "@/lib/use-slash-skills";
+import { IconButton } from "./ui/IconButton";
 
-const SIMPLE_COMPOSER = "bg-composer p-2 ring-[0.5px] ring-ink/10 hover:ring-ink/[0.22] focus-within:ring-ink/[0.22] shadow-[0_2px_8px_-1px_rgb(0_0_0/0.05),0_1px_2px_rgb(0_0_0/0.03),0_0_0_1px_rgb(228_228_228/0.04)] [transition:border-radius_300ms,box-shadow_150ms]";
+const SIMPLE_COMPOSER = "bg-composer p-2 ring-[0.5px] ring-ink/10 hover:ring-ink/[0.22] focus-within:ring-ink/[0.22] shadow-[0_2px_8px_-1px_color-mix(in_srgb,var(--color-shadow)_5%,transparent),0_1px_2px_color-mix(in_srgb,var(--color-shadow)_3%,transparent),0_0_0_1px_rgb(228_228_228/0.04)] [transition:border-radius_300ms,box-shadow_150ms]";
 
 const supportsAgents = (instances: InstanceInfo[], candidate?: Bot) =>
   Boolean(candidate && instances.find((instance) => instance.instanceId === candidate.modelSelection.instanceId)?.capabilities?.agentsMcp);
@@ -711,7 +712,7 @@ export function Composer({
   return (
     <div className={cn("pointer-events-none relative px-5", simpleDock ? "pb-4" : "pb-3")}>
       {speechError && (
-        <div className="pointer-events-auto mb-2 w-full rounded-lg border border-warning/30 bg-warning/10 px-3 py-2 text-[12px] text-warning">
+        <div className="pointer-events-auto mb-2 w-full rounded-lg border border-warning/30 bg-warning/10 px-3 py-2 text-small text-warning-text">
           {speechError}
         </div>
       )}
@@ -719,7 +720,7 @@ export function Composer({
         {failedSends.map((failed) => (
           <div
             key={failed.id}
-            className="mb-2 flex items-center gap-2 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-[13px] text-danger"
+            className="mb-2 flex items-center gap-2 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-ui text-danger-text"
           >
             <span className="min-w-0 flex-1 truncate">
               {t("composer.failed.notSent", {
@@ -733,15 +734,12 @@ export function Composer({
             >
               {t("chat.retry")}
             </button>
-            <button
-              type="button"
+            <IconButton label={t("composer.failed.dismissAria")} tooltip={t("composer.failed.dismiss")}
               onClick={() => forgetFailedComposerSend(draftId, failed.id)}
-              aria-label={t("composer.failed.dismissAria")}
-              title={t("composer.failed.dismiss")}
               className="flex size-5 shrink-0 items-center justify-center rounded hover:bg-danger/10"
             >
               <X size={13} strokeWidth={2.5} />
-            </button>
+            </IconButton>
           </div>
         ))}
         <SlashCommandMenu listRef={commandListRef} motion={commandMotion} commands={commandCandidates} highlight={highlight}
@@ -830,15 +828,12 @@ export function Composer({
           {!locked && !singleRow && (
             <div className={cn("flex items-center gap-1", simpleDock ? "shrink-0" : "flex-wrap")}>
               {simpleDock && <ComposerPlusMenu onAttach={() => fileInput.current?.click()} goal={goal} teach={canLearn ? teachTask : undefined} />}
-              {advanced && <button
-                type="button"
+              {advanced && <IconButton label={t("composer.attach")}
                 onClick={() => fileInput.current?.click()}
-                aria-label={t("composer.attach")}
-                title={t("composer.attach")}
                 className="flex size-8 shrink-0 items-center justify-center rounded-full text-ink-secondary hover:bg-control hover:text-ink"
               >
                 <Paperclip size={16} strokeWidth={1.75} absoluteStrokeWidth />
-              </button>}
+              </IconButton>}
               {/* Simple mode shows a mode's chip only while it is on, so a choice made in the + menu or the bot panel stays in view. */}
               {goal && (advanced || goal.on) && <GoalToggle {...goal} compact={simpleDock} />}
               {advanced && approvalChoice && <ApprovalModeSelector {...approvalChoice} />}
@@ -950,15 +945,14 @@ export function Composer({
           aria-label={t("composer.placeholder.bot", { name: group ? group.name : (bot?.name ?? "") })}
             className={cn(
               "block max-h-[9rem] w-full resize-none overflow-y-auto bg-transparent placeholder:text-ink-tertiary focus:outline-none",
-              !simpleDock && "px-1 text-[15px]",
-              simpleDock ? "min-h-7 px-0.5 py-1 text-[14px] leading-5" : "min-h-6 py-1 leading-6",
+              !simpleDock && "px-1 text-body",
+              simpleDock ? "min-h-7 px-0.5 py-1 text-label leading-5" : "min-h-6 py-1 leading-6",
             )}
           />
           <div data-composer-actions className={cn("flex items-center", simpleDock ? "gap-2" : "gap-1", !singleRow && !simpleDock && "@max-[30rem]/composer:ml-auto")}>
           {(simpleDock ? stoppable : busy) && !locked && (
-          <button
+          <IconButton label={t("chat.stopTurn")} tooltip={t("chat.stop")}
             onClick={interruptTurn}
-            aria-label={t("chat.stopTurn")}
             data-composer-stop={simpleDock ? (stopInSlot ? "slot" : "beside") : undefined}
             className={cn(
               "flex shrink-0 items-center justify-center rounded-full",
@@ -967,35 +961,30 @@ export function Composer({
                 : SIMPLE_CONTROL,
             )}
             style={stopInSlot ? slot.button.style : undefined}
-            title={t("chat.stop")}
           >
             <Square size={simpleDock ? 10 : 14} className="fill-current" />
-          </button>
+          </IconButton>
         )}
         {!locked && !busy && capabilities.dictation.available && (
-          <button
+          <IconButton label={recording ? t("composer.dictation.stop") : t("composer.dictation.start")} tooltip={recording ? t("composer.dictation.stopHint") : t("composer.dictation.hint")}
             onClick={toggleMic}
-            aria-label={recording ? t("composer.dictation.stop") : t("composer.dictation.start")}
             className={cn(
               "flex shrink-0 items-center justify-center rounded-full",
               simpleDock ? "size-7" : "size-8",
               recording
-                ? "animate-pulse bg-danger/20 text-danger"
+                ? "animate-pulse bg-danger/20 text-danger-text"
                 : advanced || singleRow ? "text-ink-secondary hover:bg-raised hover:text-ink" : SIMPLE_CONTROL,
             )}
-            title={recording ? t("composer.dictation.stopHint") : t("composer.dictation.hint")}
           >
             <Mic size={16} strokeWidth={1.75} absoluteStrokeWidth className="[&_rect]:fill-current" />
-          </button>
+          </IconButton>
         )}
         {callShown && bot && !group && <CallButton bot={bot} placement="composer" fill={advanced || singleRow ? undefined : slot.fill} ink={slot.ink} inverse={singleRow} />}
         {callShown && group && !advanced && <GroupCallButton group={group} members={members ?? []} placement="composer" fill={slot.fill} ink={slot.ink} />}
         {hasContent && !locked && (
-          <button
+          <IconButton label={sendNames.label} tooltip={sendNames.title}
             onClick={send}
             disabled={attachmentPending}
-            aria-label={sendNames.label}
-            title={sendNames.title}
             style={busy && !canSteer ? undefined : slot.button.style}
             className={cn(
               "flex shrink-0 items-center justify-center rounded-full disabled:cursor-default",
@@ -1004,7 +993,7 @@ export function Composer({
             )}
           >
             {busy && !canSteer ? <Clock size={simpleDock ? 14 : 15} /> : <ArrowUp size={16} strokeWidth={1.75} absoluteStrokeWidth />}
-          </button>
+          </IconButton>
           )}
           </div>
         </div>

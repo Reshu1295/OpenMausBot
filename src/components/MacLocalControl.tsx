@@ -4,6 +4,7 @@ import { useDesktopCapabilities } from "./DesktopCapabilities";
 import { macCuaPermissionMessage, missingMacCuaPermissions } from "@/lib/mac-cua-permissions";
 import { MacCuaRecoveryActions } from "./MacCuaRecoveryActions";
 import { t } from "@/lib/i18n";
+import { Button } from "./ui/Button";
 
 export function MacLocalControl() {
   const { capabilities } = useDesktopCapabilities();
@@ -61,15 +62,15 @@ export function MacLocalControl() {
   return (
     <section className="mt-4 rounded-xl border border-warning/25 bg-warning/10 p-4">
       <div className="flex items-start gap-3">
-        <Shield size={16} className="mt-0.5 shrink-0 text-warning" />
+        <Shield size={16} className="mt-0.5 shrink-0 text-warning-text" />
         <div className="min-w-0 flex-1">
-          <div className="text-[14px] font-medium text-ink">Allow control of this computer</div>
-          <p className="mt-1 text-[13px] leading-relaxed text-ink-secondary">
+          <div className="text-label font-medium text-ink">Allow control of this computer</div>
+          <p className="mt-1 text-ui leading-relaxed text-ink-secondary">
             {permissionMessage ?? t("computer.mac.permission.generic")}
           </p>
-          {reason && <details className="mt-2 text-[12px] text-ink-secondary"><summary className="cursor-pointer">{t("computer.mac.permission.driverDetail")}</summary><p className="mt-1 break-words">{reason}</p></details>}
+          {reason && <details className="mt-2 text-small text-ink-secondary"><summary className="cursor-pointer">{t("computer.mac.permission.driverDetail")}</summary><p className="mt-1 break-words">{reason}</p></details>}
           {error && (
-            <div className="mt-2 flex gap-1.5 text-[12px] text-danger">
+            <div className="mt-2 flex gap-1.5 text-small text-danger-text">
               <AlertTriangle size={13} className="mt-0.5 shrink-0" />
               <span>{error}</span>
             </div>
@@ -77,20 +78,19 @@ export function MacLocalControl() {
           <div className="mt-3 flex flex-wrap gap-2">
             {permissionMessage && reason && <MacCuaRecoveryActions reason={reason} />}
             {!permissionMessage && (
-              <button
-                type="button"
+              <Button variant="primary"
                 onClick={() => void openSettings()}
                 disabled={pending}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-accent px-3 py-1.5 text-[13px] font-medium text-white hover:brightness-110 disabled:opacity-50"
+                className="gap-1.5"
               >
                 Open System Settings
-              </button>
+              </Button>
             )}
             <button
               type="button"
               onClick={() => void retry()}
               disabled={pending}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-hairline/50 px-3 py-1.5 text-[13px] font-medium text-ink hover:bg-raised disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-hairline px-3 py-1.5 text-ui font-medium text-ink hover:bg-raised disabled:opacity-50"
             >
               {pending && <Loader2 size={13} className="animate-spin" />}
               Retry

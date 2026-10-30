@@ -15,6 +15,7 @@ import { AvatarImageGenerator } from "../AvatarImageGenerator";
 import { AvatarFraming, OrganizationAvatarIcons, RESET_MASCOT_PATCH, useAvatarImage, type AvatarPatch } from "../avatar-editing";
 import { Segmented } from "./rows";
 import { MascotFaceColorPicker } from "../MascotFaceColorPicker";
+import { IconButton } from "../ui/IconButton";
 
 export type AvatarEditorTab = "bot" | "generate" | "upload";
 
@@ -71,13 +72,10 @@ export function AvatarEditorCard({ bot, activeState, onPatch, onClose }: {
   const [moreLooks, setMoreLooks] = useState(() => dressed || isHalloweenBody(body) || Boolean(bot.mascotExpression && bot.mascotExpression !== "idle"));
   const dressedAs = costume !== body && isHalloweenBody(costume) ? HALLOWEEN_BODIES[costume].name : null;
   const bodyButton = (id: BotBodyId, name: string) => (
-    <button
+    <IconButton label={`Use the ${name} body`} tooltip={name}
       key={id}
-      type="button"
       disabled={busy}
       aria-pressed={!showsImage && body === id}
-      aria-label={`Use the ${name} body`}
-      title={name}
       onClick={() => pickMascot({ mascotBody: id })}
       className={cn(
         "flex h-[58px] items-center justify-center rounded-xl disabled:opacity-50",
@@ -85,7 +83,7 @@ export function AvatarEditorCard({ bot, activeState, onPatch, onClose }: {
       )}
     >
       <MausAvatar color={bot.color} faceColor={bot.mascotFaceColor} bodyId={id} size={40} animated={false} trackPointer={false} />
-    </button>
+    </IconButton>
   );
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -101,7 +99,7 @@ export function AvatarEditorCard({ bot, activeState, onPatch, onClose }: {
       aria-label={t("botPanel.avatar.edit")}
       data-panel-avatar-editor
       onKeyDown={onKeyDown}
-      className="popover-surface absolute inset-x-[-5px] top-[80px] z-30 overflow-hidden rounded-2xl border border-ink/[0.08] bg-menu text-left shadow-2xl shadow-black/50"
+      className="popover-surface absolute inset-x-[-5px] top-[80px] z-30 overflow-hidden rounded-2xl border border-ink/[0.08] bg-menu text-left shadow-2xl shadow-shadow/50"
     >
       <div ref={tabsRef} className="flex items-center gap-0.5 border-b border-ink/[0.06] p-2">
         {TABS.map(([id, label]) => (
@@ -113,7 +111,7 @@ export function AvatarEditorCard({ bot, activeState, onPatch, onClose }: {
             data-avatar-tab={id}
             onClick={() => setTab(id)}
             className={cn(
-              "rounded-lg px-[11px] py-[5px] text-[13px]",
+              "rounded-lg px-[11px] py-[5px] text-ui",
               tab === id ? "bg-ink/[0.08] font-medium text-ink" : "text-ink-secondary hover:text-ink",
             )}
           >
@@ -125,7 +123,7 @@ export function AvatarEditorCard({ bot, activeState, onPatch, onClose }: {
           data-avatar-reset
           disabled={busy}
           onClick={() => onPatch(RESET_MASCOT_PATCH)}
-          className="ml-auto rounded-lg px-[11px] py-[5px] text-[13px] text-ink-secondary hover:text-ink disabled:opacity-50"
+          className="ml-auto rounded-lg px-[11px] py-[5px] text-ui text-ink-secondary hover:text-ink disabled:opacity-50"
         >
           {t("botPanel.avatar.reset")}
         </button>
@@ -161,14 +159,14 @@ export function AvatarEditorCard({ bot, activeState, onPatch, onClose }: {
               data-avatar-more
               aria-expanded={moreLooks}
               onClick={() => setMoreLooks((open) => !open)}
-              className="mx-auto mt-2.5 flex items-center gap-1 rounded-full px-2.5 py-1 text-[12px] text-ink-secondary hover:bg-ink/[0.04] hover:text-ink"
+              className="mx-auto mt-2.5 flex items-center gap-1 rounded-full px-2.5 py-1 text-small text-ink-secondary hover:bg-ink/[0.04] hover:text-ink"
             >
               {t("botPanel.avatar.more")}
               <ChevronDown size={13} aria-hidden="true" className={cn("transition-transform", moreLooks && "rotate-180")} />
             </button>
             {moreLooks && (
               <div data-avatar-more-looks>
-                <div className="flex flex-wrap items-baseline gap-x-2 px-1 pb-1.5 pt-2 text-[12px] text-ink-tertiary">
+                <div className="flex flex-wrap items-baseline gap-x-2 px-1 pb-1.5 pt-2 text-small text-ink-tertiary">
                   <span>{t("botPanel.avatar.halloween")}</span>
                   {dressedAs && <span data-avatar-costume>{t("botPanel.avatar.costume", { name: dressedAs })}</span>}
                 </div>
@@ -176,7 +174,7 @@ export function AvatarEditorCard({ bot, activeState, onPatch, onClose }: {
                   {HALLOWEEN_BODY_IDS.map((id) => bodyButton(id, HALLOWEEN_BODIES[id].name))}
                 </div>
                 <div className="flex flex-wrap items-center justify-center gap-1.5 pt-2.5" role="group" aria-label={t("botPanel.avatar.face")}>
-                  <span className="mr-0.5 text-[12px] text-ink-tertiary">{t("botPanel.avatar.face")}</span>
+                  <span className="mr-0.5 text-small text-ink-tertiary">{t("botPanel.avatar.face")}</span>
                   {PICKABLE_STATES.map((expression) => (
                     <button
                       key={expression}
@@ -186,7 +184,7 @@ export function AvatarEditorCard({ bot, activeState, onPatch, onClose }: {
                       aria-pressed={activeState === expression}
                       onClick={() => pickMascot({ mascotExpression: expression })}
                       className={cn(
-                        "rounded-full px-2.5 py-1 text-[12px] disabled:opacity-50",
+                        "rounded-full px-2.5 py-1 text-small disabled:opacity-50",
                         activeState === expression ? "bg-ink/[0.15] text-ink" : "bg-ink/[0.04] text-ink-secondary hover:text-ink",
                       )}
                     >
@@ -232,14 +230,14 @@ export function AvatarEditorCard({ bot, activeState, onPatch, onClose }: {
                 event.preventDefault();
                 void upload(event.dataTransfer.files?.[0]);
               }}
-              className="flex w-full flex-col items-center gap-1.5 rounded-xl border-[1.5px] border-dashed border-ink/15 px-3 py-6 text-center text-[13px] text-ink-secondary hover:border-ink/25 hover:text-ink disabled:opacity-50"
+              className="flex w-full flex-col items-center gap-1.5 rounded-xl border-[1.5px] border-dashed border-ink/15 px-3 py-6 text-center text-ui text-ink-secondary hover:border-ink/25 hover:text-ink disabled:opacity-50"
             >
               {uploading ? <Loader2 size={22} className="animate-spin" /> : <ImagePlus size={22} />}
               <span>{t("botPanel.avatar.drop")}</span>
-              <span className="text-[12px] text-ink-tertiary">{t("botPanel.avatar.types")}</span>
+              <span className="text-small text-ink-tertiary">{t("botPanel.avatar.types")}</span>
             </button>
             <div className="mt-2.5 flex items-center gap-2.5">
-              <span className="shrink-0 text-[12px] text-ink-secondary">{t("botPanel.avatar.shape")}</span>
+              <span className="shrink-0 text-small text-ink-secondary">{t("botPanel.avatar.shape")}</span>
               <Segmented
                 attr="data-avatar-crop"
                 label={t("botPanel.avatar.shape")}
@@ -248,23 +246,20 @@ export function AvatarEditorCard({ bot, activeState, onPatch, onClose }: {
                 options={IMAGE_CROPS.map((value) => ({ value, label: t(CROP_KEY[value]), disabled: busy || !bot.avatarUrl }))}
               />
               {bot.avatarUrl && (
-                <button
-                  type="button"
+                <IconButton label="Remove custom avatar image" tooltip={t("botPanel.avatar.remove")}
                   onClick={removeImage}
                   disabled={busy}
-                  aria-label="Remove custom avatar image"
-                  title={t("botPanel.avatar.remove")}
-                  className="flex size-8 shrink-0 items-center justify-center rounded-lg text-ink-secondary hover:bg-control hover:text-danger disabled:opacity-50"
+                  className="flex size-8 shrink-0 items-center justify-center rounded-lg text-ink-secondary hover:bg-control hover:text-danger-text disabled:opacity-50"
                 >
                   <Trash2 size={14} />
-                </button>
+                </IconButton>
               )}
             </div>
-            {!showsImage && <p className="mt-2 text-[12px] text-ink-tertiary">{t("botPanel.avatar.uploadHint")}</p>}
+            {!showsImage && <p className="mt-2 text-small text-ink-tertiary">{t("botPanel.avatar.uploadHint")}</p>}
           </>
         )}
 
-        {error && <div role="alert" className="mt-3 text-[12px] text-danger">{error}</div>}
+        {error && <div role="alert" className="mt-3 text-small text-danger-text">{error}</div>}
       </div>
     </div>
   );

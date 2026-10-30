@@ -125,6 +125,8 @@ import { archiveBotWithNotice, onArchiveNotice } from "./bot-archive";
 import { ArchivedBotsPanel, botConfirmCopy, type BotConfirmKind } from "./ArchivedBotsPanel"; import { MovedBotRows } from "./MoveToTeam";
 import { NewRoomPanel } from "./SidebarNewRoomPanel";
 import { SectionPicker } from "./SidebarSectionPicker";
+import { Button } from "./ui/Button";
+import { IconButton } from "./ui/IconButton";
 
 export { PinnedBotCircle, PinnedCircleThreadPanel, PinnedCircleThreadSection } from "./PinnedCircleThreads";
 export { ArchivedBotRow, ArchivedBotsPanel, archivedDeleteAllCopy, botConfirmCopy, type BotConfirmKind } from "./ArchivedBotsPanel";
@@ -218,13 +220,13 @@ export function GroupListItem({
       <StackedMauses members={members} density={railTile ? "comfortable" : density} large={simpleRow || railTile} />
       <div className={cn("min-w-0 flex-1", density === "icons" && "hidden")}>
         <div className={cn("flex items-baseline justify-between gap-2", simpleRow && "pr-7")}>
-          <span className={cn("truncate text-[14px] text-ink", simpleRow ? "font-medium leading-5" : "font-semibold")}>{group.name}</span>
-          {advanced && selected && last && !expanded && <span className="shrink-0 text-[10px] text-ink-secondary">{formatTime(last.at)}</span>}
+          <span className={cn("truncate text-label text-ink", simpleRow ? "font-medium leading-5" : "font-semibold")}>{group.name}</span>
+          {advanced && selected && last && !expanded && <span className="shrink-0 text-caption text-ink-secondary">{formatTime(last.at)}</span>}
           {!simpleRow && (expanded || (quiet && !groupStatus)) && group.unread && <span className="size-1.5 shrink-0 rounded-full bg-accent" aria-label={t("task.unreadMany")} />}
           {simpleRow && !expanded && group.unread && <RowDot />}
         </div>
         {!expanded && (!quiet || groupStatus) && <div className="flex items-center justify-between gap-2">
-          <span className={cn("truncate text-ink-secondary", simpleRow ? "text-[13px] leading-[18px]" : "text-[11px]")}>{group.description || groupPreview(group, state.bots, state.instances, advanced)}</span>
+          <span className={cn("truncate text-ink-secondary", simpleRow ? "text-ui leading-[18px]" : "text-caption")}>{group.description || groupPreview(group, state.bots, state.instances, advanced)}</span>
           {!simpleRow && group.unread && <span className="size-2 shrink-0 rounded-full bg-accent" />}
         </div>}
         {simpleRow && <RowStatusText unread={group.unread} />}
@@ -234,12 +236,12 @@ export function GroupListItem({
       )}
     </button>
     {!group.dm && density !== "icons" && hasThreadList && <button type="button" aria-label={t(expanded ? "task.collapseNamed" : "task.expandNamed", { name: group.name })} aria-expanded={expanded}
-      onClick={() => setThreadsOpen((open) => !open)} className="absolute left-0.5 top-1/2 flex size-5 -translate-y-1/2 items-center justify-center rounded text-ink-secondary outline-none hover:text-ink focus-visible:ring-1 focus-visible:ring-accent/60">
+      onClick={() => setThreadsOpen((open) => !open)} className="absolute left-0.5 top-1/2 flex size-5 -translate-y-1/2 items-center justify-center rounded text-ink-secondary outline-none hover:text-ink focus-visible:ring-1 focus-visible:ring-focus/60">
       <ChevronRight aria-hidden="true" size={12} className={cn("transition-transform", expanded && "rotate-90")} />
     </button>}
-    {!group.dm && density !== "icons" && <button type="button" disabled={roomBusy} aria-label={t("task.newShort")} title={t(roomBusy ? "task.newBusy" : "task.newShort")}
+    {!group.dm && density !== "icons" && <IconButton label={t("task.newShort")} tooltip={t(roomBusy ? "task.newBusy" : "task.newShort")} disabled={roomBusy}
       onClick={() => { setThreadsOpen(true); dispatch({ type: "newGroupTask", groupId: group.id }); }}
-      className="pointer-events-none absolute right-1 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded text-ink-secondary opacity-0 hover:bg-raised hover:text-ink disabled:opacity-40 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 max-md:pointer-events-auto max-md:opacity-70 touch:pointer-events-auto touch:opacity-70 touch:disabled:opacity-40"><Plus size={14} /></button>}
+      className="pointer-events-none absolute right-1 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded text-ink-secondary opacity-0 hover:bg-raised hover:text-ink disabled:opacity-40 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 max-md:pointer-events-auto max-md:opacity-70 touch:pointer-events-auto touch:opacity-70 touch:disabled:opacity-40"><Plus size={14} /></IconButton>}
     </div>
     {expanded && <GroupThreadList group={group} selected={selected} density={density} query={group.name.toLowerCase().includes(query.toLowerCase()) ? "" : query} />}
     </>
@@ -336,26 +338,20 @@ function RoomContextMenu({
                 onClose();
               }
             }}
-            className="min-w-0 flex-1 rounded-lg bg-raised px-2 py-1.5 text-[14px] text-ink focus:outline-none focus:ring-1 focus:ring-accent"
+            className="min-w-0 flex-1 rounded-lg bg-raised px-2 py-1.5 text-label text-ink focus:outline-none focus:ring-1 focus:ring-focus"
           />
-          <button
-            type="button"
+          <IconButton label={t("sidebar.room.saveDescription")} tooltip={t("common.save")}
             onClick={saveDescription}
-            aria-label={t("sidebar.room.saveDescription")}
-            title={t("common.save")}
             className="flex size-8 shrink-0 items-center justify-center rounded-lg text-ink-secondary hover:bg-raised hover:text-ink"
           >
             <Check size={15} />
-          </button>
-          <button
-            type="button"
+          </IconButton>
+          <IconButton label={t("common.cancel")}
             onClick={onClose}
-            aria-label={t("common.cancel")}
-            title={t("common.cancel")}
             className="flex size-8 shrink-0 items-center justify-center rounded-lg text-ink-secondary hover:bg-raised hover:text-ink"
           >
             <X size={15} />
-          </button>
+          </IconButton>
         </div>
       ) : !remoteClient && (renaming ? (
         <div className="flex items-center gap-1 px-2 py-1">
@@ -376,26 +372,20 @@ function RoomContextMenu({
                 onClose();
               }
             }}
-            className="min-w-0 flex-1 rounded-lg bg-raised px-2 py-1.5 text-[14px] text-ink focus:outline-none focus:ring-1 focus:ring-accent"
+            className="min-w-0 flex-1 rounded-lg bg-raised px-2 py-1.5 text-label text-ink focus:outline-none focus:ring-1 focus:ring-focus"
           />
-          <button
-            type="button"
+          <IconButton label={isBotChat ? t("sidebar.room.saveChatName") : t("sidebar.room.saveChannelName")} tooltip={t("common.save")}
             onClick={saveRename}
-            aria-label={isBotChat ? t("sidebar.room.saveChatName") : t("sidebar.room.saveChannelName")}
-            title={t("common.save")}
             className="flex size-8 shrink-0 items-center justify-center rounded-lg text-ink-secondary hover:bg-raised hover:text-ink"
           >
             <Check size={15} />
-          </button>
-          <button
-            type="button"
+          </IconButton>
+          <IconButton label={isBotChat ? t("sidebar.room.cancelChatRename") : t("sidebar.room.cancelChannelRename")} tooltip={t("common.cancel")}
             onClick={onClose}
-            aria-label={isBotChat ? t("sidebar.room.cancelChatRename") : t("sidebar.room.cancelChannelRename")}
-            title={t("common.cancel")}
             className="flex size-8 shrink-0 items-center justify-center rounded-lg text-ink-secondary hover:bg-raised hover:text-ink"
           >
             <X size={15} />
-          </button>
+          </IconButton>
         </div>
       ) : (
         <button
@@ -453,7 +443,7 @@ function RoomContextMenu({
           onClose();
           onDelete(group.id);
         }}
-        className={cn(MENU_ITEM, "text-danger hover:bg-menu-hover")}
+        className={cn(MENU_ITEM, "text-danger-text hover:bg-menu-hover")}
       >
         <Trash2 size={16} />
         {isBotChat ? t("sidebar.room.deleteChat") : t("sidebar.room.deleteChannel")}
@@ -613,21 +603,21 @@ export function BotThreadList({ bot, selected, density, query, pendingQueued, re
               const next = new Set(previous);
               if (next.has(project.id)) next.delete(project.id); else next.add(project.id);
               return next;
-            })} className="flex size-6 shrink-0 items-center justify-center rounded outline-none hover:text-ink focus-visible:ring-1 focus-visible:ring-accent/60" aria-label={t(open ? "task.collapseNamed" : "task.expandNamed", { name: project.name })}>
+            })} className="flex size-6 shrink-0 items-center justify-center rounded outline-none hover:text-ink focus-visible:ring-1 focus-visible:ring-focus/60" aria-label={t(open ? "task.collapseNamed" : "task.expandNamed", { name: project.name })}>
               <ChevronRight aria-hidden="true" size={11} className={cn("shrink-0 transition-transform", open && "rotate-90")} />
             </button>
-            <button type="button" aria-label={t("folder.iconNamed", { name: project.name })} title={t("folder.iconNamed", { name: project.name })} onClick={() => setEditingProject(project.id)} className="flex size-6 shrink-0 items-center justify-center rounded hover:bg-raised"><FolderIcon emoji={project.emoji} size={14} /></button>
+            <IconButton label={t("folder.iconNamed", { name: project.name })} onClick={() => setEditingProject(project.id)} className="flex size-6 shrink-0 items-center justify-center rounded hover:bg-raised"><FolderIcon emoji={project.emoji} size={14} /></IconButton>
             <button type="button" data-sidebar-folder-label={project.id} draggable={!reordering} aria-expanded={open} onClick={() => setCollapsed((previous) => {
               const next = new Set(previous);
               if (next.has(project.id)) next.delete(project.id); else next.add(project.id);
               return next;
-            })} className="flex min-h-8 min-w-0 flex-1 cursor-grab select-none items-center gap-1.5 py-1 text-left text-[13px] font-semibold active:cursor-grabbing" title={project.name}>
+            })} className="flex min-h-8 min-w-0 flex-1 cursor-grab select-none items-center gap-1.5 py-1 text-left text-ui font-semibold active:cursor-grabbing" title={project.name}>
               <span className="truncate">{project.name}</span>
-              <span className="shrink-0 text-[10px] font-normal opacity-50">{projectTasks.length}</span>
-              {!open && (waiting ? <span className="text-[10px] text-warning">{t("task.waiting")}</span> : working ? <Loader2 size={10} className="shrink-0 animate-spin text-success" /> : projectTasks.some((task) => task.unread) ? <span className="size-1.5 shrink-0 rounded-full bg-accent" aria-label={t("task.unreadMany")} /> : null)}
+              <span className="shrink-0 text-caption font-normal opacity-50">{projectTasks.length}</span>
+              {!open && (waiting ? <span className="text-caption text-warning-text">{t("task.waiting")}</span> : working ? <Loader2 size={10} className="shrink-0 animate-spin text-success" /> : projectTasks.some((task) => task.unread) ? <span className="size-1.5 shrink-0 rounded-full bg-accent" aria-label={t("task.unreadMany")} /> : null)}
             </button>
-            <button type="button" title={t("task.newIn", { name: project.name })} aria-label={t("task.newIn", { name: project.name })} onClick={() => dispatch({ type: "newTask", botId: bot.id, projectId: project.id })}
-              className="flex size-6 items-center justify-center rounded opacity-0 hover:bg-raised hover:text-ink focus-visible:opacity-100 group-hover/folder:opacity-100 max-md:opacity-70 touch:opacity-70"><Plus size={12} /></button>
+            <IconButton label={t("task.newIn", { name: project.name })} onClick={() => dispatch({ type: "newTask", botId: bot.id, projectId: project.id })}
+              className="flex size-6 items-center justify-center rounded opacity-0 hover:bg-raised hover:text-ink focus-visible:opacity-100 group-hover/folder:opacity-100 max-md:opacity-70 touch:opacity-70"><Plus size={12} /></IconButton>
             <FolderActions project={project} canMoveUp={index > 0} canMoveDown={index < projects.length - 1} canMarkRead={folderUnreadThreadIds(bot, project.id).length > 0} saving={reordering || markingRead}
               menu={folderMenu?.projectId === project.id ? folderMenu : null} onMenuChange={(menu) => setFolderMenu(menu ? { ...menu, projectId: project.id } : null)}
               onEdit={() => setEditingProject(project.id)} onMove={(direction, onSaved) => saveOrder(moveFolder(projectIds, project.id, direction), onSaved)}
@@ -635,18 +625,18 @@ export function BotThreadList({ bot, selected, density, query, pendingQueued, re
           </div>
           {open && <div role="group" aria-label={t("task.namedList", { name: project.name })}>
             {visible.map(renderThread)}
-            {projectTasks.length === 0 && <p className="px-2.5 py-1 text-[11px] text-ink-tertiary">{t("task.empty")}</p>}
+            {projectTasks.length === 0 && <p className="px-2.5 py-1 text-caption text-ink-tertiary">{t("task.empty")}</p>}
             {/* The short list keeps only the newest threads, so an open folder can hold none of them: offer the rest. */}
             {!query && !bulk.active && visible.length < projectTasks.length && <button type="button" data-sidebar-folder-show-all={project.id} onClick={() => setShowAll(true)}
-              className="inline-flex h-7 items-center pl-6 text-[13px] font-medium leading-4 text-ink-secondary hover:text-ink">{t("folder.showAll")}</button>}
+              className="inline-flex h-7 items-center pl-6 text-ui font-medium leading-4 text-ink-secondary hover:text-ink">{t("folder.showAll")}</button>}
           </div>}
         </div>;
       })}
-      {reorderError && <p role="alert" className="px-2.5 py-1 text-[12px] text-danger">{reorderError}</p>}
+      {reorderError && <p role="alert" className="px-2.5 py-1 text-small text-danger-text">{reorderError}</p>}
       <span role="status" className="sr-only">{reorderStatus}</span>
-      {readError && <p role="alert" className="px-2.5 py-1 text-[12px] text-danger">{readError}</p>}
+      {readError && <p role="alert" className="px-2.5 py-1 text-small text-danger-text">{readError}</p>}
       <span role="status" className="sr-only">{readStatus}</span>
-      {projects.length > 0 && ungrouped.length > 0 && <div className="pl-6 pr-3 pb-1 pt-2 text-[11px] text-ink-tertiary">{t("task.list")}</div>}
+      {projects.length > 0 && ungrouped.length > 0 && <div className="pl-6 pr-3 pb-1 pt-2 text-caption text-ink-tertiary">{t("task.list")}</div>}
       {ungrouped.map(renderThread)}
       <HelperThreadGroup tasks={orderedThreadList(helpers)} busy={helpers.some((task) => currentTaskBot(bot, task.threadId).busy)} renderThread={renderThread} />
       <ThreadListFooter bulk={bulk} rows={shownRows} selected={selection} total={ownTasks.length} canShowAll={!query && !showAll && ownTasks.length > visibleTasks.length} canSelect={tasks.length > 1}
@@ -777,14 +767,14 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
           />
         )}
         {!simpleRow && waiting && <span data-testid="waiting-dot" role="status" aria-label={t("sidebar.preview.waiting")} title={t("sidebar.preview.waiting")}
-          className={cn("absolute -right-0.5 -bottom-0.5 flex items-center justify-center overflow-hidden rounded-full border-2 border-panel bg-warning font-black text-panel", iconOnly ? "size-5 text-[14px]" : "size-4 text-[12px]")}><span aria-hidden="true">!</span></span>}
+          className={cn("absolute -right-0.5 -bottom-0.5 flex items-center justify-center overflow-hidden rounded-full border-2 border-panel bg-warning font-black text-warning-ink", iconOnly ? "size-5 text-label" : "size-4 text-small")}><span aria-hidden="true">!</span></span>}
         {!simpleRow && teammateWait && <span data-testid="teammate-wait-dot" role="status" aria-label={t("sidebar.preview.waitingOnTeammate")} title={t("sidebar.preview.waitingOnTeammate")}
           className={cn("absolute -right-0.5 -bottom-0.5 rounded-full border-2 border-panel bg-accent", iconOnly ? "size-3" : "size-2.5")} />}
         {!simpleRow && !teammateWait && !waiting && !working && queued && <span data-testid="queued-dot" role="status" aria-label={t("task.queued")} title={t("task.queued")}
           className={cn("absolute -right-0.5 -bottom-0.5 rounded-full border-2 border-panel bg-ink-secondary", iconOnly ? "size-3" : "size-2.5")} />}
         {bot.chiefOfStaff && (iconOnly || simpleRow) && (
           <span className="absolute -left-1 -top-1 flex rounded-full bg-raised p-[3px]">
-            <Crown size={11} strokeWidth={2.25} className="shrink-0 text-accent" role="img" aria-label={t("sidebar.bot.chiefOfStaff")} data-testid="chief-crown">
+            <Crown size={11} strokeWidth={2.25} className="shrink-0 text-accent-text" role="img" aria-label={t("sidebar.bot.chiefOfStaff")} data-testid="chief-crown">
               <title>{t("sidebar.bot.chiefOfStaff")}</title>
             </Crown>
           </span>
@@ -799,7 +789,7 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
       </span>
       <div className={cn("min-w-0 flex-1", iconOnly && "hidden")}>
         <div className={cn("flex items-baseline justify-between gap-2", simpleRow && "pr-7")}>
-          <span className={cn("flex min-w-0 grow items-center gap-1.5 truncate text-ink", simpleRow ? "text-[14px] font-medium leading-5" : "text-[15px] font-semibold leading-5")}>
+          <span className={cn("flex min-w-0 grow items-center gap-1.5 truncate text-ink", simpleRow ? "text-label font-medium leading-5" : "text-body font-semibold leading-5")}>
             {!simpleList && bot.pinned && <Pin size={12} className="shrink-0 text-ink-secondary" />}
             <RenameTitle
               key={iconOnly ? "icons" : "expanded"}
@@ -817,10 +807,10 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
               }}
               onEditingChange={setRenaming}
               className="truncate"
-              inputClassName={cn("w-full rounded bg-inset px-1 py-0.5", simpleRow ? "text-[14px] font-medium" : "text-[15px] font-semibold")}
+              inputClassName={cn("w-full rounded bg-inset px-1 py-0.5", simpleRow ? "text-label font-medium" : "text-body font-semibold")}
             />
             {!simpleList && bot.chiefOfStaff && !renaming && (
-              <Crown size={13} strokeWidth={2.25} className="shrink-0 text-accent" role="img" aria-label={t("sidebar.bot.chiefOfStaff")} data-testid="chief-crown">
+              <Crown size={13} strokeWidth={2.25} className="shrink-0 text-accent-text" role="img" aria-label={t("sidebar.bot.chiefOfStaff")} data-testid="chief-crown">
                 <title>{t("sidebar.bot.chiefOfStaff")}</title>
               </Crown>
             )}
@@ -833,7 +823,7 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
           </span>
           {last && !renaming && !expanded && (
             <span className={cn(
-              "shrink-0 text-[12px] tabular-nums text-ink-secondary transition-opacity",
+              "shrink-0 text-small tabular-nums text-ink-secondary transition-opacity",
               // Phones show the time on every row; elsewhere only the selected row, until its actions appear.
               selected && !simpleList ? "group-hover:opacity-0 group-focus-within:opacity-0 touch:opacity-0 max-md:touch:opacity-100" : "hidden max-md:inline",
             )}>
@@ -847,12 +837,12 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
         </div>
         {(!expanded || deleting) && (!quiet || statusLine) && <div className="flex items-center justify-between gap-2">
           {deleting ? (
-            <span role="status" className="flex min-w-0 items-center gap-1.5 truncate text-[13px] leading-[18px] text-ink-secondary">
+            <span role="status" className="flex min-w-0 items-center gap-1.5 truncate text-ui leading-[18px] text-ink-secondary">
               <Loader2 size={12} className="shrink-0 animate-spin" />
               {t("sidebar.bot.deletingRow")}
             </span>
           ) : (
-            <span className={cn("flex min-w-0 items-center gap-1.5 truncate text-[13px] leading-[18px]", waiting ? simpleRow ? "text-warning" : "font-semibold text-warning" : "text-ink-secondary")}>
+            <span className={cn("flex min-w-0 items-center gap-1.5 truncate text-ui leading-[18px]", waiting ? simpleRow ? "text-warning-text" : "font-semibold text-warning-text" : "text-ink-secondary")}>
               {working ? (
                 <SidebarWorkingStep bot={bot} last={last} />
               ) : (
@@ -914,19 +904,19 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
         aria-label={t(threadsOpen ? "task.collapseNamed" : "task.expandNamed", { name: bot.name })}
         aria-expanded={threadsOpen}
         onClick={() => setThreadsOpen((open) => !open)}
-        className="absolute left-0.5 top-1/2 flex size-5 -translate-y-1/2 items-center justify-center rounded text-ink-secondary outline-none hover:text-ink focus-visible:ring-1 focus-visible:ring-accent/60"
+        className="absolute left-0.5 top-1/2 flex size-5 -translate-y-1/2 items-center justify-center rounded text-ink-secondary outline-none hover:text-ink focus-visible:ring-1 focus-visible:ring-focus/60"
       ><ChevronRight aria-hidden="true" size={13} className={cn("transition-transform", threadsOpen && "rotate-90")} /></button>}
       {!renaming && iconOnly && unread && (
         <span className={cn("pointer-events-none absolute size-2 rounded-full border border-panel bg-accent", railTile ? "right-1 top-1" : "bottom-1.5 right-1.5")} />
       )}
       {!renaming && !deleting && !iconOnly && <>
-        {showThreads && <button type="button" aria-label={t("task.newShort")} title={t("task.newShort")} onClick={() => { setThreadsOpen(true); dispatch({ type: "newTask", botId: bot.id }); }}
-          className="pointer-events-none absolute right-[3.75rem] top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded text-ink-secondary opacity-0 hover:bg-raised hover:text-ink group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 max-md:hidden touch:pointer-events-auto touch:opacity-70"><Plus size={14} /></button>}
-        {showThreads && <button type="button" aria-label={t("folder.newNamed", { name: bot.name })} title={t("folder.new")} onClick={() => { setThreadsOpen(true); setCreatingProject(true); }}
-          className="pointer-events-none absolute right-8 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded text-ink-secondary opacity-0 hover:bg-raised hover:text-ink group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 max-md:hidden touch:pointer-events-auto touch:opacity-70"><FolderPlus size={14} /></button>}
-        <button type="button" data-bot-actions={bot.id} aria-label={t("sidebar.bot.actions", { name: bot.name })} title={t("sidebar.bot.actions", { name: bot.name })} aria-haspopup="menu" onClick={(event) => { const rect = event.currentTarget.getBoundingClientRect(); onMenu({ botId: bot.id, x: rect.left, y: rect.bottom }); }}
+        {showThreads && <IconButton label={t("task.newShort")} onClick={() => { setThreadsOpen(true); dispatch({ type: "newTask", botId: bot.id }); }}
+          className="pointer-events-none absolute right-[3.75rem] top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded text-ink-secondary opacity-0 hover:bg-raised hover:text-ink group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 max-md:hidden touch:pointer-events-auto touch:opacity-70"><Plus size={14} /></IconButton>}
+        {showThreads && <IconButton label={t("folder.newNamed", { name: bot.name })} tooltip={t("folder.new")} onClick={() => { setThreadsOpen(true); setCreatingProject(true); }}
+          className="pointer-events-none absolute right-8 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded text-ink-secondary opacity-0 hover:bg-raised hover:text-ink group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 max-md:hidden touch:pointer-events-auto touch:opacity-70"><FolderPlus size={14} /></IconButton>}
+        <IconButton label={t("sidebar.bot.actions", { name: bot.name })} data-bot-actions={bot.id} aria-haspopup="menu" onClick={(event) => { const rect = event.currentTarget.getBoundingClientRect(); onMenu({ botId: bot.id, x: rect.left, y: rect.bottom }); }}
           className={cn("absolute right-1 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded text-ink-secondary hover:bg-raised hover:text-ink", simpleRow && "right-2 top-1 translate-y-0 rounded-lg",
-            selected && !simpleRow ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 max-md:pointer-events-auto max-md:opacity-70 touch:pointer-events-auto touch:opacity-70")}><MoreHorizontal size={15} /></button>
+            selected && !simpleRow ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 max-md:pointer-events-auto max-md:opacity-70 touch:pointer-events-auto touch:opacity-70")}><MoreHorizontal size={15} /></IconButton>
       </>}
       {deleting && iconOnly && (
         <span className="pointer-events-none absolute bottom-1 right-1 rounded-full bg-card p-1 text-ink-secondary">
@@ -1271,18 +1261,16 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
   const plusItem = cn(MENU_ITEM, "text-ink hover:bg-menu-hover");
   const plusControl = (
     <div ref={plusMenuRef} className="contents">
-    <button
+    <IconButton label={remoteClient ? t("sidebar.new") : t("sidebar.newOrShare")}
       ref={importReturnRef}
       onClick={() => setPlusOpen((o) => !o)}
-      aria-label={remoteClient ? t("sidebar.new") : t("sidebar.newOrShare")}
       className={phone ? PHONE_TOP_BUTTON : rail || simple ? SIMPLE_TOP_BUTTON : cn(
         "flex items-center justify-center text-ink-secondary transition-colors hover:bg-ink/[0.06] hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
         density === "icons" ? "size-[46px] shrink-0 rounded-xl" : "size-8 rounded-full",
       )}
-      title={remoteClient ? t("sidebar.new") : t("sidebar.newOrShare")}
     >
       <Plus size={phone || simple || density === "icons" ? 20 : 18} strokeWidth={phone ? 2 : 1.5} />
-    </button>
+    </IconButton>
     {plusMotion.shown && (
       <>
         <div role="menu" aria-label={remoteClient ? t("sidebar.new") : t("sidebar.newOrShare")} onKeyDown={navigateThreadMenu} className={cn(
@@ -1348,7 +1336,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
             >
               <Archive size={16} className="text-ink-secondary" />
               <span className="flex-1">{t("sidebar.archived.title")}</span>
-              <span className="text-[12px] text-ink-secondary">{archivedBots.length}</span>
+              <span className="text-small text-ink-secondary">{archivedBots.length}</span>
             </button>
           )}
           </>}
@@ -1408,9 +1396,9 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
           </div>
         ) : null}{!phone && <ChromeRailToggle advanced={advanced} icons={density === "icons"} style={windowNoDragStyle} />}
         {rail && <div data-sidebar-rail-top className="flex flex-col items-center gap-2 pt-1" style={windowNoDragStyle}>
-          <button type="button" onClick={railSearch} aria-label={t("sidebar.searchAria")} title={t("sidebar.searchAria")} className={SIMPLE_TOP_BUTTON}>
+          <IconButton label={t("sidebar.searchAria")} onClick={railSearch} className={SIMPLE_TOP_BUTTON}>
             <Search size={18} strokeWidth={1.5} aria-hidden="true" />
-          </button>
+          </IconButton>
           <div className="relative flex">{plusControl}</div>
         </div>}
         {density !== "icons" && (simpleDesk ? <div data-sidebar-top-slot className="min-w-0 flex-1" /> : (
@@ -1439,15 +1427,12 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
           >
             {density === "icons" ? <PanelLeftOpen size={20} strokeWidth={1.5} /> : <PanelLeftClose size={18} strokeWidth={1.5} />}
           </button>}
-          {density === "icons" && <button
-            type="button"
+          {density === "icons" && <IconButton label={t("sidebar.searchAria")}
             onClick={openCommandPalette}
-            aria-label={t("sidebar.searchAria")}
-            title={t("sidebar.searchAria")}
             className="flex size-[46px] shrink-0 items-center justify-center rounded-xl text-ink-secondary hover:bg-raised hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
           >
             <Search size={20} strokeWidth={1.5} />
-          </button>}
+          </IconButton>}
           {advanced && <div ref={attentionMenuRef} className={density === "icons" ? "relative" : "contents"}>
             <button
               type="button"
@@ -1456,12 +1441,12 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
               title={attentionTriggerLabel(attention.length)}
               className={cn(
                 "relative flex items-center justify-center text-ink-secondary transition-colors hover:bg-ink/[0.06] hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
-                density === "icons" ? "size-[46px] shrink-0 rounded-xl" : phone ? "size-10 shrink-0 rounded-full border border-hairline bg-card text-ink" : "size-8 rounded-full",
+                density === "icons" ? "size-[46px] shrink-0 rounded-xl" : phone ? "size-10 shrink-0 rounded-full border border-edge bg-card text-ink" : "size-8 rounded-full",
               )}
             >
               <Activity size={density === "icons" ? 20 : 18} strokeWidth={1.5} />
               {attention.length > 0 && (
-                <span className="absolute -right-0.5 -top-0.5 flex min-w-4 items-center justify-center rounded-full bg-accent px-0.5 text-[10px] font-semibold leading-4 text-ink">{attention.length > 9 ? "9+" : attention.length}</span>
+                <span className="absolute -right-0.5 -top-0.5 flex min-w-4 items-center justify-center rounded-full bg-accent px-0.5 text-caption font-semibold leading-4 text-ink">{attention.length > 9 ? "9+" : attention.length}</span>
               )}
               {attentionHasRunningWork(attention) && (
                 <span data-header-activity="" className="absolute bottom-0.5 right-0.5 size-1.5 rounded-full bg-success" aria-hidden="true" />
@@ -1476,19 +1461,16 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
                   attentionMotion.className,
                 )} {...attentionMotion.exitProps}>
                   <div className="flex items-center gap-1 py-0.5 pl-2">
-                    <span className="flex-1 text-[13px] font-medium text-ink">{t("attention.title")}</span>
-                    <button
-                      type="button"
+                    <span className="flex-1 text-ui font-medium text-ink">{t("attention.title")}</span>
+                    <IconButton label={t(attentionPinned ? "attention.unpin" : "attention.pin")}
                       onClick={() => setAttentionPinned(!attentionPinned)}
-                      aria-label={t(attentionPinned ? "attention.unpin" : "attention.pin")}
-                      title={t(attentionPinned ? "attention.unpin" : "attention.pin")}
                       className="flex size-6 items-center justify-center rounded-md text-ink-secondary hover:bg-menu-hover hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
                     >
                       {attentionPinned ? <PinOff size={14} /> : <Pin size={14} />}
-                    </button>
+                    </IconButton>
                   </div>
                   {attention.length === 0 ? (
-                    <div className="px-2 py-1.5 text-[13px] text-ink-secondary">{t("attention.empty")}</div>
+                    <div className="px-2 py-1.5 text-ui text-ink-secondary">{t("attention.empty")}</div>
                   ) : (
                     <AttentionThreadRows inset entries={attention} onJump={(entry) => { setAttentionOpen(false); dispatch(attentionJumpAction(entry)); }} />
                   )}
@@ -1511,7 +1493,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
             onKeyDown={(e) => e.key === "Escape" && setQuery("")}
             placeholder={t("sidebar.search")}
             aria-label={t("sidebar.searchAria")}
-            className="w-full bg-transparent text-[13px] text-ink placeholder:text-ink-tertiary focus:outline-none"
+            className="w-full bg-transparent text-ui text-ink placeholder:text-ink-tertiary focus:outline-none"
           />
         </div>
       </div>}
@@ -1519,10 +1501,10 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
         <div
           data-sidebar-universal-pins=""
           // vh, not %: a percentage has no height to resolve against inside the glass head.
-          className="max-h-[min(40vh,280px)] shrink-0 overflow-y-auto border-b border-hairline/40 px-2 pb-2"
+          className="max-h-[min(40vh,280px)] shrink-0 overflow-y-auto border-b border-hairline px-2 pb-2"
         >
           {density !== "icons" && !pinnedCircles && (
-            <div className="px-2 pb-1 pt-1 text-[11px] font-medium uppercase tracking-[0.08em] text-ink-secondary">
+            <div className="px-2 pb-1 pt-1 text-caption font-medium uppercase tracking-[0.08em] text-ink-secondary">
               {t("sidebar.section.pinned")}
             </div>
           )}
@@ -1568,7 +1550,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
       <GlassScroller className={rail ? "[scrollbar-gutter:stable_both-edges]" : simpleDesk ? "px-3" : "px-2"}>
         <div className={cn("flex flex-col", simpleDesk ? cn("gap-0.5 pb-2", !tiles && "pt-2") : advanced ? "gap-0.5" : "gap-1 pb-2 pt-2")}>
           {matchingBots.length === 0 && visibleGroups.length === 0 && q && q.length < MIN_QUERY && (
-            <div className="px-3 py-6 text-center text-[13px] text-ink-secondary">{t("sidebar.noMatch", { query })}</div>
+            <div className="px-3 py-6 text-center text-ui text-ink-secondary">{t("sidebar.noMatch", { query })}</div>
           )}
           {!q && <NeedsYouButton compact={rail} />}{!q && <SidebarPeople compact={rail} />}
           {unsectionedChief && (phone ? (
@@ -1659,7 +1641,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
                 )}
                 {collapsed && queued.length > 0 && <button type="button" onClick={() => toggleSection(id)}
                   title={`${t("task.queued")} · ${queued.join(", ")}`} aria-label={`${t("sidebar.section.expand", { name: sectionLabel(id) })} · ${t("task.queued")} · ${queued.join(", ")}`}
-                  className="mx-3 mb-1 inline-flex h-7 items-center self-start rounded-full bg-raised/50 px-3 text-[13px] font-medium leading-4 text-ink-secondary hover:text-ink">{t("task.queued")} · {queued.length}</button>}
+                  className="mx-3 mb-1 inline-flex h-7 items-center self-start rounded-full bg-raised/50 px-3 text-ui font-medium leading-4 text-ink-secondary hover:text-ink">{t("task.queued")} · {queued.length}</button>}
                 {!collapsed && (
                   <>
                     {sectionChiefItems.map((bot) => <BotListItem key={bot.id} {...botRow(bot)} />)}
@@ -1683,10 +1665,10 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
                       />
                     ) : sectionBotItems.map((bot) => <BotListItem key={bot.id} {...botRow(bot)} />)}
                     {!remoteClient && sectionName && layoutInteractive && (!simple || sectionChiefItems.length + sectionGroupItems.length + sectionBotItems.length === 0) && (
-                      <button onClick={() => setMoveToTeam(sectionName)} aria-label={t(state.bots.some(bot => !bot.hidden && bot.section?.trim() === sectionName) ? "team.manageBotsIn" : "team.addBotsTo", { name: sectionName })}
-                        className="mx-3 my-1 flex items-center gap-1.5 rounded-md px-2 py-1.5 text-[12px] text-ink-secondary hover:bg-raised hover:text-ink">
+                      <Button variant="ghost" onClick={() => setMoveToTeam(sectionName)} aria-label={t(state.bots.some(bot => !bot.hidden && bot.section?.trim() === sectionName) ? "team.manageBotsIn" : "team.addBotsTo", { name: sectionName })}
+                        className="mx-3 my-1 flex gap-1.5 px-2 text-small font-normal">
                         <Plus size={13} /> {t(state.bots.some(bot => !bot.hidden && bot.section?.trim() === sectionName) ? "team.manageBots" : "team.addBots")}
-                      </button>
+                      </Button>
                     )}
                   </>
                 )}
@@ -1892,10 +1874,10 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
           <div
             role="status"
             className={cn(
-              "fixed bottom-4 left-4 z-[60] max-w-[300px] rounded-xl border px-3.5 py-2.5 text-[13px] shadow-xl",
+              "fixed bottom-4 left-4 z-[60] max-w-[300px] rounded-xl border px-3.5 py-2.5 text-ui shadow-xl",
               teamFeedback.error
-                ? "border-danger/30 bg-card text-danger"
-                : "border-hairline/50 bg-card text-ink",
+                ? "border-danger/30 bg-card text-danger-text"
+                : "border-hairline bg-card text-ink",
             )}
           >
             <div className="flex items-center gap-3">
@@ -1903,7 +1885,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
               {pendingBotUndo && (
                 <button
                   onClick={() => void undoBotArchive(pendingBotUndo)}
-                  className="rounded-md px-1.5 py-0.5 font-medium text-accent hover:bg-raised"
+                  className="rounded-md px-1.5 py-0.5 font-medium text-accent-text hover:bg-raised"
                 >
                   {t("common.undo")}
                 </button>

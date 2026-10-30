@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 
@@ -18,12 +18,14 @@ import {
   type TeamPlanRow,
   type TeamResultRow,
 } from "@/lib/team-bulk-settings";
+import { useModalDialog } from "@/hooks/use-modal-dialog";
 import { api, desktopApprovalBridge, persistBotUpdate, useStore } from "@/state/store";
 import { EFFORT_LEVELS, type EffortLevel } from "../../shared/wire";
 import { approvalModeOptions } from "./ApprovalModeSelector";
 import { LocalComputerAutoWarning } from "./LocalComputerAutoWarning";
 import { effortLabel } from "./ModelPicker";
 import { Select } from "./Select";
+import { Button } from "./ui/Button";
 
 type Tab = "approval" | "model";
 const KEEP = "";
@@ -33,14 +35,14 @@ export function TeamSettingsRows({ rows }: { rows: ReadonlyArray<TeamPlanRow | T
   return (
     <ul className="flex flex-col gap-1" data-testid="team-settings-rows">
       {rows.map((row) => {
-        const [label, tone] = row.status === "apply" ? [t("teamSettings.row.willChange"), "text-accent"]
+        const [label, tone] = row.status === "apply" ? [t("teamSettings.row.willChange"), "text-accent-text"]
           : row.status === "applied" ? [t("teamSettings.row.applied"), "text-success"]
             : row.status === "unchanged" ? [t("teamSettings.row.unchanged"), "text-ink-secondary"]
-              : [t("teamSettings.row.skipped", { reason: row.reason }), "text-warning"];
+              : [t("teamSettings.row.skipped", { reason: row.reason }), "text-warning-text"];
         return (
-          <li key={row.bot.id} className="flex items-start justify-between gap-3 rounded-lg bg-inset px-3 py-1.5 text-[13px]">
+          <li key={row.bot.id} className="flex items-start justify-between gap-3 rounded-lg bg-inset px-3 py-1.5 text-ui">
             <span className="min-w-0 truncate text-ink">{row.bot.name}</span>
-            <span className={cn("max-w-[65%] text-right text-[12px]", tone)}>{label}</span>
+            <span className={cn("max-w-[65%] text-right text-small", tone)}>{label}</span>
           </li>
         );
       })}
@@ -59,6 +61,7 @@ export function TeamSettingsDialog({ team, onClose }: { team: string; onClose: (
   const [results, setResults] = useState<TeamResultRow[] | null>(null);
   const [consent, setConsent] = useState(false);
   const dialog = useRef<HTMLDivElement>(null);
+  const closeButton = useRef<HTMLButtonElement>(null);
 
   const bots = useMemo(() => teamBots(state.bots, team), [state.bots, team]);
   const models = useMemo(() => teamModelChoices(bots, state.instances), [bots, state.instances]);
@@ -73,12 +76,6 @@ export function TeamSettingsDialog({ team, onClose }: { team: string; onClose: (
       };
   const plan = change ? planTeamChange(bots, state.instances, change) : [];
   const applying = plan.filter((row) => row.status === "apply").length;
-
-  useEffect(() => {
-    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    dialog.current?.querySelector<HTMLElement>("button")?.focus();
-    return () => { if (opener?.isConnected) opener.focus(); };
-  }, []);
 
   const run = async (acknowledgeLocalAuto: boolean) => {
     if (running || !applying) return;
@@ -96,34 +93,34 @@ export function TeamSettingsDialog({ team, onClose }: { team: string; onClose: (
     else void run(false);
   };
   const close = () => { if (!running) onClose(); };
+  useModalDialog(dialog, close, { initialFocus: closeButton });
   const counts = results ? teamResultCounts(results) : null;
-  const tabClass = (active: boolean) => cn("flex-1 rounded-md px-2.5 py-1.5 text-[13px] font-medium",
+  const tabClass = (active: boolean) => cn("flex-1 rounded-md px-2.5 py-1.5 text-ui font-medium",
     active ? "bg-raised text-ink" : "text-ink-secondary hover:text-ink");
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onMouseDown={(event) => {
       if (event.target === event.currentTarget) close();
     }}>
-      <div ref={dialog} role="dialog" aria-modal="true" aria-labelledby="team-settings-title" data-testid="team-settings-dialog"
-        className="max-h-[90vh] w-full max-w-[460px] overflow-y-auto rounded-2xl border border-hairline/50 bg-panel p-5 text-ink shadow-2xl"
-        onKeyDown={(event) => { if (event.key === "Escape" && !consent) { event.stopPropagation(); close(); } }}>
+      <div ref={dialog} role="dialog" aria-modal="true" aria-labelledby="team-settings-title" data-testid="team-settings-dialog" tabIndex={-1}
+        className="max-h-[90vh] w-full max-w-[460px] overflow-y-auto rounded-2xl border border-hairline bg-panel p-5 text-ink shadow-2xl">
         <div className="mb-2 flex items-center justify-between gap-3">
-          <h2 id="team-settings-title" className="text-[17px] font-semibold">{t("teamSettings.title", { name: team || t("teamSettings.general") })}</h2>
-          <button type="button" aria-label={t("teamSettings.close")} disabled={running} onClick={close} className="rounded-lg p-1.5 text-ink-secondary hover:bg-raised"><X size={18} /></button>
+          <h2 id="team-settings-title" className="text-title font-semibold">{t("teamSettings.title", { name: team || t("teamSettings.general") })}</h2>
+          <button ref={closeButton} type="button" aria-label={t("teamSettings.close")} disabled={running} onClick={close} className="rounded-lg p-1.5 text-ink-secondary hover:bg-raised"><X size={18} /></button>
         </div>
         {results && counts ? (
           <>
-            <p role="status" className="mb-3 text-[13px] text-ink-secondary">
+            <p role="status" className="mb-3 text-ui text-ink-secondary">
               {t("teamSettings.summary", { applied: counts.applied, unchanged: counts.unchanged, skipped: counts.skipped })}
             </p>
             <TeamSettingsRows rows={results} />
             <div className="mt-4 flex justify-end">
-              <button type="button" onClick={onClose} className="rounded-lg bg-accent px-4 py-2 text-[13px] font-medium text-white">{t("teamSettings.done")}</button>
+              <Button variant="primary" size="lg" onClick={onClose}>{t("teamSettings.done")}</Button>
             </div>
           </>
         ) : (
           <>
-            <p className="mb-3 text-[13px] leading-relaxed text-ink-secondary">{t("teamSettings.intro", { count: bots.length })}</p>
+            <p className="mb-3 text-ui leading-relaxed text-ink-secondary">{t("teamSettings.intro", { count: bots.length })}</p>
             <div className="mb-3 flex gap-1 rounded-lg bg-inset p-0.5" role="tablist">
               <button type="button" role="tab" aria-selected={tab === "approval"} disabled={running} className={tabClass(tab === "approval")} onClick={() => setTab("approval")}>{t("teamSettings.tab.approval")}</button>
               <button type="button" role="tab" aria-selected={tab === "model"} disabled={running} className={tabClass(tab === "model")} onClick={() => setTab("model")}>{t("teamSettings.tab.model")}</button>
@@ -136,44 +133,44 @@ export function TeamSettingsDialog({ team, onClose }: { team: string; onClose: (
                     <input type="radio" name="team-approval" className="mt-1" checked={mode === option.mode}
                       onChange={() => setMode(option.mode as TeamApprovalMode)} />
                     <span>
-                      <span className="block text-[14px] text-ink">{option.label}</span>
-                      <span className="block text-[12px] text-ink-secondary">{option.description}</span>
+                      <span className="block text-label text-ink">{option.label}</span>
+                      <span className="block text-small text-ink-secondary">{option.description}</span>
                     </span>
                   </label>
                 ))}
-                <p className="mt-1 text-[12px] text-ink-secondary">{t("teamSettings.allThreads")} {t("teamSettings.customPerBot")}</p>
+                <p className="mt-1 text-small text-ink-secondary">{t("teamSettings.allThreads")} {t("teamSettings.customPerBot")}</p>
               </fieldset>
             ) : (
               <fieldset disabled={running} className="flex flex-col gap-3">
-                <label className="text-[13px] text-ink-secondary">{t("teamSettings.model")}
+                <label className="text-ui text-ink-secondary">{t("teamSettings.model")}
                   <Select className="mt-1 w-full" aria-label={t("teamSettings.model")} value={model} onChange={(event) => setModel(event.target.value)}>
                     <option value={KEEP}>{t("teamSettings.keepModel")}</option>
                     {models.map((choice) => <option key={choice.id} value={choice.id}>{`${choice.label} · ${choice.engines.join(", ")}`}</option>)}
                   </Select>
                 </label>
-                <label className="text-[13px] text-ink-secondary">{t("teamSettings.effort")}
+                <label className="text-ui text-ink-secondary">{t("teamSettings.effort")}
                   <Select className="mt-1 w-full" aria-label={t("teamSettings.effort")} value={effort} onChange={(event) => setEffort(event.target.value)}>
                     <option value={KEEP}>{t("teamSettings.keepEffort")}</option>
                     <option value={ENGINE_DEFAULT}>{t("teamSettings.engineDefaultEffort")}</option>
                     {efforts.map((level) => <option key={level} value={level}>{effortLabel(level)}</option>)}
                   </Select>
                 </label>
-                <p className="text-[12px] text-ink-secondary">{t("teamSettings.threadModels")}</p>
+                <p className="text-small text-ink-secondary">{t("teamSettings.threadModels")}</p>
               </fieldset>
             )}
             {change && (
               <div className="mt-4">
-                <div className="mb-1 text-[12px] font-medium text-ink-secondary">{t("teamSettings.preview")}</div>
+                <div className="mb-1 text-small font-medium text-ink-secondary">{t("teamSettings.preview")}</div>
                 <TeamSettingsRows rows={plan} />
               </div>
             )}
             <div className="mt-4 flex items-center justify-end gap-2">
-              {running && <span role="status" className="mr-auto text-[12px] text-ink-secondary">{t("teamSettings.progress", { done: progress, count: plan.length })}</span>}
-              <button type="button" disabled={running} onClick={close} className="rounded-lg px-3 py-2 text-[13px] text-ink-secondary hover:bg-raised">{t("common.cancel")}</button>
-              <button type="button" disabled={running || !applying} onClick={apply}
-                className="rounded-lg bg-accent px-4 py-2 text-[13px] font-medium text-white disabled:opacity-40">
+              {running && <span role="status" className="mr-auto text-small text-ink-secondary">{t("teamSettings.progress", { done: progress, count: plan.length })}</span>}
+              <Button variant="ghost" size="lg" disabled={running} onClick={close} className="px-3 font-normal">{t("common.cancel")}</Button>
+              <Button variant="primary" size="lg" disabled={running || !applying} onClick={apply}
+                >
                 {t(applying === 1 ? "teamSettings.applyOne" : "teamSettings.applyMany", { count: applying })}
-              </button>
+              </Button>
             </div>
           </>
         )}

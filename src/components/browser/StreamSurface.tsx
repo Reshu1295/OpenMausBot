@@ -37,6 +37,7 @@ import { copyText } from "@/lib/copy-text";
 import { AgentCursor } from "./AgentCursor";
 import { AuthPrompt } from "./AuthPrompt";
 import { SelectPopup, type SelectPopupOption } from "./SelectPopup";
+import { Button } from "../ui/Button";
 
 export interface StreamSurfaceHandle {
   /** The canvas once it shows a frame, to seed picture in picture. */
@@ -653,7 +654,7 @@ export function StreamSurface(props: {
           defaultValue={INPUT_SENTINEL}
           // The caret must sit after the sentinel for a deletion to have something to delete.
           onFocus={(event) => resetInput(event.currentTarget)}
-          className="sr-only left-0 top-0 text-base"
+          className="sr-only left-0 top-0 text-body"
           onKeyDown={(event) => handleKey("down", event)}
           onKeyUp={(event) => handleKey("up", event)}
           onInput={handleInput}
@@ -693,8 +694,8 @@ export function StreamSurface(props: {
           />
         ) : null}
         {fileChooser && you ? (
-          <div className="absolute inset-x-3 top-3 z-20 mx-auto flex max-w-sm flex-col gap-2 rounded-xl border border-hairline/60 bg-card p-3 text-ink shadow-xl" role="dialog" aria-label="Choose files for the page">
-            <p className="flex items-center gap-2 text-[13px]"><FileUp size={14} aria-hidden="true" />The page asks for {fileChooser.multiple ? "files" : "a file"}.</p>
+          <div className="popover-surface absolute inset-x-3 top-3 z-20 mx-auto flex max-w-sm flex-col gap-2 rounded-xl border border-hairline bg-menu p-3 text-ink shadow-xl" role="dialog" aria-label="Choose files for the page">
+            <p className="flex items-center gap-2 text-ui"><FileUp size={14} aria-hidden="true" />The page asks for {fileChooser.multiple ? "files" : "a file"}.</p>
             <input
               ref={fileInputRef}
               type="file"
@@ -708,23 +709,23 @@ export function StreamSurface(props: {
               }}
             />
             <div className="flex justify-end gap-2">
-              <button type="button" className="rounded-lg px-3 py-1.5 text-[12px] text-ink-secondary hover:bg-inset" onClick={() => answerFileChooser([])}>Cancel</button>
-              <button type="button" className="rounded-lg bg-accent px-3 py-1.5 text-[12px] text-accent-ink" onClick={() => fileInputRef.current?.click()}>Choose {fileChooser.multiple ? "files" : "file"}</button>
+              <button type="button" className="rounded-lg px-3 py-1.5 text-small text-ink-secondary hover:bg-inset" onClick={() => answerFileChooser([])}>Cancel</button>
+              <Button variant="primary" className="text-small" onClick={() => fileInputRef.current?.click()}>Choose {fileChooser.multiple ? "files" : "file"}</Button>
             </div>
           </div>
         ) : null}
         {control?.dialog && control.controller !== "another-viewer" ? (
-          <div className="absolute inset-x-3 top-3 z-20 mx-auto flex max-w-sm flex-col gap-2 rounded-xl border border-hairline/60 bg-card p-3 text-ink shadow-xl" role="dialog" aria-label="Browser dialog">
-            <p className="break-words text-[13px]">{control.dialog.message}</p>
+          <div className="popover-surface absolute inset-x-3 top-3 z-20 mx-auto flex max-w-sm flex-col gap-2 rounded-xl border border-hairline bg-menu p-3 text-ink shadow-xl" role="dialog" aria-label="Browser dialog">
+            <p className="break-words text-ui">{control.dialog.message}</p>
             {you ? (
               <>
-                {control.dialog.type === "prompt" ? <input aria-label="Dialog response" value={promptText} onChange={(event) => setPromptText(event.target.value)} className="rounded-lg bg-inset px-3 py-2 text-[13px] outline-none focus:ring-1 focus:ring-accent" /> : null}
+                {control.dialog.type === "prompt" ? <input aria-label="Dialog response" value={promptText} onChange={(event) => setPromptText(event.target.value)} className="rounded-lg bg-inset px-3 py-2 text-ui outline-none focus:ring-1 focus:ring-focus" /> : null}
                 <div className="flex justify-end gap-2">
-                  <button type="button" className="rounded-lg px-3 py-1.5 text-[12px] text-ink-secondary hover:bg-inset" onClick={() => direct({ type: "dialog", accept: false })}>Dismiss</button>
-                  <button type="button" className="rounded-lg bg-accent px-3 py-1.5 text-[12px] text-accent-ink" onClick={() => direct({ type: "dialog", accept: true, ...(control.dialog?.type === "prompt" ? { promptText } : {}) })}>Accept</button>
+                  <button type="button" className="rounded-lg px-3 py-1.5 text-small text-ink-secondary hover:bg-inset" onClick={() => direct({ type: "dialog", accept: false })}>Dismiss</button>
+                  <Button variant="primary" className="text-small" onClick={() => direct({ type: "dialog", accept: true, ...(control.dialog?.type === "prompt" ? { promptText } : {}) })}>Accept</Button>
                 </div>
               </>
-            ) : <p className="text-[12px] text-ink-secondary">Take control to respond.</p>}
+            ) : <p className="text-small text-ink-secondary">Take control to respond.</p>}
           </div>
         ) : null}
         {authPrompt && you ? (
@@ -741,19 +742,19 @@ export function StreamSurface(props: {
         {notices.length ? (
           <div className="absolute inset-x-3 bottom-3 z-20 flex flex-col items-center gap-2" role="status">
             {notices.map((notice) => (
-              <div key={notice.id} className="flex max-w-full items-center gap-2 rounded-xl border border-hairline/60 bg-card px-3 py-2 text-[12px] text-ink shadow-lg">
+              <div key={notice.id} className="flex max-w-full items-center gap-2 rounded-xl border border-hairline bg-card px-3 py-2 text-small text-ink shadow-lg">
                 {notice.kind === "download" ? (
                   <>
                     <Download size={13} aria-hidden="true" className="shrink-0" />
                     <span className="min-w-0 truncate">Downloaded {notice.download.fileName}</span>
-                    <button type="button" className="shrink-0 rounded-md bg-accent px-2 py-0.5 text-accent-ink" onClick={() => { save(notice.download); dismiss(notice.id); }}>Save</button>
+                    <Button variant="primary" size="sm" className="shrink-0" onClick={() => { save(notice.download); dismiss(notice.id); }}>Save</Button>
                   </>
                 ) : notice.kind === "clipboard" ? (
                   <>
                     <span className="min-w-0 truncate">The page copied text</span>
-                    <button type="button" className="shrink-0 rounded-md bg-accent px-2 py-0.5 text-accent-ink" onClick={() => { void copyText(notice.text); dismiss(notice.id); }}>Copy</button>
+                    <Button variant="primary" size="sm" className="shrink-0" onClick={() => { void copyText(notice.text); dismiss(notice.id); }}>Copy</Button>
                   </>
-                ) : <span role="alert" className="min-w-0 text-danger">{notice.message}</span>}
+                ) : <span role="alert" className="min-w-0 text-danger-text">{notice.message}</span>}
                 <button type="button" aria-label="Dismiss" className="shrink-0 rounded-md p-0.5 text-ink-secondary hover:bg-inset" onClick={() => dismiss(notice.id)}><X size={12} /></button>
               </div>
             ))}
@@ -762,9 +763,9 @@ export function StreamSurface(props: {
       </div>
       {hostSetup ? (
         <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 bg-card p-4 text-center">
-          <p role="alert" className="max-w-sm text-[13px] text-ink-secondary">{previewStreamHostSetupMessage(hostSetup)}</p>
-          <code className="max-w-md select-all break-all rounded-lg bg-inset px-3 py-2 text-left text-[12px] text-ink">{hostSetup.command}</code>
-          <button type="button" className="rounded-lg border border-hairline px-3 py-1.5 text-[12px] text-ink hover:bg-inset" onClick={() => setHostSetup(null)}>Try again</button>
+          <p role="alert" className="max-w-sm text-ui text-ink-secondary">{previewStreamHostSetupMessage(hostSetup)}</p>
+          <code className="max-w-md select-all break-all rounded-lg bg-inset px-3 py-2 text-left text-small text-ink">{hostSetup.command}</code>
+          <button type="button" className="rounded-lg border border-edge px-3 py-1.5 text-small text-ink hover:bg-inset" onClick={() => setHostSetup(null)}>Try again</button>
         </div>
       ) : null}
     </div>

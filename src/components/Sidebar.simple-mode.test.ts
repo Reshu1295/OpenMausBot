@@ -132,8 +132,8 @@ describe("bot-first sidebar", () => {
     fixture.showThreads = false;
     const markup = renderToStaticMarkup(createElement(BotListItem, rowProps("comfortable", { ...bot, tasks: [], projects: [] })));
     const name = markup.match(/<span class="flex min-w-0 grow items-center gap-1\.5 truncate text-ink ([^"]*)"/)?.[1];
-    expect(name).toBe(advanced ? "text-[15px] font-semibold leading-5" : "text-[14px] font-medium leading-5");
-    expect(markup).toContain("truncate text-[13px] leading-[18px]");
+    expect(name).toBe(advanced ? "text-body font-semibold leading-5" : "text-label font-medium leading-5");
+    expect(markup).toContain("truncate text-ui leading-[18px]");
   });
 
   it.each(["comfortable", "compact"] as const)("puts the bot's role in its name line in Advanced mode, %s density", (density) => {
@@ -163,7 +163,7 @@ describe("bot-first sidebar", () => {
     expect(line.slice(0, line.indexOf("data-provider-mark"))).not.toContain("title=");
     expect(String(findElement(tree, "data-sidebar-bot-row", bot.id)!.props.className)).not.toContain("group-hover:pr-9");
     expect(markup).not.toContain("group-hover:pr-7");
-    expect(markup).toMatch(/data-bot-actions="atlas"[^>]*class="[^"]*\bright-2 top-1 translate-y-0\b/);
+    expect(markup).toMatch(/<button(?=[^>]*data-bot-actions="atlas")[^>]*class="[^"]*\bright-2 top-1 translate-y-0\b/);
   });
 
   it("fades the collapsed rail's engine badge in both modes", () => {
@@ -183,7 +183,7 @@ describe("bot-first sidebar", () => {
     const waiting = renderToStaticMarkup(createElement(BotListItem, rowProps("comfortable", { ...quiet, activity: "waiting-on-you" })));
     expect(waiting).toContain('data-testid="waiting-dot" title="Waiting for you…" class="size-2 shrink-0 rounded-full bg-warning"');
     expect(waiting).not.toContain(">!<");
-    expect(waiting).not.toContain("font-semibold text-warning");
+    expect(waiting).not.toContain("font-semibold text-warning-text");
     expect(waiting).not.toContain('role="status"');
     const working = renderToStaticMarkup(createElement(BotListItem, rowProps("comfortable", { ...quiet, busy: true })));
     expect(working).toContain('data-testid="working-dot" title="Working" class="absolute bottom-0.5 right-0.5 size-2 rounded-full ring-2 ring-[var(--row)] bg-success"');
@@ -229,11 +229,11 @@ describe("bot-first sidebar", () => {
     const group: Group = { id: "room", threadId: "room-thread", name: "Launch", memberIds: [bot.id], messages: [], defaultResponder: { kind: "mentions" }, bulletin: "", unread: false, createdAt: 1 };
     const simple = renderToStaticMarkup(createElement(BotListItem, rowProps("comfortable", { ...bot, tasks: [], projects: [] }))) + renderToStaticMarkup(createElement(GroupListItem, { group, density: "comfortable", onMenu: vi.fn() }));
     expect(simple.match(/focus-visible:outline-2 focus-visible:-outline-offset-2! focus-visible:outline-focus/g)).toHaveLength(2);
-    expect(simple).not.toContain("focus-visible:ring-accent/60");
+    expect(simple).not.toContain("focus-visible:ring-focus/60");
     fixture.advanced = true;
     const advanced = renderToStaticMarkup(createElement(BotListItem, rowProps("comfortable", { ...bot, tasks: [], projects: [] })));
     expect(advanced).toContain("focus-visible:outline-2 focus-visible:-outline-offset-2! focus-visible:outline-focus");
-    expect(advanced).not.toContain("focus-visible:ring-accent/60");
+    expect(advanced).not.toContain("focus-visible:ring-focus/60");
   });
 
   it("hides even the selected Simple row's actions until hover or focus, where Advanced keeps them shown", () => {
@@ -242,10 +242,10 @@ describe("bot-first sidebar", () => {
     const candidate = { ...bot, tasks: [], projects: [] };
     const simple = renderToStaticMarkup(createElement(BotListItem, rowProps("comfortable", candidate)));
     expect(simple).toContain("[--row:var(--color-raised)]");
-    expect(simple).toMatch(/data-bot-actions="atlas"[^>]*class="[^"]*\bpointer-events-none opacity-0 group-hover:pointer-events-auto/);
+    expect(simple).toMatch(/<button(?=[^>]*data-bot-actions="atlas")[^>]*class="[^"]*\bpointer-events-none opacity-0 group-hover:pointer-events-auto/);
     expect(simple).toContain('class="flex items-baseline justify-between gap-2 pr-7"');
     fixture.advanced = true;
-    expect(renderToStaticMarkup(createElement(BotListItem, rowProps("comfortable", candidate)))).toMatch(/data-bot-actions="atlas"[^>]*class="[^"]*\bpointer-events-auto opacity-100/);
+    expect(renderToStaticMarkup(createElement(BotListItem, rowProps("comfortable", candidate)))).toMatch(/<button(?=[^>]*data-bot-actions="atlas")[^>]*class="[^"]*\bpointer-events-auto opacity-100/);
   });
 
   it("marks an unread Simple group chat with the same top-right dot as a bot row, said once for a screen reader", () => {
@@ -289,11 +289,11 @@ describe("bot-first sidebar", () => {
   });
 
   it.each([
-    { advanced: false, density: "comfortable", face: 36, spacing: ["gap-2", "rounded-[10px]", "pl-2", "pr-2", "md:h-[54px]"], name: "font-medium", preview: "text-[13px]" },
-    { advanced: false, density: "icons", face: 36, spacing: ["h-[54px]", "justify-center"], name: "font-semibold", preview: "text-[11px]" },
-    { advanced: true, density: "icons", face: 44, spacing: ["justify-center", "px-1", "py-1.5"], name: "font-semibold", preview: "text-[11px]" },
-    { advanced: true, density: "comfortable", face: 32, spacing: ["gap-2", "py-1.5", "pl-6", "pr-9"], name: "font-semibold", preview: "text-[11px]" },
-    { advanced: false, density: "compact", face: 26, spacing: ["gap-1.5", "py-1", "pl-6", "pr-9"], name: "font-semibold", preview: "text-[11px]" },
+    { advanced: false, density: "comfortable", face: 36, spacing: ["gap-2", "rounded-[10px]", "pl-2", "pr-2", "md:h-[54px]"], name: "font-medium", preview: "text-ui" },
+    { advanced: false, density: "icons", face: 36, spacing: ["h-[54px]", "justify-center"], name: "font-semibold", preview: "text-caption" },
+    { advanced: true, density: "icons", face: 44, spacing: ["justify-center", "px-1", "py-1.5"], name: "font-semibold", preview: "text-caption" },
+    { advanced: true, density: "comfortable", face: 32, spacing: ["gap-2", "py-1.5", "pl-6", "pr-9"], name: "font-semibold", preview: "text-caption" },
+    { advanced: false, density: "compact", face: 26, spacing: ["gap-1.5", "py-1", "pl-6", "pr-9"], name: "font-semibold", preview: "text-caption" },
   ] as const)("sizes group chat rows in $density density (advanced $advanced)", ({ advanced, density, face, spacing, name, preview }) => {
     fixture.advanced = advanced;
     const group: Group = { id: "room", threadId: "room-thread", name: "Launch", memberIds: [bot.id], messages: [], defaultResponder: { kind: "mentions" }, bulletin: "", unread: false, createdAt: 1 };
@@ -303,7 +303,7 @@ describe("bot-first sidebar", () => {
     const row = findElement(tree, "data-sidebar-group-row", group.id)!;
     expect(String(row.props.className).split(" ")).toEqual(expect.arrayContaining([...spacing]));
     expect(markup).toContain(`width="${face}px" height="${face}px"`);
-    expect(markup).toMatch(new RegExp(`truncate text-\\[14px\\] text-ink ${name}`));
+    expect(markup).toMatch(new RegExp(`truncate text-label text-ink ${name}`));
     expect(markup).toContain(`truncate text-ink-secondary ${preview}`);
   });
 
@@ -321,7 +321,7 @@ describe("bot-first sidebar", () => {
     expect(queuedDot).not.toContain("size-4");
     expect(queuedDot).not.toContain("size-5");
     expect(markup).toContain('class="truncate">Queued</span>');
-    expect(markup).not.toContain("font-semibold text-warning");
+    expect(markup).not.toContain("font-semibold text-warning-text");
     expect(markup).not.toContain("waiting-dot");
   });
 
@@ -492,7 +492,7 @@ describe("bot-first sidebar", () => {
     expect(markup).toContain('aria-label="New thread"');
     expect(markup).toContain('aria-label="Collapse Planning threads"');
     const working = renderToStaticMarkup(createElement(GroupListItem, { group: { ...group, working: true }, density: "comfortable", onMenu: vi.fn() }));
-    expect(working).toMatch(/<button type="button" disabled="" aria-label="New thread"/);
+    expect(working).toMatch(/<button(?=[^>]*disabled="")[^>]*aria-label="New thread"/);
     const single = renderToStaticMarkup(createElement(GroupListItem, { group: { ...group, tasks: [group.tasks![0]] }, density: "comfortable", onMenu: vi.fn() }));
     expect(single).not.toContain("Planning threads");
     expect(single).not.toContain('data-sidebar-thread-row=');

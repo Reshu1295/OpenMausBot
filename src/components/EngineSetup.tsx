@@ -12,6 +12,7 @@ import { noteAppCopySwitch } from "@/state/engine-install";
 import { keyEntry, keyForInstance, type KeyId } from "./keys/key-catalog";
 import { openKeySettings } from "./keys/key-focus";
 import { KeyRow, SavedKeyLine } from "./keys/KeyRow";
+import { Button } from "./ui/Button";
 
 type Platform = "darwin" | "win32" | "linux";
 
@@ -73,7 +74,7 @@ export function CommandRow({
     if (result !== "empty") settle(result);
   };
   const copyIcon = (size: number) => status === "copied" ? <Check size={size} className="text-success" />
-    : status === "failed" ? <X size={size} className="text-danger" /> : <Copy size={size} />;
+    : status === "failed" ? <X size={size} className="text-danger-text" /> : <Copy size={size} />;
 
   const openTerminal = async () => {
     const opened = await window.ogb!.openInstallTerminal!(command);
@@ -82,31 +83,29 @@ export function CommandRow({
 
   if (compact) {
     return (
-      <div className="mt-2 flex min-w-0 items-center gap-1.5 rounded-lg border border-hairline/50 bg-app px-2 py-1.5">
-        <code className="min-w-0 flex-1 truncate font-mono text-[11px] text-ink-secondary" title={command}>
+      <div className="mt-2 flex min-w-0 items-center gap-1.5 rounded-lg border border-hairline bg-app px-2 py-1.5">
+        <code className="min-w-0 flex-1 truncate font-mono text-caption text-ink-secondary" title={command}>
           {command}
         </code>
-        <button
-          type="button"
+        <Button variant="ghost" size="sm"
           onClick={() => void copy()}
           aria-label={t("engineSetup.copyCommand")}
           title={t("engineSetup.copyCommand")}
-          className="flex shrink-0 items-center gap-1 rounded-md px-1.5 py-1 text-[11px] font-medium text-ink-secondary hover:bg-control hover:text-ink"
+          className="flex shrink-0 gap-1 text-caption"
         >
           {copyIcon(12)}
           {t(status === "copied" ? "engineSetup.copied" : status === "failed" ? "common.copyFailed" : "engineSetup.copy")}
-        </button>
+        </Button>
         {canOpen && (
-          <button
-            type="button"
+          <Button variant="primary" size="sm"
             onClick={() => void openTerminal()}
             aria-label={actionLabel}
             title={actionLabel}
-            className="flex shrink-0 items-center gap-1 rounded-md bg-accent px-2 py-1 text-[11px] font-semibold text-white hover:brightness-110"
+            className="flex shrink-0 gap-1 text-caption"
           >
             {status === "opened" ? <Check size={12} /> : <TerminalSquare size={12} />}
             {status === "opened" ? t("engineSetup.opened") : t("engineSetup.terminal")}
-          </button>
+          </Button>
         )}
         <span aria-live="polite" className="sr-only">
           {status === "opened" ? t("engineSetup.openedHint") : ""}
@@ -117,47 +116,44 @@ export function CommandRow({
 
   return (
     <div className="mt-3">
-      <div className="flex min-w-0 items-center gap-2 rounded-lg border border-hairline/50 bg-app px-2.5 py-2">
-        <code className="min-w-0 flex-1 truncate font-mono text-[12px] text-ink-secondary" title={command}>
+      <div className="flex min-w-0 items-center gap-2 rounded-lg border border-hairline bg-app px-2.5 py-2">
+        <code className="min-w-0 flex-1 truncate font-mono text-small text-ink-secondary" title={command}>
           {command}
         </code>
         {canOpen && (
-          <button
-            type="button"
+          <Button variant="ghost" size="md"
             onClick={() => void copy()}
             aria-label={t("engineSetup.copyCommand")}
             title={t("engineSetup.copyCommand")}
-            className="flex shrink-0 items-center gap-1 rounded-md px-1.5 py-1 text-[12px] font-medium text-ink-secondary hover:bg-control hover:text-ink"
+            className="flex shrink-0 gap-1 px-1.5 text-small"
           >
             {copyIcon(12)}
             {t(status === "copied" ? "engineSetup.copied" : status === "failed" ? "common.copyFailed" : "engineSetup.copy")}
-          </button>
+          </Button>
         )}
       </div>
 
       {canOpen ? (
         <>
-          <button
-            type="button"
+          <Button variant="primary" size="lg"
             onClick={() => void openTerminal()}
-            className="mt-2 flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-accent px-3 py-2 text-[13px] font-semibold text-white hover:brightness-110"
+            className="mt-2 flex w-full gap-2 whitespace-nowrap px-3"
           >
             {status === "opened" ? <Check size={14} /> : <TerminalSquare size={14} />}
             {status === "opened" ? t("engineSetup.terminalOpened") : actionLabel}
-          </button>
-          <p aria-live="polite" className="mt-1.5 text-center text-[11px] text-ink-tertiary">
+          </Button>
+          <p aria-live="polite" className="mt-1.5 text-center text-caption text-ink-tertiary">
             {status === "opened" ? t("engineSetup.pasteHint") : t("engineSetup.copyOnOpenHint")}
           </p>
         </>
       ) : (
-        <button
-          type="button"
+        <Button size="lg"
           onClick={() => void copy()}
-          className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg bg-control px-3 py-2 text-[13px] font-semibold text-ink hover:bg-raised-hover"
+          className="mt-2 flex w-full gap-2 px-3"
         >
           {copyIcon(14)}
           {t(status === "copied" ? "engineSetup.commandCopied" : status === "failed" ? "common.copyFailed" : "engineSetup.copyCommand")}
-        </button>
+        </Button>
       )}
     </div>
   );
@@ -196,29 +192,29 @@ function ServerEngineInstall({ instance, mode, command, quiet = false }: { insta
 
   return (
     <div className="mt-3 space-y-2">
-      <button
-        type="button"
+      <Button
+        variant={quiet ? "secondary" : "primary"}
+        size="lg"
         disabled={busy}
         onClick={() => void run()}
-        className={cn("flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-[13px] font-semibold disabled:cursor-wait disabled:opacity-70",
-          quiet ? "bg-control text-ink hover:bg-raised-hover" : "ui-button-primary bg-accent text-white hover:brightness-110")}
+        className="flex w-full gap-2 px-3 disabled:cursor-wait"
       >
         {busy ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
         {busy
           ? t("engineSetup.serverInstalling")
           : t(mode === "update" ? "engineSetup.serverUpdate" : "engineSetup.serverInstall", { name: instance.displayName })}
-      </button>
+      </Button>
       {standalone && mode === "install" && !busy && !done && (
-        <p className="text-center text-[11px] text-ink-tertiary">
+        <p className="text-center text-caption text-ink-tertiary">
           {/* Decimal megabytes, as macOS and Windows show file sizes. */}
           {t("engineSetup.standaloneDownloadNote", { mb: Math.max(1, Math.round(standalone.downloadBytes / 1_000_000)) })}
         </p>
       )}
-      {done && !busy && <p role="status" className="text-center text-[11px] text-success">{t("engineSetup.installVerified")}</p>}
+      {done && !busy && <p role="status" className="text-center text-caption text-success">{t("engineSetup.installVerified")}</p>}
       {!busy && <AppCopyNotice instance={instance} />}
-      {error && <p role="alert" className="whitespace-pre-wrap text-[12px] leading-relaxed text-danger">{error}</p>}
+      {error && <p role="alert" className="whitespace-pre-wrap text-small leading-relaxed text-danger-text">{error}</p>}
       {terminalCommand && (
-        <details className="rounded-lg border border-hairline/50 bg-app px-2.5 py-2 text-[12px] text-ink-secondary">
+        <details className="rounded-lg border border-hairline bg-app px-2.5 py-2 text-small text-ink-secondary">
           <summary className="cursor-pointer select-none">{t("engineSetup.preferTerminal")}</summary>
           <CommandRow command={terminalCommand} actionLabel={t(mode === "update" ? "engineSetup.openUpdate" : "engineSetup.openInstall")} compact allowTerminal={state.config?.cloudHome !== true} />
         </details>
@@ -245,10 +241,10 @@ export function EngineUpdateNotice({
       className={cn("rounded-xl border border-warning/25 bg-warning/5 p-2.5", className)}
     >
       <div className="flex items-start gap-2">
-        <AlertTriangle size={14} className="mt-0.5 shrink-0 text-warning" aria-hidden="true" />
+        <AlertTriangle size={14} className="mt-0.5 shrink-0 text-warning-text" aria-hidden="true" />
         <div className="min-w-0">
-          <div className="text-[13px] font-semibold text-ink">{update.title}</div>
-          <p className="mt-0.5 text-[12px] leading-relaxed text-ink-secondary">{update.message}</p>
+          <div className="text-ui font-semibold text-ink">{update.title}</div>
+          <p className="mt-0.5 text-small leading-relaxed text-ink-secondary">{update.message}</p>
         </div>
       </div>
       {instance?.install?.server
@@ -271,10 +267,10 @@ export function EngineWarningNotice({
       className={cn("rounded-xl border border-warning/25 bg-warning/5 p-2.5", className)}
     >
       <div className="flex items-start gap-2">
-        <AlertTriangle size={14} className="mt-0.5 shrink-0 text-warning" aria-hidden="true" />
+        <AlertTriangle size={14} className="mt-0.5 shrink-0 text-warning-text" aria-hidden="true" />
         <div className="min-w-0">
-          <div className="text-[13px] font-semibold text-ink">{warning.title}</div>
-          <p className="mt-0.5 text-[12px] leading-relaxed text-ink-secondary">{warning.message}</p>
+          <div className="text-ui font-semibold text-ink">{warning.title}</div>
+          <p className="mt-0.5 text-small leading-relaxed text-ink-secondary">{warning.message}</p>
         </div>
       </div>
     </div>
@@ -343,30 +339,28 @@ function ManagedEngineSetup({ instance, signInOnly }: { instance: InstanceInfo; 
   if (!signInOnly) {
     return (
       <div className="mt-3">
-        <button
-          type="button"
+        <Button variant="primary" size="lg"
           disabled={busy !== null}
           onClick={() => void install()}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-accent px-3 py-2 text-[13px] font-semibold text-white hover:brightness-110 disabled:cursor-wait disabled:opacity-70"
+          className="flex w-full gap-2 px-3 disabled:cursor-wait"
         >
           {busy === "install" ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
           {busy === "install" ? t("engineSetup.installing") : managed.label}
-        </button>
-        <p className="mt-1.5 text-center text-[11px] text-ink-tertiary">
+        </Button>
+        <p className="mt-1.5 text-center text-caption text-ink-tertiary">
           {t("engineSetup.downloadNote", { mb: Math.ceil(managed.downloadBytes / 1024 / 1024) })}
         </p>
-        {error && <p className="mt-2 text-[12px] text-danger">{error}</p>}
+        {error && <p className="mt-2 text-small text-danger-text">{error}</p>}
       </div>
     );
   }
 
   return (
     <div className="mt-3 space-y-2">
-      <button
-        type="button"
+      <Button variant="primary" size="lg"
         disabled={busy !== null}
         onClick={() => void signIn()}
-        className="flex w-full items-center justify-center gap-2 rounded-lg bg-accent px-3 py-2 text-[13px] font-semibold text-white hover:brightness-110 disabled:cursor-wait disabled:opacity-70"
+        className="flex w-full gap-2 px-3 disabled:cursor-wait"
       >
         {busy === "signin" ? <Loader2 size={14} className="animate-spin" /> : <LogIn size={14} />}
         {busy === "signin"
@@ -374,14 +368,14 @@ function ManagedEngineSetup({ instance, signInOnly }: { instance: InstanceInfo; 
           : flow
             ? t("engineSetup.openGoogleAgain")
             : t("engineSetup.signInGoogle")}
-      </button>
-      {busy === "signin" && <p role="status" className="text-[12px] text-ink-secondary">{t("engineSetup.antigravitySlow")}</p>}
+      </Button>
+      {busy === "signin" && <p role="status" className="text-small text-ink-secondary">{t("engineSetup.antigravitySlow")}</p>}
       {flow && (
         <>
-          <button type="button" onClick={() => void check()} className="w-full rounded-lg bg-control px-3 py-2 text-[12px] font-semibold text-ink hover:bg-raised-hover">
+          <Button size="lg" onClick={() => void check()} className="w-full px-3 text-small">
             {busy === "check" ? t("common.checking") : t("engineSetup.finishedSignIn")}
-          </button>
-          <details className="rounded-lg border border-hairline/50 bg-app px-2.5 py-2 text-[12px] text-ink-secondary">
+          </Button>
+          <details className="rounded-lg border border-hairline bg-app px-2.5 py-2 text-small text-ink-secondary">
             <summary className="cursor-pointer select-none">{t("engineSetup.otherComputer")}</summary>
             <p className="mt-2 leading-relaxed">{t("engineSetup.otherComputerHint")}</p>
             <input
@@ -389,20 +383,19 @@ function ManagedEngineSetup({ instance, signInOnly }: { instance: InstanceInfo; 
               onChange={(event) => setCallbackUrl(event.target.value)}
               aria-label={t("engineSetup.otherComputerUrl")}
               placeholder="http://127.0.0.1:…/?code=…"
-              className="mt-2 w-full rounded-md border border-hairline bg-inset px-2 py-1.5 text-[11px] text-ink outline-none focus:border-accent"
+              className="mt-2 w-full rounded-md border border-edge bg-inset px-2 py-1.5 text-caption text-ink outline-none focus:border-accent"
             />
-            <button
-              type="button"
+            <Button
               disabled={!callbackUrl.trim() || busy !== null}
               onClick={() => void complete()}
-              className="mt-2 w-full rounded-md bg-control px-2 py-1.5 font-medium text-ink disabled:opacity-50"
+              className="mt-2 w-full px-2"
             >
               {busy === "complete" ? t("engineSetup.sending") : t("engineSetup.sendRedirect")}
-            </button>
+            </Button>
           </details>
         </>
       )}
-      {error && <p className="text-[12px] text-danger">{error}</p>}
+      {error && <p className="text-small text-danger-text">{error}</p>}
     </div>
   );
 }
@@ -435,7 +428,7 @@ export function ApiKeyHint({ instance }: { instance: InstanceInfo }) {
   const key = window.ogb?.remoteClient?.active === true ? undefined : inlineKey(instance);
   return (
     <>
-      <div className="mt-0.5 text-[12px] leading-4 text-ink-tertiary">{t("model.apiKeyHint")}</div>
+      <div className="mt-0.5 text-small leading-4 text-ink-tertiary">{t("model.apiKeyHint")}</div>
       {key && <SavedKeyLine id={key} />}
     </>
   );
@@ -444,12 +437,12 @@ export function ApiKeyHint({ instance }: { instance: InstanceInfo }) {
 function GrokKeyInstead({ className, unframed }: { className?: string; unframed: boolean }) {
   const remote = window.ogb?.remoteClient?.active === true;
   return (
-    <div data-engine-setup-key-instead className={cn(!unframed && "rounded-xl border border-hairline/40 bg-control/30 p-3", className)}>
+    <div data-engine-setup-key-instead className={cn(!unframed && "rounded-xl border border-hairline bg-control/30 p-3", className)}>
       <div className="flex items-start gap-2.5">
         <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-inset text-ink-secondary">
           <KeyRound size={14} />
         </span>
-        <p className="min-w-0 text-[13px] leading-relaxed text-ink">{t("engineSetup.grok.notInstalled")}</p>
+        <p className="min-w-0 text-ui leading-relaxed text-ink">{t("engineSetup.grok.notInstalled")}</p>
       </div>
       {!remote && <KeyRow id="xai" bare via="model_picker" className="mt-2 px-0 pb-0" />}
     </div>
@@ -464,26 +457,26 @@ function ApiKeyEngineSetup({ instance, className, unframed, configured = false }
     ? { title: "engineSetup.apiKey.configuredTitle", description: remote ? "engineSetup.apiKey.configuredRemote" : inline ? null : "engineSetup.apiKey.configuredDescription", action: "engineSetup.apiKey.change" } as const
     : { title: "engineSetup.apiKey.title", description: remote ? "engineSetup.apiKey.remote" : inline ? "engineSetup.apiKey.inline" : "engineSetup.apiKey.description", action: "engineSetup.apiKey.open" } as const;
   return (
-    <div data-engine-setup-api-key={configured ? "configured" : ""} className={cn(!unframed && "rounded-xl border border-hairline/40 bg-control/30 p-3", className)}>
+    <div data-engine-setup-api-key={configured ? "configured" : ""} className={cn(!unframed && "rounded-xl border border-hairline bg-control/30 p-3", className)}>
       <div className="flex items-start gap-2.5">
         <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-inset text-ink-secondary">
           <KeyRound size={14} />
         </span>
         <div className="min-w-0">
-          <div className="text-[13px] font-semibold text-ink">{t(copy.title, { name: instance.displayName })}</div>
-          {copy.description && <p className="mt-0.5 text-[12px] leading-relaxed text-ink-secondary">{t(copy.description)}</p>}
+          <div className="text-ui font-semibold text-ink">{t(copy.title, { name: instance.displayName })}</div>
+          {copy.description && <p className="mt-0.5 text-small leading-relaxed text-ink-secondary">{t(copy.description)}</p>}
         </div>
       </div>
       {/* An API-only engine is available only with a saved key, so unauthenticated means rejected.
           A key engine with its own CLI (DeepSeek Harness) is unauthenticated simply when no key is saved yet. */}
       {!inline && isApiKeyEngine(instance) && needsSignIn(instance) && (
-        <p role="alert" className="mt-2 text-[12px] leading-relaxed text-danger">{t("engineSetup.apiKey.rejected")}</p>
+        <p role="alert" className="mt-2 text-small leading-relaxed text-danger-text">{t("engineSetup.apiKey.rejected")}</p>
       )}
       {inline ? <KeyRow id={inline} bare via="model_picker" rejected={isApiKeyEngine(instance) && needsSignIn(instance)} className="mt-2 px-0 pb-0" /> : !remote && (
         <button
           type="button"
           onClick={() => dispatch(openKeysFor(instance))}
-          className="mt-3 flex items-center gap-1.5 rounded-lg bg-raised px-3 py-1.5 text-[13px] font-medium text-ink hover:bg-raised-hover"
+          className="mt-3 flex items-center gap-1.5 rounded-lg bg-raised px-3 py-1.5 text-ui font-medium text-ink hover:bg-raised-hover"
         >
           <KeyRound size={13} aria-hidden="true" />
           {t(copy.action)}
@@ -557,9 +550,9 @@ export function EngineSetup({
 
   if (!install || instance.snapshot.authenticationUnavailableReason) {
     return (
-      <div className={cn(!unframed && "rounded-xl border border-hairline/40 bg-control/30 p-3", className)}>
-        <div className="text-[13px] font-semibold text-ink">{t("engineSetup.notReady", { name: instance.displayName })}</div>
-        <p className="mt-1 text-[12px] leading-relaxed text-ink-secondary">
+      <div className={cn(!unframed && "rounded-xl border border-hairline bg-control/30 p-3", className)}>
+        <div className="text-ui font-semibold text-ink">{t("engineSetup.notReady", { name: instance.displayName })}</div>
+        <p className="mt-1 text-small leading-relaxed text-ink-secondary">
           {instance.snapshot.authenticationUnavailableReason ?? instance.snapshot.reason ?? t("engineSetup.noReason")}
         </p>
       </div>
@@ -572,24 +565,24 @@ export function EngineSetup({
   }
 
   return (
-    <div className={cn(!unframed && "rounded-xl border border-hairline/40 bg-control/30 p-3", className)}>
+    <div className={cn(!unframed && "rounded-xl border border-hairline bg-control/30 p-3", className)}>
       <div className="flex items-start gap-2.5">
         <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-inset text-ink-secondary">
           {signInOnly ? <LogIn size={14} /> : <Download size={14} />}
         </span>
         <div className="min-w-0">
-          <div className="text-[13px] font-semibold text-ink">{title}</div>
-          <p className="mt-0.5 text-[12px] leading-relaxed text-ink-secondary">{description}</p>
+          <div className="text-ui font-semibold text-ink">{title}</div>
+          <p className="mt-0.5 text-small leading-relaxed text-ink-secondary">{description}</p>
         </div>
       </div>
 
       {instance.snapshot.state === "unavailable" && instance.snapshot.reason && (quiet ? (
-        <details data-engine-setup-reason className="mt-2 text-[12px] leading-4 text-ink-tertiary">
+        <details data-engine-setup-reason className="mt-2 text-small leading-4 text-ink-tertiary">
           <summary className="cursor-pointer select-none hover:text-ink-secondary">{t("engineSetup.details")}</summary>
           <p className="mt-1 whitespace-pre-wrap">{instance.snapshot.reason}</p>
         </details>
       ) : (
-        <p role="alert" className="mt-2 text-[12px] leading-relaxed text-danger">
+        <p role="alert" className="mt-2 text-small leading-relaxed text-danger-text">
           {instance.snapshot.reason}
         </p>
       ))}
@@ -598,7 +591,7 @@ export function EngineSetup({
         <>
           <DeviceSignIn key={instance.instanceId} instanceId={instance.instanceId} browserPkce={browserSignIn} provider={provider} />
           {deviceSignIn && provider === "grok" && signInCommand && serverTerminal(cloudHome) && (
-            <details className="mt-2 rounded-lg border border-hairline/50 bg-app px-2.5 py-2 text-[12px] text-ink-secondary">
+            <details className="mt-2 rounded-lg border border-hairline bg-app px-2.5 py-2 text-small text-ink-secondary">
               <summary className="cursor-pointer select-none">{t("engineSetup.preferTerminal")}</summary>
               <CommandRow command={signInCommand} actionLabel={t("engineSetup.openSignIn")} compact />
             </details>
@@ -617,13 +610,13 @@ export function EngineSetup({
           allowTerminal={!cloudHome}
         />
       ) : (
-        <p className="mt-3 rounded-lg bg-inset px-2.5 py-2 text-[12px] leading-relaxed text-ink-secondary">
+        <p className="mt-3 rounded-lg bg-inset px-2.5 py-2 text-small leading-relaxed text-ink-secondary">
           {t("engineSetup.noInstaller")}
         </p>
       )}
 
       {!signInOnly && install.needsNode && !install.server && (
-        <p className="mt-2 text-[11px] leading-relaxed text-ink-tertiary">
+        <p className="mt-2 text-caption leading-relaxed text-ink-tertiary">
           {t("engineSetup.needsNode").split("{npm}").flatMap((part, index) =>
             index === 0
               ? [part]
@@ -633,9 +626,9 @@ export function EngineSetup({
       )}
 
       {(install.command || signInCommand) && !deviceSignIn && !browserSignIn && !pasteSignIn && !install.managed && (
-        <div className="mt-3 border-t border-hairline/40 pt-2">
-          <p className="mb-1 text-[12px] leading-relaxed text-ink-secondary">{t("engineSetup.sameMachine")}</p>
-          {needsCli(instance) && <p className="mb-1 text-[12px] leading-relaxed text-ink-secondary">{t("engineSetup.pathHint")}</p>}
+        <div className="mt-3 border-t border-hairline pt-2">
+          <p className="mb-1 text-small leading-relaxed text-ink-secondary">{t("engineSetup.sameMachine")}</p>
+          {needsCli(instance) && <p className="mb-1 text-small leading-relaxed text-ink-secondary">{t("engineSetup.pathHint")}</p>}
           <RefreshEngines key={instance.instanceId} />
         </div>
       )}
@@ -645,7 +638,7 @@ export function EngineSetup({
           href={install.docsUrl}
           target="_blank"
           rel="noreferrer"
-          className="mt-2.5 inline-flex items-center gap-1.5 text-[12px] font-medium text-accent hover:underline"
+          className="mt-2.5 inline-flex items-center gap-1.5 text-small font-medium text-accent-text hover:underline"
         >
           <ExternalLink size={12} /> {t("engineSetup.viewGuide")}
         </a>

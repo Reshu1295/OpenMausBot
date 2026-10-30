@@ -114,7 +114,7 @@ describe("the Simple composer in a bot chat", () => {
     const pill = container.querySelector('[data-tour="composer"]')!.className.split(" ");
     expect(pill).toEqual(expect.arrayContaining(["rounded-[22px]", "bg-composer", "p-2", "ring-[0.5px]", "hover:ring-ink/[0.22]", "focus-within:ring-ink/[0.22]",
       "[transition:border-radius_300ms,box-shadow_150ms]"]));
-    expect(pill.filter((name) => name.startsWith("shadow"))).toEqual(["shadow-[0_2px_8px_-1px_rgb(0_0_0/0.05),0_1px_2px_rgb(0_0_0/0.03),0_0_0_1px_rgb(228_228_228/0.04)]"]);
+    expect(pill.filter((name) => name.startsWith("shadow"))).toEqual(["shadow-[0_2px_8px_-1px_color-mix(in_srgb,var(--color-shadow)_5%,transparent),0_1px_2px_color-mix(in_srgb,var(--color-shadow)_3%,transparent),0_0_0_1px_rgb(228_228_228/0.04)]"]);
     expect(container.querySelector("[data-composer-row]")!.className).not.toContain("flex-wrap");
     expect(container.querySelector("[data-composer-actions]")!.className.split(" ")).toContain("gap-2");
     expect(container.querySelector("[data-composer-plus]")!.className.split(" ")).toEqual(expect.arrayContaining(["size-7", "bg-ink/[0.05]", "ring-inset", "text-ink-tertiary"]));
@@ -127,7 +127,7 @@ describe("the Simple composer in a bot chat", () => {
     expect([...menu()!.querySelectorAll("[data-menu-key]")].map((row) => row.getAttribute("data-menu-key"))).toEqual(["attach", "goal", "teach"]);
     expect([...menu()!.querySelectorAll("[data-menu-key]")].map((row) => row.textContent)).toEqual(["Attach files", "Work until done", "Teach a task"]);
     const row = menu()!.querySelector("[data-menu-key='attach']")!.className.split(" ");
-    expect(row).toEqual(expect.arrayContaining(["h-[34px]", "gap-2", "px-3", "text-[15px]"]));
+    expect(row).toEqual(expect.arrayContaining(["h-[34px]", "gap-2", "px-3", "text-body"]));
     expect(menu()!.className.split(" ")).toEqual(expect.arrayContaining(["popover-surface", "rounded-[14px]", "w-max", "min-w-[200px]", "max-w-[280px]"]));
   });
 
@@ -155,7 +155,9 @@ describe("the Simple composer in a bot chat", () => {
     render({ bot: { ...bot, busy: true } });
     expect(container.querySelector("textarea")!.getAttribute("placeholder")).toBe("Message Atlas");
     const send = container.querySelector<HTMLButtonElement>('button[aria-label="Sends when Atlas is done"]')!;
-    expect(send.getAttribute("title")).toBe("Sends when Atlas is done");
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "Tab" }));
+    flushSync(() => send.focus());
+    expect(document.getElementById(send.getAttribute("aria-describedby") ?? "")?.textContent).toBe("Sends when Atlas is done");
   });
 
   it("rounds its corners in from 22 to 18 once the message takes a second line", () => {
@@ -235,7 +237,7 @@ describe("the Simple composer in a bot chat", () => {
     expect(chip.querySelector(".lucide-x")).not.toBeNull();
     expect(chip.getAttribute("aria-label")).toBe("Turn off Work until done");
     expect(chip.hasAttribute("aria-pressed")).toBe(false);
-    expect(chip.className.split(" ")).toEqual(expect.arrayContaining(["h-7", "gap-1", "px-2.5", "text-[13px]"]));
+    expect(chip.className.split(" ")).toEqual(expect.arrayContaining(["h-7", "gap-1", "px-2.5", "text-ui"]));
     click(chip);
     expect(container.querySelector("[data-goal-chip]")).toBeNull();
   });

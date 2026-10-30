@@ -7,6 +7,7 @@ import type { CloudRenewal } from "../../electron/cloud-list.mjs";
 import { cn } from "@/lib/cn";
 import { activeLocale, t } from "@/lib/i18n";
 import type { LocaleKey } from "@/locales";
+import { Button } from "./ui/Button";
 
 export const CLOUD_CALL_URL = "https://cal.com/milind-soni-002qed/30min";
 const ANSWERS: readonly CloudCancelAnswer[] = ["feature", "price", "setup", "broken", "later", "other"];
@@ -60,13 +61,13 @@ export function CloudCancelPlan({ renewal, actions, onChanged }: { renewal: Clou
   return <>
     {renewal.cancelled
       ? <div data-cloud-cancel="cancelled" className="flex flex-col items-start gap-2 self-start">
-        <p role="status" className="text-[13px] text-ink">{endedLine(renewal)}</p>
-        <button type="button" className="ui-button" disabled={keeping} onClick={keep}>{t(keeping ? "cloudCancel.keeping" : "cloudCancel.keep")}</button>
-        {note && <p role={note === "failed" ? "alert" : "status"} className={cn("text-[13px]", note === "failed" ? "text-danger" : "text-ink-secondary")}>
+        <p role="status" className="text-ui text-ink">{endedLine(renewal)}</p>
+        <Button disabled={keeping} onClick={keep}>{t(keeping ? "cloudCancel.keeping" : "cloudCancel.keep")}</Button>
+        {note && <p role={note === "failed" ? "alert" : "status"} className={cn("text-ui", note === "failed" ? "text-danger-text" : "text-ink-secondary")}>
           {t(note === "failed" ? "cloudCancel.failed" : "cloudCancel.browser")}</p>}
       </div>
-      : <button type="button" data-cloud-cancel="renewing" className="ui-button self-start" onClick={() => { setNote(null); setOpened(renewal); }}>
-        {t(renewal.trial ? "cloudCancel.cancelTrial" : "cloudCancel.cancelPlan")}</button>}
+      : <Button data-cloud-cancel="renewing" className="self-start" onClick={() => { setNote(null); setOpened(renewal); }}>
+        {t(renewal.trial ? "cloudCancel.cancelTrial" : "cloudCancel.cancelPlan")}</Button>}
     {opened && <CloudCancelSheet renewal={opened} actions={actions} onClose={changed => { setOpened(null); if (changed) onChanged?.(); }} />}
   </>;
 }
@@ -105,12 +106,12 @@ export function CloudCancelSheet({ renewal, actions, onClose }: { renewal: Cloud
     else setFailed(true);
   });
   const title = t(renewal.trial ? "cloudCancel.titleTrial" : "cloudCancel.titlePlan");
-  const box = "mt-1.5 w-full rounded-lg border border-hairline/50 bg-inset px-3 py-2 text-[14px] text-ink disabled:opacity-60";
-  const alert = failed && <p role="alert" className="mt-3 text-[13px] text-danger">{t("cloudCancel.failed")}</p>;
+  const box = "mt-1.5 w-full rounded-lg border border-hairline bg-inset px-3 py-2 text-label text-ink disabled:opacity-60";
+  const alert = failed && <p role="alert" className="mt-3 text-ui text-danger-text">{t("cloudCancel.failed")}</p>;
   return createPortal(
     <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/55 p-4" onMouseDown={event => { if (event.target === event.currentTarget) close(); }}>
       <div ref={dialog} role="dialog" aria-modal="true" aria-labelledby="cloud-cancel-title" aria-busy={busy} tabIndex={-1} data-cloud-cancel-sheet={state.step}
-        className="flex max-h-[90vh] w-full max-w-[480px] flex-col overflow-hidden rounded-2xl border border-hairline/50 bg-panel text-ink shadow-2xl outline-none"
+        className="flex max-h-[90vh] w-full max-w-[480px] flex-col overflow-hidden rounded-2xl border border-hairline bg-panel text-ink shadow-2xl outline-none"
         onKeyDown={event => {
           if (event.key === "Escape") { event.stopPropagation(); close(); }
           if (event.key === "Tab") {
@@ -122,46 +123,46 @@ export function CloudCancelSheet({ renewal, actions, onClose }: { renewal: Cloud
           }
         }}>
         <header className="flex items-start justify-between gap-3 px-6 pb-1 pt-5">
-          <h2 id="cloud-cancel-title" className="text-[17px] font-semibold">{title}</h2>
+          <h2 id="cloud-cancel-title" className="text-title font-semibold">{title}</h2>
           <button type="button" aria-label={t("cloudCancel.close")} disabled={busy} onClick={close} className="rounded-lg p-1.5 text-ink-secondary hover:bg-raised"><X size={18} /></button>
         </header>
         <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-5 pt-1">
           {state.step === "ask" && <>
-            <p className="text-[13px] leading-relaxed text-ink-secondary">{leadLine(renewal)}</p>
+            <p className="text-ui leading-relaxed text-ink-secondary">{leadLine(renewal)}</p>
             <fieldset className="mt-4" disabled={busy}>
-              <legend className="text-[14px] font-medium text-ink">{t("cloudCancel.question")}</legend>
+              <legend className="text-label font-medium text-ink">{t("cloudCancel.question")}</legend>
               <div className="mt-2.5 flex flex-wrap gap-2">
                 {ANSWERS.map(answer => <button key={answer} type="button" aria-pressed={picked === answer} onClick={() => setPicked(current => current === answer ? null : answer)}
                   className={cn("ui-button ui-button-pill", picked === answer && "border-accent bg-accent/10 font-medium")}>{t(ANSWER_LABEL[answer])}</button>)}
               </div>
             </fieldset>
-            <label className="mt-4 block text-[13px] text-ink">{t("cloudCancel.expected")} <span className="text-ink-secondary">{t("cloudCancel.optional")}</span>
+            <label className="mt-4 block text-ui text-ink">{t("cloudCancel.expected")} <span className="text-ink-secondary">{t("cloudCancel.optional")}</span>
               <textarea rows={2} maxLength={BOX_MAX} value={expected} disabled={busy} onChange={event => setExpected(event.target.value)} className={box} /></label>
-            <label className="mt-3 block text-[13px] text-ink">{t("cloudCancel.improve")} <span className="text-ink-secondary">{t("cloudCancel.optional")}</span>
+            <label className="mt-3 block text-ui text-ink">{t("cloudCancel.improve")} <span className="text-ink-secondary">{t("cloudCancel.optional")}</span>
               <textarea rows={2} maxLength={BOX_MAX} value={improve} disabled={busy} onChange={event => setImprove(event.target.value)} className={box} /></label>
-            <p className="mt-3 text-[12px] text-ink-secondary">{t("cloudCancel.talk")}{" "}
+            <p className="mt-3 text-small text-ink-secondary">{t("cloudCancel.talk")}{" "}
               <a href={CLOUD_CALL_URL} target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-ink">{t("cloudCancel.book")}</a></p>
             {alert}
             <div className="mt-5 flex flex-wrap justify-end gap-2">
-              <button type="button" className="ui-button" disabled={busy} onClick={close}>{t("cloudCancel.keep")}</button>
-              <button type="button" data-cloud-cancel-confirm className="ui-button border-transparent bg-danger text-white hover:brightness-110" disabled={busy} onClick={cancel}>
-                {t(busy ? "cloudCancel.cancelling" : renewal.trial ? "cloudCancel.confirmTrial" : "cloudCancel.confirmPlan")}</button>
+              <Button disabled={busy} onClick={close}>{t("cloudCancel.keep")}</Button>
+              <Button data-cloud-cancel-confirm className="border-transparent bg-danger text-white hover:brightness-110" disabled={busy} onClick={cancel}>
+                {t(busy ? "cloudCancel.cancelling" : renewal.trial ? "cloudCancel.confirmTrial" : "cloudCancel.confirmPlan")}</Button>
             </div>
           </>}
           {state.step === "done" && <>
-            <p role="status" className="text-[14px] font-medium text-ink">{endedLine(state.renewal)}</p>
-            <p className="mt-2 text-[13px] leading-relaxed text-ink-secondary">{stopsLine(state.renewal)}</p>
-            {state.surveyed && <p className="mt-2 text-[13px] leading-relaxed text-ink-secondary">{t("cloudCancel.thanks")}</p>}
+            <p role="status" className="text-label font-medium text-ink">{endedLine(state.renewal)}</p>
+            <p className="mt-2 text-ui leading-relaxed text-ink-secondary">{stopsLine(state.renewal)}</p>
+            {state.surveyed && <p className="mt-2 text-ui leading-relaxed text-ink-secondary">{t("cloudCancel.thanks")}</p>}
             {alert}
             <div className="mt-5 flex flex-wrap items-center gap-2">
-              <span className="text-[13px] text-ink-secondary">{t("cloudCancel.changedMind")}</span>
-              <button type="button" className="ui-button" disabled={busy} onClick={keep}>{t(busy ? "cloudCancel.keeping" : "cloudCancel.keep")}</button>
-              <button type="button" className="ui-button ui-button-primary ms-auto" disabled={busy} onClick={close}>{t("cloudCancel.done")}</button>
+              <span className="text-ui text-ink-secondary">{t("cloudCancel.changedMind")}</span>
+              <Button disabled={busy} onClick={keep}>{t(busy ? "cloudCancel.keeping" : "cloudCancel.keep")}</Button>
+              <Button variant="primary" className="ms-auto" disabled={busy} onClick={close}>{t("cloudCancel.done")}</Button>
             </div>
           </>}
           {state.step === "browser" && <>
-            <p role="status" className="text-[13px] leading-relaxed text-ink">{t("cloudCancel.browser")}</p>
-            <div className="mt-5 flex justify-end"><button type="button" className="ui-button ui-button-primary" onClick={close}>{t("cloudCancel.done")}</button></div>
+            <p role="status" className="text-ui leading-relaxed text-ink">{t("cloudCancel.browser")}</p>
+            <div className="mt-5 flex justify-end"><Button variant="primary" onClick={close}>{t("cloudCancel.done")}</Button></div>
           </>}
         </div>
       </div>

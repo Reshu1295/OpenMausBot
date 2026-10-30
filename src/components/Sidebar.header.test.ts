@@ -133,10 +133,10 @@ describe("sidebar top row", () => {
     expect(switcherClasses).toEqual(expect.arrayContaining(["min-w-0", "max-w-[140px]"]));
     expect(switcherClasses).not.toContain("flex-1");
     expect(classesOf(row, "data-sidebar-top-buttons")).toEqual(expect.arrayContaining(["shrink-0", "gap-0.5"]));
-    expect(row).toMatch(/aria-label="Switch server: Servers"[^>]*title="Servers"[^>]*class="[^"]*\bh-7\b[^"]*\boverflow-hidden\b[^"]*\btext-\[13px\][^"]*" style="-webkit-app-region:no-drag"/);
+    expect(row).toMatch(/aria-label="Switch server: Servers"[^>]*title="Servers"[^>]*class="[^"]*\bh-7\b[^"]*\boverflow-hidden\b[^"]*\btext-ui[^"]*" style="-webkit-app-region:no-drag"/);
     expect(row).toContain('<span class="min-w-0 truncate @max-[96px]/sidebar-top:hidden">Servers</span>');
     expect(row).toContain("focus-visible:outline-2");
-    expect(html).toContain('title="New or share"');
+    expect(html).toContain('aria-label="New or share"');
     expect(row).toContain('title="Collapse to avatars"');
     expect(row).toContain('aria-label="Collapse sidebar to avatars"');
     expect(row).toContain('title="Active Threads"');
@@ -159,9 +159,9 @@ describe("sidebar top row", () => {
     expect(buttons).toBeGreaterThan(slot);
     expect(classesOf(row, "data-sidebar-top-buttons")).toEqual(expect.arrayContaining(["shrink-0", "gap-2"]));
     expect(row.slice(buttons).match(/<button/g)).toHaveLength(2);
-    expect(row).toMatch(/data-sidebar-search-toggle="true" aria-label="Search bots and messages" aria-expanded="false" title="Search bots and messages" class="[^"]*\bsize-9\b[^"]*\brounded-full\b[^"]*\btext-ink\/90\b[^"]*\bbg-composer\b/);
+    expect(row).toMatch(/<button(?=[^>]*data-sidebar-search-toggle="true")(?=[^>]*aria-expanded="false")[^>]*aria-label="Search bots and messages" class="[^"]*\bsize-9\b[^"]*\brounded-full\b[^"]*\btext-ink\/90\b[^"]*\bbg-composer\b/);
     expect(html).toMatch(/aria-label="New or share" class="[^"]*\bsize-9\b[^"]*\brounded-full\b/);
-    expect(html).toMatch(/data-sidebar-edge-toggle="true" aria-label="Collapse sidebar to avatars" aria-expanded="true" title="Collapse to avatars" style="-webkit-app-region:no-drag" class="[^"]*\babsolute\b[^"]*\bpointer-events-none opacity-0\b[^"]*\btouch:pointer-events-auto touch:opacity-100\b[^"]*\btop-\[14px\]/);
+    expect(html).toMatch(/<button(?=[^>]*data-sidebar-edge-toggle="true")(?=[^>]*aria-expanded="true")(?=[^>]*style="-webkit-app-region:no-drag")[^>]*aria-label="Collapse sidebar to avatars" class="[^"]*\babsolute\b[^"]*\bpointer-events-none opacity-0\b[^"]*\btouch:pointer-events-auto touch:opacity-100\b[^"]*\btop-\[14px\]/);
     expect(html).not.toContain('title="Active Threads"');
     expect(html).not.toContain("data-sidebar-search-pill");
   });
@@ -214,7 +214,7 @@ describe("sidebar top row", () => {
       expect(index, marker).toBeGreaterThan(-1);
       return index;
     };
-    expect(html).toMatch(/data-sidebar-edge-toggle="true" aria-label="Expand sidebar" aria-expanded="false"[^>]*class="[^"]*\bopacity-100\b[^"]*"><svg[^>]*lucide-chevron-right/);
+    expect(html).toMatch(/<button(?=[^>]*data-sidebar-edge-toggle="true")(?=[^>]*aria-expanded="false")[^>]*aria-label="Expand sidebar" class="[^"]*\bopacity-100\b[^"]*"[^>]*><svg[^>]*lucide-chevron-right/);
     expect(foot).not.toContain('aria-label="Expand sidebar"');
     expect(foot).not.toContain('aria-label="Search bots and messages"');
     const positions = [
@@ -250,7 +250,7 @@ describe("the button that hides and shows the window's rail of places", () => {
     const html = render();
     return html.slice(html.indexOf("data-sidebar-top-row"), html.indexOf('aria-label="New or share"'));
   };
-  const toggle = (html: string) => /<button type="button" data-rail-toggle="true"[^>]*>/.exec(html)?.[0] ?? "";
+  const toggle = (html: string) => /<button [^>]*data-rail-toggle="true"[^>]*>/.exec(html)?.[0] ?? "";
   beforeEach(() => {
     vi.stubGlobal("window", { innerWidth: 1280, location: { protocol: "http:", search: "" }, ogb: { workspaces: { state: () => new Promise(() => {}), menu: () => Promise.resolve() } } });
     fixture.windowChrome = "mac-inset";
@@ -261,7 +261,8 @@ describe("the button that hides and shows the window's rail of places", () => {
     const advanced = row();
     expect(advanced.indexOf("data-traffic-light-space")).toBeLessThan(advanced.indexOf("data-rail-toggle"));
     expect(advanced.indexOf("data-rail-toggle")).toBeLessThan(advanced.indexOf("data-sidebar-top-slot"));
-    expect(toggle(advanced)).toMatch(/aria-label="Hide your computers" title="Hide your computers" aria-expanded="true" style="-webkit-app-region:no-drag" class="[^"]*\bsize-8\b[^"]*\brounded-full\b/);
+    expect(toggle(advanced)).toMatch(/aria-label="Hide your computers" class="[^"]*\bsize-8\b[^"]*\brounded-full\b[^"]*" data-rail-toggle="true" aria-expanded="true" style="-webkit-app-region:no-drag"/);
+    expect(toggle(advanced), "its tooltip is the label, not a native title").not.toContain("title=");
     expect(advanced).toMatch(/data-rail-toggle="true"[^>]*><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect[^>]*><\/rect><path d="M9 3v18"><\/path>(<circle[^>]*fill="currentColor"><\/circle>){3}<\/svg>/);
     fixture.advanced = false;
     const simple = row();
@@ -270,7 +271,7 @@ describe("the button that hides and shows the window's rail of places", () => {
     expect(toggle(simple)).toMatch(/class="[^"]*\bsize-9\b[^"]*\brounded-full\b[^"]*\bbg-composer\b/);
     expect(toggle(simple), "the rail is shown most of the time: no open-menu tint for it").not.toContain("aria-expanded:bg-");
     fixture.rail = { available: true, hidden: true };
-    expect(toggle(row())).toContain('aria-label="Show your computers" title="Show your computers" aria-expanded="false"');
+    expect(toggle(row())).toMatch(/aria-label="Show your computers" class="[^"]*" data-rail-toggle="true" aria-expanded="false"/);
   });
 
   it("lands where it was with the rail beside the page or not: the traffic lights' space gives back the room the rail takes", () => {
@@ -292,7 +293,7 @@ describe("the button that hides and shows the window's rail of places", () => {
     for (const [windowChrome, hostLabel] of [["win-caption", "Windows"], ["native", "Linux"]] as const) {
       fixture.windowChrome = windowChrome;
       fixture.hostLabel = hostLabel;
-      const html = row(), at = html.indexOf('<button type="button" data-rail-toggle');
+      const html = row(), at = html.search(/<button [^>]*data-rail-toggle/);
       expect(at, windowChrome).toBeGreaterThan(-1);
       expect(at, windowChrome).toBeLessThan(html.indexOf("data-sidebar-top-slot"));
       expect(html.slice(0, at), windowChrome).toMatch(/^data-sidebar-top-row="true" class="[^"]*"(?: style="[^"]*")?>$/);

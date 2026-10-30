@@ -13,6 +13,7 @@ import { useStore } from "@/state/store";
 
 import { SidebarSectionHeader } from "./SidebarSectionHeader";
 import { UpdateIndicator } from "./UpdateIndicator";
+import { IconButton } from "./ui/IconButton";
 
 
 function NavRow({
@@ -52,7 +53,7 @@ function NavRow({
       )}
     >
       {icon(active)}
-      {!iconsOnly && <span className="flex-1 truncate text-[14px] font-medium leading-5">{label}</span>}
+      {!iconsOnly && <span className="flex-1 truncate text-label font-medium leading-5">{label}</span>}
       {attention && (
         <span
           data-testid="routines-attention"
@@ -67,21 +68,18 @@ export function SidebarAppsButton() {
   const { state, dispatch } = useStore();
   const label = t("sidebar.nav.apps");
   return (
-    <button
-      type="button"
+    <IconButton label={label}
       data-tour="nav-apps"
       data-sidebar-nav="apps"
       onClick={() => dispatch({ type: "togglePlugins", open: true })}
-      aria-label={label}
-      title={label}
       aria-pressed={state.pluginsOpen}
       className={cn(
         "flex size-9 shrink-0 items-center justify-center rounded-xl transition-colors",
-        state.pluginsOpen ? "bg-raised text-accent" : "text-ink-secondary hover:bg-raised/50 hover:text-ink",
+        state.pluginsOpen ? "bg-raised text-accent-text" : "text-ink-secondary hover:bg-raised/50 hover:text-ink",
       )}
     >
       <Puzzle size={18} />
-    </button>
+    </IconButton>
   );
 }
 
@@ -119,7 +117,7 @@ export function SidebarFooterNav({
   const toolsLayout = useSidebarToolsLayout();
   const toolbar = advanced && !iconsOnly && toolsLayout === "toolbar";
   const iconSize = iconsOnly && !rail ? 20 : 18;
-  const tone = (active: boolean) => (active ? "text-accent" : "text-ink-secondary");
+  const tone = (active: boolean) => (active ? "text-accent-text" : "text-ink-secondary");
   const automationsNeedYou = useAutomationsNeedYou();
   const automationsRow = <NavRow
     id="automations"

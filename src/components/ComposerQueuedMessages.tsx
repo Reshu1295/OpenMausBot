@@ -4,6 +4,8 @@ import type { SteerQueueReason } from "../../shared/wire";
 import { t } from "@/lib/i18n";
 import { replySnippet } from "@/lib/replies";
 import { splitTranscriptCitations } from "@/lib/citations";
+import { Button } from "./ui/Button";
+import { IconButton } from "./ui/IconButton";
 
 const ATTACHMENT_TAG = /<attached-(?:image|file)\s/;
 
@@ -83,7 +85,7 @@ export function QueuedComposerMessages({
 
   return (
     <div
-      className="relative z-[1] mx-3 -mb-3 max-h-36 overflow-y-auto rounded-t-2xl border border-b-0 border-hairline/40 bg-raised/95 pb-3 shadow-sm backdrop-blur-sm"
+      className="relative z-[1] mx-3 -mb-3 max-h-36 overflow-y-auto rounded-t-2xl border border-b-0 border-hairline bg-raised/95 pb-3 shadow-sm backdrop-blur-sm"
       aria-label={
         items.length === 1
           ? t("composer.queued.regionOne")
@@ -92,12 +94,12 @@ export function QueuedComposerMessages({
       aria-live="polite"
     >
       {items.some((item) => item.reason === "group-turn") && (
-        <p className="px-3 pt-2 text-[12px] text-ink-secondary">{t("composer.queued.groupTurn")}</p>
+        <p className="px-3 pt-2 text-small text-ink-secondary">{t("composer.queued.groupTurn")}</p>
       )}
       {items.some((item) => item.reason === "capacity") && (
-        <p className="px-3 pt-2 text-[12px] text-ink-secondary">{t("composer.queued.capacity")}</p>
+        <p className="px-3 pt-2 text-small text-ink-secondary">{t("composer.queued.capacity")}</p>
       )}
-      <ul className="divide-y divide-hairline/25" aria-label={t("composer.queued.list")}>
+      <ul className="divide-y divide-hairline" aria-label={t("composer.queued.list")}>
         {items.map((item, index) => {
           const label = queuedMessageLabel(item.text);
           return <li key={item.queueId} className="flex min-h-10 min-w-0 items-center gap-2 px-2.5 py-1.5">
@@ -107,17 +109,16 @@ export function QueuedComposerMessages({
               className="shrink-0 text-ink-secondary"
               aria-hidden="true"
             />
-            <span dir="auto" className="min-w-0 flex-1 truncate text-[14px] text-ink" title={label}>
+            <span dir="auto" className="min-w-0 flex-1 truncate text-label text-ink" title={label}>
               {label}
             </span>
             {index === 0 && onSteer && (
-              <button
-                type="button"
+              <Button variant="ghost" size="md"
                 onClick={onSteer}
                 disabled={steering}
                 aria-label={steering ? t("composer.queued.steeringAria") : steerDescription}
                 title={steerDescription}
-                className="flex h-7 shrink-0 items-center gap-1 rounded-lg px-2 text-[13px] font-medium text-ink-secondary outline-none hover:bg-raised-hover hover:text-ink focus-visible:ring-2 focus-visible:ring-accent/60 disabled:cursor-wait disabled:opacity-60"
+                className="flex shrink-0 gap-1 outline-none disabled:cursor-wait"
               >
                 <CornerDownRight
                   size={13}
@@ -126,28 +127,22 @@ export function QueuedComposerMessages({
                   aria-hidden="true"
                 />
                 {steerLabel}
-              </button>
+              </Button>
             )}
             {onEdit && (
-              <button
-                type="button"
+              <IconButton label={t("composer.queued.editAria", { index: index + 1, count: items.length })} tooltip={t("composer.queued.editTitle")}
                 onClick={() => onEdit(item.queueId)}
-                aria-label={t("composer.queued.editAria", { index: index + 1, count: items.length })}
-                title={t("composer.queued.editTitle")}
-                className="flex size-7 shrink-0 items-center justify-center rounded-lg text-ink-secondary outline-none hover:bg-raised-hover hover:text-ink focus-visible:ring-2 focus-visible:ring-accent/60"
+                className="flex size-7 shrink-0 items-center justify-center rounded-lg text-ink-secondary outline-none hover:bg-raised-hover hover:text-ink focus-visible:ring-2 focus-visible:ring-focus/60"
               >
                 <Pencil size={14} aria-hidden="true" />
-              </button>
+              </IconButton>
             )}
-            <button
-              type="button"
+            <IconButton label={t("composer.queued.deleteAria", { index: index + 1, count: items.length })} tooltip={t("composer.queued.deleteTitle")}
               onClick={() => onCancel(item.queueId)}
-              aria-label={t("composer.queued.deleteAria", { index: index + 1, count: items.length })}
-              title={t("composer.queued.deleteTitle")}
-              className="flex size-7 shrink-0 items-center justify-center rounded-lg text-ink-secondary outline-none hover:bg-raised-hover hover:text-ink focus-visible:ring-2 focus-visible:ring-accent/60"
+              className="flex size-7 shrink-0 items-center justify-center rounded-lg text-ink-secondary outline-none hover:bg-raised-hover hover:text-ink focus-visible:ring-2 focus-visible:ring-focus/60"
             >
               <Trash2 size={14} aria-hidden="true" />
-            </button>
+            </IconButton>
           </li>;
         })}
       </ul>

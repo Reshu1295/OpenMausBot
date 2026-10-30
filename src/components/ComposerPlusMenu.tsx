@@ -36,7 +36,7 @@ export function GoalToggle({ on, onToggle, solo = false, compact = false }: { on
         aria-label={off}
         title={off}
         onClick={onToggle}
-        className="flex h-7 items-center gap-1 whitespace-nowrap rounded-full border border-accent/35 bg-accent/10 px-2.5 text-[13px] text-accent transition-colors hover:bg-accent/15"
+        className="flex h-7 items-center gap-1 whitespace-nowrap rounded-full border border-accent/35 bg-accent/10 px-2.5 text-ui text-accent-text transition-colors hover:bg-accent/15"
       >
         {t(solo ? "composer.goal.soloAria" : "composer.goal.aria")}
         <X size={12} aria-hidden="true" />
@@ -51,11 +51,11 @@ export function GoalToggle({ on, onToggle, solo = false, compact = false }: { on
       title={t(solo ? "composer.goal.soloTitle" : "composer.goal.title")}
       onClick={onToggle}
       className={cn(
-        "flex items-center gap-1.5 whitespace-nowrap rounded-full border text-[13px] transition-colors",
+        "flex items-center gap-1.5 whitespace-nowrap rounded-full border text-ui transition-colors",
         compact ? "h-7 px-2.5" : "h-8 px-3",
         on
-          ? "border-accent/35 bg-accent/10 text-accent"
-          : "border-hairline/20 bg-transparent text-ink-secondary hover:bg-raised hover:text-ink",
+          ? "border-accent/35 bg-accent/10 text-accent-text"
+          : "border-hairline bg-transparent text-ink-secondary hover:bg-raised hover:text-ink",
       )}
     >
       <Target size={14} aria-hidden="true" />
@@ -64,7 +64,7 @@ export function GoalToggle({ on, onToggle, solo = false, compact = false }: { on
   );
 }
 
-const check = <Check size={15} className="shrink-0 text-accent" aria-hidden="true" />;
+const check = <Check size={15} className="shrink-0 text-accent-text" aria-hidden="true" />;
 
 /** The thread's approval level, the same choices the Advanced composer's shield offers: the level shown and its menu.
  * Simple mode names the levels as the bot panel does. */
@@ -136,7 +136,7 @@ export function ApprovalChip({ choice, quiet = false }: { choice: ApprovalChoice
         <span
           data-approval-chip={current.mode}
           className={cn(
-            "flex h-7 items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 text-[13px] transition-colors",
+            "flex h-7 items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 text-ui transition-colors",
             open ? "bg-ink/[0.11] text-ink" : quiet ? "text-ink-secondary hover:bg-ink/[0.06] hover:text-ink" : "bg-ink/[0.06] text-ink-secondary hover:bg-ink/[0.11] hover:text-ink",
           )}
         >
@@ -321,9 +321,9 @@ function ComposerMenu({ items, renderTrigger }: { items: SidebarMenuItem[]; rend
                 close(false);
                 item.onSelect();
               }}
-              className="flex h-[34px] w-full items-center gap-2 rounded-[9px] px-3 text-start text-[15px] text-ink transition-colors hover:bg-menu-hover focus-visible:bg-menu-hover focus-visible:outline-none disabled:opacity-50"
+              className="flex h-[34px] w-full items-center gap-2 rounded-[9px] px-3 text-start text-body text-ink transition-colors hover:bg-menu-hover focus-visible:bg-menu-hover focus-visible:outline-none disabled:opacity-50"
             >
-              <span className={cn("flex size-3.5 shrink-0 items-center justify-center [&_svg]:size-3.5 [&_svg]:stroke-[1.5]", item.active ? "text-accent" : "text-ink-secondary")} aria-hidden="true">{item.icon}</span>
+              <span className={cn("flex size-3.5 shrink-0 items-center justify-center [&_svg]:size-3.5 [&_svg]:stroke-[1.5]", item.active ? "text-accent-text" : "text-ink-secondary")} aria-hidden="true">{item.icon}</span>
               <span className="min-w-0 flex-1 truncate">{item.label}</span>
               {item.trailing}
             </button>

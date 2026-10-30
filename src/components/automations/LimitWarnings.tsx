@@ -5,6 +5,7 @@ import { t } from "@/lib/i18n";
 import { dueBeforeReset, limitLine, nearLimitEngines, useEngineLimits, type EngineLimit } from "@/lib/limit-resets";
 import type { Routine } from "@/lib/routines";
 import { api, useStore } from "@/state/store";
+import { Button } from "../ui/Button";
 
 /** Each engine near its limit, with the automations due before it resets and one button that moves just their next
  * run to after the reset. */
@@ -38,22 +39,22 @@ export function LimitWarnings({ botFilter = "all" }: { botFilter?: string }) {
         const due = dueBeforeReset(routines, botEngine, limit);
         return (
           <div key={limit.engine} data-limit-warning={limit.engine} role="status"
-            className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 rounded-xl border border-warning/40 bg-warning/10 px-3.5 py-2.5 text-[13px] text-ink">
-            <Hourglass size={15} className="shrink-0 text-warning" aria-hidden="true" />
+            className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 rounded-xl border border-warning/40 bg-warning/10 px-3.5 py-2.5 text-ui text-ink">
+            <Hourglass size={15} className="shrink-0 text-warning-text" aria-hidden="true" />
             <span className="font-medium tabular-nums">{limitLine(limit)}</span>
             {due.length > 0 ? (
               <>
                 <span className="text-ink-secondary">{t(due.length === 1 ? "limits.dueOne" : "limits.dueMany", { count: due.length })}</span>
-                <button type="button" disabled={busy === limit.engine} onClick={() => void move(limit, due)}
-                  className="ml-auto rounded-lg bg-accent px-3 py-1.5 text-[13px] font-medium text-accent-ink hover:brightness-110 disabled:opacity-50">
+                <Button variant="primary" disabled={busy === limit.engine} onClick={() => void move(limit, due)}
+                  className="ml-auto">
                   {t("limits.moveAfterReset")}
-                </button>
+                </Button>
               </>
             ) : moved === limit.engine && <span className="text-ink-secondary">{t("limits.moved")}</span>}
           </div>
         );
       })}
-      {error && <p role="alert" className="text-[12px] text-danger">{error}</p>}
+      {error && <p role="alert" className="text-small text-danger-text">{error}</p>}
     </section>
   );
 }

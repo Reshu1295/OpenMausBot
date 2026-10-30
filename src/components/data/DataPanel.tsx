@@ -9,6 +9,7 @@ import { DataCard, RunningStatus } from "./DataCard";
 import { DataResultFooter } from "./DataGrid";
 import { SqlEditor } from "./SqlEditor";
 import { cardsLatestFirst } from "./data-format";
+import { IconButton } from "../ui/IconButton";
 
 const QUERY_MIN_HEIGHT = 128;
 const RESULT_MIN_HEIGHT = 180;
@@ -224,13 +225,13 @@ function BotDataPanel({ bot, requestedCard }: { bot: Bot; requestedCard?: { id: 
     setSelection(next);
   };
   const empty = sheet && cards.length === 0 && !selection;
-  const control = "flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[12px] text-ink-secondary hover:bg-inset hover:text-ink";
+  const control = "flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-small text-ink-secondary hover:bg-inset hover:text-ink";
   const controls = <>
         <details className="relative" data-testid="data-history">
           <summary role="button" className={`${control} cursor-pointer list-none [&::-webkit-details-marker]:hidden`} aria-label={t("data.history")} title={t("data.history")}>
             <History size={14} aria-hidden="true" /><span className="hidden @min-[460px]/data:inline">{t("data.history")}</span><ChevronDown size={12} aria-hidden="true" />
           </summary>
-          <div className="absolute right-0 bottom-full z-30 mb-1 flex max-h-[min(20rem,calc(100cqh-3rem))] w-72 max-w-[70vw] flex-col overflow-y-auto rounded-xl border border-hairline/50 bg-menu p-1.5 shadow-xl" role="menu" aria-label={t("data.history")}>
+          <div className="popover-surface absolute right-0 bottom-full z-30 mb-1 flex max-h-[min(20rem,calc(100cqh-3rem))] w-72 max-w-[70vw] flex-col overflow-y-auto rounded-xl border border-hairline bg-menu p-1.5 shadow-xl" role="menu" aria-label={t("data.history")}>
             <button type="button" role="menuitemradio" aria-checked={selection === null} className={`${control} text-left`} onClick={(event) => { select(null); event.currentTarget.closest("details")?.removeAttribute("open"); }}>{t("data.latest")}</button>
             {cards.map((candidate) => (
               <button key={candidate.id} type="button" role="menuitemradio" aria-checked={selection !== null && card?.id === candidate.id} className={`${control} text-left`}
@@ -242,9 +243,9 @@ function BotDataPanel({ bot, requestedCard }: { bot: Bot; requestedCard?: { id: 
             ))}
           </div>
         </details>
-        <button type="button" className={control} aria-label={t(fullscreen ? "desktopViewer.exitFullscreen" : "desktopViewer.fullscreen")} title={t(fullscreen ? "desktopViewer.exitFullscreen" : "desktopViewer.fullscreen")} onClick={() => void toggleFullscreen()}>
+        <IconButton label={t(fullscreen ? "desktopViewer.exitFullscreen" : "desktopViewer.fullscreen")} className={control} onClick={() => void toggleFullscreen()}>
           {fullscreen ? <Minimize2 size={14} aria-hidden="true" /> : <Maximize2 size={14} aria-hidden="true" />}
-        </button>
+        </IconButton>
   </>;
   const queryError = runError ?? (fullscreenError ? t("desktopViewer.fullscreenFailed") : null);
 
@@ -252,16 +253,16 @@ function BotDataPanel({ bot, requestedCard }: { bot: Bot; requestedCard?: { id: 
     <div ref={panel} className="@container/data flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-card text-ink fullscreen:h-full fullscreen:w-full" data-testid="data-panel">
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden [container-type:size]" data-testid="data-result">
         {!sheet && !loadError && (
-          <p className="flex items-center justify-center gap-2 py-10 text-[13px] text-ink-secondary" role="status">
+          <p className="flex items-center justify-center gap-2 py-10 text-ui text-ink-secondary" role="status">
             <Loader2 size={14} className="animate-spin" aria-hidden="true" />{t("data.loading")}
           </p>
         )}
-        {loadError && <p role="alert" className="rounded-xl border border-danger/30 bg-danger/10 px-3 py-2 text-[12px] text-danger">{t("data.loadFailed", { reason: loadError })}</p>}
-        {unavailable && <p role="status" className="px-3 py-8 text-center text-[13px] text-ink-secondary">{t("data.resultUnavailable")}</p>}
+        {loadError && <p role="alert" className="rounded-xl border border-danger/30 bg-danger/10 px-3 py-2 text-small text-danger-text">{t("data.loadFailed", { reason: loadError })}</p>}
+        {unavailable && <p role="status" className="px-3 py-8 text-center text-ui text-ink-secondary">{t("data.resultUnavailable")}</p>}
         {empty && (
           <div className="flex flex-col items-center gap-3 py-12 text-center" data-testid="data-empty">
             <Database size={22} className="text-ink-secondary" aria-hidden="true" />
-            <p className="text-[13px] text-ink-secondary">{t("data.empty")}</p>
+            <p className="text-ui text-ink-secondary">{t("data.empty")}</p>
           </div>
         )}
         {card && <DataCard key={card.id} bot={bot} card={card} theme={theme} controls={controls} running={running} onCancel={cancel} />}
@@ -271,13 +272,13 @@ function BotDataPanel({ bot, requestedCard }: { bot: Bot; requestedCard?: { id: 
         aria-valuemin={bounds.min} aria-valuemax={bounds.max} aria-valuenow={queryHeight ?? undefined} tabIndex={0}
         onPointerDown={startResize} onPointerMove={moveResize} onPointerUp={endResize} onPointerCancel={endResize}
         onLostPointerCapture={() => { resizeFrom.current = null; }} onKeyDown={resizeByKey} data-testid="data-query-resize"
-        className="group flex h-1.5 shrink-0 cursor-row-resize touch-none items-center justify-center border-t border-hairline/40 hover:bg-accent/10 focus-visible:bg-accent/10 focus-visible:outline-none">
-        <span className="h-0.5 w-8 rounded-full bg-hairline group-hover:bg-accent/60 group-focus-visible:bg-accent/60" />
+        className="group flex h-1.5 shrink-0 cursor-row-resize touch-none items-center justify-center border-t border-hairline hover:bg-accent/10 focus-visible:bg-accent/10 focus-visible:outline-none">
+        <span className="h-0.5 w-8 rounded-full bg-edge group-hover:bg-accent/60 group-focus-visible:bg-accent/60" />
       </div>
       <div ref={query} id={queryId} style={{ height: queryHeight ?? undefined }} className="flex min-h-0 shrink-0 flex-col overflow-hidden px-3 py-2" data-testid="data-query">
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
           <SqlEditor sql={shown.sql} externalRevision={String(shown.revision)} onChange={edit} />
-          <p role={queryError ? "alert" : undefined} title={queryError ?? undefined} className="mt-1 h-4 shrink-0 truncate text-[12px] text-danger" data-testid="data-query-error">{queryError}</p>
+          <p role={queryError ? "alert" : undefined} title={queryError ?? undefined} className="mt-1 h-4 shrink-0 truncate text-small text-danger-text" data-testid="data-query-error">{queryError}</p>
         </div>
         <div className="shrink-0"><SourcesStrip sources={tables} /></div>
       </div>

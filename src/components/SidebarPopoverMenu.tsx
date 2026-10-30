@@ -5,7 +5,10 @@ import { cn } from "@/lib/cn";
 import { useMenuMotion } from "./MenuMotion";
 import { popoverClosesOnKey, usePopoverDismiss } from "@/hooks/use-popover-dismiss";
 import { submenuIntent, type Point, type SubmenuIntent } from "@/lib/submenu-intent";
-import { MENU_HEADING, MENU_ITEM_SEPARATOR, MENU_SHEET } from "./menu-recipe";
+import { MENU_HEADING, MENU_ITEM_SEPARATOR, MENU_SHEET, nextMenuIndex } from "./menu-recipe";
+import { useTypeahead } from "./ui/Menu";
+
+export { nextMenuIndex };
 
 export interface SidebarMenuItem {
   key: string;
@@ -71,16 +74,6 @@ const isRtl = (element: Element | null) =>
 const menuItems = (menu: HTMLElement | null) =>
   menu ? [...menu.querySelectorAll<HTMLElement>(':scope > div > [role="menuitem"]:not(:disabled)')] : [];
 
-export function nextMenuIndex(key: string, current: number, count: number): number | null {
-  if (count === 0) return null;
-  switch (key) {
-    case "ArrowDown": return current < 0 ? 0 : (current + 1) % count;
-    case "ArrowUp": return current < 0 ? count - 1 : (current - 1 + count) % count;
-    case "Home": return 0;
-    case "End": return count - 1;
-    default: return null;
-  }
-}
 
 function MenuRows({
   items,
@@ -116,13 +109,13 @@ function MenuRows({
             onPointerEnter={(event) => onRowEnter?.(item, event.currentTarget, { x: event.clientX, y: event.clientY })}
             onPointerLeave={() => onRowLeave?.(item)}
             className={cn(
-              "flex min-h-[30px] w-full items-center gap-2 rounded-md px-2 py-1.5 text-start text-[14px] leading-[18px] disabled:opacity-60 focus-visible:bg-menu-hover focus-visible:outline-none",
+              "flex min-h-[30px] w-full items-center gap-2 rounded-md px-2 py-1.5 text-start text-label leading-[18px] disabled:opacity-60 focus-visible:bg-menu-hover focus-visible:outline-none",
               item.active || (item.submenu && openSubmenu === item.key && engaged) ? "bg-menu-active text-ink" : "text-ink hover:bg-menu-hover",
             )}
           >
             {item.icon && (
               <span
-                className={cn("flex size-4 shrink-0 items-center justify-center [&>svg]:size-4", item.wrap && "h-[18px] self-start", item.active ? "text-accent" : "text-ink-secondary")}
+                className={cn("flex size-4 shrink-0 items-center justify-center [&>svg]:size-4", item.wrap && "h-[18px] self-start", item.active ? "text-accent-text" : "text-ink-secondary")}
               >
                 {item.icon}
               </span>
@@ -130,13 +123,13 @@ function MenuRows({
             {item.subtitle || item.note ? (
               <span className="flex min-w-0 flex-1 flex-col">
                 <span className={item.wrap ? "break-words" : "truncate"}>{item.label}</span>
-                {item.subtitle && <span className="truncate text-[12px] font-normal leading-4 text-ink-secondary">{item.subtitle}</span>}
-                {item.note && <span className="text-[12px] font-normal leading-snug text-ink-tertiary">{item.note}</span>}
+                {item.subtitle && <span className="truncate text-small font-normal leading-4 text-ink-secondary">{item.subtitle}</span>}
+                {item.note && <span className="text-small font-normal leading-snug text-ink-tertiary">{item.note}</span>}
               </span>
             ) : (
               <span className={cn("flex-1", item.wrap ? "min-w-0 break-words" : "truncate")}>{item.label}</span>
             )}
-            {item.value && <span className="shrink-0 text-[13px] font-normal leading-[18px] tabular-nums text-ink-secondary">{item.value}</span>}
+            {item.value && <span className="shrink-0 text-ui font-normal leading-[18px] tabular-nums text-ink-secondary">{item.value}</span>}
             {item.trailing}
             {item.attention && (
               <span
@@ -209,6 +202,7 @@ export function SidebarPopoverMenu({
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const menuId = useId();
   const motion = useMenuMotion(open);
+  const typeahead = useTypeahead();
   const anchored = placement === "above";
   const reportOpen = useRef(onOpenChange);
   reportOpen.current = onOpenChange;
@@ -328,6 +322,8 @@ export function SidebarPopoverMenu({
     } else if (event.key === "Tab" && anchored) {
       event.preventDefault();
       close(true);
+    } else {
+      typeahead(event, list, current);
     }
   };
 

@@ -7,6 +7,7 @@ import {
   sidebarAttentionLabel,
   type SidebarSectionAttention,
 } from "@/lib/sidebar-attention";
+import { IconButton } from "./ui/IconButton";
 
 export function SidebarSectionHeader({
   name,
@@ -49,7 +50,7 @@ export function SidebarSectionHeader({
 }) {
   const Chevron = collapsed ? ChevronRight : ChevronDown;
   const leadLabel = lead ? <span data-department-lead={lead} title={t("owner.departmentLeadAria", { department: name, name: lead })}
-    className="shrink-0 truncate text-[11px] font-normal text-ink-tertiary">{t("owner.departmentLead", { name: lead })}<span className="sr-only">{`, ${t("owner.departmentLeadAria", { department: name, name: lead })}`}</span></span> : null;
+    className="shrink-0 truncate text-caption font-normal text-ink-tertiary">{t("owner.departmentLead", { name: lead })}<span className="sr-only">{`, ${t("owner.departmentLeadAria", { department: name, name: lead })}`}</span></span> : null;
   const attentionLabel = attention ? sidebarAttentionLabel(attention) : "";
   const onHeaderKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
     if (!reorderable || !event.altKey) return;
@@ -72,7 +73,7 @@ export function SidebarSectionHeader({
   if (line) {
     const tail = (
       <span aria-hidden="true" className="relative flex size-4 shrink-0 items-center justify-center">
-        {count !== undefined && <span className={cn("text-[12px] tabular-nums leading-4 text-ink-secondary transition-opacity", onToggle && "group-hover/section:opacity-0 group-focus-within/section:opacity-0 touch:opacity-0")}>{count}</span>}
+        {count !== undefined && <span className={cn("text-small tabular-nums leading-4 text-ink-secondary transition-opacity", onToggle && "group-hover/section:opacity-0 group-focus-within/section:opacity-0 touch:opacity-0")}>{count}</span>}
         {onToggle && <Chevron size={14} className="absolute text-ink-secondary opacity-0 transition-opacity group-hover/section:opacity-100 group-focus-within/section:opacity-100 touch:opacity-100" />}
       </span>
     );
@@ -97,31 +98,28 @@ export function SidebarSectionHeader({
             title={toggleTitle}
             className="flex min-w-0 flex-1 items-center gap-1.5 rounded text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-focus"
           >
-            <span className="min-w-0 flex-1 truncate text-[12px] leading-4 text-ink-secondary">{name}</span>
+            <span className="min-w-0 flex-1 truncate text-small leading-4 text-ink-secondary">{name}</span>
             {leadLabel}
             {collapsed && <SectionAttention attention={attention} label={attentionLabel} alert={alert} />}
             {tail}
           </button>
         ) : (
           <div className="flex min-w-0 flex-1 items-center gap-1.5">
-            <span className="min-w-0 flex-1 truncate text-[12px] leading-4 text-ink-secondary">{name}</span>
+            <span className="min-w-0 flex-1 truncate text-small leading-4 text-ink-secondary">{name}</span>
             {leadLabel}
             {attentionLabel && <span className="sr-only">{attentionLabel}</span>}
             {tail}
           </div>
         )}
         {onMenu && (
-          <button
-            type="button"
-            aria-label={t("team.actions", { name })}
-            title={t("team.actions", { name })}
+          <IconButton label={t("team.actions", { name })}
             aria-haspopup="menu"
             aria-expanded={menuOpen}
             onClick={(event) => onMenu(event.currentTarget)}
             className="flex h-[18px] w-[22px] shrink-0 items-center justify-center rounded-[5px] text-ink-tertiary opacity-0 transition-opacity hover:bg-raised hover:text-ink focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-focus group-hover/section:opacity-100 group-focus-within/section:opacity-100 aria-expanded:bg-raised aria-expanded:text-ink aria-expanded:opacity-100 touch:opacity-100"
           >
             <MoreHorizontal size={15} aria-hidden="true" />
-          </button>
+          </IconButton>
         )}
       </div>
     );
@@ -139,7 +137,7 @@ export function SidebarSectionHeader({
           title={toggleTitle}
           className="flex min-w-0 flex-1 items-center gap-1.5 rounded-md px-1 py-0.5 text-left hover:bg-raised/50"
         >
-          <span className="truncate text-[12px] font-semibold text-ink-secondary">
+          <span className="truncate text-small font-semibold text-ink-secondary">
             {name}
           </span>
           <Chevron size={13} className="shrink-0 text-ink-secondary" aria-hidden="true" />
@@ -147,7 +145,7 @@ export function SidebarSectionHeader({
         </button>
       ) : (
         <div className="flex min-w-0 flex-1 items-center gap-1.5 px-1 py-0.5">
-          <span className="truncate text-[12px] font-semibold text-ink-secondary">
+          <span className="truncate text-small font-semibold text-ink-secondary">
             {name}
           </span>
           {attentionLabel && <span className="sr-only">{attentionLabel}</span>}
@@ -155,15 +153,12 @@ export function SidebarSectionHeader({
       )}
       {leadLabel}
       {onDelete && (
-        <button
-          type="button"
+        <IconButton label={t("sidebar.section.deleteAria", { name })}
           onClick={onDelete}
-          aria-label={t("sidebar.section.deleteAria", { name })}
-          title={t("sidebar.section.deleteAria", { name })}
-          className="flex size-6 shrink-0 items-center justify-center rounded text-ink-secondary hover:bg-danger/10 hover:text-danger"
+          className="flex size-6 shrink-0 items-center justify-center rounded text-ink-secondary hover:bg-danger/10 hover:text-danger-text"
         >
           <Trash2 size={13} aria-hidden="true" />
-        </button>
+        </IconButton>
       )}
       {reorderable && (
         <span
@@ -190,7 +185,7 @@ function SectionAttention({ attention, label, alert }: { attention?: SidebarSect
       {attention && attention.waiting > 0 && (
         <span
           aria-hidden="true"
-          className="min-w-4 rounded-full bg-warning/15 px-1 text-center text-[9px] font-semibold leading-4 text-warning"
+          className="min-w-4 rounded-full bg-warning/15 px-1 text-center text-caption font-semibold leading-4 text-warning-text"
         >
           {attention.waiting}
         </span>
@@ -198,7 +193,7 @@ function SectionAttention({ attention, label, alert }: { attention?: SidebarSect
       {attention && attention.unread > 0 && (
         <span
           aria-hidden="true"
-          className="min-w-4 rounded-full bg-accent/15 px-1 text-center text-[9px] font-semibold leading-4 text-accent"
+          className="min-w-4 rounded-full bg-accent/15 px-1 text-center text-caption font-semibold leading-4 text-accent-text"
         >
           {attention.unread}
         </span>

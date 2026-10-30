@@ -46,7 +46,7 @@ describe("the move's words on the account", () => {
     const opened = vi.fn();
     const failed = AccountMoveStatus({ kind: "failed", onOpen: opened }) as ReturnType<typeof createElement>;
     expect(markup(failed)).toContain('data-account-move="failed"');
-    expect(markup(failed)).toContain("text-warning");
+    expect(markup(failed)).toContain("text-warning-text");
     expect(markup(failed)).toContain("<button");
     expect(markup(AccountMoveStatus({ kind: "sending", onOpen: opened }))).toContain("Moving to My Cloud…");
     expect(markup(AccountMoveStatus({ kind: "sending", onOpen: opened }))).not.toContain("text-warning");

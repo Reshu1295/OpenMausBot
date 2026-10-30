@@ -21,6 +21,7 @@ import { setShowRunCard, useShowRunCard } from "@/lib/run-card-preferences";
 import { parseSendKey, SEND_KEYS, sendKeyLabel, setSendKey, useSendKey } from "@/lib/send-key";
 import { effectiveLanguage, setLanguageChoice, useLanguageChoice } from "@/lib/language-preference";
 import { Select } from "./Select";
+import { Button } from "./ui/Button";
 
 export function UpdatesRow({ title = t("settings.updates.title") }: { title?: string }) {
   const s = useUpdaterState();
@@ -51,7 +52,7 @@ export function UpdatesRow({ title = t("settings.updates.title") }: { title?: st
                   : t("settings.updates.latest");
   return (
     <SettingRow title={title} subtitle={label}>
-      <button
+      <Button
         onClick={() => {
           if (s.status === "downloaded") return void updater.install();
           void updater.check();
@@ -60,7 +61,6 @@ export function UpdatesRow({ title = t("settings.updates.title") }: { title?: st
           s.status === "checking" || s.status === "downloading" || s.status === "preparing" ||
           s.status === "installing" || s.retryable === false
         }
-        className="ui-button"
       >
         {s.retryable === false
           ? t("settings.updates.quitReopen")
@@ -75,7 +75,7 @@ export function UpdatesRow({ title = t("settings.updates.title") }: { title?: st
                   ? t("settings.updates.opening")
                   : t("settings.updates.restartingShort")
                 : t("settings.updates.check")}
-      </button>
+      </Button>
     </SettingRow>
   );
 }
@@ -107,7 +107,7 @@ export function NewBotEffortRow() {
     <SettingRow
       title={t("settings.newBotEffort.title")}
       subtitle={t("settings.newBotEffort.subtitle")}
-      message={error ? <p role="alert" className="text-danger">{error}</p> : null}
+      message={error ? <p role="alert" className="text-danger-text">{error}</p> : null}
     >
       <Select size="sm" className="w-full max-w-[240px]"
         value={current}
@@ -132,7 +132,7 @@ function ReplayAppTourButton() {
   const [failed, setFailed] = useState(false);
   return (
     <div>
-      <button
+      <Button
         disabled={saving}
         onClick={() => {
           setSaving(true);
@@ -152,11 +152,10 @@ function ReplayAppTourButton() {
             .catch(() => setFailed(true))
             .finally(() => setSaving(false));
         }}
-        className="ui-button"
       >
         {t("settings.welcome.appTour")}
-      </button>
-      {failed && <p role="alert" className="mt-2 text-[13px] text-danger">{t("onboarding.tour.error")}</p>}
+      </Button>
+      {failed && <p role="alert" className="mt-2 text-ui text-danger-text">{t("onboarding.tour.error")}</p>}
     </div>
   );
 }
@@ -167,12 +166,11 @@ export function ReplayTourRow() {
     <SettingRow title={t("settings.welcome.title")} subtitle={t("settings.welcome.subtitleShort")}>
       <div className="flex flex-wrap justify-end gap-2">
         <ReplayAppTourButton />
-        <button
+        <Button
           onClick={() => dispatch({ type: "toggleWelcome", open: true })}
-          className="ui-button"
         >
           {t("settings.welcome.replay")}
-        </button>
+        </Button>
       </div>
     </SettingRow>
   );
@@ -349,7 +347,7 @@ export function ToolCallsRow() {
     <SettingRow
       title={t("settings.toolCalls.title")}
       subtitle={<>{t("settings.toolCalls.subtitle")} {t("settings.toolCalls.detail")}</>}
-      message={error ? <p role="alert" className="text-danger">{error}</p> : null}
+      message={error ? <p role="alert" className="text-danger-text">{error}</p> : null}
     >
       <Switch
         checked={enabled}
@@ -389,8 +387,8 @@ export function ExperimentalFeaturesRow() {
     <Card title={t("settings.experimental.title")} subtitle={t("settings.experimental.subtitle")}>
       <div className="flex items-center justify-between gap-4">
         <div className="min-w-0">
-          <div className="text-[14px] font-medium text-ink">{t("settings.experimental.skillAuthoring")}</div>
-          <div className="mt-0.5 text-[12px] leading-relaxed text-ink-secondary">
+          <div className="text-label font-medium text-ink">{t("settings.experimental.skillAuthoring")}</div>
+          <div className="mt-0.5 text-small leading-relaxed text-ink-secondary">
             {t("settings.experimental.skillAuthoringDetail")}
           </div>
         </div>
@@ -402,7 +400,7 @@ export function ExperimentalFeaturesRow() {
           className="disabled:cursor-wait disabled:opacity-50"
         />
       </div>
-      {error ? <p role="alert" className="mt-2 text-[12px] text-danger">{error}</p> : null}
+      {error ? <p role="alert" className="mt-2 text-small text-danger-text">{error}</p> : null}
       <LearnedSkillsSettings />
       <NewBrowserSettings />
     </Card>

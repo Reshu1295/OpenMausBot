@@ -71,7 +71,7 @@ export function ChatFindBar({ threadId, onClose }: { threadId: string; onClose: 
 
   return (
     <div className="w-full px-5 pb-2">
-      <div className="flex items-center gap-1.5 rounded-xl border border-hairline/50 bg-panel px-2 py-1.5 shadow-sm focus-within:border-focus">
+      <div className="flex items-center gap-1.5 rounded-xl border border-hairline bg-panel px-2 py-1.5 shadow-sm focus-within:border-focus">
         <Search size={15} className="shrink-0 text-ink-secondary" />
         <input
           ref={inputRef}
@@ -89,9 +89,9 @@ export function ChatFindBar({ threadId, onClose }: { threadId: string; onClose: 
           }}
           placeholder={t("chat.find.placeholder")}
           aria-label={t("chat.find.placeholder")}
-          className="min-w-0 flex-1 bg-transparent px-1 text-[13px] text-ink outline-none placeholder:text-ink-tertiary"
+          className="min-w-0 flex-1 bg-transparent px-1 text-ui text-ink outline-none placeholder:text-ink-tertiary"
         />
-        <span className="min-w-[58px] text-right text-[12px] tabular-nums text-ink-secondary">
+        <span className="min-w-[58px] text-right text-small tabular-nums text-ink-secondary">
           {loading
             ? t("chat.find.searching")
             : query.trim()

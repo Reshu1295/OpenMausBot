@@ -313,7 +313,7 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
         aria-label="Open bot list"
         aria-expanded={drawerOpen}
         onClick={() => setDrawerOpen(true)}
-        className="absolute left-3 top-3 z-30 rounded-md p-1.5 text-ink-secondary hover:bg-raised hover:text-ink max-md:flex max-md:size-9 max-md:items-center max-md:justify-center max-md:rounded-full max-md:border max-md:border-hairline max-md:bg-card max-md:p-0 max-md:text-ink md:hidden"
+        className="absolute left-3 top-3 z-30 rounded-md p-1.5 text-ink-secondary hover:bg-raised hover:text-ink max-md:flex max-md:size-9 max-md:items-center max-md:justify-center max-md:rounded-full max-md:border max-md:border-edge max-md:bg-card max-md:p-0 max-md:text-ink md:hidden"
       >
         <Menu size={18} className="max-md:hidden" />
         <ChevronLeft size={20} aria-hidden="true" className="hidden max-md:block" />
@@ -368,9 +368,9 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
           <WindowDragStrip />
           <div className="w-full max-w-md"><ChatNotice notice={state.notice} /></div>
           {loading.busy && <Loader2 size={20} className="animate-spin" />}
-          <div className="text-[14px]">{t(loading.text)}</div>
+          <div className="text-label">{t(loading.text)}</div>
           {loading.command && (
-            <div className="text-[12px]">
+            <div className="text-small">
             {t("app.loading.startServer")} <code className="rounded bg-raised px-1.5 py-0.5">pnpm dev:server</code>
             </div>
           )}

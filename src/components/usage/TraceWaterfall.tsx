@@ -20,7 +20,7 @@ export function modelName(model: string, instances: readonly InstanceInfo[]): st
 
 export function LiveBadge() {
   return (
-    <span className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-accent/12 px-2.5 py-1 text-[13px] font-medium text-accent" data-testid="trace-live">
+    <span className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-accent/12 px-2.5 py-1 text-ui font-medium text-accent-text" data-testid="trace-live">
       <span className="size-1.5 animate-pulse rounded-full bg-accent" />{t("trace.live")}
     </span>
   );
@@ -32,11 +32,11 @@ export function StatStrip({ items }: { items: Array<{ label: string; value: stri
       {items.map((item, index) => (
         <div
           key={item.label}
-          className={cn("min-w-0 px-4 py-3.5 sm:px-5", index % 3 !== 0 && "border-l border-hairline/40", index >= 3 && "border-t border-hairline/40 sm:border-t-0", index === 3 && "sm:border-l")}
+          className={cn("min-w-0 px-4 py-3.5 sm:px-5", index % 3 !== 0 && "border-l border-hairline", index >= 3 && "border-t border-hairline sm:border-t-0", index === 3 && "sm:border-l")}
           title={item.hint}
         >
-          <dt className="truncate text-[11px] font-medium uppercase tracking-[0.08em] text-ink-secondary">{item.label}</dt>
-          <dd className={cn("mt-1 truncate text-[20px] font-medium tabular-nums sm:text-[22px]", item.tone === "danger" ? "text-danger" : "text-ink")}>{item.value}</dd>
+          <dt className="truncate text-caption font-medium uppercase tracking-[0.08em] text-ink-secondary">{item.label}</dt>
+          <dd className={cn("mt-1 truncate text-display font-medium tabular-nums sm:text-display", item.tone === "danger" ? "text-danger-text" : "text-ink")}>{item.value}</dd>
         </div>
       ))}
     </dl>
@@ -110,9 +110,9 @@ function RowName({ row, models }: { row: TraceRow; models: readonly InstanceInfo
   return (
     <>
       {icon}
-      <span className={cn("shrink-0 truncate text-[14px]", node.kind === "turn" ? "font-medium text-ink" : "text-ink", failed && "text-danger")}>{name}</span>
-      {detail && <span className={cn("min-w-0 truncate text-[13px]", failed ? "text-danger/80" : "text-ink-tertiary")}>{detail}</span>}
-      {node.kind === "turn" && !node.timed && <span className="shrink-0 rounded bg-raised px-1.5 text-[11px] text-ink-secondary">{t("trace.notTimed")}</span>}
+      <span className={cn("shrink-0 truncate text-label", node.kind === "turn" ? "font-medium text-ink" : "text-ink", failed && "text-danger-text")}>{name}</span>
+      {detail && <span className={cn("min-w-0 truncate text-ui", failed ? "text-danger-text/80" : "text-ink-tertiary")}>{detail}</span>}
+      {node.kind === "turn" && !node.timed && <span className="shrink-0 rounded bg-raised px-1.5 text-caption text-ink-secondary">{t("trace.notTimed")}</span>}
     </>
   );
 }
@@ -129,8 +129,8 @@ function barClass(row: TraceRow): string {
 function Badge({ kind }: { kind: "slowest" | "costliest" }) {
   return (
     <span className={cn(
-      "ml-2 rounded-md px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.06em]",
-      kind === "slowest" ? "bg-warning/15 text-warning" : "bg-accent/12 text-accent",
+      "ml-2 rounded-md px-1.5 py-0.5 text-caption font-semibold uppercase tracking-[0.06em]",
+      kind === "slowest" ? "bg-warning/15 text-warning-text" : "bg-accent/12 text-accent-text",
     )}>{t(kind === "slowest" ? "trace.slowest" : "trace.costliest")}</span>
   );
 }
@@ -167,7 +167,7 @@ function RowBar({ row, origin, axisMax, badges, now, trackPx }: {
       {point
         ? <span className="absolute top-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-[2px] bg-ink-tertiary" style={{ left: `${startPct}%` }} />
         : <span className={cn("absolute top-1/2 h-[18px] -translate-y-1/2 rounded-md", barClass(row))} style={{ left: `${startPct}%`, width: `max(${width}%, 3px)` }} />}
-      <span className={cn("absolute top-1/2 flex -translate-y-1/2 items-center whitespace-nowrap text-[13px] tabular-nums", place === "inside" ? "text-ink" : "text-ink-secondary")} style={labelStyle}>
+      <span className={cn("absolute top-1/2 flex -translate-y-1/2 items-center whitespace-nowrap text-ui tabular-nums", place === "inside" ? "text-ink" : "text-ink-secondary")} style={labelStyle}>
         {label}
         {badges.slowest === node.id && <Badge kind="slowest" />}
         {badges.costliest === node.id && <Badge kind="costliest" />}
@@ -198,7 +198,7 @@ export function TraceWaterfall({ detail, now, actions }: { detail: TraceDetail; 
   }, []);
   const nowPct = live ? ((now - origin) / axis.max) * 100 : null;
   const grid: CSSProperties = {
-    backgroundImage: "linear-gradient(to right, color-mix(in srgb, var(--color-hairline) 55%, transparent) 1px, transparent 1px)",
+    backgroundImage: "linear-gradient(to right, var(--color-hairline) 1px, transparent 1px)",
     backgroundSize: `${100 / (axis.ticks.length - 1)}% 100%`,
   };
   const toggle = (id: string) => setToggled((current) => {
@@ -209,23 +209,23 @@ export function TraceWaterfall({ detail, now, actions }: { detail: TraceDetail; 
   const title = root.title || t(`trace.source.${root.source}`, { bot: root.bots[0]?.name ?? "" });
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-hairline/50 bg-card" data-testid="trace-waterfall" aria-label={t("trace.title")}>
-      <header className="flex items-center gap-3 border-b border-hairline/40 px-5 py-4">
-        <Sparkles size={16} className="shrink-0 text-accent" aria-hidden />
-        <span className="shrink-0 text-[15px] font-semibold text-ink">{t("trace.title")}</span>
-        <span className="min-w-0 flex-1 truncate text-[15px] text-ink-secondary" title={title}>{title}</span>
+    <section className="overflow-hidden rounded-2xl border border-hairline bg-card" data-testid="trace-waterfall" aria-label={t("trace.title")}>
+      <header className="flex items-center gap-3 border-b border-hairline px-5 py-4">
+        <Sparkles size={16} className="shrink-0 text-accent-text" aria-hidden />
+        <span className="shrink-0 text-body font-semibold text-ink">{t("trace.title")}</span>
+        <span className="min-w-0 flex-1 truncate text-body text-ink-secondary" title={title}>{title}</span>
         {live && <LiveBadge />}
         {actions}
       </header>
       <StatStrip items={totalsStats(root, t("trace.stat.duration"))} />
-      <div role="tree" aria-label={t("trace.spans")} className="border-t border-hairline/40">
-        <div className="grid grid-cols-1 border-b border-hairline/40 sm:grid-cols-[minmax(220px,38%)_1fr]">
-          <div className="hidden px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.08em] text-ink-secondary sm:block">{t("trace.span")}</div>
-          <div ref={track} className="relative mx-4 h-9 sm:ml-0 sm:mr-6 sm:border-l sm:border-hairline/40">
+      <div role="tree" aria-label={t("trace.spans")} className="border-t border-hairline">
+        <div className="grid grid-cols-1 border-b border-hairline sm:grid-cols-[minmax(220px,38%)_1fr]">
+          <div className="hidden px-5 py-2.5 text-caption font-medium uppercase tracking-[0.08em] text-ink-secondary sm:block">{t("trace.span")}</div>
+          <div ref={track} className="relative mx-4 h-9 sm:ml-0 sm:mr-6 sm:border-l sm:border-hairline">
             {axis.ticks.map((tick, index) => (
               <span
                 key={tick}
-                className={cn("absolute top-1/2 -translate-y-1/2 text-[12px] tabular-nums text-ink-tertiary", index === axis.ticks.length - 1 ? "-translate-x-full" : index > 0 && "-translate-x-1/2", index === 0 && "pl-2")}
+                className={cn("absolute top-1/2 -translate-y-1/2 text-small tabular-nums text-ink-tertiary", index === axis.ticks.length - 1 ? "-translate-x-full" : index > 0 && "-translate-x-1/2", index === 0 && "pl-2")}
                 style={{ left: `${(tick / axis.max) * 100}%` }}
               >{formatTick(tick)}</span>
             ))}
@@ -257,9 +257,9 @@ export function TraceWaterfall({ detail, now, actions }: { detail: TraceDetail; 
                     </button>
                   ) : <span className="w-5 shrink-0" />}
                   <RowName row={row} models={state.instances} />
-                  {rowFailed(row.node) && row.node.kind === "turn" && <X size={13} className="shrink-0 text-danger" aria-label={t("trace.failed")} />}
+                  {rowFailed(row.node) && row.node.kind === "turn" && <X size={13} className="shrink-0 text-danger-text" aria-label={t("trace.failed")} />}
                 </div>
-                <div className="relative mx-4 h-7 sm:ml-0 sm:mr-6 sm:h-9 sm:border-l sm:border-hairline/40" style={grid}>
+                <div className="relative mx-4 h-7 sm:ml-0 sm:mr-6 sm:h-9 sm:border-l sm:border-hairline" style={grid}>
                   <RowBar row={row} origin={origin} axisMax={axis.max} badges={badges} now={now} trackPx={trackPx} />
                   {nowPct !== null && <span className="absolute inset-y-0 w-px bg-accent/70" style={{ left: `${nowPct}%` }} />}
                 </div>

@@ -59,7 +59,7 @@ export function LiveCallSettings({ onClose }: { onClose: () => void }) {
       role="dialog"
       tabIndex={-1}
       aria-label={t("call.live.settings")}
-      className="flex w-[300px] max-w-[90vw] flex-col gap-3 rounded-xl border border-hairline bg-panel p-3 text-[13px] text-ink shadow-lg"
+      className="flex w-[300px] max-w-[90vw] flex-col gap-3 rounded-xl border border-edge bg-panel p-3 text-ui text-ink shadow-lg"
       onKeyDown={(event) => {
         if (event.key !== "Escape") return;
         event.stopPropagation();
@@ -78,7 +78,7 @@ export function LiveCallSettings({ onClose }: { onClose: () => void }) {
           {LIVE_VOICE_OPTIONS.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}
         </Select>
       </label>
-      <div className="-mt-2 text-[12px] text-ink-tertiary">{t("call.live.voiceNext")}</div>
+      <div className="-mt-2 text-small text-ink-tertiary">{t("call.live.voiceNext")}</div>
       <label className="flex items-center justify-between gap-2">
         <span className="text-ink-secondary">{t("call.live.readTyped")}</span>
         <input
@@ -89,7 +89,7 @@ export function LiveCallSettings({ onClose }: { onClose: () => void }) {
           onChange={(event) => void save({ readTypedReplies: event.target.checked })}
         />
       </label>
-      <div id={typedHintId} className="-mt-2 text-[12px] text-ink-tertiary">{t("call.live.readTypedHint")}</div>
+      <div id={typedHintId} className="-mt-2 text-small text-ink-tertiary">{t("call.live.readTypedHint")}</div>
       <label className="flex items-center justify-between gap-2">
         <span className="text-ink-secondary">{t("call.live.idle")}</span>
         <Select
@@ -103,25 +103,25 @@ export function LiveCallSettings({ onClose }: { onClose: () => void }) {
           ))}
         </Select>
       </label>
-      <div className="flex items-center justify-between gap-2 border-t border-hairline/60 pt-2">
+      <div className="flex items-center justify-between gap-2 border-t border-hairline pt-2">
         <span className="text-ink-secondary">{t("call.live.key")}</span>
         <span className="flex gap-2">
-          <button type="button" className="text-accent hover:underline" onClick={() => setChangingKey((open) => !open)}>
+          <button type="button" className="text-accent-text hover:underline" onClick={() => setChangingKey((open) => !open)}>
             {t("call.live.keyChange")}
           </button>
           {live.keySource === "live" && (
-            <button type="button" className="text-danger hover:underline" disabled={saving} onClick={() => void removeKey()}>
+            <button type="button" className="text-danger-text hover:underline" disabled={saving} onClick={() => void removeKey()}>
               {t("call.live.keyRemove")}
             </button>
           )}
         </span>
       </div>
       {live.keySource !== "live" && (
-        <div className="-mt-2 text-[12px] text-ink-tertiary">{t(live.keySource === "openai" ? "call.live.keyFromApiKeys" : "call.live.needsKey")} <KeysLink id="openai" purpose="liveCalls" /></div>
+        <div className="-mt-2 text-small text-ink-tertiary">{t(live.keySource === "openai" ? "call.live.keyFromApiKeys" : "call.live.needsKey")} <KeysLink id="openai" purpose="liveCalls" /></div>
       )}
       {changingKey && <LiveKeySetup compact onSaved={() => setChangingKey(false)} />}
-      <div className="text-[12px] text-ink-tertiary">{liveDisclosure({ cloudHome: state.config?.cloudHome === true })} {t("call.live.cost")}</div>
-      {error && <div className="text-[12px] text-danger">{error}</div>}
+      <div className="text-small text-ink-tertiary">{liveDisclosure({ cloudHome: state.config?.cloudHome === true })} {t("call.live.cost")}</div>
+      {error && <div className="text-small text-danger-text">{error}</div>}
     </div>
   );
 }

@@ -55,13 +55,13 @@ export function SidebarPhoneBar({ query, onQuery }: { query: string; onQuery: (q
           triggerClassName="shrink-0 rounded-full"
           triggerTitle={t("sidebar.tools")}
           renderTrigger={({ open }) => (
-            <span className={`relative flex size-11 items-center justify-center rounded-full border border-hairline text-ink ${open ? "bg-raised" : "bg-card"}`}>
+            <span className={`relative flex size-11 items-center justify-center rounded-full border border-edge text-ink ${open ? "bg-raised" : "bg-card"}`}>
               <LayoutGrid size={19} aria-hidden="true" />
               {automationsNeedYou && <span aria-hidden className="absolute right-1 top-1 size-2.5 rounded-full bg-danger ring-2 ring-app" />}
             </span>
           )}
         />
-        <div className="flex h-11 min-w-0 flex-1 items-center gap-2 rounded-full border border-hairline bg-card pl-3.5 pr-1.5 text-ink-secondary focus-within:border-focus">
+        <div className="flex h-11 min-w-0 flex-1 items-center gap-2 rounded-full border border-edge bg-card pl-3.5 pr-1.5 text-ink-secondary focus-within:border-focus">
           <Search size={17} aria-hidden="true" className="shrink-0" />
           <input
             value={query}
@@ -70,7 +70,7 @@ export function SidebarPhoneBar({ query, onQuery }: { query: string; onQuery: (q
             placeholder={t("sidebar.search")}
             aria-label={t("sidebar.searchAria")}
             enterKeyHint="search"
-            className="min-w-0 flex-1 bg-transparent text-[15px] text-ink placeholder:text-ink-secondary focus:outline-none"
+            className="min-w-0 flex-1 bg-transparent text-body text-ink placeholder:text-ink-secondary focus:outline-none"
           />
           {query !== "" && (
             <button

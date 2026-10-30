@@ -3,6 +3,7 @@ import type { Bot, Message } from "@/state/store";
 import { t } from "@/lib/i18n";
 import { peerLine } from "@/lib/peer-message";
 import { citationPreviewText } from "@/lib/citations";
+import { IconButton } from "./ui/IconButton";
 
 /** The chat's pinned message above the transcript: who said it, a one-line preview that jumps to it, and Unpin. */
 export function PinnedBanner({
@@ -28,23 +29,21 @@ export function PinnedBanner({
   return (
     <div className="w-full px-5">
       <div className="mb-2 flex items-center gap-2 rounded-lg border border-accent/25 bg-accent/[0.07] px-3 py-1.5">
-        <Pin size={12} className="shrink-0 text-accent" />
+        <Pin size={12} className="shrink-0 text-accent-text" />
         <button
           onClick={() => onJump(pinned.id)}
           className="flex min-w-0 flex-1 items-baseline gap-2 text-left"
           title={t("chat.pinnedJump")}
         >
-          <span className="shrink-0 text-[12px] font-medium text-accent">{sender}</span>
-          <span dir="auto" className="truncate text-[13px] text-ink-secondary">{text}</span>
+          <span className="shrink-0 text-small font-medium text-accent-text">{sender}</span>
+          <span dir="auto" className="truncate text-ui text-ink-secondary">{text}</span>
         </button>
-        {onUnpin && <button
+        {onUnpin && <IconButton label={t("chat.unpinMessage")} tooltip={t("chat.unpin")}
           onClick={onUnpin}
-          aria-label={t("chat.unpinMessage")}
-          title={t("chat.unpin")}
           className="shrink-0 rounded p-0.5 text-ink-secondary hover:bg-raised hover:text-ink"
         >
           <X size={13} />
-        </button>}
+        </IconButton>}
       </div>
     </div>
   );

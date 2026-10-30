@@ -10,6 +10,7 @@ import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
 import { useCloudSendNotice } from "./CloudSendStrip";
 import type { SidebarMenuItem } from "./SidebarPopoverMenu";
+import { Button } from "./ui/Button";
 
 export type AccountMoveLine = NonNullable<ReturnType<typeof moveLine>>;
 export type AccountMoveKind = AccountMoveLine["kind"];
@@ -44,12 +45,12 @@ export function moveMenuItems(line: AccountMoveLine | null, { retrying = false, 
   if (!line) return [];
   if (line.kind === "failed") {
     const title = failingWhy(line, unanswered);
-    if (!line.retry) return [{ key: "cloud-move", label: t("sidebar.account.moveNeedsYou"), title, icon: <CloudAlert size={16} className="text-warning" />, onSelect: onOpen }];
+    if (!line.retry) return [{ key: "cloud-move", label: t("sidebar.account.moveNeedsYou"), title, icon: <CloudAlert size={16} className="text-warning-text" />, onSelect: onOpen }];
     return [{
       key: "cloud-move",
       label: t("sidebar.account.moveRetry"),
       title,
-      icon: retrying ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} className="text-warning" />,
+      icon: retrying ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} className="text-warning-text" />,
       disabled: retrying,
       keepOpen: true,
       onSelect: onRetry,
@@ -138,7 +139,7 @@ export function AccountMoveStatus({ kind, retry = null, onOpen, className }: { k
   const words = accountMoveWords(kind);
   if (!words) return null;
   const Icon = kind === "failed" ? CloudAlert : CloudUpload;
-  const look = cn("flex min-w-0 items-center gap-1.5 text-start text-[12px] leading-4", kind === "failed" ? "font-medium text-warning" : "text-ink-secondary");
+  const look = cn("flex min-w-0 items-center gap-1.5 text-start text-small leading-4", kind === "failed" ? "font-medium text-warning-text" : "text-ink-secondary");
   const body = <>
     <Icon size={13} aria-hidden="true" className="shrink-0" />
     <span className="truncate">{words}</span>
@@ -148,19 +149,17 @@ export function AccountMoveStatus({ kind, retry = null, onOpen, className }: { k
     <div role="status" data-account-move={kind} className={cn("flex min-w-0 items-center gap-1.5", className)}>
       <button type="button" onClick={onOpen} className={cn(look, kind === "failed" ? "hover:underline" : "hover:text-ink")}>{body}</button>
       {kind === "failed" && retry && (
-        <button
-          type="button"
+        <Button
+          size="sm"
+          loading={retry.retrying}
           data-move-retry
           aria-label={t("sidebar.account.moveRetryName")}
-          aria-busy={retry.retrying || undefined}
-          aria-disabled={retry.retrying || undefined}
           title={retry.why}
-          onClick={retry.retrying ? undefined : retry.onRetry}
-          className={cn("ui-button ui-button-sm shrink-0", retry.retrying && "cursor-progress")}
+          onClick={retry.onRetry}
+          className="shrink-0"
         >
-          {retry.retrying && <Loader2 aria-hidden="true" className="size-3.5 shrink-0 animate-spin motion-reduce:animate-none" />}
           {t("cloudSend.strip.retry")}
-        </button>
+        </Button>
       )}
     </div>
   );

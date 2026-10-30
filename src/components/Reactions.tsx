@@ -8,6 +8,7 @@ import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
 import type { LocaleKey } from "@/locales";
 import { api, useStore, type Bot, type Message } from "@/state/store";
+import { IconButton } from "./ui/IconButton";
 
 const LABEL: Record<Reaction, LocaleKey> = {
   "👍": "chat.reaction.yes",
@@ -110,18 +111,15 @@ export function ReactAction({ threadId, message }: { threadId: string; message: 
       className="relative"
       onBlur={(event) => { if (!(event.relatedTarget instanceof Node && rootRef.current?.contains(event.relatedTarget))) setOpen(false); }}
     >
-      <button
+      <IconButton label={t("chat.react")}
         ref={buttonRef}
-        type="button"
         onClick={() => setOpen((value) => !value)}
-        aria-label={t("chat.react")}
-        title={t("chat.react")}
         aria-expanded={open}
         aria-controls={open ? id : undefined}
         className={cn(messageActionClass, open && "bg-ink/10 text-ink")}
       >
         <SmilePlus {...ACTION_ICON} aria-hidden="true" />
-      </button>
+      </IconButton>
       {open && (
         <div
           ref={rowRef}
@@ -130,7 +128,7 @@ export function ReactAction({ threadId, message }: { threadId: string; message: 
           aria-label={t("chat.reactions")}
           onKeyDown={onKey}
           className={cn(
-            "popover-surface absolute bottom-full z-40 mb-1 flex animate-pop-in items-center gap-0.5 rounded-full border border-hairline/50 bg-menu p-1 shadow-2xl shadow-black/40",
+            "popover-surface absolute bottom-full z-40 mb-1 flex animate-pop-in items-center gap-0.5 rounded-full border border-hairline bg-menu p-1 shadow-2xl shadow-shadow/40",
             end ? "end-0" : "start-0",
           )}
         >
@@ -146,7 +144,7 @@ export function ReactAction({ threadId, message }: { threadId: string; message: 
                 close(true);
               }}
               className={cn(
-                "flex size-8 items-center justify-center rounded-full text-[18px] leading-none transition-transform hover:scale-110 hover:bg-raised focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus motion-reduce:transition-none motion-reduce:hover:scale-100",
+                "flex size-8 items-center justify-center rounded-full text-title leading-none transition-transform hover:scale-110 hover:bg-raised focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus motion-reduce:transition-none motion-reduce:hover:scale-100",
                 mine === emoji && "bg-accent/15",
               )}
             >
@@ -184,14 +182,14 @@ function Chips({ threadId, message, bots = [], align = "start", canReact = true 
       {shown.map(({ emoji, people, fresh }) => {
         const label = t("chat.reaction.chip", { reaction: labelOf(emoji), people: people.join(", ") });
         const chip = cn(
-          "flex items-center gap-1 rounded-full border px-2 py-0.5 text-[13px] leading-5",
+          "flex items-center gap-1 rounded-full border px-2 py-0.5 text-ui leading-5",
           fresh && "animate-pop-in",
-          mine === emoji ? "border-accent/50 bg-accent/15" : "border-hairline/40 bg-panel",
+          mine === emoji ? "border-accent/50 bg-accent/15" : "border-hairline bg-panel",
         );
         const face = (
           <>
             <span aria-hidden="true">{emoji}</span>
-            {people.length > 1 && <span aria-hidden="true" className="text-[12px] tabular-nums text-ink-secondary">{people.length}</span>}
+            {people.length > 1 && <span aria-hidden="true" className="text-small tabular-nums text-ink-secondary">{people.length}</span>}
           </>
         );
         return canReact && Object.hasOwn(LABEL, emoji) ? (

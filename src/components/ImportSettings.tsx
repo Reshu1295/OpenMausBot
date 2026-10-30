@@ -12,6 +12,7 @@ import { detectionCount, detectionSources, type SetupDetection, type SetupImport
 import { GrokBotMark } from "./GrokBotMark";
 import { GrokImportFlow } from "./GrokImportFlow";
 import { ClaudeMark, CodexMark, CursorMark, PresetProviderMark } from "./ProviderIcons";
+import { Button } from "./ui/Button";
 
 function SourceMarks({ sources }: { sources: readonly SetupSource[] }) {
   const marks = [...new Set(sources.map((source) => (source === "claudeDesktop" ? "claudeCode" : source)))];
@@ -51,18 +52,18 @@ export function ImportRow({ icon, label, summary, hint, sources, checked, disabl
       <span className="mt-0.5 flex size-4 shrink-0 items-center justify-center text-ink-secondary">{icon}</span>
       <span className="flex min-w-0 flex-1 flex-col">
         {/* One run of text, so a narrow card wraps the summary under the label, marks included. */}
-        <span className="text-[13px] leading-5 text-ink-secondary">
-          <span className="mr-2 text-[14px] font-medium text-ink">{label}</span>
+        <span className="text-ui leading-5 text-ink-secondary">
+          <span className="mr-2 text-label font-medium text-ink">{label}</span>
           <SourceMarks sources={sources} />
           {summary}
         </span>
-        <span className="mt-0.5 text-[12px] leading-relaxed text-ink-secondary">{hint}</span>
+        <span className="mt-0.5 text-small leading-relaxed text-ink-secondary">{hint}</span>
       </span>
     </label>
   );
 }
 
-const buttonClass = "inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-3 py-2 text-[13px] font-medium text-accent-ink disabled:opacity-40";
+const buttonClass = "gap-2 px-3";
 
 export interface AiAppsImportViewProps {
   local: boolean;
@@ -78,9 +79,9 @@ export interface AiAppsImportViewProps {
 export function AiAppsImportView({ local, detection, chosen, status, result, onChoose, onBring }: AiAppsImportViewProps) {
   const working = status === "working";
   let body;
-  if (!local) body = <p className="text-[13px] text-ink-secondary">{t("settings.import.appsLocalOnly")}</p>;
+  if (!local) body = <p className="text-ui text-ink-secondary">{t("settings.import.appsLocalOnly")}</p>;
   else if (detection === undefined) {
-    body = <p className="flex items-center gap-2 text-[13px] text-ink-secondary"><Loader2 size={14} className="animate-spin" />{t("settings.import.appsLooking")}</p>;
+    body = <p className="flex items-center gap-2 text-ui text-ink-secondary"><Loader2 size={14} className="animate-spin" />{t("settings.import.appsLooking")}</p>;
   } else if (result) {
     const { line, notes, done } = importOutcome(result);
     body = (
@@ -89,17 +90,17 @@ export function AiAppsImportView({ local, detection, chosen, status, result, onC
           {done ? <Check size={12} strokeWidth={3} /> : <Info size={12} strokeWidth={2.5} />}
         </span>
         <div className="min-w-0">
-          <p className="text-[14px] font-medium text-ink">{line}</p>
-          {notes.map((note) => <p key={note} className="mt-1 text-[12px] leading-relaxed text-ink-secondary">{note}</p>)}
+          <p className="text-label font-medium text-ink">{line}</p>
+          {notes.map((note) => <p key={note} className="mt-1 text-small leading-relaxed text-ink-secondary">{note}</p>)}
         </div>
       </div>
     );
   } else if (!detection || detectionCount(detection) === 0) {
-    body = <p className="text-[13px] text-ink-secondary">{detection === null ? t("onboarding.import.error") : t("settings.import.appsNothing")}</p>;
+    body = <p className="text-ui text-ink-secondary">{detection === null ? t("onboarding.import.error") : t("settings.import.appsNothing")}</p>;
   } else {
     body = (
       <>
-        <div className="divide-y divide-hairline/40 overflow-hidden rounded-xl border border-hairline/40">
+        <div className="divide-y divide-hairline overflow-hidden rounded-xl border border-hairline">
           {detection.skills.length > 0 && (
             <ImportRow icon={<BookOpen size={15} />} label={t("onboarding.import.skills")} summary={skillsSummary(detection)}
               hint={t("onboarding.import.skillsHint")} sources={detectionSources(detection.skills)} checked={chosen.skills}
@@ -111,18 +112,18 @@ export function AiAppsImportView({ local, detection, chosen, status, result, onC
               disabled={working} onChange={(tools) => onChoose({ ...chosen, tools })} />
           )}
         </div>
-        {status === "failed" && <p role="alert" className="mt-3 text-[13px] text-danger">{t("onboarding.import.error")}</p>}
-        <button onClick={onBring} disabled={working || !(chosen.skills || chosen.tools)} className={cn(buttonClass, "mt-3")}>
+        {status === "failed" && <p role="alert" className="mt-3 text-ui text-danger-text">{t("onboarding.import.error")}</p>}
+        <Button variant="primary" size="lg" onClick={onBring} disabled={working || !(chosen.skills || chosen.tools)} className={cn(buttonClass, "mt-3")}>
           {working && <Loader2 size={14} className="animate-spin" />}
           {working ? t("onboarding.import.bringing") : t("onboarding.import.bring")}
-        </button>
+        </Button>
       </>
     );
   }
   return (
     <section data-import-section="apps" className="rounded-xl bg-card p-4">
-      <div className="text-[15px] font-medium text-ink">{t("settings.import.appsTitle")}</div>
-      <div className="mt-0.5 text-[13px] leading-relaxed text-ink-secondary">{t("settings.import.appsSubtitle")}</div>
+      <div className="text-body font-medium text-ink">{t("settings.import.appsTitle")}</div>
+      <div className="mt-0.5 text-ui leading-relaxed text-ink-secondary">{t("settings.import.appsSubtitle")}</div>
       <div className="mt-4">{body}</div>
     </section>
   );
@@ -163,8 +164,8 @@ function AiAppsImport({ client, local }: { client: SetupImportClient; local: boo
 export function GrokImportSection() {
   return (
     <section data-import-section="grok" className="rounded-xl bg-card p-4">
-      <div className="flex items-center gap-2 text-[15px] font-medium text-ink"><GrokBotMark size={16} />{t("settings.import.grokTitle")}</div>
-      <div className="mt-0.5 text-[13px] leading-relaxed text-ink-secondary">{t("settings.import.grokSubtitle")}</div>
+      <div className="flex items-center gap-2 text-body font-medium text-ink"><GrokBotMark size={16} />{t("settings.import.grokTitle")}</div>
+      <div className="mt-0.5 text-ui leading-relaxed text-ink-secondary">{t("settings.import.grokSubtitle")}</div>
       <div className="mt-4"><GrokImportFlow bare /></div>
     </section>
   );

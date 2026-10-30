@@ -4,6 +4,7 @@ import { MausAvatar } from "@/components/Avatar";
 import { cn } from "@/lib/cn";
 import type { MausState } from "@/lib/mascot";
 import { reducedMotion } from "@/lib/onboarding";
+import { Button } from "../ui/Button";
 
 const PAD = 8;
 const RADIUS = 14;
@@ -185,7 +186,7 @@ export function Spotlight({
         <div
           role="dialog"
           className={cn(
-            "flex items-start gap-3 rounded-2xl border border-hairline/50 bg-panel p-3.5 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.6)]",
+            "flex items-start gap-3 rounded-2xl border border-hairline bg-panel p-3.5 shadow-[0_24px_60px_-20px_color-mix(in_srgb,var(--color-shadow)_60%,transparent)]",
             rect
               ? beside
                 ? "origin-left"
@@ -196,7 +197,7 @@ export function Spotlight({
             settled ? "animate-spot-in motion-reduce:animate-none" : "opacity-0",
           )}
         >
-          <div className="shrink-0 drop-shadow-[0_6px_14px_rgba(0,0,0,0.35)]">
+          <div className="shrink-0 drop-shadow-[0_6px_14px_color-mix(in_srgb,var(--color-shadow)_35%,transparent)]">
             <MausAvatar
               color="green"
               state={mascot}
@@ -208,22 +209,21 @@ export function Spotlight({
             key={anchor ?? "centre"}
             className="min-w-0 flex-1 animate-rise motion-reduce:animate-none"
           >
-            <div className="text-[14px] leading-relaxed text-ink">
+            <div className="text-label leading-relaxed text-ink">
               {children}
             </div>
             <div className="mt-2.5 flex items-center gap-3">
               {primary && (
-                <button
-                  type="button"
+                <Button variant="primary"
                   autoFocus
                   onClick={primary.onClick}
-                  className="rounded-lg bg-accent px-3 py-1.5 text-[13px] font-medium text-white transition-transform duration-150 active:scale-[0.98]"
+                  className="transition-transform duration-150 active:scale-[0.98]"
                 >
                   {primary.label}
-                </button>
+                </Button>
               )}
               {progress && (
-                <span className="text-[12px] tabular-nums text-ink-secondary">
+                <span className="text-small tabular-nums text-ink-secondary">
                   {progress}
                 </span>
               )}
@@ -231,7 +231,7 @@ export function Spotlight({
                 <button
                   type="button"
                   onClick={secondary.onClick}
-                  className="ml-auto text-[12px] text-ink-secondary transition-colors hover:text-ink"
+                  className="ml-auto text-small text-ink-secondary transition-colors hover:text-ink"
                 >
                   {secondary.label}
                 </button>

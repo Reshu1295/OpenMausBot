@@ -8,6 +8,7 @@ import { copyText } from "@/lib/copy-text";
 import { columnMinimums, fitsColumns } from "@/lib/table-fit";
 import { cn } from "@/lib/cn";
 import { useAdvancedMode } from "@/lib/interface-mode";
+import { IconButton } from "./ui/IconButton";
 
 export interface TableCell { text: string; content?: ReactNode; align?: TableAlign; vAlign?: "top" | "middle" | "bottom" }
 export type TableAlign = "left" | "center" | "right" | "start" | "end";
@@ -35,9 +36,9 @@ export function TableDialog({ title, onClose, children, returnFocus }: { title: 
   return createPortal(
     <dialog ref={ref} aria-labelledby={id} onCancel={onClose} onClose={onClose}
       onKeyDown={(event) => { if (event.key === "Escape") event.stopPropagation(); }}
-      className="m-auto flex max-h-[94dvh] w-[min(96vw,1400px)] max-w-none flex-col overflow-hidden rounded-2xl border border-hairline bg-panel p-0 text-ink shadow-2xl backdrop:bg-black/55">
-      <header className="flex shrink-0 items-center justify-between gap-3 border-b border-hairline/40 px-4 py-3">
-        <h2 id={id} className="min-w-0 truncate text-sm font-medium">{title}</h2>
+      className="m-auto flex max-h-[94dvh] w-[min(96vw,1400px)] max-w-none flex-col overflow-hidden rounded-2xl border border-edge bg-panel p-0 text-ink shadow-2xl backdrop:bg-black/55">
+      <header className="flex shrink-0 items-center justify-between gap-3 border-b border-hairline px-4 py-3">
+        <h2 id={id} className="min-w-0 truncate text-label font-medium">{title}</h2>
         <button type="button" autoFocus onClick={onClose} className="table-action" aria-label={t("table.close")}><X size={16} /></button>
       </header>
       <div className="min-h-0 overflow-auto p-3 sm:p-5">{children}</div>
@@ -86,7 +87,7 @@ export function RichTable({ columns, rows, name = t("table.title"), expanded = f
     <label className={className}>
       <Search size={13} aria-hidden="true" />
       <input value={query} onChange={(event) => setQuery(event.target.value)} aria-label={t("table.search")}
-        placeholder={t("table.search")} className="w-full min-w-0 bg-transparent py-1 text-xs text-ink outline-none placeholder:text-ink-tertiary focus-visible:ring-1 focus-visible:ring-accent" />
+        placeholder={t("table.search")} className="w-full min-w-0 bg-transparent py-1 text-small text-ink outline-none placeholder:text-ink-tertiary focus-visible:ring-1 focus-visible:ring-focus" />
     </label>
   );
   const sortBy = (column: number) => setSort(sort?.column !== column ? { column, descending: false } : !sort.descending ? { column, descending: true } : null);
@@ -94,13 +95,13 @@ export function RichTable({ columns, rows, name = t("table.title"), expanded = f
     <div data-table-card className={TABLE_CARD} dir="ltr">
       <div className="table-plate absolute end-1.5 top-1.5 z-20 flex items-center gap-0.5 rounded-full bg-composer p-0.5 opacity-0 ring-[0.5px] ring-ink/10 transition-opacity focus-within:opacity-100 group-hover/table:opacity-100 touch:end-1 touch:top-0 touch:bg-transparent touch:p-0 touch:opacity-100 touch:ring-0">
         <button type="button" className="table-action !rounded-full" aria-label={t("table.copyPlain")} title={t("table.copyPlain")} onClick={() => void copy()}>{copyState === "copied" ? <Check size={14} /> : <Copy size={14} />}</button>
-        <button type="button" className="table-action !rounded-full" aria-label={t("table.download")} title={t("table.download")} onClick={download}><Download size={14} /></button>
-        <button type="button" className="table-action !rounded-full" aria-label={t("table.expand")} title={t("table.expand")} onClick={(event) => { trigger.current = event.currentTarget; setOpen(true); }}><Maximize2 size={14} /></button>
+        <IconButton label={t("table.download")} className="table-action !rounded-full" onClick={download}><Download size={14} /></IconButton>
+        <IconButton label={t("table.expand")} className="table-action !rounded-full" onClick={(event) => { trigger.current = event.currentTarget; setOpen(true); }}><Maximize2 size={14} /></IconButton>
       </div>
       {rows.length > SMALL_TABLE_ROWS && (
         <div className="flex items-center gap-2 px-4 pb-1.5 text-ink-tertiary">
           {search("flex min-w-24 flex-1 items-center gap-2")}
-          <span role="status" className="shrink-0 text-[12px] tabular-nums">{t("table.count", { shown: order.length.toLocaleString(), total: rows.length.toLocaleString(), columns: columns.length })}</span>
+          <span role="status" className="shrink-0 text-small tabular-nums">{t("table.count", { shown: order.length.toLocaleString(), total: rows.length.toLocaleString(), columns: columns.length })}</span>
         </div>
       )}
       <TableViewport columns={columns} rows={rows} order={order} name={name} wrap={wrap} large={false} sort={sort} direction={direction} headless={headless} look="card" onSort={sortBy} />
@@ -111,22 +112,22 @@ export function RichTable({ columns, rows, name = t("table.title"), expanded = f
     if (simple && asCard && !large) return card();
     const small = !large && rows.length <= SMALL_TABLE_ROWS;
     const actions = <>
-        {!small && <button type="button" className="table-action" aria-label={t("table.wrap")} title={t("table.wrap")} aria-pressed={wrap} onClick={() => setWrap(!wrap)}><WrapText size={14} /></button>}
+        {!small && <IconButton label={t("table.wrap")} className="table-action" aria-pressed={wrap} onClick={() => setWrap(!wrap)}><WrapText size={14} /></IconButton>}
         <button type="button" className="table-action" aria-label={t("table.copy")} title={t("table.copy")} onClick={() => void copy()}>{copyState === "copied" ? <Check size={14} /> : <Copy size={14} />}</button>
-        <button type="button" className="table-action" aria-label={t("table.download")} title={t("table.download")} onClick={download}><Download size={14} /></button>
-        {!large && <button type="button" className="table-action" aria-label={t("table.expand")} title={t("table.expand")} onClick={(event) => { trigger.current = event.currentTarget; setOpen(true); }}><Maximize2 size={14} /></button>}
+        <IconButton label={t("table.download")} className="table-action" onClick={download}><Download size={14} /></IconButton>
+        {!large && <IconButton label={t("table.expand")} className="table-action" onClick={(event) => { trigger.current = event.currentTarget; setOpen(true); }}><Maximize2 size={14} /></IconButton>}
     </>;
     return (
-    <div className={cn("rich-table w-fit min-w-[min(100%,var(--chat-prose-max))] max-w-full overflow-hidden rounded-xl border border-hairline/50 text-ink", simple ? "bg-composer" : "bg-panel")} dir="ltr">
-      {!small && <div className="flex flex-wrap items-center gap-1 border-b border-hairline/40 px-2 py-1.5">
+    <div className={cn("rich-table w-fit min-w-[min(100%,var(--chat-prose-max))] max-w-full overflow-hidden rounded-xl border border-hairline text-ink", simple ? "bg-composer" : "bg-panel")} dir="ltr">
+      {!small && <div className="flex flex-wrap items-center gap-1 border-b border-hairline px-2 py-1.5">
         {search("flex min-w-24 flex-1 items-center gap-2 px-1 text-ink-secondary")}
         {actions}
       </div>}
       <TableViewport columns={columns} rows={rows} order={order} name={name} wrap={wrap} large={large} sort={sort} direction={direction} headless={headless}
         look={simple ? "quiet" : "panel"} onSort={sortBy} />
       <footer className={small
-        ? "flex items-center justify-end gap-0.5 border-t border-hairline/30 px-1.5 py-1 text-[11px] text-ink-tertiary"
-        : "flex flex-wrap items-center justify-between gap-2 border-t border-hairline/40 px-3 py-2 text-[11px] text-ink-secondary"}>
+        ? "flex items-center justify-end gap-0.5 border-t border-hairline px-1.5 py-1 text-caption text-ink-tertiary"
+        : "flex flex-wrap items-center justify-between gap-2 border-t border-hairline px-3 py-2 text-caption text-ink-secondary"}>
         {!small && <span role="status">{t("table.count", { shown: order.length.toLocaleString(), total: rows.length.toLocaleString(), columns: columns.length })}</span>}
         {copyState !== "idle" && <span role={copyState === "failed" ? "alert" : "status"} className={small ? "me-auto ps-1.5" : undefined}>{t(copyState === "failed" ? "table.copyFailed" : "table.copied")}</span>}
         {small && actions}
@@ -184,16 +185,16 @@ function TableViewport({ columns, rows, order, name, wrap, large, sort, onSort, 
   const header = (column: TableColumn, index: number) => column.content ?? (column.text || t("table.column", { number: index + 1 }));
   const arrow = (index: number, className?: string) => sort?.column === index && sort.descending ? <ArrowDown size={12} className={className} /> : <ArrowUp size={12} className={cn(className, sort?.column !== index && !card && "opacity-35")} />;
   return <div ref={scroll} tabIndex={0} role="region" aria-label={name}
-    className={cn("overflow-auto overscroll-x-contain focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/60", card && !fit && "[mask-image:linear-gradient(90deg,#000_calc(100%-40px),transparent)]")}
+    className={cn("overflow-auto overscroll-x-contain focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-focus/60", card && !fit && "[mask-image:linear-gradient(90deg,#000_calc(100%-40px),transparent)]")}
     style={{ maxHeight: large ? "65dvh" : virtual || !wrap ? 400 : undefined }} data-fit={fit || undefined}>
-    <table dir={direction} aria-label={name} aria-rowcount={order.length + 1} className={cn("w-full border-separate border-spacing-0 text-[14px]", fit ? "table-auto" : "table-fixed", card && "leading-5")} style={fit ? undefined : { minWidth: widths.reduce((a, b) => a + b, 0) }}>
+    <table dir={direction} aria-label={name} aria-rowcount={order.length + 1} className={cn("w-full border-separate border-spacing-0 text-label", fit ? "table-auto" : "table-fixed", card && "leading-5")} style={fit ? undefined : { minWidth: widths.reduce((a, b) => a + b, 0) }}>
       {!fit && <colgroup>{widths.map((width, index) => <col key={index} style={{ width }} />)}</colgroup>}
       <thead ref={heading} hidden={headless} className={cn("sticky top-0 z-10", look === "panel" ? "bg-raised" : "bg-composer")}><tr aria-rowindex={1}>
         {columns.map((column, index) => <th key={index} scope="col" aria-sort={sort?.column === index ? sort.descending ? "descending" : "ascending" : "none"}
-          className={card ? "px-4 py-2.5 align-bottom font-semibold" : "h-10 border-b border-hairline/60 px-3 py-2 font-medium"} style={{ textAlign: alignment(column, index) }}>
+          className={card ? "px-4 py-2.5 align-bottom font-semibold" : "h-10 border-b border-hairline px-3 py-2 font-medium"} style={{ textAlign: alignment(column, index) }}>
           <div className="break-words [overflow-wrap:anywhere]" style={fit ? { minWidth: minimums[index] } : undefined}>
             {card ? (
-              <button type="button" className="group/th inline-flex max-w-full items-center gap-1 text-start font-semibold [text-align:inherit] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60" aria-label={sortLabel(column, index)} title={sortLabel(column, index)} onClick={() => onSort(index)}>
+              <button type="button" className="group/th inline-flex max-w-full items-center gap-1 text-start font-semibold [text-align:inherit] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/60" aria-label={sortLabel(column, index)} title={sortLabel(column, index)} onClick={() => onSort(index)}>
                 <span dir="auto">{header(column, index)}</span>
                 {arrow(index, cn("shrink-0 text-ink-tertiary transition-opacity", sort?.column === index ? "opacity-100" : "opacity-0 group-hover/th:opacity-100 group-focus-within/th:opacity-100 touch:opacity-100"))}
               </button>
@@ -210,7 +211,7 @@ function TableViewport({ columns, rows, order, name, wrap, large, sort, onSort, 
           className={card ? undefined : item.index % 2 ? cn(look === "quiet" ? "bg-ink/[0.03]" : "bg-inset/35", "hover:bg-raised/70") : "hover:bg-raised/70"}>
           {columns.map((column, index) => {
             const cell = rows[order[item.index]!]![index];
-            return <td key={index} className={card ? "border-t-[0.5px] border-ink/[0.07] px-4 py-2.5 align-top tabular-nums" : "border-b border-hairline/20 px-3 py-2.5 align-top tabular-nums"} style={{ textAlign: cell?.align ?? alignment(column, index), verticalAlign: cell?.vAlign }}>
+            return <td key={index} className={card ? "border-t-[0.5px] border-ink/[0.07] px-4 py-2.5 align-top tabular-nums" : "border-b border-hairline px-3 py-2.5 align-top tabular-nums"} style={{ textAlign: cell?.align ?? alignment(column, index), verticalAlign: cell?.vAlign }}>
               <div dir="auto" title={!wrap ? cell?.text : undefined} className={wrap ? "whitespace-pre-wrap break-words [overflow-wrap:anywhere]" : "truncate"}>{cell?.content ?? cell?.text}</div>
             </td>;
           })}
@@ -218,6 +219,6 @@ function TableViewport({ columns, rows, order, name, wrap, large, sort, onSort, 
         {after > 0 && <tr aria-hidden="true"><td colSpan={columns.length} style={{ height: after, padding: 0 }} /></tr>}
       </tbody>
     </table>
-    {order.length === 0 && <p className="p-8 text-center text-sm text-ink-secondary">{t(rows.length ? "table.noResults" : "table.empty")}</p>}
+    {order.length === 0 && <p className="p-8 text-center text-label text-ink-secondary">{t(rows.length ? "table.noResults" : "table.empty")}</p>}
   </div>;
 }
