@@ -1,4 +1,4 @@
-import { createCipheriv, createDecipheriv, createHash, randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
+import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
 import { mkdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { z } from "zod";
@@ -561,6 +561,16 @@ export class WebhookManager {
   authorize(endpointId: string, secret: string): boolean {
     const trigger = this.webhooks.find((candidate) => candidate.endpointId === endpointId);
     return Boolean(trigger && secretMatches(secret, trigger.secretHash));
+  }
+
+  /** The kept secret leaves this method only after GitHub's signature authenticates the raw request bytes. */
+  githubSecret(endpointId: string, signature: string | undefined, raw: Buffer): string | null {
+    if (!signature || !/^sha256=[a-f0-9]{64}$/.test(signature)) return null;
+    const trigger = this.webhooks.find((candidate) => candidate.endpointId === endpointId);
+    const secret = trigger && this.unseal(trigger);
+    if (!secret) return null;
+    const expected = createHmac("sha256", secret).update(raw).digest();
+    return timingSafeEqual(Buffer.from(signature.slice(7), "hex"), expected) ? secret : null;
   }
 
   receive(endpointId: string, secret: string, event: WebhookEvent): WebhookReceiveResult | Promise<WebhookReceiveResult> {

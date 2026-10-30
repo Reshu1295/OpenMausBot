@@ -38,7 +38,7 @@ export function webhookAddress(webhooks: Pick<WebhookManager, "currentSecret">, 
     url: credential.url,
     endpoint: credential.endpointUrl,
     bearer: credential.secret,
-    note: `Paste url into the setup of the app that sends to this automation, and nowhere else: never repeat it in chat, notes, files or messages to other bots. An app that can't take the full address sends to endpoint with the header "Authorization: Bearer <bearer>".${local}`,
+    note: `Paste url into the setup of the app that sends to this automation, and nowhere else: never repeat it in chat, notes, files or messages to other bots. An app that can't take the full address sends to endpoint with the header "Authorization: Bearer <bearer>". For GitHub, use endpoint + "/github" as Payload URL, application/json as Content type, and bearer as Secret. Select the requested GitHub events; put action and branch conditions in the automation's instructions.${local}`,
   };
 }
 

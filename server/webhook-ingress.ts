@@ -24,7 +24,7 @@ function json(res: ServerResponse, status: number, body: JsonValue): void {
   res.end(JSON.stringify(body));
 }
 
-async function readRawBody(req: IncomingMessage): Promise<string> {
+async function readRawBody(req: IncomingMessage): Promise<Buffer> {
   const chunks: Buffer[] = [];
   let bytes = 0;
   try {
@@ -41,7 +41,7 @@ async function readRawBody(req: IncomingMessage): Promise<string> {
     if (parsed.success && parsed.data.status === 413) throw error;
     throw Object.assign(new Error("Could not read webhook body"), { status: 400 });
   }
-  return Buffer.concat(chunks, bytes).toString("utf8");
+  return Buffer.concat(chunks, bytes);
 }
 
 function parsePayload(raw: string, contentType: string): JsonValue {
@@ -106,29 +106,37 @@ export function createWebhookIngressHandler(manager: WebhookManager, claimReques
     let release: (() => void) | undefined;
     try {
       release = claimRequest?.();
+      const github = match[2] === "github";
       let secret = "";
-      try {
-        secret = (match[2] ? decodeURIComponent(match[2]) : "") || bearerSecret(req);
-      } catch {
+      let raw: Buffer | undefined;
+      if (github) {
+        if (header(req, "x-github-delivery")?.trim() && header(req, "x-github-event")?.trim()) {
+          raw = await readRawBody(req);
+          secret = manager.githubSecret(match[1], header(req, "x-hub-signature-256"), raw) ?? "";
+        }
+      } else {
+        try {
+          secret = (match[2] ? decodeURIComponent(match[2]) : "") || bearerSecret(req);
+        } catch {
+        }
       }
-      // Reject bad capability URLs before buffering or parsing attacker input.
       if (!manager.authorize(match[1], secret)) {
         manager.recordUnauthorized(match[1], {
           contentType: header(req, "content-type"),
-          eventName: eventName(req),
-          deliveryId: deliveryId(req),
+          eventName: github ? header(req, "x-github-event") : eventName(req),
+          deliveryId: github ? header(req, "x-github-delivery") : deliveryId(req),
         });
         return json(res, 401, { error: "Invalid webhook URL or secret" });
       }
-      const raw = await readRawBody(req);
+      raw ??= await readRawBody(req);
       const contentType = header(req, "content-type")?.split(";")[0]?.trim().toLowerCase() ?? "text/plain";
-      const payload = parsePayload(raw, contentType);
+      const payload = parsePayload(raw.toString("utf8"), contentType);
       const result = await manager.receive(match[1], secret, {
         payload,
         contentType,
-        eventName: eventName(req),
+        eventName: github ? header(req, "x-github-event")?.trim() : eventName(req),
         userAgent: header(req, "user-agent"),
-        deliveryId: deliveryId(req),
+        deliveryId: github ? header(req, "x-github-delivery")?.trim() : deliveryId(req),
       });
       return json(res, 202, { accepted: true, ...result });
     } catch (error) {
