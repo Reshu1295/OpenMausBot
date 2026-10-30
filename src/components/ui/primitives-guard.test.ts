@@ -5,16 +5,17 @@
 // - a dialog keeps Tab inside itself: it is a <Dialog>, calls useModalDialog, or is listed below with its own trap or as a
 //   non-modal surface (a popover, a side panel) where focus may leave.
 import { readdirSync, readFileSync, statSync } from "node:fs";
-import { join, relative } from "node:path";
+import { join, relative, sep } from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
-const ROOT = new URL("../../../", import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
 
 function sources(dir = join(ROOT, "src")): string[] {
   return readdirSync(dir).flatMap((name) => {
     const path = join(dir, name);
     if (statSync(path).isDirectory()) return name === "testing" ? [] : sources(path);
-    return /\.tsx?$/.test(name) && !name.includes(".test.") ? [relative(ROOT, path)] : [];
+    return /\.tsx?$/.test(name) && !name.includes(".test.") ? [relative(ROOT, path).split(sep).join("/")] : [];
   });
 }
 

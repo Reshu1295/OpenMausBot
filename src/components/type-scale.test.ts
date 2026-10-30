@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync } from "node:fs";
-import { dirname, join, relative } from "node:path";
+import { dirname, join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { TYPE_SCALE } from "@/theme/tokens/type";
@@ -31,20 +31,21 @@ function sourceFiles(dir: string): string[] {
   });
 }
 
+const nameOf = (file: string) => relative(srcRoot, file).split(sep).join("/");
 const shipped = () => sourceFiles(srcRoot).filter((file) => !/\.test\.tsx?$/.test(file));
 const sizesIn = (text: string) => [...text.matchAll(OFF_SCALE_SIZE)].map((match) => match[1] ?? match[2]!);
 
 describe("type scale", () => {
   it("sizes text in whole pixels, so neighbouring steps stay distinct", () => {
     const offenders = sourceFiles(srcRoot).flatMap((file) =>
-      (readFileSync(file, "utf8").match(FRACTIONAL_SIZE) ?? []).map((size) => `${relative(srcRoot, file)}: ${size}`),
+      (readFileSync(file, "utf8").match(FRACTIONAL_SIZE) ?? []).map((size) => `${nameOf(file)}: ${size}`),
     );
     expect(offenders).toEqual([]);
   });
 
   it("sizes text from the scale (text-caption … text-display), not in pixels", () => {
     const offenders = shipped().flatMap((file) => {
-      const name = relative(srcRoot, file);
+      const name = nameOf(file);
       const allowed = ALLOWED[name]?.sizes;
       if (allowed === "any") return [];
       return sizesIn(readFileSync(file, "utf8")).filter((size) => !allowed?.includes(size)).map((size) => `${name}: ${size}`);
@@ -54,7 +55,7 @@ describe("type scale", () => {
 
   it("does not use Tailwind's own text sizes", () => {
     const offenders = shipped().flatMap((file) =>
-      (readFileSync(file, "utf8").match(TAILWIND_SIZE) ?? []).map((size) => `${relative(srcRoot, file)}: ${size}`),
+      (readFileSync(file, "utf8").match(TAILWIND_SIZE) ?? []).map((size) => `${nameOf(file)}: ${size}`),
     );
     expect(offenders).toEqual([]);
   });
