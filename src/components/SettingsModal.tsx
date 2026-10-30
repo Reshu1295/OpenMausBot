@@ -13,6 +13,7 @@ import { OpenAtLoginRow } from "./OpenAtLoginRow";
 import { DefaultBotSidebarRow } from "./DefaultBotControls";
 import { TalkShortcutRow, talkShortcutKeywords } from "./TalkShortcutRow";
 import { DiagnosticsRow } from "./DiagnosticsRow";
+import { WebSearchSettings } from "./WebSearchSettings";
 import { DecisionModelSettings } from "./DecisionModelSettings";
 import { EnginesSettings } from "./EnginesSettings";
 import { LocalComputerSection } from "./LocalComputerSection";
@@ -391,7 +392,7 @@ export function SettingsModal() {
       case "experimental":
         return <ExperimentalFeaturesRow />;
       case "connections":
-        return <KeysPage />;
+        return <><KeysPage /><WebSearchSettings /></>;
       case "decisionModel": return <DecisionModelSettings />;
       case "engines": return <EnginesSettings />;
       case "backups": return <><WorkspaceBackupSettings /><CompanyBackupSettings /></>;

@@ -1,53 +1,38 @@
 import { request as httpsRequest } from "node:https";
-import type { LookupFunction } from "node:net";
-
+import { request as httpRequest } from "node:http";
+import { BlockList, isIP, type LookupFunction } from "node:net";
 import { resolveTarget } from "./browser/egress/gate.ts";
 import { addressClass, ownAddresses } from "./browser/egress/policy.ts";
+import { configuredWebSearch, privateSearchAddress, searxngBase, type WebSearchConfig } from "./web-search-config.ts";
 
-const ENDPOINT = "https://html.duckduckgo.com/html/";
 export const WEB_SEARCH_TIMEOUT_MS = 15_000;
 export const WEB_SEARCH_MAX_BYTES = 1024 * 1024;
-const ENTITIES: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " " };
-
-function decode(text: string): string {
-  return text.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (whole, name: string) => {
-    if (name[0] !== "#") return ENTITIES[name.toLowerCase()] ?? whole;
-    const code = /^#x/i.test(name) ? parseInt(name.slice(2), 16) : parseInt(name.slice(1), 10);
-    return code > 0 && code <= 0x10ffff ? String.fromCodePoint(code) : whole;
-  });
-}
-
-const text = (html: string, max: number) => decode(html.replace(/<[^<>]*>/g, " ")).replace(/\s+/g, " ").trim().slice(0, max);
-const attribute = (tag: string, name: string) => new RegExp(`\\b${name}\\s*=\\s*(["'])(.*?)\\1`, "i").exec(tag)?.[2] ?? "";
-
-function element(html: string, className: string): { tag: string; body: string } | null {
-  for (const match of html.matchAll(/<([a-z]+)\b[^<>]*>/gi)) {
-    if (!attribute(match[0], "class").split(/\s+/).includes(className)) continue;
-    const start = match.index + match[0].length;
-    const end = html.indexOf(`</${match[1]}`, start);
-    if (end !== -1) return { tag: match[0], body: html.slice(start, end) };
-  }
-  return null;
-}
+const publicV6 = new BlockList();
+publicV6.addSubnet("2000::", 3, "ipv6");
+const translatedV6 = new BlockList();
+for (const [ip, bits] of [["2002::", 16], ["2001::", 23], ["2001:db8::", 32], ["3fff::", 20]] as const) translatedV6.addSubnet(ip, bits, "ipv6");
+const reservedV4 = new BlockList();
+for (const ip of ["192.0.0.0", "192.0.2.0", "192.88.99.0", "198.51.100.0", "203.0.113.0"]) reservedV4.addSubnet(ip, 24);
 
 export interface WebSearchHit { title: string; url: string; snippet: string }
 
-export function parseSearchResults(html: string, limit: number): WebSearchHit[] {
+export function parseSearchResults(body: string, backend: "searxng" | "brave", limit: number): WebSearchHit[] {
+  let data;
+  try { data = JSON.parse(body); } catch { throw new Error("Web search returned invalid JSON."); }
+  const rows: unknown = backend === "searxng" ? data?.results : data?.web?.results;
+  if (!Array.isArray(rows)) throw new Error("Web search returned an unsupported JSON response.");
   const results: WebSearchHit[] = [];
   const seen = new Set<string>();
-  const sections = html.split(/<div\b[^<>]*\bclass\s*=\s*["'][^"']*\bresult\b[^"']*["'][^<>]*>/i);
-  for (const section of sections) {
-    const link = element(section, "result__a");
-    if (!link) continue;
+  for (const row of rows) {
+    if (!row || typeof row !== "object" || typeof row.url !== "string" || !row.url.trim() || row.url.length > 2048 || typeof row.title !== "string") continue;
     try {
-      const wrapped = new URL(decode(attribute(link.tag, "href")), ENDPOINT);
-      const url = new URL(wrapped.hostname === "duckduckgo.com" || wrapped.hostname === "html.duckduckgo.com"
-        ? wrapped.searchParams.get("uddg") ?? wrapped.href : wrapped.href);
+      const url = new URL(row.url);
       if (!["http:", "https:"].includes(url.protocol) || url.username || url.password || url.href.length > 2048 || seen.has(url.href)) continue;
-      const title = text(link.body, 300);
+      const title = row.title.trim().slice(0, 300);
       if (!title) continue;
+      const snippet = backend === "searxng" ? row.content : row.description;
       seen.add(url.href);
-      results.push({ title, url: url.href, snippet: text(element(section, "result__snippet")?.body ?? "", 1000) });
+      results.push({ title, url: url.href, snippet: typeof snippet === "string" ? snippet.trim().slice(0, 1000) : "" });
       if (results.length >= limit) break;
     } catch { continue; }
   }
@@ -63,11 +48,19 @@ export interface WebSearchOptions {
   maxBytes?: number;
 }
 
-export async function searchWeb(query: string, limit = 5, signal?: AbortSignal, options: WebSearchOptions = {}): Promise<WebSearchHit[]> {
-  const url = new URL(ENDPOINT);
+export async function searchWeb(config: WebSearchConfig | undefined, query: string, limit = 5, signal?: AbortSignal, options: WebSearchOptions = {}): Promise<WebSearchHit[]> {
+  const backend = configuredWebSearch(config);
+  if (!backend) throw new Error("Configure SearXNG or Brave Search before using web search.");
+  const url = backend === "searxng" ? new URL("search", searxngBase(config!.searxngUrl!)) : new URL("https://api.search.brave.com/res/v1/web/search");
   url.searchParams.set("q", query);
+  if (backend === "searxng") url.searchParams.set("format", "json");
+  else { url.searchParams.set("count", String(limit)); url.searchParams.set("text_decorations", "false"); }
+  const expires = performance.now() + (options.timeoutMs ?? WEB_SEARCH_TIMEOUT_MS);
   const deadline = AbortSignal.any([AbortSignal.timeout(options.timeoutMs ?? WEB_SEARCH_TIMEOUT_MS), ...(signal ? [signal] : [])]);
-  deadline.throwIfAborted();
+  const check = () => {
+    if (deadline.aborted || performance.now() >= expires) throw new Error("Web search stopped or timed out.");
+  };
+  check();
   let onAbort: () => void = () => {};
   const aborted = new Promise<never>((_resolve, reject) => {
     onAbort = () => reject(new Error("Web search stopped or timed out."));
@@ -75,26 +68,36 @@ export async function searchWeb(query: string, limit = 5, signal?: AbortSignal, 
   });
   const run = async () => {
     options.assertAllowed?.();
-    const addresses = await (options.resolve ?? resolveTarget)(url.hostname);
-    deadline.throwIfAborted();
+    const host = url.hostname.replace(/^\[|\]$/g, "");
+    const addresses = await (options.resolve ?? resolveTarget)(host);
+    check();
     const own = ownAddresses();
-    if (!addresses.length || addresses.some(({ address }) => addressClass(address, own) !== "public")) throw new Error("Web search destination is not public.");
+    if (!addresses.length || addresses.some(({ address }) => backend === "brave"
+      ? addressClass(address, own) !== "public" || (isIP(address) === 4 && reservedV4.check(address)) || (isIP(address) === 6 && (!publicV6.check(address, "ipv6") || translatedV6.check(address, "ipv6")))
+      : url.protocol === "http:" && !privateSearchAddress(address))) {
+      throw new Error(backend === "brave" ? "Web search destination is not public." : "SearXNG HTTP requires loopback or private addresses. Use HTTPS for public instances.");
+    }
     options.assertAllowed?.();
+    check();
     const address = addresses[0]!;
     const lookup: LookupFunction = (_host, settings, done) => {
       if (settings.all) done(null, [address]);
       else done(null, address.address, address.family);
     };
-    const html = await new Promise<string>((resolve, reject) => {
-      const req = (options.request ?? httpsRequest)(url, {
+    const body = await new Promise<Buffer>((resolve, reject) => {
+      const req = (options.request ?? (url.protocol === "http:" ? httpRequest : httpsRequest))(url, {
         agent: false, lookup, signal: deadline,
-        headers: { "user-agent": "OpenMausBot/1.0 (web search)", accept: "text/html", "accept-encoding": "identity" },
+        headers: { "user-agent": "OpenMausBot/1.0 (web search)", accept: "application/json", "accept-encoding": "identity", ...(backend === "brave" ? { "X-Subscription-Token": config!.braveApiKey! } : {}) },
       }, response => {
-        response.on("error", reject);
-        if (response.statusCode !== 200 || !/^text\/html\b/i.test(response.headers["content-type"] ?? "") ||
+        response.on("error", () => reject(new Error("Web search response was interrupted.")));
+        const contentType = response.headers["content-type"] ?? "";
+        const parts = contentType.toLowerCase().split(";").map(part => part.trim());
+        if (response.statusCode !== 200 || parts[0] !== "application/json" || parts.slice(1).some(part => { const [name, value] = part.split("=").map(value => value.trim()); return name === "charset" && value !== "utf-8" && value !== '"utf-8"'; }) ||
             (response.headers["content-encoding"] && response.headers["content-encoding"] !== "identity")) {
           response.destroy();
-          reject(new Error("Web search is unavailable. Try again later."));
+          reject(new Error(backend === "searxng" && (response.statusCode === 403 || parts[0] === "text/html")
+            ? "SearXNG JSON is disabled or access was denied. Enable json in search.formats in settings.yml."
+            : "Web search is unavailable or did not return UTF-8 JSON."));
           return;
         }
         const chunks: Buffer[] = [];
@@ -102,18 +105,20 @@ export async function searchWeb(query: string, limit = 5, signal?: AbortSignal, 
         response.on("data", (chunk: Buffer) => {
           bytes += chunk.length;
           if (bytes > (options.maxBytes ?? WEB_SEARCH_MAX_BYTES)) {
-            reject(new Error("Web search response is too large."));
-            response.destroy();
+            reject(new Error("Web search response is too large.")); response.destroy();
           } else chunks.push(chunk);
         });
-        response.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")));
+        response.on("end", () => resolve(Buffer.concat(chunks)));
         response.on("aborted", () => reject(new Error("Web search response was interrupted.")));
       });
       req.on("error", () => reject(new Error("Web search could not be reached.")));
       req.end();
     });
-    const results = parseSearchResults(html, limit);
-    if (!results.length && !/class=["'][^"']*\bno-results\b|No results found/i.test(html)) throw new Error("Web search returned no readable results. It may be blocked; try again later.");
+    check();
+    let decoded: string;
+    try { decoded = new TextDecoder("utf-8", { fatal: true }).decode(body); } catch { throw new Error("Web search returned invalid UTF-8."); }
+    const results = parseSearchResults(decoded, backend, limit);
+    check();
     return results;
   };
   try { return await Promise.race([run(), aborted]); }

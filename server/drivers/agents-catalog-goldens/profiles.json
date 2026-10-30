@@ -1273,9 +1273,9 @@
       "add_mcp_server"
     ]
   },
-  "default+keyless": {
-    "bytes": 56701,
-    "sha256": "ab94c393e192bc63077b290df8c5356c14a24c42b974521a32f4bd449fb27eff",
+  "default+search": {
+    "bytes": 56660,
+    "sha256": "e7a8f4001a29054eda32d44f326ac0239e2ee08934a9ea92b59071ebe4bd2d33",
     "tools": [
       "tool_result_read",
       "list_room_targets",
@@ -1321,9 +1321,9 @@
       "add_mcp_server"
     ]
   },
-  "skills+shared+voice+escalations+x+team+keyless": {
-    "bytes": 67702,
-    "sha256": "3b732d0b901746e3d38e7c13c00c92db156356dae207a45ea0e22230561be4b1",
+  "skills+shared+voice+escalations+x+team+search": {
+    "bytes": 67661,
+    "sha256": "ec0f02ac4400e5e677df5042f7e6d019620c7c026f410411601e0a537f7f44fa",
     "tools": [
       "tool_result_read",
       "list_shared_computers",

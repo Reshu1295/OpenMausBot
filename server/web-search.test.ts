@@ -1,95 +1,115 @@
-import { createServer, request as httpRequest, type IncomingMessage, type ServerResponse, type RequestOptions, type Server } from "node:http";
+import { createServer, request as httpRequest, type RequestOptions, type Server } from "node:http";
 import type { request as httpsRequest } from "node:https";
 import type { AddressInfo, LookupFunction } from "node:net";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { parseSearchResults, searchWeb, type WebSearchOptions } from "./web-search.ts";
 
-const html = `<html><div class="result results_links web-result"><a class="result__a" href="//duckduckgo.com/l/?uddg=https%3A%2F%2Fexample.com%2Fguide%3Fa%3D1%26b%3D2&amp;rut=x">A <b>guide</b> &amp; &#x1f680;</a><a class="result__snippet">Read <b>this</b> guide.</a></div><div class="result results_links"><a class="result__a" href="https://example.org/">Second</a><div class="result__snippet">Another result</div></div></html>`;
+const brave = { braveApiKey: "synthetic-brave-secret" };
+const searxng = { searxngUrl: "http://search.local/base/", ...brave };
+const hit = { title: "café", url: "https://example.com/guide", content: "SearXNG source", description: "Brave source" };
 const servers: Server[] = [];
 afterEach(async () => {
   await Promise.all(servers.splice(0).map(server => new Promise<void>((resolve, reject) => {
     server.closeAllConnections(); server.close(error => error ? reject(error) : resolve());
   })));
 });
-
-async function fixture(reply: (req: IncomingMessage, res: ServerResponse) => void) {
-  const server = createServer(reply); servers.push(server);
-  await new Promise<void>(resolve => server.listen(0, "127.0.0.1", resolve));
-  const address = server.address() as AddressInfo;
-  const targets: URL[] = [];
-  const settings: RequestOptions[] = [];
+async function fixture(body: string | Buffer = JSON.stringify({ results: [hit], web: { results: [hit] } }), status = 200, type = "application/json") {
+  const server = createServer((_req, res) => { res.writeHead(status, { "content-type": type, location: "http://127.0.0.1/private" }); res.end(body); });
+  servers.push(server); await new Promise<void>(resolve => server.listen(0, "127.0.0.1", resolve));
+  const targets: URL[] = []; const settings: RequestOptions[] = [];
   const request = ((url: URL, options: RequestOptions, listener: Parameters<typeof httpRequest>[2]) => {
     targets.push(url); settings.push(options);
-    return httpRequest(`http://127.0.0.1:${address.port}${url.pathname}${url.search}`, { ...options, lookup: undefined }, listener);
+    return httpRequest(`http://127.0.0.1:${(server.address() as AddressInfo).port}${url.pathname}${url.search}`, { ...options, lookup: undefined }, listener);
   }) as typeof httpsRequest;
-  const resolve = vi.fn(async () => [{ address: "93.184.216.34", family: 4 }]);
-  return { targets, settings, resolve, options: { request, resolve } satisfies WebSearchOptions };
+  return { server, targets, settings, options: { request, resolve: async () => [{ address: "93.184.216.34", family: 4 }] } satisfies WebSearchOptions };
 }
 
-describe("DuckDuckGo HTML search", () => {
-  it("unwraps links, decodes text and keeps snippets with their result", () => {
-    expect(parseSearchResults(html, 5)).toEqual([
-      { title: "A guide & 🚀", url: "https://example.com/guide?a=1&b=2", snippet: "Read this guide." },
-      { title: "Second", url: "https://example.org/", snippet: "Another result" },
-    ]);
-    expect(parseSearchResults(html, 1)).toHaveLength(1);
-  });
-  it("skips malformed, credential-bearing and executable links and duplicate results", () => {
-    const result = (href: string) => `<div class="result"><a class="result__a" href="${href}">Title</a></div>`;
-    expect(parseSearchResults(["javascript:alert(1)", "data:text/html,x", "https://name:secret@example.com/", "http://[invalid", "https://example.org/", "https://example.org/"].map(result).join(""), 10))
-      .toEqual([{ title: "Title", url: "https://example.org/", snippet: "" }]);
-  });
-  it("uses one fixed keyless request and pins the checked address without a proxy or credentials", async () => {
-    const f = await fixture((req, res) => {
-      expect(req.url).toBe("/html/?q=cats+%26+dogs");
-      expect(req.headers.authorization).toBeUndefined(); expect(req.headers.cookie).toBeUndefined();
-      res.writeHead(200, { "content-type": "text/html" }); res.end(html);
-    });
-    expect(await searchWeb("cats & dogs", 1, undefined, f.options)).toHaveLength(1);
-    expect(f.targets[0].origin).toBe("https://html.duckduckgo.com");
-    expect(f.resolve).toHaveBeenCalledOnce();
-    expect(f.settings[0].agent).toBe(false);
-    const done = vi.fn();
-    (f.settings[0].lookup as LookupFunction)("html.duckduckgo.com", {}, done);
+describe("configured JSON web search", () => {
+  it("uses the fixed Brave HTTPS API and pins the public address", async () => {
+    const f = await fixture();
+    expect(await searchWeb(brave, "cats & dogs", 1, undefined, f.options)).toEqual([{ title: "café", url: hit.url, snippet: "Brave source" }]);
+    expect(f.targets[0].origin + f.targets[0].pathname).toBe("https://api.search.brave.com/res/v1/web/search");
+    expect(f.targets[0].searchParams.get("q")).toBe("cats & dogs");
+    expect(f.targets[0].searchParams.get("count")).toBe("1");
+    expect(f.settings[0]).toMatchObject({ agent: false, headers: { "X-Subscription-Token": brave.braveApiKey, accept: "application/json" } });
+    expect(f.settings[0].headers).not.toHaveProperty("cookie");
+    const done = vi.fn(); (f.settings[0].lookup as LookupFunction)("api.search.brave.com", {}, done);
     expect(done).toHaveBeenCalledWith(null, "93.184.216.34", 4);
   });
-  it.each(["127.0.0.1", "10.0.0.1", "169.254.169.254", "100.64.0.1", "::1", "fd12::1", "::ffff:127.0.0.1", "240.0.0.1"])("refuses DNS answer %s before a connection", async address => {
-    const request = vi.fn();
-    await expect(searchWeb("test", 5, undefined, { request: request as typeof httpsRequest, resolve: async () => [{ address: "93.184.216.34", family: 4 }, { address, family: address.includes(":") ? 6 : 4 }] })).rejects.toThrow("not public");
-    expect(request).not.toHaveBeenCalled();
+  it("prefers owner-set SearXNG, allows private HTTP, and never sends the Brave key", async () => {
+    const f = await fixture();
+    expect(await searchWeb(searxng, "cats", 5, undefined, { ...f.options, resolve: async () => [{ address: "10.0.0.2", family: 4 }] })).toEqual([{ title: "café", url: hit.url, snippet: "SearXNG source" }]);
+    expect(f.targets[0].href).toBe("http://search.local/base/search?q=cats&format=json");
+    expect(f.settings[0].headers).not.toHaveProperty("X-Subscription-Token");
   });
-  it.each([302, 202, 429, 503])("refuses HTTP %s without following a redirect or returning a challenge as results", async status => {
-    const f = await fixture((_req, res) => { res.writeHead(status, { location: "http://127.0.0.1/private", "content-type": "text/html" }); res.end(html); });
-    await expect(searchWeb("test", 5, undefined, f.options)).rejects.toThrow("unavailable");
+  it("does not offer a default backend or fall back after SearXNG errors", async () => {
+    const f = await fixture("Forbidden", 403, "text/html");
+    await expect(searchWeb(undefined, "test", 5, undefined, f.options)).rejects.toThrow("Configure");
+    expect(f.targets).toHaveLength(0);
+    await expect(searchWeb({ ...searxng, searxngUrl: "https://search.local" }, "test", 5, undefined, f.options)).rejects.toThrow("search.formats");
     expect(f.targets).toHaveLength(1);
   });
-  it("distinguishes no results from an HTML challenge", async () => {
-    const empty = await fixture((_req, res) => { res.setHeader("content-type", "text/html"); res.end('<div class="no-results">No results found</div>'); });
-    expect(await searchWeb("test", 5, undefined, empty.options)).toEqual([]);
-    const challenge = await fixture((_req, res) => { res.setHeader("content-type", "text/html"); res.end("<html>Please solve this challenge</html>"); });
-    await expect(searchWeb("test", 5, undefined, challenge.options)).rejects.toThrow("no readable results");
+  it.each(["127.0.0.1", "10.0.0.1", "169.254.169.254", "100.64.0.1", "::1", "fd12::1", "::ffff:93.184.216.34", "0:0:0:0:0:ffff:5db8:d822", "64:ff9b::5db8:d822", "64:ff9b:0:0:0:0:5db8:d822", "64:ff9b:1::1", "2002:5db8:d822::1", "2001::5db8:d822", "240.0.0.1", "192.0.2.1", "198.51.100.1", "203.0.113.1", "2001:db8::1", "2001:20::1", "3fff::1"])("refuses mixed Brave DNS answer %s before a connection", async address => {
+    const request = vi.fn();
+    await expect(searchWeb(brave, "test", 5, undefined, { request: request as typeof httpsRequest, resolve: async () => [{ address: "93.184.216.34", family: 4 }, { address, family: address.includes(":") ? 6 : 4 }] })).rejects.toThrow("not public");
+    expect(request).not.toHaveBeenCalled();
   });
-  it("rejects oversized, wrong-type and interrupted responses", async () => {
-    const big = await fixture((_req, res) => { res.setHeader("content-type", "text/html"); res.end(html); });
-    await expect(searchWeb("test", 5, undefined, { ...big.options, maxBytes: 10 })).rejects.toThrow("too large");
-    const binary = await fixture((_req, res) => { res.setHeader("content-type", "application/pdf"); res.end(html); });
-    await expect(searchWeb("test", 5, undefined, binary.options)).rejects.toThrow("unavailable");
-    const partial = await fixture((_req, res) => { res.writeHead(200, { "content-type": "text/html", "content-length": "10000" }); res.write(html); setImmediate(() => res.destroy()); });
-    await expect(searchWeb("test", 5, undefined, partial.options)).rejects.toThrow();
+  it("requires every HTTP SearXNG address to be private but trusts owner-set HTTPS", async () => {
+    const f = await fixture();
+    await expect(searchWeb(searxng, "test", 5, undefined, f.options)).rejects.toThrow("HTTP requires");
+    expect(f.targets).toHaveLength(0);
+    expect(await searchWeb({ searxngUrl: "https://private.local" }, "test", 5, undefined, { ...f.options, resolve: async () => [{ address: "127.0.0.1", family: 4 }] })).toHaveLength(1);
   });
-  it("bounds both DNS and the complete streamed response, and accepts turn cancellation", async () => {
-    const f = await fixture((_req, res) => { res.writeHead(200, { "content-type": "text/html" }); res.write("<html>"); });
-    await expect(searchWeb("test", 5, undefined, { ...f.options, timeoutMs: 30 })).rejects.toThrow();
-    await expect(searchWeb("test", 5, undefined, { ...f.options, timeoutMs: 30, resolve: () => new Promise(() => {}) })).rejects.toThrow();
-    const stop = new AbortController();
-    const pending = searchWeb("test", 5, stop.signal, f.options); stop.abort();
+  it.each([302, 202, 429, 503])("refuses HTTP %s without redirects", async status => {
+    const f = await fixture("{}", status);
+    await expect(searchWeb(brave, "test", 5, undefined, f.options)).rejects.toThrow("unavailable");
+    expect(f.targets).toHaveLength(1);
+  });
+  it("skips missing, relative, executable, credential-bearing and duplicate URLs without inventing hits", () => {
+    const rows = [undefined, "", "/relative", "javascript:alert(1)", "data:text/html,x", "https://name:secret@example.com/", "http://[invalid", hit.url, hit.url].map(url => ({ ...hit, url }));
+    expect(parseSearchResults(JSON.stringify({ results: rows, comment: hit }), "searxng", 10)).toEqual([{ title: hit.title, url: hit.url, snippet: hit.content }]);
+    expect(parseSearchResults('{"results":[]}', "searxng", 5)).toEqual([]);
+    expect(() => parseSearchResults('{"comment":[]}', "searxng", 5)).toThrow("unsupported");
+  });
+  it("bounds output and rejects malformed JSON, HTML, charsets and malformed UTF-8", async () => {
+    expect(parseSearchResults(JSON.stringify({ web: { results: [{ ...hit, title: "a".repeat(500), description: "s".repeat(2000) }, { ...hit, url: "https://example.org" }] } }), "brave", 1)).toEqual([{ title: "a".repeat(300), url: hit.url, snippet: "s".repeat(1000) }]);
+    for (const [body, type] of [["{", "application/json"], ["<html>challenge</html>", "text/html"], ["{}", "application/json; charset=iso-8859-1"], [Buffer.from([0xff]), "application/json"]] as const) {
+      const f = await fixture(body, 200, type);
+      await expect(searchWeb(brave, "test", 5, undefined, f.options)).rejects.toThrow();
+    }
+    const f = await fixture();
+    await expect(searchWeb(brave, "test", 5, undefined, { ...f.options, maxBytes: 10 })).rejects.toThrow("too large");
+  });
+  it("bounds DNS, streaming, cancellation and elapsed time even when the abort timer has not fired", async () => {
+    const f = await fixture();
+    await expect(searchWeb(brave, "test", 5, undefined, { ...f.options, timeoutMs: 30, resolve: () => new Promise(() => {}) })).rejects.toThrow();
+    f.server.removeAllListeners("request"); f.server.on("request", (_req, res) => { res.writeHead(200, { "content-type": "application/json" }); res.write("{"); });
+    await expect(searchWeb(brave, "test", 5, undefined, { ...f.options, timeoutMs: 30 })).rejects.toThrow();
+    const stop = new AbortController(); const pending = searchWeb(brave, "test", 5, stop.signal, f.options); stop.abort();
     await expect(pending).rejects.toThrow();
+    const request = vi.fn();
+    await expect(searchWeb(brave, "test", 5, undefined, { request: request as typeof httpsRequest, timeoutMs: 10, resolve: async () => {
+      const until = performance.now() + 30; while (performance.now() < until) { /* Deliberately block timer delivery. */ }
+      return [{ address: "93.184.216.34", family: 4 }];
+    } })).rejects.toThrow("timed out");
+    expect(request).not.toHaveBeenCalled();
   });
   it("rechecks authorization after DNS before connecting", async () => {
-    const f = await fixture((_req, res) => res.end(html));
-    let allowed = true;
-    const resolve = async () => { allowed = false; return [{ address: "93.184.216.34", family: 4 }]; };
-    await expect(searchWeb("test", 5, undefined, { ...f.options, resolve, assertAllowed: () => { if (!allowed) throw new Error("revoked"); } })).rejects.toThrow("revoked");
+    const f = await fixture(); let allowed = true;
+    await expect(searchWeb(brave, "test", 5, undefined, { ...f.options, resolve: async () => { allowed = false; return [{ address: "93.184.216.34", family: 4 }]; }, assertAllowed: () => { if (!allowed) throw new Error("revoked"); } })).rejects.toThrow("revoked");
     expect(f.targets).toEqual([]);
   });
+});
+
+it("checks the elapsed deadline after JSON parsing before returning success", async () => {
+  const f = await fixture();
+  const parse = JSON.parse;
+  const spy = vi.spyOn(JSON, "parse").mockImplementation((body: string) => {
+    const result = parse(body);
+    const until = performance.now() + 50;
+    while (performance.now() < until) { /* Simulate synchronous work across the deadline. */ }
+    return result;
+  });
+  try { await expect(searchWeb(brave, "test", 5, undefined, { ...f.options, timeoutMs: 40 })).rejects.toThrow("timed out"); }
+  finally { spy.mockRestore(); }
 });

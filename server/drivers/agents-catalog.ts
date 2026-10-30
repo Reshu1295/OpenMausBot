@@ -900,7 +900,7 @@ export function fullInputSchema(name: string): unknown {
 function catalogTools(profile: CatalogProfile) {
   const BOT_SCOPED_TOOLS = TOOL_DEFINITIONS.filter((tool) =>
     (profile.botId === WATCHER_OPTIONS_CARD_BOT_ID || !WATCHER_TOOL_NAMES.has(tool.name)) &&
-    (profile.keylessWebSearch === true || tool.name !== "web_search") &&
+    (profile.webSearch === true || tool.name !== "web_search") &&
     (profile.memoryEnabled !== false || (tool.name !== "memory_update" && tool.name !== "memory_log")) &&
     (profile.escalations === true || tool.name !== "raise_escalation") &&
     (profile.team === true || !PERSON_TOOL_NAMES.has(tool.name)) &&

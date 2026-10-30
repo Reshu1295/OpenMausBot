@@ -225,7 +225,7 @@ export interface ProviderAdapter {
     /** The driver mounts integrations.agents. Every *Mcp flag guards one rule: never tell a bot about tools its driver cannot mount. */
     agentsMcp?: boolean;
     /** This runtime has no native web search and needs the agents MCP fallback. */
-    keylessWebSearch?: boolean;
+    webSearch?: boolean;
     /** The driver mounts isolated computer MCP descriptors. */
     computerMcp?: boolean;
     /** The driver mounts integrations.composio. */
