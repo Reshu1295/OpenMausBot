@@ -3,7 +3,7 @@ import { spawnSync } from "node:child_process";
 import { chmodSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { test } from "node:test";
 
 import { serverChildLaunch } from "./server-child-launch.mjs";
@@ -117,7 +117,7 @@ test("bootstrap leaves queued desktop capabilities for the server listener", (t)
       if (queued) { queued = false; queueMicrotask(() => listeners.forEach(fn => fn({ data: { type: "openmausbot:desktop-mutation-token" } }))); }
     } } });
   `);
-  const result = spawnSync(process.execPath, ["--import", preload, path.join(dir, "server", "desktop-entry.mjs")], { encoding: "utf8", timeout: 20_000 });
+  const result = spawnSync(process.execPath, ["--import", pathToFileURL(preload).href, path.join(dir, "server", "desktop-entry.mjs")], { encoding: "utf8", timeout: 20_000 });
   assert.equal(result.status, 0, result.stderr);
   assert.match(result.stdout, /openmausbot:desktop-mutation-token/);
 });
