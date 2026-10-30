@@ -73,7 +73,7 @@ describe("configured JSON web search", () => {
   });
   it("bounds output and rejects malformed JSON, HTML, charsets and malformed UTF-8", async () => {
     expect(parseSearchResults(JSON.stringify({ web: { results: [{ ...hit, title: "a".repeat(500), description: "s".repeat(2000) }, { ...hit, url: "https://example.org" }] } }), "brave", 1)).toEqual([{ title: "a".repeat(300), url: hit.url, snippet: "s".repeat(1000) }]);
-    for (const [body, type] of [["{", "application/json"], ["<html>challenge</html>", "text/html"], ["{}", "application/json; charset=iso-8859-1"], [Buffer.from([0xff]), "application/json"]] as const) {
+    for (const [body, type] of [["{", "application/json"], ["<html>challenge</html>", "text/html"], [JSON.stringify({ web: { results: [hit] } }), "application/json; charset=iso-8859-1"], [Buffer.concat([Buffer.from('{"web":{"results":[{"title":"caf'), Buffer.from([0xe9]), Buffer.from('","url":"https://example.com/"}]}}')]), "application/json"]] as const) {
       const f = await fixture(body, 200, type);
       await expect(searchWeb(brave, "test", 5, undefined, f.options)).rejects.toThrow();
     }
