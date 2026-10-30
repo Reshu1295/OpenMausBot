@@ -1,5 +1,5 @@
 import { mkdtempSync, readFileSync, statSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { homedir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -22,18 +22,20 @@ const ADA_ACCESS = { url: "https://broker.test", token: "a".repeat(64) };
 const AUDIENCES: Record<string, Audience> = { "ada-chat": `member:${ADA}`, "cleo-chat": `member:${CLEO}`, "room-chat": "room:launch", "main-chat": "team" };
 
 function setup(options: { team?: boolean; requester?: Record<string, string>; servers?: Record<string, unknown> } = {}) {
-  const dataDir = mkdtempSync(join(tmpdir(), "omb-team-connections-"));
+  const dataDir = mkdtempSync(join(homedir(), "omb-team-connections-"));
   const requester = { "ada-chat": ADA, "cleo-chat": CLEO, "room-chat": ADA, "main-chat": ADA, ...options.requester };
   const cfg = { mcpServers: options.servers ?? {
     mail: { type: "http", url: "https://mail.example/mcp", headers: { Authorization: "Bearer team-mail-key" }, enabled: true },
     console: { type: "http", url: "https://console.example/mcp", headers: { Authorization: "Bearer team-console-key" }, enabled: true },
   } } as unknown as AppConfig;
   const minted: Array<{ threadId: string; connectorsFor?: string }> = [];
+  const connectedServices = vi.fn(async (_cfg: AppConfig, as?: { token: string }) => (as?.token === ADA_ACCESS.token
+    ? { gmail: { connected: true, pending: false, status: "ACTIVE", accounts: [{ id: "ca_1", status: "ACTIVE", alias: "ada@gmail.example" }] } } : {}));
   const composio = {
     configured: () => true,
     mcpIntegration: vi.fn(async (_cfg: AppConfig, context: { commsToken: string; as?: unknown }) => ({ command: "node", args: ["bridge"], env: { TOKEN: context.commsToken, AS: context.as ? "own" : "team" } })),
-    connectedServices: vi.fn(async (_cfg: AppConfig, as?: { token: string }) => (as?.token === ADA_ACCESS.token
-      ? { gmail: { connected: true, pending: false, status: "ACTIVE", accounts: [{ id: "ca_1", status: "ACTIVE", alias: "ada@gmail.example" }] } } : {})),
+    connectedServices,
+    connectedServicesInventory: vi.fn(async (cfg: AppConfig, as?: { token: string }) => ({ services: await connectedServices(cfg, as), complete: true })),
     connectedServiceSlugs: vi.fn(async () => ["google_search_console"] as readonly string[]),
     authorizeService: vi.fn(),
     removeService: vi.fn(),
@@ -149,6 +151,20 @@ describe("apps each person connects", () => {
     expect(await host.callRefusal({ threadId: "room-chat", generation: "g" }, [{ slug: "COMPOSIO_PROXY_EXECUTE" }])).toMatch(/Google Search Console is connected by each person/);
     composio.connectedServiceSlugs.mockResolvedValue([]);
     expect(await host.callRefusal({ threadId: "room-chat", generation: "g" }, [{ slug: "COMPOSIO_PROXY_EXECUTE" }])).toBeNull();
+  });
+
+  it("refuses opaque team calls when inventory discovery fails, then checks the recovered inventory", async () => {
+    const { host, composio } = setup();
+    host.scopes.set("app", "gmail", "person");
+    const cap = { threadId: "room-chat", generation: "g" };
+    const calls = [{ slug: "COMPOSIO_PROXY_EXECUTE" }];
+    composio.connectedServiceSlugs.mockResolvedValue(["gmail"]);
+    expect(await host.callRefusal(cap, calls)).toMatch(/can't run here.*Gmail/);
+    composio.connectedServiceSlugs.mockRejectedValueOnce(new Error("synthetic inventory timeout"));
+    expect(await host.callRefusal(cap, calls)).toMatch(/can't run here.*inventory.*could not be verified/);
+    expect(await host.callRefusal(cap, calls)).toMatch(/can't run here.*Gmail/);
+    composio.connectedServiceSlugs.mockResolvedValue([]);
+    expect(await host.callRefusal(cap, calls)).toBeNull();
   });
 
   it("answers a connection card for a person's app with the one plain line, never a card", () => {
@@ -269,5 +285,15 @@ describe("the connected apps a turn's app tools come from", () => {
     expect(composio.connectedServices, "not read again at once").toHaveBeenCalledTimes(1);
     await vi.advanceTimersByTimeAsync(10_000);
     expect(appTools(await host.appsIntegrations(bot, "main-chat", "g3"))).toContain("gmail.search_emails");
+  });
+
+  it("does not cache an incomplete app inventory as an empty installation", async () => {
+    vi.useFakeTimers();
+    const { host, composio } = setup();
+    composio.connectedServicesInventory.mockResolvedValueOnce({ services: {}, complete: false });
+    composio.connectedServices.mockResolvedValue(GMAIL as never);
+    expect(appTools(await host.appsIntegrations(bot, "main-chat", "g1"))).toEqual([]);
+    await vi.advanceTimersByTimeAsync(10_000);
+    expect(appTools(await host.appsIntegrations(bot, "main-chat", "g2"))).toContain("gmail.search_emails");
   });
 });

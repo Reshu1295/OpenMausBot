@@ -56,11 +56,11 @@ interface AccountLinkRequest {
 }
 
 const connectedAccountResponseSchema = z.object({
-  id: z.string().optional(),
+  id: z.string().regex(/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/),
   alias: z.string().nullable().optional(),
   status: z.string().optional(),
   updated_at: z.string().optional(),
-  toolkit: z.object({ slug: z.string().optional() }).optional(),
+  toolkit: z.object({ slug: z.string().regex(/^[A-Za-z0-9][A-Za-z0-9_-]*$/) }),
 });
 type ConnectedAccountResponse = z.infer<typeof connectedAccountResponseSchema>;
 
@@ -80,13 +80,23 @@ const toolkitPageSchema = z.object({
   next_cursor: z.string().nullable().optional(),
 });
 
+const toolkitInventoryPageSchema = toolkitPageSchema.extend({
+  items: z.array(toolkitItemSchema.extend({
+    slug: z.string().regex(/^[A-Za-z0-9][A-Za-z0-9_-]*$/),
+    connected_account: z.object({
+      id: z.string().regex(/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/),
+      status: z.string().optional(),
+    }).nullable().optional(),
+  }).refine((item) => item.is_no_auth === true || item.connected_account != null)),
+});
+
 const connectorServiceSchema = z.object({
   connected: z.boolean(),
   pending: z.boolean().optional(),
   status: z.string().optional(),
   accounts: z.array(z.object({ id: z.string(), alias: z.string().optional(), status: z.string() })).optional(),
 });
-const connectorServicesResponseSchema = z.object({ services: z.record(z.string(), connectorServiceSchema).optional() });
+const connectorServicesResponseSchema = z.object({ services: z.record(z.string(), connectorServiceSchema).optional(), complete: z.boolean().optional() });
 const removalResponseSchema = z.object({ removed: z.number() });
 const authUrlResponseSchema = z.object({ url: z.string().optional() });
 const linkResponseSchema = z.object({ redirect_url: z.string().optional() });
@@ -251,7 +261,7 @@ export async function mcpIntegration(
   }
   const serviceSlugs = context.connectorTools === undefined
     ? undefined
-    : serializeConnectorServiceSlugs(await connectedServiceSlugs(cfg, context.as));
+    : await connectedServiceSlugs(cfg, context.as).then(serializeConnectorServiceSlugs).catch(() => undefined);
   if (serviceSlugs?.oversized) {
     console.warn(
       `[composio] connector service slugs for bot ${context.botId} exceed ${CONNECTOR_SERVICE_SLUGS_MAX_BYTES} bytes;`
@@ -362,7 +372,8 @@ async function listConnectedAccounts(
     const body = connectedAccountsPageSchema.parse(await response.json());
     accounts.push(...body.items);
     const next = body.next_cursor || undefined;
-    if (!next || seenCursors.has(next)) return accounts;
+    if (!next) return accounts;
+    if (seenCursors.has(next)) throw new Error("Composio account inventory contains a pagination cursor cycle");
     seenCursors.add(next);
     cursor = next;
   }
@@ -385,10 +396,11 @@ async function listSessionToolkits(
       { headers: projectHeaders(apiKey), signal: AbortSignal.timeout(15_000) },
     );
     if (!response.ok) throw new Error(await responseError(response, `Composio toolkits: HTTP ${response.status}`));
-    const body = toolkitPageSchema.parse(await response.json());
-    toolkits.push(...(body.items ?? []));
+    const body = toolkitInventoryPageSchema.parse(await response.json());
+    toolkits.push(...body.items);
     const next = body.next_cursor || undefined;
-    if (!next || seenCursors.has(next)) return toolkits;
+    if (!next) return toolkits;
+    if (seenCursors.has(next)) throw new Error("Composio toolkit inventory contains a pagination cursor cycle");
     seenCursors.add(next);
     cursor = next;
   }
@@ -475,8 +487,8 @@ export async function connectedServicesInventory(cfg: AppConfig, as?: BrokerAcce
   if (!apiKey) {
     const response = await brokerRequest("/v1/connectors/connected", undefined, as);
     if (!response.ok) await throwBrokerError(response, `Connected apps: HTTP ${response.status}`);
-    const body = connectorServicesResponseSchema.parse(await response.json());
-    const services = canonicalServiceRecord(body.services ?? {});
+    const body = connectorServicesResponseSchema.required({ services: true }).parse(await response.json());
+    const services = canonicalServiceRecord(body.services);
     return {
       services: Object.fromEntries(
         Object.entries(services).map(([slug, state]) => [slug, {
@@ -486,7 +498,7 @@ export async function connectedServicesInventory(cfg: AppConfig, as?: BrokerAcce
           accounts: state.accounts ?? [],
         }]),
       ),
-      complete: true,
+      complete: body.complete === true,
     };
   }
   const session = await ensureProjectSession(cfg);
@@ -588,14 +600,12 @@ export async function connectedServiceSlugs(cfg: AppConfig, as?: BrokerAccess): 
     return connectorServiceSlugsCache.slugs;
   }
   if (connectorServiceSlugsRequest?.identity === identity) return connectorServiceSlugsRequest.slugs;
-  const walk = connectedServices(cfg, as).then(
-    (services) => {
-      const slugs = Object.keys(services);
-      connectorServiceSlugsCache = { at: Date.now(), identity, slugs };
-      return slugs;
-    },
-    () => [] as readonly string[],
-  );
+  const walk = connectedServicesInventory(cfg, as).then(({ services, complete }) => {
+    if (!complete) throw new Error("Connected-app inventory is incomplete; account discovery did not finish.");
+    const slugs = Object.keys(services);
+    connectorServiceSlugsCache = { at: Date.now(), identity, slugs };
+    return slugs;
+  });
   connectorServiceSlugsRequest = { identity, slugs: walk };
   try {
     return await walk;
@@ -625,8 +635,7 @@ function connectorToolListing(tool: unknown): ConnectorToolListing | null {
 }
 
 async function collectConnectorTools(cfg: AppConfig): Promise<Record<string, ConnectorToolListing[]>> {
-  const connected = await connectedServices(cfg).catch(() => null);
-  const candidates = connected ? Object.keys(connected) : [];
+  const candidates = await connectedServiceSlugs(cfg);
   const initialize = await relayMcp(cfg, {
     jsonrpc: "2.0",
     id: "omb-grants-initialize",
