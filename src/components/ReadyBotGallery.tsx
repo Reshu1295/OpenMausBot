@@ -56,6 +56,7 @@ export function ReadyBotGallery({ search, onDialog, onAdded, stats }: {
     if (id !== null && window.ogb?.remoteClient?.active) { dispatch({ type: "newBot", onCreated: onAdded }); return; }
     setAdding(id); onDialog(id !== null);
   };
+  const galleryHasStats = Object.values(stats ?? {}).some(hasSignals);
   const visible = READY_BOTS.filter((bot) => (!category || bot.category === category) && matchesReadyBot(bot, search));
   if (search.trim() && visible.length === 0) return null;
   return <section className="mb-8" aria-labelledby="ready-bots-title">
@@ -71,13 +72,14 @@ export function ReadyBotGallery({ search, onDialog, onAdded, stats }: {
         {value ? t(CATEGORY_KEYS[value]) : t("readyBots.all")}
       </button>)}
     </div>
-    <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid auto-rows-fr grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
       {visible.map((bot) => {
         const apps = bot.apps.map((app) => APP_LABELS[app] ?? app).join(", ");
         const tryPrompt = t("readyBots.try", { prompt: bot.tryAsking[0]! });
         // One layout for every card: header, two lines of description, one Try line, and a one-line footer at the bottom.
+        // Left is what the bot is; right is + Add above its stars, at the same edge on every card.
         return <article key={bot.id} data-ready-bot={bot.id} className="flex flex-col rounded-2xl border border-hairline/40 bg-card p-4">
-          <div className="flex items-center gap-3">
+          <div className="flex h-10 items-center gap-3">
             <MausAvatar color={bot.look.color} bodyId={bot.look.mascotBody} size={40} animated={false} label={bot.name} />
             <div className="min-w-0 flex-1">
               <h4 className="truncate text-[14px] font-medium text-ink">{bot.name}</h4>
@@ -90,15 +92,16 @@ export function ReadyBotGallery({ search, onDialog, onAdded, stats }: {
           </div>
           <p data-ready-bot-description title={bot.description} className="mt-3 line-clamp-2 min-h-[2.9em] text-[13px] leading-[1.45] text-ink-secondary">{bot.description}</p>
           <p data-ready-bot-try title={tryPrompt} className="mt-2 truncate text-[12px] italic text-ink-tertiary">{tryPrompt}</p>
-          <div data-ready-bot-footer className="mt-auto flex min-w-0 items-center gap-2 pt-3 text-[12px] text-ink-tertiary">
-            <span className="shrink-0 rounded-full bg-raised/70 px-2 py-0.5 text-[11px] font-medium text-ink-secondary">{t(CATEGORY_KEYS[bot.category])}</span>
-            {apps && <span className="min-w-0 truncate" title={t("readyBots.worksWith", { apps })}>{t("readyBots.worksWith", { apps })}</span>}
-            {(hasSignals(stats?.[bot.id]) || Boolean(bot.routines?.length)) && <span className="ms-auto flex shrink-0 items-center gap-2">
-              <CommunitySignals stats={stats?.[bot.id]} />
-              {bot.routines?.length ? <span className="flex shrink-0 items-center gap-1" title={t("readyBots.pausedRoutine")}>
+          <div data-ready-bot-footer className="mt-auto flex h-6 min-w-0 items-center gap-3 pt-3 text-[12px] text-ink-tertiary">
+            <div data-ready-bot-about className="flex min-w-0 flex-1 items-center gap-2">
+              <span className="shrink-0 rounded-full bg-raised/70 px-2 py-0.5 text-[11px] font-medium text-ink-secondary">{t(CATEGORY_KEYS[bot.category])}</span>
+              {bot.routines?.length ? <span data-ready-bot-routine className="flex shrink-0 items-center gap-1" title={t("readyBots.pausedRoutine")}>
                 <Clock3 size={12} aria-hidden="true" /><span aria-hidden="true">{t("readyBots.routine")}</span><span className="sr-only">{t("readyBots.pausedRoutine")}</span>
               </span> : null}
-            </span>}
+              {apps && <span className="min-w-0 truncate" title={t("readyBots.worksWith", { apps })}>{t("readyBots.worksWith", { apps })}</span>}
+            </div>
+            {/* Under + Add on every card once any template has numbers, so the columns line up; empty for a template without its own. */}
+            {galleryHasStats && <div data-ready-bot-stats className="flex w-24 shrink-0 justify-end tabular-nums"><CommunitySignals stats={stats?.[bot.id]} /></div>}
           </div>
         </article>;
       })}

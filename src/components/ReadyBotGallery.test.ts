@@ -58,7 +58,7 @@ describe("ready-made bots gallery", () => {
       expect(tryLine.className).toContain("truncate");
       expect(tryLine.getAttribute("title")).toContain(bot.tryAsking[0]!);
       const footer = card.querySelector("[data-ready-bot-footer]")!;
-      expect(footer.children[0]!.textContent, bot.id).toMatch(/^(Everyday|Work|Writing|Design|Sales|Personal)$/);
+      expect(footer.querySelector("[data-ready-bot-about]")!.children[0]!.textContent, bot.id).toMatch(/^(Everyday|Work|Writing|Design|Sales|Personal)$/);
     }
   });
 
@@ -71,7 +71,7 @@ describe("ready-made bots gallery", () => {
     expect(footer.querySelector('[title="Includes a paused routine"]')).not.toBeNull();
     const plain = READY_BOTS.find((bot) => bot.apps.length === 0 && !bot.routines?.length)!;
     const plainFooter = host.querySelector(`[data-ready-bot="${plain.id}"] [data-ready-bot-footer]`)!;
-    expect(plainFooter.children).toHaveLength(1);
+    expect(plainFooter.querySelector("[data-ready-bot-about]")!.children).toHaveLength(1);
     expect(host.querySelector(`[data-ready-bot="${plain.id}"] [data-ready-bot-role]`)!.textContent).not.toContain("·");
   });
 
@@ -87,6 +87,27 @@ describe("ready-made bots gallery", () => {
     const inbox = host.querySelector('[data-ready-bot="inbox"] [data-ready-bot-signals]')!;
     expect(inbox.textContent).toBe("31Used by 31");
     expect(host.querySelector('[data-ready-bot="scout"] [data-ready-bot-signals]')).toBeNull();
+  });
+
+  it("keeps the same order on every card: category, Routine, apps on the left; numbers alone on the right", () => {
+    render("", { assistant: { stars: 128, installs: 2400 } });
+    for (const bot of READY_BOTS) {
+      const footer = host.querySelector(`[data-ready-bot="${bot.id}"] [data-ready-bot-footer]`)!;
+      const parts = [...footer.children].map((child) => child.getAttribute("data-ready-bot-about") !== null ? "about" : child.getAttribute("data-ready-bot-stats") !== null ? "stats" : "other");
+      expect(parts, bot.id).toEqual(["about", "stats"]);
+      const about = footer.querySelector("[data-ready-bot-about]")!;
+      const routine = about.querySelector("[data-ready-bot-routine]");
+      if (bot.routines?.length) expect([...about.children].indexOf(routine!), bot.id).toBe(1);
+      else expect(routine).toBeNull();
+    }
+    expect(host.querySelector('[data-ready-bot="inbox"] [data-ready-bot-stats]')!.textContent).toBe("");
+  });
+
+  it("leaves the numbers' slot out of every card while no template has numbers", () => {
+    render();
+    expect(host.querySelector("[data-ready-bot-stats]")).toBeNull();
+    render("", { assistant: {} });
+    expect(host.querySelector("[data-ready-bot-stats]")).toBeNull();
   });
 
   it("narrows to a category and back to all", () => {
